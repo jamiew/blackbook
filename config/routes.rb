@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.admin '/admin', :controller => 'admin/base'
+
   map.forgot_password '/forgot_password',
   :controller => 'password_reset',
   :action => 'new'
