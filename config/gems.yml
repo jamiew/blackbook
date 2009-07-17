@@ -38,6 +38,10 @@ gems:
   - name: 'capistrano-ext'
     version: '1.2.1'
 
+  - name: 'haml'
+    version: '2.3.0'
+    load: true    
+
   - name: 'RedCloth'
     version: '4.1.9'
     load: true
@@ -61,3 +65,4 @@ gems:
     version: '2.1.1'
     load: true
     source: 'http://gems.github.com'
+    
