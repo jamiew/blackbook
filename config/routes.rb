@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :likes
+
 
 
   map.root :controller => 'home'
@@ -12,21 +14,22 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :password_reset
 
-  map.resource :account, :controller => "users"
-
   map.resource :user_session
-
   map.signup '/signup', :controller => 'users', :action => 'new'
-
   map.login '/login', :controller => 'user_sessions', :action => 'new'
-
   map.logout '/logout', :controller => 'user_sessions', :action => 'destroy'
 
-  map.resources :users
+  map.resource :account, :controller => "users"
   
-  map.resources :visualizations
+  map.resources :users,
+    :has_many => [:tags, :comments]
+  
+  map.resources :visualizations,
+    :has_many => [:comments, :likes] # users? tags?
 
-  map.resources :tags
+  map.resources :tags,
+    :has_many => [:comments, :likes]  
+    
 
   map.activity '/activity', :controller => 'home', :action => 'activity'
 
