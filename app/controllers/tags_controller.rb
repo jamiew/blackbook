@@ -9,6 +9,7 @@ class TagsController < ApplicationController
   end
     
   def new
+    require_user
     @tag = Tag.new  
   end
   
