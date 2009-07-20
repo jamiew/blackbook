@@ -1,0 +1,16 @@
+
+
+
+%h2 All Activity On This Internet Website
+%p
+  &larr;
+  = link_to "back to home", root_path
+
+%p
+  %br
+  - if @notifications.blank?
+    = "None yet."
+  - else
+    %ol.square
+      - @notifications.each do |notif|
+        %li= link_to h(notif.inspect), notification_path(notif)

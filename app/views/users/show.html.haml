@@ -1,8 +1,9 @@
+- @user ||= current_user
 %h2
-  Your Account:
-  %span= current_user.email
+  = (current_user == @user? 'Your Account:' : 'Their Account:')
+  %span= @user.email
   
 %ol
-  %li= link_to 'Change password', edit_user_path(current_user)
-  %li= link_to 'Edit info', edit_user_path(current_user)
+  %li= link_to 'Change password', edit_user_path(@user)
+  %li= link_to 'Edit bio & info', edit_user_path(@user)
 
