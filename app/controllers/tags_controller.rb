@@ -16,9 +16,14 @@ class TagsController < ApplicationController
   def create
     #TODO
     raise "No params!" if params.blank? || params[:tag].blank?
-    @tag = Tag.new(params[:tag])
-    @tag.save!
-    redirect_to @tag
+    @tag = Tag.new(params[:tag])    
+    if @tag.save
+      flash[:notice] = "Tag created"
+      redirect_to @tag
+    else
+      flash[:error] = "Could not save tag!"
+      render :action => 'new'
+    end        
   end
   
   def update

@@ -3,21 +3,21 @@ $(function() {});
 var PNB = function() {
   return {
     formFocusFirst: function(form) {
-      $('#' + form + ' input:visible:enabled:first').focus()
+      $('#' + form + ' input:visible:enabled:first').focus();
     },
 
     updateSortables: function(parent) {
-      var elems = $(parent + ' ul li .position'), i = 1
+      var elems = $(parent + ' ul li .position'), i = 1;
       elems.each(function() {
-        this.value = i++
-      })
+        this.value = i++;
+      });
     },
 
     sizeTehToolbars: function() {
       $('.textile-toolbar').each(function() {
-        box_id = this.id.replace('textile-toolbar-', '')
-        $(this).css('width', $('#' + box_id).css('width'))
-      })
+        box_id = this.id.replace('textile-toolbar-', '');
+        $(this).css('width', $('#' + box_id).css('width'));
+      });
     },
 
     load_gat: function(code) {
@@ -32,3 +32,14 @@ var PNB = function() {
     }
   };
 }();
+
+
+$(document).ready(function(){
+
+  // flashing
+  $('#flash-error, #flash-notice, #flash-warning').fadeIn('fast');
+  setTimeout(function(){
+    $('#flash-error, #flash-notice, #flash-warning').fadeOut('slow');
+  }, 2000);
+  
+});
