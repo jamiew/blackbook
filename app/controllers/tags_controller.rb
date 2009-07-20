@@ -15,6 +15,10 @@ class TagsController < ApplicationController
   
   def create
     #TODO
+    raise "No params!" if params.blank? || params[:tag].blank?
+    @tag = Tag.new(params[:tag])
+    @tag.save!
+    redirect_to @tag
   end
   
   def update
