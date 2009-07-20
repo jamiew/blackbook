@@ -16,7 +16,11 @@
 class Tag < ActiveRecord::Base
   acts_as_commentable
   
-  validates_associated :attribute, :on => :create
+  belongs_to :user
+  has_many :comments
+  has_many :likes
+  
+  validates_associated :user, :on => :create
   
   has_attached_file :image, :styles => { :web => '800x800>', :small => "300x300>", :thumb => "100x100>" }
 end
