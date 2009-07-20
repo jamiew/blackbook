@@ -3,11 +3,14 @@
     %h2 Login
     = f.text_field :login, :label => 'Username'
     = f.password_field :password
-    = f.check_box :remember_me, :class => 'left'
+    = f.check_box :remember_me, :class => 'floatLeft'
     %br
     .buttons
       = f.submit "Login"
-    = link_to 'Forgotten Password', forgot_password_path, :class => 'forgotten_password'
+      
+    %br
+    %ol.square
+      %li= link_to 'forgot your password?', forgot_password_path, :class => 'forgotten_password'
 
   - content_for :on_ready do
     PNB.formFocusFirst('new_user_session')
