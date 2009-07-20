@@ -4,7 +4,7 @@
 require 'capistrano/ext/multistage'
 set :stages, %w(staging production)
 set :default_stage, "staging"
-set :application, "CHANGE_ME"
+set :application, "blackbook"
 
 #############################################################
 #	Settings
