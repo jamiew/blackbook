@@ -1,0 +1,279 @@
+/*
+* #000000book CSS v1
+* Jamie Dubs <http://jamiedubs.com>
+* Free Art & Technology Lab
+*/
+
+
+/* reset */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td {
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/* main */
+
+html, body { width: 100%; height: 100%; }
+
+body {
+  font-size: .92em;
+  font-family: helvetica, arial, sans-serif;
+  line-height: 1.25em;
+}
+body.ie6 {
+  font-size: 16px;
+}
+
+html {
+  color: #fff;
+  background: #000;
+  font-size: 100%;
+}
+
+a {
+  color: #fff;
+  text-decoration: underline;
+}
+a:hover {
+  color: #ffaeae;
+}
+
+h1 {
+  font-size: 1.6em;
+}
+
+h2 {
+  font-size: 1.4em;
+}
+
+h3 {
+  font-size: 1.2em;
+  margin-bottom: 8px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+/*  font-weight: bold;*/
+  font-family: "Century Gothic", sans-serif;
+  line-height: 2.125em;
+  font-size: 150%;
+}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+  text-decoration: none;
+}
+
+
+/* general... */
+hr {
+  border: 0;
+  height: 1px;
+  border-top: 1px solid #333;
+  width: 70%;
+  margin: 15px auto 10px auto;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+fieldset, img {
+  border: 0;
+}
+
+address, caption, cite, code, dfn, em, strong, th, var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+li {
+  list-style: none;
+}
+ol li {
+  list-style: upper-roman;
+  margin-left: 2em;
+  margin-bottom: 0.3em;
+}
+ol.square li, ul.square li {
+  list-style-type: square;
+}
+
+caption, th {
+  text-align: left;
+}
+
+q:before, q:after { content: ''; }
+
+abbr, acronym { border: 0; font-variant: normal; }
+
+sup { vertical-align: text-top; }
+sub { vertical-align: text-bottom; }
+
+
+/* form sylings */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+input, textarea, select {
+  font-size: 100%;
+}
+
+legend {
+  color: #fff;
+}
+
+form label { 
+	display: block;  /* block float the labels to left column, set a width */
+	float: left; 
+	width: 150px; 
+/*  padding: 0; */
+  padding: 0 5px 5px 5px;
+	margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
+	text-align: right; 
+}
+
+form {  /* set width in form, not fieldset (still takes up more room w/ fieldset width */
+  font:100% verdana,arial,sans-serif;
+  margin: 0;
+  padding: 0;
+  min-width: 500px;
+  max-width: 600px;
+  width: 560px; 
+}
+
+form fieldset {
+  clear: both;
+  padding: 10px;
+  margin: 0;
+  
+}
+
+form fieldset legend {
+	font-size:1.1em;
+}
+
+form fieldset label:first-letter { /* use first-letter pseudo-class to underline accesskey, note that */
+/*  text-decoration:underline;*/
+}
+
+form br {
+	clear:left;
+}
+
+
+
+
+/* custom classes */
+.clear { display: block; clear: both; }
+br.clear { display: block; display: block; clear: both; height: 0; }
+
+.left { text-align: left; }
+.right { text-align: right; }
+.center { text-align: center; }
+.centered { margin-left: auto; margin-right: auto; }
+.float_right, .floatRight { float: right; margin-left: 0.2em; }
+.float_left, .floatLeft { float: left; margin-right: 0.2em; }
+
+.full { width: 100%; }
+.half { width: 50%; }
+.third { width: 33%; }
+.quarter { width: 25%; }
+
+
+
+/* MAIN LAYOUT */
+#container {
+  padding: 0 16px;
+  width: 768px;
+  margin: 0 auto;
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -3em;
+}
+
+#header {
+  /* background: #b4b3b3;*/
+  height: 24px;
+  padding: 16px;
+  margin-bottom: 8px;
+}
+#header h1 {
+  float: left;
+  font-family: helvetica, arial, sans-serif;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  line-height: 1em;
+}
+#header ul.reg_nav {
+  float: right;
+}
+#header ul.reg_nav li {
+  display: block;
+  float: left;
+}
+#header ul.reg_nav li {
+  margin-left: 16px;
+}
+
+#footer, .push {
+  padding: 0 16px;
+  width: 768px;
+  margin: 0 auto;
+  height: 3em;
+  text-align: center;
+}
+
+
+
+#flash-notice, #flash-warning, #flash-error {
+  
+  display: none; /* FIXME: obtrusive O_o */  
+  position: absolute;
+  margin-top: -20px;
+    
+  width: 700px;
+  
+  font-size: 1em;
+  font-weight: bold;
+  
+  background: #eec;
+  padding: 6px 12px 4px;
+}
+
+#flash-notice {
+  color: green;
+}
+
+#flash-warning {
+  color: yellow;
+}
+
+#flash-error {
+  color: red;
+}
+
+
+
+
+
+/* LAYOUT STYLES, break da mod */
+
+
+#intro {
+  line-height: 0.8em;
+  font-size: 2em;
+  font-family: serif;
+  text-align: center;
+}
+
+.bigtext {
+  font-size: 1.4em;
+  line-height: 1.6em;
+/*  font-family: serif;*/
+}
