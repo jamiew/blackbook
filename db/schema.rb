@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090720051707) do
+ActiveRecord::Schema.define(:version => 20090720062142) do
 
   create_table "comments", :force => true do |t|
     t.string   "title",            :limit => 50, :default => ""
@@ -24,6 +24,14 @@ ActiveRecord::Schema.define(:version => 20090720051707) do
   add_index "comments", ["commentable_id"], :name => "index_comments_on_commentable_id"
   add_index "comments", ["commentable_type"], :name => "index_comments_on_commentable_type"
   add_index "comments", ["user_id"], :name => "index_comments_on_user_id"
+
+  create_table "likes", :force => true do |t|
+    t.integer  "object_id"
+    t.string   "object_type"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "notifications", :force => true do |t|
     t.string   "subject_id"
@@ -45,6 +53,10 @@ ActiveRecord::Schema.define(:version => 20090720051707) do
     t.integer  "likes_count"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "location"
+    t.string   "application"
+    t.string   "set"
+    t.string   "cached_tag_list"
   end
 
   create_table "users", :force => true do |t|
