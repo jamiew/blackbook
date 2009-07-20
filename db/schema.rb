@@ -9,7 +9,43 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090717010212) do
+ActiveRecord::Schema.define(:version => 20090720051707) do
+
+  create_table "comments", :force => true do |t|
+    t.string   "title",            :limit => 50, :default => ""
+    t.text     "comment"
+    t.integer  "commentable_id"
+    t.string   "commentable_type"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "comments", ["commentable_id"], :name => "index_comments_on_commentable_id"
+  add_index "comments", ["commentable_type"], :name => "index_comments_on_commentable_type"
+  add_index "comments", ["user_id"], :name => "index_comments_on_user_id"
+
+  create_table "notifications", :force => true do |t|
+    t.string   "subject_id"
+    t.string   "subject_type"
+    t.string   "verb"
+    t.integer  "user_id"
+    t.integer  "supplement_id"
+    t.string   "supplement_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "tags", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "title"
+    t.string   "slug"
+    t.text     "description"
+    t.integer  "comment_count"
+    t.integer  "likes_count"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", :force => true do |t|
     t.datetime "created_at"
@@ -34,5 +70,14 @@ ActiveRecord::Schema.define(:version => 20090717010212) do
   add_index "users", ["login"], :name => "index_users_on_login"
   add_index "users", ["perishable_token"], :name => "index_users_on_perishable_token"
   add_index "users", ["persistence_token"], :name => "index_users_on_persistence_token"
+
+  create_table "visualizations", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "name"
+    t.string   "slug"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end
