@@ -1,0 +1,18 @@
+
+%fieldset
+  = form.error_messages
+  %legend  
+
+  %hr
+  = form.file_field :image
+
+  %hr
+  = form.text_field :application, :label => 'Application'
+  = form.text_field :location, :label => 'Location'
+  = form.text_field :title, :label => 'Title/Name'
+  =# form.text_field :description
+
+  %hr
+  = form.text_field :cached_tag_list, :label => 'Tags (comma-separated)'
+  
+

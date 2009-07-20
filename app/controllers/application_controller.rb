@@ -81,5 +81,68 @@ class ApplicationController < ActionController::Base
       end
       super
     end
+    
+    
+    # moar 
+    def url_escape(str, whitelist=false)
+      if whitelist
+        # Append to whatever else domains magma may be under
+        if !(/^(http|https)(\:\/\/)(www\.)?(lh|localhost|magma\.rocketboom\.com|mag\.ma|hotlikemagma\.com)/i.match(str))
+          return ''
+        end
+      end
+
+      return str.gsub(/([^ a-zA-Z0-9_.-]+)/n) do
+        '%' + $1.unpack('H2' * $1.size).join('%').upcase
+      end.tr(' ', '+')
+    end
+    helper_method :url_escape
+
+
+    # shell for a future a Merb-esque displays/provides syntax
+    # TODO: handle arrays better
+    # TODO: also handle text...
+    def default_respond_to(object, opts={})
+
+      opts = { :exclude => [:id, :created_at, :cached_tag_list] }.merge(opts)
+      puts "exclude = #{opts[:exclude].inspect}"
+      which_layout = opts[:layout] || false
+      puts "which_layout => #{which_layout}"
+      # TODO: strip out excluded attributes
+
+      respond_to do |format|
+
+        # format.html { render :html => object.to_html }      
+        format.html {
+          if request.xhr? && !opts[:html_partial].blank?
+            render :partial => opts[:html_partial], :object => object
+          else
+            render :text => object.to_html(:exclude => opts[:exclude]), :layout => which_layout
+          end
+        }
+
+        format.xml  { render :text => object.to_xml }
+        format.json { render :text => object.to_json }
+        format.yaml { render :text => object.to_yaml }
+        # - JS
+        # - text
+        # - RSS
+        # - atom
+      end and return
+    end
+
+
+    protected
+
+    # Automatically respond with 404 for ActiveRecord::RecordNotFound
+    def record_not_found
+      render :file => File.join(RAILS_ROOT, 'public', '404.html'), :status => 404
+    end  
+
+    def fetch_partial(file, opts = {})
+      render_to_string :partial => file, :locals => opts
+    end
+    helper_method :fetch_partial
+
 
 end

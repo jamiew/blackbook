@@ -121,3 +121,51 @@ module ApplicationHelper
     end
   end
 end
+
+
+
+# jdubs display/provdes + to_html merb emulation mode code
+
+# a simple ActiveRecord->HTML table of attributes default (why isn't this builtin?) 
+# in the case of arrays, just do many tables
+# TODO: move to a plugin or somesuch?
+module ToHTML
+
+  def to_html(opts = {})
+    
+    # TODO FIXME merge in opts[:exclude]
+    @private_attributes ||= [:id, :video_id, :user_id, :cached_tag_list, :points, :identified, :identified_at, :created_at, :service_id]
+    
+    object = self
+    str = ''
+    [*object].each { |obj|
+      
+      str << "<table>\n"
+      data = case obj
+      when ActiveRecord::Base
+        obj.attributes.reject { |k,v| @private_attributes.include?(k.to_sym) }
+      when Hash
+        obj
+      else
+        raise "Don't know how to render to_html for an `#{object.class}` => #{object.inspect}"
+      end
+      
+      data.each { |k,v|
+        str << "\t<tr><td>#{k}</td><td>#{v}</td></tr>\n"
+      }
+      str << "</table>\n"
+    }
+    return str
+  end
+end
+
+
+# mix to_html into ActiveRecord + arrays of ARs, as well as Hash
+ActiveRecord::Base.send(:include, ToHTML)
+Hash.send(:include, ToHTML)
+Array.send(:include, ToHTML)
+
+
+
+
+

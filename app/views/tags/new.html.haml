@@ -1,0 +1,11 @@
+.quarter.centered.bigtext
+  - uberform_for @tag, :url => tags_path do |f|
+    %h2 Add Tag
+    = link_to '&larr; back to all tags', tags_path
+
+    = render :partial => "form", :object => f
+    .buttons
+      = f.submit "Create"
+
+  - content_for :on_ready do
+    PNB.formFocusFirst('new_user')
