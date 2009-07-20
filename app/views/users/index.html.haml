@@ -1,0 +1,11 @@
+
+%h2 List of users
+%p
+  &larr;
+  = link_to "back to home", root_path
+
+%p
+  %br
+  %ol.square
+    - @users.each do |user|
+      %li= link_to user.login, user_path(user)

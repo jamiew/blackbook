@@ -1,0 +1,13 @@
+
+%h2 List of Visualizations
+%p
+  &larr;
+  = link_to "back to home", root_path
+
+%p
+  %br
+  - if @visualizations.empty?
+    = "None yet."
+  %ol.square
+    - @visualizations.each do |vis|
+      %li= link_to vis.name, visualization_path(vis)
