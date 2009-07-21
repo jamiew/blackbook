@@ -9,7 +9,7 @@
       %td= image_tag tag.image(:thumb)
       %td= link_to (tag.title.blank? ? "tag #{tag.id}" : tag.title), tag_path(tag)
       %td= tag.application
-      %td= tag.user.login rescue 'nil'
+      %td= tag.user.login if tag.user
       %td= tag.created_at.strftime('%D %H:%m')
       
       %td
