@@ -12,5 +12,17 @@
     = "None yet."
   - else
     %ol.square
-      - @notifications.each do |notif|
-        %li= link_to h(notif.inspect), notification_path(notif)
+      - @notifications.each do |notif|        
+        %li
+          = notif.created_at.strftime('%D %T')
+          == &mdash;
+          - case notif.subject
+          - when Tag
+            - tag = notif.subject
+            = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
+            == created by #{tag.user || '(niluser)'}
+            
+          - when User
+            - user = notif.subject
+            User created: 
+            = h(user.username)

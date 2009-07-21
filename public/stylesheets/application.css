@@ -277,3 +277,10 @@ br.clear { display: block; display: block; clear: both; height: 0; }
   line-height: 1.6em;
 /*  font-family: serif;*/
 }
+
+
+td { padding: 2px 8px; }
+tr { padding: 3px 0; }
+
+a.button { background: #eee; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #999; }
+a.smallbutton { padding: 2px 2px; border: 0; }

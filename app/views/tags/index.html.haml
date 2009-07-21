@@ -1,0 +1,19 @@
+
+%p= link_to '+ Add Tag', new_tag_path, :class => 'button facebox add'
+
+%br
+
+%table
+  - @tags.each do |tag|
+    %tr
+      %td= image_tag tag.image(:thumb)
+      %td= link_to (tag.title.blank? ? "tag #{tag.id}" : tag.title), tag_path(tag)
+      %td= tag.application
+      %td= tag.user.login rescue 'nil'
+      %td= tag.created_at.strftime('%D %H:%m')
+      
+      %td
+        = link_to 'html', tag_path(tag), :class => 'button smallbutton facebox'
+        = link_to 'xml', tag_path(tag, :xml), :class => 'button smallbutton facebox'
+        = link_to 'json', tag_path(tag, :json), :class => 'button smallbutton facebox'
+      

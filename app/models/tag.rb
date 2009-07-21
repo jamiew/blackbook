@@ -22,5 +22,13 @@ class Tag < ActiveRecord::Base
   
   validates_associated :user, :on => :create
   
-  has_attached_file :image, :styles => { :web => '800x800>', :small => "300x300>", :thumb => "100x100>" }
+  has_attached_file :image, :default_style => :web, :styles => { :web => '600x600>', :small => "250x250>", :thumb => '100x100#' }
+  validates_attachment_presence :image
+  
+  after_create :create_notification
+  
+  def create_notification
+    Notification.create(:subject => self, :verb => 'created')
+  end
+  
 end

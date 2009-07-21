@@ -1,4 +1,19 @@
 
-%h1 Well look here
+%li= link_to '&larr; back to all', tags_path
+%br
 
-= h(@tag.inspect)
+.floatRight{:style => 'position: absolute; margin: 10px 0 0 605px; opacity: 0.8; width: 150px; background-color: #151515; padding: 5px 16px;'}
+  %hr.floatLeft
+  %p.clear== Application: #{@tag.application || 'nil'}
+  %p== Author: #{@tag.user || 'nil'}
+  %p== Note: #{@tag.title || 'nil'}
+  %p== Location: #{@tag.location || 'nil'}
+
+  %hr.floatLeft
+  %p.clear Filename: ...
+  %p Set: ...
+  %br
+  
+.left.image{:style => 'background: #1a1a1a; height: 500px;'}
+  = image_tag @tag.image(:web)
+
