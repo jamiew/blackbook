@@ -21,4 +21,7 @@ class Notification < ActiveRecord::Base
   validates_presence_of :verb, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
   
+  belongs_to :subject, :polymorphic => true
+  belongs_to :user
+  
 end

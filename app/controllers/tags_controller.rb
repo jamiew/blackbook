@@ -16,7 +16,8 @@ class TagsController < ApplicationController
   def create
     #TODO
     raise "No params!" if params.blank? || params[:tag].blank?
-    @tag = Tag.new(params[:tag])    
+    puts params[:tag].inspect
+    @tag = Tag.new(params[:tag], :user => current_user)
     if @tag.save
       flash[:notice] = "Tag created"
       redirect_to @tag

@@ -1,5 +1,5 @@
 .full.centered
-  - uberform_for @tag, :url => tags_path do |f|
+  - uberform_for @tag, :url => tags_path, :html => { :multipart => true } do |f|
     %h2 Add Tag
     = link_to '&larr; back to all tags', tags_path
 
