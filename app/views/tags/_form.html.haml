@@ -11,8 +11,9 @@
   = form.text_field :location, :label => 'Location'
   =# form.text_field :title, :label => 'Title/Name'
   =# form.text_field :description
-
-  %hr
   = form.text_field :cached_tag_list, :label => 'Tags (comma-separated)'
+  
+  %hr
+  = form.text_area :description, :label => '<abbr>GML</abbr>'
   
 
