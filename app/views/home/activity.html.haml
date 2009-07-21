@@ -20,9 +20,9 @@
           - when Tag
             - tag = notif.subject
             = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
-            == created by #{tag.user || '(niluser)'}
+            == created by #{link_to(tag.user.login, user_path(tag.user)) rescue '(niluser)'}
             
           - when User
-            - user = notif.subject
-            User created: 
-            = h(user.username)
+            - user = notif.subject            
+            = link_to user.login, user_path(user)
+            signed up
