@@ -17,7 +17,8 @@ class TagsController < ApplicationController
     #TODO
     raise "No params!" if params.blank? || params[:tag].blank?
     puts params[:tag].inspect
-    @tag = Tag.new(params[:tag], :user => current_user)
+    params[:tag][:user] = current_user #set here vs. in the form
+    @tag = Tag.new(params[:tag])
     if @tag.save
       flash[:notice] = "Tag created"
       redirect_to @tag
