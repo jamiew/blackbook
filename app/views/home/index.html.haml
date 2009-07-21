@@ -1,7 +1,5 @@
 
-
 #intro.center
-
   %br
   %span{:style => 'font-family: "Verdana", sans-serif; letter-spacing: 3px;'} welcome
   
@@ -11,8 +9,7 @@
   %p{:style => 'font-size: 1.4em; font-style: italic; text-transform: uppercase'}
     internet website
     
-  %div{:style => 'margin: 60px auto; width: 300px; text-align: left'}
-    
+  %div{:style => 'margin: 60px auto; width: 300px; text-align: left'}    
     %ol
       %li
         = link_to 'Sign up', signup_path
@@ -24,10 +21,8 @@
     %br
     %ol.square
       %li= link_to 'All Tags', tags_path
-      %li      
-        = link_to 'Visualizations', visualizations_path    
-      %li
-        = link_to 'System Activity', activity_path
+      %li= link_to 'Visualizations', visualizations_path    
+      %li= link_to 'System Activity', activity_path
         
         
         
