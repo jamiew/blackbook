@@ -37,6 +37,10 @@ class User < ActiveRecord::Base
 
   has_attached_file :photo, :styles => { :medium => "300x300>", :thumb => "100x100>" }
 
+  after_create :create_notification
+  def create_notification
+    Notification.create(:subject => self, :verb => 'created')
+  end
 
   def deliver_password_reset_instructions!
     reset_perishable_token!
