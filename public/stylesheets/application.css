@@ -37,7 +37,7 @@ a {
   text-decoration: underline;
 }
 a:hover {
-  color: #ffaeae;
+  color: #ff0;
 }
 
 h1 {
@@ -220,6 +220,18 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 #header ul.reg_nav li {
   margin-left: 16px;
 }
+#header ul.reg_nav.buttons li a {
+  padding: 2px 3px;
+  background-color: #fff;
+  border: 1px solid #fafafa;
+  color: #222;
+}
+#header ul.reg_nav.buttons li a:hover {
+  background-color: #ff0;
+  border: 1px solid #ffa;
+  color: #000;
+}
+
 
 #footer, .push {
   padding: 0 16px;
@@ -266,11 +278,24 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 
 
 #intro {
-  line-height: 0.8em;
-  font-size: 2em;
-  font-family: serif;
+  line-height: 1.2em;
+  font-size: 1.4em;
+/*  font-family: serif;*/
   text-align: center;
+
+  background: #19181a;
+  border-bottom: 2px solid #505355;
+/*  height: 80px;*/
+  padding: 10px 0px;
 }
+
+#intro .left {
+  float: left;
+  margin-right: 20px;
+  padding: 0 10px;
+}
+
+#intro ol li { float: left; font-size: 1.4em; font-family: serif; }
 
 .bigtext {
   font-size: 1.4em;

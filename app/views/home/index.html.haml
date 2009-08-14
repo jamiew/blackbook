@@ -1,32 +1,38 @@
 
 #intro.center
-  %br
-  %span{:style => 'font-family: "Verdana", sans-serif; letter-spacing: 3px;'} welcome
+  / %br
+  / %span{:style => 'font-family: "Verdana", sans-serif; letter-spacing: 3px;'} welcome
+  / 
+  / %h1{:style => 'font-size: 2.5em; font-family: "Futura", sans-serif; letter-spacing: -2px;'}
+  /   == #000000book
+  / 
+  / %p{:style => 'font-size: 1.4em; font-style: italic; text-transform: uppercase'}
+  /   internet website
+      
+  %p.left{:style => 'width: 250px;'}
+    %a{:href => root_path, :style => 'font-size: 1.5em; font-family: "Futura", sans-serif; letter-spacing: -2px;'} #00000book
+    %br
+    %br
+    Sup dwg i herd you liek graf so we made a website for you to hang your shiz
   
-  %h1{:style => 'font-size: 2.5em; font-family: "Futura", sans-serif; letter-spacing: -2px;'}
-    == #000000book
   
-  %p{:style => 'font-size: 1.4em; font-style: italic; text-transform: uppercase'}
-    internet website
-    
-  %div{:style => 'margin: 60px auto; width: 300px; text-align: left'}    
+  %span.left{:style => 'width: 250px;'}
+    %p get started &rarr;
     %ol
       %li
-        = link_to 'Sign up', signup_path
-        for an account
+        = link_to 'Register', signup_path
+        an account
       %li
         = link_to 'Upload', new_tag_path
-        tag data        
+        tags
 
-    %br
-    %ol.square
-      %li= link_to 'All Tags', tags_path
-      %li= link_to 'Visualizations', visualizations_path    
-      %li= link_to 'System Activity', activity_path
-        
+  %br.clear
+  %br
+  %br.clear
+
         
         
         
 %ul
   - @tags.each do |tag|
-    %li.floatLeft= link_to image_tag(tag.image(:thumb)), tag_path(tag)
+    %li.floatLeft= link_to image_tag(tag.image(:large)), tag_path(tag)

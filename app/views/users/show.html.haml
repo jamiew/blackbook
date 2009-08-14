@@ -1,9 +1,12 @@
 - @user ||= current_user
 %h2
-  = (current_user == @user? 'Your Account:' : 'Their Account:')
-  %span= @user.email
-  
-%ol
-  %li= link_to 'Change password', edit_user_path(@user)
-  %li= link_to 'Edit bio & info', edit_user_path(@user)
+  = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
+  = @user.login
+
+%p= (current_user == @user? '<em>(this is you)</em>' : 'Info:')
+
+= link_to 'Edit Profile', edit_user_path(@user)
+&mdash;
+= link_to 'Change Password', edit_user_path(@user)
+
 
