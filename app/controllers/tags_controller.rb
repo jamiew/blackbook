@@ -8,6 +8,13 @@ class TagsController < ApplicationController
     @tag = Tag.find(params[:id])
     @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
     @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
+    
+    respond_to do |wants|
+      wants.html { render }
+      wants.xml { render :xml => @tag.to_xml }
+      wants.json { render :json => @tag.to_json }
+      wants.rss { render :rss => @tag.to_rss }
+    end
   end
     
   def new
