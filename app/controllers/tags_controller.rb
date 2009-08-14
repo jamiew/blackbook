@@ -6,11 +6,13 @@ class TagsController < ApplicationController
   
   def show
     @tag = Tag.find(params[:id])
+    @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
+    @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
   end
     
   def new
     require_user
-    @tag = Tag.new  
+    @tag = Tag.new
   end
   
   def create

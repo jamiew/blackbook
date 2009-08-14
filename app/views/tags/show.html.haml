@@ -1,4 +1,14 @@
 
+.prevnext.floatRight{:style => 'font-size: 1.15em;'}
+  - unless @prev.nil?
+    %li.floatLeft
+      = link_to '&larr; prev', tag_path(@prev)
+      - unless @prev.nil?
+        &nbsp;::&nbsp;
+  - unless @next.nil?
+    %li.floatLeft= link_to 'next &rarr;', tag_path(@next)
+
+
 %li= link_to '&larr; back to all', tags_path
 %br
 
