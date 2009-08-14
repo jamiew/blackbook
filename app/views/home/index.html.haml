@@ -10,8 +10,6 @@
   /   internet website
       
   %p.left{:style => 'width: 250px;'}
-    %a{:href => root_path, :style => 'font-size: 1.5em; font-family: "Futura", sans-serif; letter-spacing: -2px;'} #00000book
-    %br
     %br
     Sup dwg i herd you liek graf so we made a website for you to hang your shiz
   
@@ -35,4 +33,4 @@
         
 %ul
   - @tags.each do |tag|
-    %li.floatLeft= link_to image_tag(tag.image(:large)), tag_path(tag)
+    %li.floatLeft= link_to image_tag(tag.image.url(:small)), tag_path(tag)

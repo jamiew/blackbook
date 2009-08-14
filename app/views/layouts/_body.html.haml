@@ -3,10 +3,11 @@
     #header
       %h1.title
         / =link_to SiteConfig.site_name, root_path
-        %ul.reg_nav.buttons
-          %li= link_to 'home', root_path
-          %li= link_to 'tags', tags_path
-          %li= link_to 'activity', activity_path          
+        %ul.reg_nav.buttons{:style => 'margin-left: -50px'}
+          / %li= link_to 'home', root_path
+          %a{:href => root_path, :style => 'font-size: 1.4em; font-family: "Impact", sans-serif; letter-spacing: -1px; float: left;'} #00000book
+          %li= link_to '&nbsp;&nbsp;&nbsp;tags', tags_path
+          %li= link_to '&nbsp;&nbsp;activity', activity_path
           / %li= link_to 'visualizations', visualizations_path
         
       %ul.reg_nav
