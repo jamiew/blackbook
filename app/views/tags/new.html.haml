@@ -1,6 +1,6 @@
 .full.centered
   - uberform_for @tag, :url => tags_path, :html => { :multipart => true } do |f|
-    %h2 Add Tag
+    %h2 Upload Tag
     = link_to '&larr; back to all tags', tags_path
 
     = render :partial => "form", :object => f
