@@ -1,4 +1,7 @@
 
+-#FIXME do in the controller...
+- @user ||= @tag.user
+
 .prevnext.floatRight{:style => 'font-size: 1.15em;'}
   - unless @prev.nil?
     %li.floatLeft
@@ -9,21 +12,30 @@
     %li.floatLeft= link_to 'next &rarr;', tag_path(@next)
 
 
-%li= link_to '&larr; back to all', tags_path
+- all_link = @user ? user_tags_path(@user) : tags_path
+%li= link_to '&larr; back', all_link
 %br
 
-.floatRight{:style => 'position: absolute; margin: 10px 0 0 605px; opacity: 0.8; width: 150px; background-color: #151515; padding: 5px 16px;'}
+.floatRight{:style => 'position: absolute; margin: 20px 0 0 465px; opacity: 0.8; width: 250px; background-color: #151515; padding: 5px 16px;'}
   %hr.floatLeft
-  %p.clear== Application: #{@tag.application || 'nil'}
-  %p== Author: #{@tag.user || 'nil'}
-  %p== Note: #{@tag.title || 'nil'}
-  %p== Location: #{@tag.location || 'nil'}
-
+  %ul
+    %li.clear== Application: #{@tag.application || 'nil'}
+    %li== Author: #{link_to(@user.login, user_path(@user))}
+    %li== Note: #{@tag.title || 'nil'}
+    %li== Location: #{@tag.location || 'nil'}
   %hr.floatLeft
-  %p.clear Filename: ...
-  %p Set: ...
-  %br
+  %ul
+    %li.clear== Filename: #{File.basename(@tag.image.url(:original))[0..8]}
+    %li== Set: (TODO)
+  
+  -#TODO: need a sexier way to determine ownership (everywhere)
+  - if @user && current_user && @user.id == current_user.id
+    %br
+    %ol#controls  
+      %li= link_to 'edit', edit_tag_path
+      %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
+    
   
 .left.image{:style => 'background: #1a1a1a; height: 500px;'}
-  = image_tag @tag.image(:medium)
+  = image_tag @tag.image(:large)
 
