@@ -9,7 +9,7 @@ describe PasswordResetController do
 
   describe "requesting a password reset" do
     it "should send an email to the user if found" do
-      Notifier.stub!(:password_reset_instructions).and_return(nil)
+      Mail.stub!(:password_reset_instructions).and_return(nil)
       post :create, :email => 'michael@pixels-and-bits.com'
       users(:mmoen).perishable_token.should_not eql('')
       response.should redirect_to(root_url)
@@ -25,7 +25,7 @@ describe PasswordResetController do
       users(:mmoen).reset_perishable_token!
       post :update, :id => users(:mmoen).perishable_token, :user => {
         :password => 'new_pass', :password_confirmation => 'new_pass' }
-      response.should redirect_to(account_url)
+      response.should redirect_to(user_path)
     end
 
     it "should not change password with a valid token and non-matching passwords" do

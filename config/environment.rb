@@ -15,16 +15,30 @@ Rails::Initializer.run do |config|
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
   config.gem 'haml', :version => '2.3.0' # not working via GemTools
-  # config.gem "bj"
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "sqlite3-ruby", :lib => "sqlite3"
-  # config.gem "aws-s3", :lib => "aws/s3"
 
+  # The basics
   config.gem 'jackdempsey-acts_as_commentable', :lib => 'acts_as_commentable', :source => "http://gems.github.com"
   config.gem 'thoughtbot-paperclip', :lib => 'paperclip', :source => 'http://gems.github.com'
-    
+  config.gem "i76-has_slug", :lib => 'has_slug', :source => 'http://gems.github.com'
+  config.gem "configatron", :version => ">= 2.2.2"
+  config.gem "mislav-will_paginate", :lib => "will_paginate", :version => "~>2.3.6"
+  # config.gem 'giraffesoft-is_taggable', :lib => 'is_taggable', :source => 'http://gems.github.com'
+  # Spawn installed as a plugin -- not available as a gem
+
+  # Plugins I still need to get used to
   config.gem 'justinfrench-formtastic', :lib => 'formtastic', :source => 'http://gems.github.com'
   config.gem 'rubymood-jintastic', :lib => 'jintastic', :source => 'http://gems.github.com'
+
+  # Testing
+  config.gem "rspec", :lib => false, :version => ">= 1.2.0" 
+  config.gem "rspec-rails", :lib => false, :version => ">= 1.2.0"   
+  config.gem "thoughtbot-factory_girl", :lib => false, :source => "http://gems.github.com"
+  # config.gem "aslakhellesoy-cucumber", :lib => false, :source => 'http://gems.github.com'
+  # config.gem "jscruggs-metric_fu", :lib => false, :source => 'http://gems.github.com'
+  # config.gem 'timcharper-spork', :lib => false, :source => 'http://gems.github.com'
+
   
   
   # Only load the plugins named here, in the order given (default is alphabetical).

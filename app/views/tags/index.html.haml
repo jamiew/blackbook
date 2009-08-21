@@ -6,7 +6,7 @@
 %table
   - @tags.each do |tag|
     %tr
-      %td= image_tag tag.image(:thumb)
+      %td= image_tag tag.image(:small)
       - txt = tag.title.blank? ? "tag #{tag.id}" : tag.title
       %td= link_to txt, tag_path(tag)
       %td= tag.application

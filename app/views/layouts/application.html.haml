@@ -1,18 +1,22 @@
 - content_for :header_nav do
   - if current_user
-    %li= link_to 'your profile', account_path
-    %li= link_to 'logout', logout_path, :class => 'logout'
+    %li.user_info
+      = link_to image_tag(current_user.photo.url(:tiny), :class => 'photo'), user_path(current_user)
+      &nbsp;
+      = link_to current_user.login, user_path(current_user)
+      
+    %li= link_to 'settings', edit_user_path(current_user)
+    %li.logout= link_to 'logout', logout_path, :class => 'logout'
   - else
     %li= link_to 'login', login_path
     %li= link_to 'register', signup_path
 
-!!! XML
 !!!
 %html{html_attrs}
   %head
     = render :partial => 'layouts/common_headers'
     %title= page_title
-  = render :partial => 'layouts/body'
+  = render :partial => 'layouts/header'
   = remote_javascript_includes
   - bundle do
     = local_javascript_includes

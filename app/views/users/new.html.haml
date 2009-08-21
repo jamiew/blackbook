@@ -1,7 +1,19 @@
 .quarter.centered
-  - uberform_for @user, :url => account_path do |f|
+  - uberform_for @user, :url => user_path do |f|
     %h2 Register #000000book Account
-    = render :partial => "form", :object => f
+
+    %fieldset
+      = form.error_messages
+      %legend
+
+      %hr
+      = form.text_field :login, :label => 'Username'
+      = form.text_field :email
+      
+      %hr
+      = form.text_field :password
+      = form.text_field :password, :label => "Again"
+
     .buttons
       = f.submit "Register"
 
