@@ -12,17 +12,22 @@
     = "None yet."
   - else
     %ol.square
-      - @notifications.each do |notif|        
+      - @notifications.each do |notif|
         %li
           = notif.created_at.strftime('%D %T')
           == &mdash;
-          - case notif.subject
-          - when Tag
-            - tag = notif.subject
-            = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
-            == created by #{link_to(tag.user.login, user_path(tag.user)) rescue '(niluser)'}
-            
-          - when User
-            - user = notif.subject            
-            = link_to user.login, user_path(user)
-            signed up
+          - begin
+            - case notif.subject
+            - when Tag
+              - tag = notif.subject
+              - user = tag.user
+              = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
+              == created by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
+          
+            - when User
+              - user = notif.subject            
+              = link_to user.login, user_path(user)
+              signed up
+          - rescue
+            == ERROR: #{$!}
+          
