@@ -1,36 +1,26 @@
 
-#intro.center
-  / %br
-  / %span{:style => 'font-family: "Verdana", sans-serif; letter-spacing: 3px;'} welcome
-  / 
-  / %h1{:style => 'font-size: 2.5em; font-family: "Futura", sans-serif; letter-spacing: -2px;'}
-  /   == #000000book
-  / 
-  / %p{:style => 'font-size: 1.4em; font-style: italic; text-transform: uppercase'}
-  /   internet website
-      
-  %p.left{:style => 'width: 250px;'}
-    %br
-    Sup dwg i herd you liek graf so we made a website for you to hang your shiz
-  
-  
-  %span.left{:style => 'width: 250px;'}
-    %p get started &rarr;
-    %ol
-      %li
-        = link_to 'Register', signup_path
-        an account
-      %li
-        = link_to 'Upload', new_tag_path
-        tags
+#home
+  #intro.center
+    / Intro text
+    #welcome.left{:style => 'width: 250px;'}
+      %p
+        Sup dwg i herd you liek graf so we made a website for you  
+    / Action links  
+    #actions.left{:style => 'width: 250px;'}
+      %p
+        %ol
+          %li
+            = link_to 'Register', signup_path
+            an account
+          %li
+            = link_to 'Upload', new_tag_path
+            tags
+    %br.clear     
 
-  %br.clear
-  %br
-  %br.clear
-
-     
-%br
-%br
-%ul
-  - @tags.each do |tag|
-    %li.floatLeft= link_to image_tag(tag.image.url(:small)), tag_path(tag)
+  #tags
+    - if @tags.blank?
+      %h2.error No tags yet!
+    - else
+      %ul
+        - @tags.each do |tag|
+          %li.floatLeft= link_to image_tag(tag.image.url(:small)), tag_path(tag)

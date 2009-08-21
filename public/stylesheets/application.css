@@ -1,70 +1,47 @@
 /*
-* #000000book CSS v1
-* Jamie Dubs <http://jamiedubs.com>
+* 000000book.com
+* Jamie Wilkinson <http://jamiedubs.com>
 * Free Art & Technology Lab
 */
 
 
-/* reset */
-body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td {
+/* Reset */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, /*p, */blockquote, th, td {
   margin: 0;
   padding: 0;
 }
 
 
-
-/* main */
+/* Main */
 
 html, body { width: 100%; height: 100%; }
-
+html { color: #fff; background: #000; font-size: 100%; }
 body {
   font-size: .92em;
   font-family: helvetica, arial, sans-serif;
   line-height: 1.25em;
 }
-body.ie6 {
-  font-size: 16px;
-}
+body.ie6 { font-size: 16px; }
 
-html {
-  color: #fff;
-  background: #000;
-  font-size: 100%;
-}
+a { color: #fff; text-decoration: underline; }
+a:hover { color: #ff0; }
 
-a {
-  color: #fff;
-  text-decoration: underline;
-}
-a:hover {
-  color: #ff0;
-}
 
-h1 {
-  font-size: 1.6em;
-}
-
-h2 {
-  font-size: 1.4em;
-}
-
-h3 {
-  font-size: 1.2em;
-  margin-bottom: 8px;
-}
-
+/* Headers */
 h1, h2, h3, h4, h5, h6 {
 /*  font-weight: bold;*/
   font-family: "Century Gothic", sans-serif;
   line-height: 2.125em;
   font-size: 150%;
 }
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
-  text-decoration: none;
-}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { text-decoration: none; }
+
+h1 { font-size: 1.6em; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.2em; margin-bottom: 8px; }
 
 
-/* general... */
+/* General */
 hr {
   border: 0;
   height: 1px;
@@ -165,9 +142,12 @@ form br {
 }
 
 
+/* Tables */
 
 
-/* custom classes */
+
+
+/* Custom classes & misc helpers */
 .clear { display: block; clear: both; }
 br.clear { display: block; display: block; clear: both; height: 0; }
 
@@ -183,9 +163,16 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 .third { width: 33%; }
 .quarter { width: 25%; }
 
+/* Fonts & button misc */
+.bigtext { font-size: 1.4em;line-height: 1.6em; }
+
+a.button { background: #eee; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #999; }
+a.smallbutton { padding: 2px 2px; border: 0; }
 
 
-/* MAIN LAYOUT */
+
+
+/* Main layout */
 #container {
   padding: 0 16px;
   width: 768px;
@@ -210,28 +197,27 @@ br.clear { display: block; display: block; clear: both; height: 0; }
   padding: 0;
   line-height: 1em;
 }
-#header ul.reg_nav {
+#header ul.navigation {
   float: right;
 }
-#header ul.reg_nav li {
+#header ul.navigation li {
   display: block;
   float: left;
 }
-#header ul.reg_nav li {
-  margin-left: 16px;
+#header ul.navigation li {
+  padding-left: 12px;
 }
-#header ul.reg_nav.buttons li a {
+#header ul.navigation.buttons li a {
   padding: 2px 3px;
   background-color: #fff;
   border: 1px solid #fafafa;
   color: #222;
 }
-#header ul.reg_nav.buttons li a:hover {
+#header ul.navigation.buttons li a:hover {
   background-color: #ff0;
   border: 1px solid #ffa;
-  color: #000;
+  color: #000;  
 }
-
 
 #footer, .push {
   padding: 0 16px;
@@ -242,7 +228,7 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 }
 
 
-
+/* Flash */
 #flash-notice, #flash-warning, #flash-error {
   
   display: none; /* FIXME: obtrusive O_o */  
@@ -258,54 +244,32 @@ br.clear { display: block; display: block; clear: both; height: 0; }
   padding: 6px 12px 4px;
 }
 
-#flash-notice {
-  color: green;
-}
+#flash-notice { color: green; }
+#flash-warning { color: yellow; }
+#flash-error { color: red; }
 
-#flash-warning {
-  color: yellow;
-}
 
-#flash-error {
-  color: red;
-}
+/* User navigation: settings, logout, etc. */
+#header ul.user_navigation a img.photo { position: absolute; margin-left: -36px; margin-top: -7px; }
 
 
 
+/* Srs layout business */
 
-
-/* LAYOUT STYLES, break da mod */
-
-
-#intro {
+#home #intro {
   line-height: 1.2em;
-  font-size: 1.4em;
-/*  font-family: serif;*/
+  font-size: 1.3em;
   text-align: center;
-
   background: #19181a;
   border-bottom: 2px solid #505355;
-/*  height: 80px;*/
   padding: 10px 0px;
 }
+#home #intro .left { float: left; margin-right: 20px; padding: 0 10px;}
+#home #intro ol li { float: left; font-size: 1.4em; font-family: serif; }
 
-#intro .left {
-  float: left;
-  margin-right: 20px;
-  padding: 0 10px;
-}
-
-#intro ol li { float: left; font-size: 1.4em; font-family: serif; }
-
-.bigtext {
-  font-size: 1.4em;
-  line-height: 1.6em;
-/*  font-family: serif;*/
-}
+#home #tags { margin-top: 20px; }
 
 
-td { padding: 2px 8px; }
-tr { padding: 3px 0; }
 
-a.button { background: #eee; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #999; }
-a.smallbutton { padding: 2px 2px; border: 0; }
+#sidebar { width: 220px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; }
+#main { width: 520px; padding: 30px 0 20px 0; }

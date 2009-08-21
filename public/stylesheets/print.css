@@ -89,12 +89,12 @@ html, body {
   margin-bottom: 8px; }
   #header h1 {
     float: left; }
-  #header ul.reg_nav {
+  #header ul.navigation {
     float: right; }
-    #header ul.reg_nav li {
+    #header ul.navigation li {
       display: block;
       float: left; }
-    #header ul.reg_nav li {
+    #header ul.navigation li {
       margin-left: 16px; }
 
 #footer, .push {

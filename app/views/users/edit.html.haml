@@ -1,9 +1,29 @@
 
-- uberform_for @user, :url => account_path, :html => { :multipart => true } do |f|
+- uberform_for @user, :url => user_path, :html => { :multipart => true } do |form|
   %h2 Edit My Account
-  = render :partial => "form", :object => f
-  .buttons
-    = f.submit "Update"
+
+  %fieldset
+    = form.error_messages
+    %legend  
+    %hr
+    .floatRight= image_tag(@user.photo.url(:small))
+    = form.file_field :photo, :size => 10
+
+    %hr
+    - if is_admin?
+      = form.text_field :login, :disabled => true
+      = form.text_field :slug, :disabled => true
+    = form.text_field :email
+    = form.text_field :location
+  
+    %hr   
+    = form.text_field :website
+    = form.text_field :tagline  
+    = form.text_area :about, :rows => 8
+  
+  
+    .buttons
+      = form.submit "Update"
 
 - content_for :on_ready do
   PNB.formFocusFirst('new_user')

@@ -1,42 +1,59 @@
 class UsersController < ApplicationController
   before_filter :require_no_user, :only => [:new, :create]
-  before_filter :require_user, :only => [:show, :edit, :update]
+  before_filter :require_user, :only => [:show, :edit, :change_password, :update]
+  before_filter :set_user_from_current_user, :only => [:show, :edit, :change_password, :update]
 
+  # Show all users
   def index
-    @users = User.all
+    @page, @per_page = params[:page] || 1, 20
+    @users = User.paginate(:page => @page, :per_page => @per_page)
     # default_respond_to(@users, :layout => true, :exclude => [:email,:password,:crypted_password,:persistence_token])
   end
+  
+  # Show one user
+  def show
+    @tags = @user.tags
+  end
 
+  # Setup a new user
   def new
     @user = User.new
   end
-
-  def show
-    @user = @current_user
-  end
-
-  def edit
-    @user = @current_user
-  end
-
+  
   def create
     params[:user][:password_confirmation] = params[:user][:password] if params[:user]
     @user = User.new(params[:user])
     if @user.save
       flash[:notice] = "Account registered!"
-      redirect_back_or_default account_path
+      redirect_back_or_default user_path
     else
       render :action => :new
     end
   end
 
+  # Change information about ourselves
+  def edit
+  end
+
+  def change_password
+  end
+
   def update
-    @user = @current_user # makes our views "cleaner" and more consistent
+    puts params.inspect
     if @user.update_attributes(params[:user])
       flash[:notice] = "Account updated!"
-      redirect_to account_path
+      redirect_to(user_path)
     else
+      # Errors printed to form
       render :action => :edit
     end
   end
+  
+  
+  protected
+  
+  def set_user_from_current_user
+    @user = @current_user  # makes our views "cleaner" and more consistent
+  end
+  
 end

@@ -1,12 +1,24 @@
 - @user ||= current_user
-%h2
-  = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
-  = @user.login
 
-%p= (current_user == @user? '<em>(this is you)</em>' : 'Info:')
+#sidebar
+  %h2
+    = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
+    .clear= @user.login
 
-= link_to 'Edit Profile', edit_user_path(@user)
-&mdash;
-= link_to 'Change Password', edit_user_path(@user)
+  %p
+    = (current_user == @user? '<em>this is you!</em>' : 'Info:')
 
+  %ol
+    %li= link_to 'Edit Profile', edit_user_path(@user)
+    %li= link_to 'Change Password', edit_user_path(@user)
+
+#main
+  - if @tags.blank?
+    %strong.empty
+      Nothing yet! 
+      %br== &rarr; #{link_to 'Upload', new_tag_path}
+    
+  - @tags.each do |tag|
+    %h2= tag.application || '(untitled)'
+    = link_to image_tag(tag.image.url(:large)), tag_path(tag)
 
