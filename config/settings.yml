@@ -1,0 +1,20 @@
+defaults:
+  site_url: http://000000book.com
+  host_name: 000000book.com
+  mail_from: donotreply@000000book.com
+  site_name: "#000000book"
+  admin_email: admin@000000book.com
+  blackbird: false
+
+production:
+  site_url: http://000000book.com
+  blackbird: false
+  # Google Analytics code goes below
+  google_tracker_id:
+
+test:
+  blackbird: false
+
+development:
+  site_url: http://localhost:3000
+  host_name: localhost

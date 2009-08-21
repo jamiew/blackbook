@@ -1,0 +1,18 @@
+%body 
+  #container
+    #header
+      %h1.title
+        / =link_to SiteConfig.site_name, root_path
+        %ul.navigation.buttons{:style => 'margin-left: -50px'}
+          / %li= link_to 'home', root_path
+          %a{:href => root_path, :style => 'font-size: 1.4em; font-family: "Verdana", sans-serif; letter-spacing: -1px; float: left;'} #00000book
+          %li= link_to 'archive', tags_path
+          %li= link_to 'activity', activity_path
+          / %li= link_to 'visualizations', visualizations_path
+        
+      %ul.navigation.user_navigation
+        = yield :header_nav
+    #content
+      = flash_messages
+      = yield :layout
+  = render :partial => 'layouts/footer'
