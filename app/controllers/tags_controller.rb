@@ -1,11 +1,13 @@
 class TagsController < ApplicationController
 
+  before_filter :get_tag, :only => [:show, :update, :destroy]
+
   def index
     @tags = Tag.all
   end
   
   def show
-    @tag = Tag.find(params[:id])
+    @user = User.find(params[:user_id]) if params[:user_id]
     @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
     @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
     
@@ -39,11 +41,33 @@ class TagsController < ApplicationController
   
   def update
     #TODO
+    require_user
+    require_owner
   end
   
   def destroy
     #TODO
+    require_user
+    require_owner
+
+    @tag.destroy
+    flash[:notice]
+    redirect_to user_path(@tag.user)
   end
+  
+protected
+  
+  def get_tag
+    # @tag ||= Tag.find(params[:tag_id])    
+    @tag ||= Tag.find(params[:id])
+  end
+  
+  def require_owner
+    unless @tag.user == current_user
+      raise "You don't have permission to do this!"
+    end
+  end
+    
   
   
   

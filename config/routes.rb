@@ -31,8 +31,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.activity '/activity', :controller => 'home', :action => 'activity'
 
-  ## Lastly, flat-style /jamiew URLs
-  ## TODO!
+  ## Lastly, flat-style /jamiew URLs -- TODO!
   # map.user '/:id', :controller => 'users', :action => 'show'
 
   

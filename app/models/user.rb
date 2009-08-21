@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
   acts_as_authentic
   acts_as_commentable # user wall
   # has_many :comments
-  has_many :tags
+  has_many :tags, :order => 'created_at DESC'
   
   has_slug :login
   

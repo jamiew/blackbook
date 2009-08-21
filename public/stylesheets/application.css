@@ -38,7 +38,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { text-decoration: none; }
 
 h1 { font-size: 1.6em; }
 h2 { font-size: 1.4em; }
-h3 { font-size: 1.2em; margin-bottom: 8px; }
+h3 { font-size: 1.2em; }
 
 
 /* General */
@@ -87,6 +87,7 @@ abbr, acronym { border: 0; font-variant: normal; }
 sup { vertical-align: text-top; }
 sub { vertical-align: text-bottom; }
 
+em { background-color: #eea; color: #000; padding: 2px 3px; }
 
 /* form sylings */
 input, textarea, select {
@@ -186,38 +187,26 @@ a.smallbutton { padding: 2px 2px; border: 0; }
 #header {
   /* background: #b4b3b3;*/
   height: 24px;
-  padding: 16px;
+  padding: 16px 0;
   margin-bottom: 8px;
 }
 #header h1 {
   float: left;
-  font-family: helvetica, arial, sans-serif;
+  font-family: Verdana, arial, sans-serif;
+  font-size: 1.8em;
   font-weight: normal;
-  margin: 0;
+  margin: 0 60px 0 0px;
   padding: 0;
   line-height: 1em;
+  letter-spacing: -2px;
 }
-#header ul.navigation {
-  float: right;
-}
-#header ul.navigation li {
-  display: block;
-  float: left;
-}
-#header ul.navigation li {
-  padding-left: 12px;
-}
-#header ul.navigation.buttons li a {
-  padding: 2px 3px;
-  background-color: #fff;
-  border: 1px solid #fafafa;
-  color: #222;
-}
-#header ul.navigation.buttons li a:hover {
-  background-color: #ff0;
-  border: 1px solid #ffa;
-  color: #000;  
-}
+#header ul.navigation { float: left; font-size: 1.5em; margin-top: 5px; }
+#header ul.navigation li { display: block; float: left; }
+#header ul.navigation li { padding-left: 12px; }
+#header ul.navigation.buttons li a { padding: 2px 3px; background-color: #fff; border: 1px solid #fafafa; color: #222; text-decoration: none; }
+#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }
+
+#header ul.navigation.user_navigation { font-size: 1em; float: right; }
 
 #footer, .push {
   padding: 0 16px;
@@ -265,7 +254,7 @@ a.smallbutton { padding: 2px 2px; border: 0; }
   padding: 10px 0px;
 }
 #home #intro .left { float: left; margin-right: 20px; padding: 0 10px;}
-#home #intro ol li { float: left; font-size: 1.4em; font-family: serif; }
+#home #intro ol li { float: left; font-size: 1.2em; font-family: serif; }
 
 #home #tags { margin-top: 20px; }
 

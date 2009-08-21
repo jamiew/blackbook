@@ -12,7 +12,8 @@ class UsersController < ApplicationController
   
   # Show one user
   def show
-    @tags = @user.tags
+    @page, @per_page = params[:page] || 1, 20
+    @tags = @user.tags.paginate(:page => @page, :per_page => @per_page)
   end
 
   # Setup a new user
