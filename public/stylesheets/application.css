@@ -24,7 +24,7 @@ body {
 body.ie6 { font-size: 16px; }
 
 a { color: #fff; text-decoration: underline; }
-a:hover { color: #ff0; }
+a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }
 
 
 /* Headers */
@@ -50,10 +50,10 @@ hr {
   margin: 15px auto 10px auto;
 }
 
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
+table { border-collapse: collapse; border-spacing: 0; }
+table tr { }
+table th { background-color: #333; padding: 5px; font-weight: bold; }
+table td { padding: 5px 5px; }
 
 fieldset, img {
   border: 0;
@@ -143,11 +143,6 @@ form br {
 }
 
 
-/* Tables */
-
-
-
-
 /* Custom classes & misc helpers */
 .clear { display: block; clear: both; }
 br.clear { display: block; display: block; clear: both; height: 0; }
@@ -167,10 +162,24 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 /* Fonts & button misc */
 .bigtext { font-size: 1.4em;line-height: 1.6em; }
 
-a.button { background: #eee; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #999; }
-a.smallbutton { padding: 2px 2px; border: 0; }
+a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #444; }
+a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
+/* Pagination */
+.pagination { text-align: center; padding: .3em 0 1em 0; }
+/*.pagination a, .pagination span { padding: .2em .5em; }*/
+.pagination a { padding: .2em .5em; }
+.pagination span.disabled { color: #AAA; }
+/*.pagination span.current { font-weight: bold; color: #dF5084; }*/
+.pagination span.current {  }
+.pagination a { border: 1px solid #333; background-color: #fff; color: #000; text-decoration: none; }
+/*.pagination a:hover, .pagination a:focus { border-color: #003366; background: #0063DC; color: white; }*/
+.pagination a:hover, .pagination a:focus { }
+.pagination .page_info { color: #aaa; padding-top: .8em; }
+.pagination .prev_page, .pagination .next_page { border-width: 2px; }
+/*.pagination .prev_page { margin-right: 1em; }*/
+/*.pagination .next_page { margin-left: 1em; }*/
 
 
 /* Main layout */
@@ -204,17 +213,12 @@ a.smallbutton { padding: 2px 2px; border: 0; }
 #header ul.navigation li { display: block; float: left; }
 #header ul.navigation li { padding-left: 12px; }
 #header ul.navigation.buttons li a { padding: 2px 3px; background-color: #fff; border: 1px solid #fafafa; color: #222; text-decoration: none; }
-#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }
+/*#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }*/
 
 #header ul.navigation.user_navigation { font-size: 1em; float: right; }
 
-#footer, .push {
-  padding: 0 16px;
-  width: 768px;
-  margin: 0 auto;
-  height: 3em;
-  text-align: center;
-}
+#footer { padding: 0 16px; width: 768px; margin: 0 auto; height: 3em; text-align: center; }
+#footer { display: none; } /* REMOVEME disabling for time being */
 
 
 /* Flash */

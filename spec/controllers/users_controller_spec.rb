@@ -33,7 +33,7 @@ describe UsersController do
     it "should redirect to account on successful :create" do
       post :create, :user => { :login => 'bob', :email => 'bob@example.com',
         :password => 'bobs_pass', :password_confirmation => 'bobs_pass' }
-      response.should redirect_to(account_path)
+      response.should redirect_to(user_path(User.find('bob')) #TODO: requires has_slug...?
     end
   end
 
@@ -66,9 +66,10 @@ describe UsersController do
     end
 
     it "should redirect to account on :update" do
-      UserSession.create(users(:mmoen))
+      u = users(:mmoen)
+      UserSession.create(u)
       post :update, :user => { :email => 'new_valid_email@example.com' }
-      response.should redirect_to(account_path)
+      response.should redirect_to(user_path(u))
     end
 
     it "should not redirect to account on failed :update" do

@@ -14,7 +14,8 @@
     %ol.square
       - @notifications.each do |notif|
         %li
-          = notif.created_at.strftime('%D %T')
+          = time_ago_in_words(notif.created_at.strftime('%D %T')).gsub('about ','')
+          ago
           == &mdash;
           - begin
             - case notif.subject
