@@ -23,7 +23,8 @@
     - else
       %ul
         - @tags.each do |tag|
-          %li.floatLeft= link_to image_tag(tag.image.url(:small)), user_tag_path(tag.user, tag)  
+          - user = tag.user
+          %li.floatLeft= link_to image_tag(tag.image.url(:small)), (user.nil? ? tag_path(tag) : user_tag_path(user, tag))
     %br.clear
   #vis{:style => 'margin-left: -150px; height: 350px;'}
     :plain
