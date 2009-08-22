@@ -1,6 +1,7 @@
 class TagsController < ApplicationController
 
   before_filter :get_tag, :only => [:show, :update, :destroy]
+  protect_from_forgery :except => [:create] # for the "API"
 
   def index
     @page, @per_page = params[:page] || 1, 5
