@@ -11,17 +11,18 @@
     %th title
     %th app
     %th who
-    %th when
+    %th{:style => 'width: 120px'} when
     %th
     
   - @tags.each do |tag|
     - user = tag.user
+    - url = user.nil? ? tag_path(tag) : user_tag_path(user,tag)
     %tr
-      %td= image_tag tag.image(:small)
+      %td= link_to(image_tag(tag.image(:small)), url)
       - txt = tag.title.blank? ? "tag #{tag.id}" : tag.title
-      %td= link_to txt, tag_path(tag)
-      %td= tag.application
-      %td= link_to(user.login, user_path(user)) rescue nil
+      %td= link_to(txt, url)
+      %td= tag.application || '&mdash;'
+      %td= link_to(user.login, user_path(user)) rescue '&mdash;'
       %td= tag.created_at.strftime('%D %H:%m')
       
       %td      
