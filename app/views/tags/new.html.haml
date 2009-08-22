@@ -1,11 +1,10 @@
 .full.centered
   - uberform_for @tag, :url => tags_path, :html => { :multipart => true } do |f|
-    %h2 Upload Tag
+    %h2= (@tag.new_record? ? 'Adding new tag' : "Editing Tag ##{@tag.id}")
     = link_to '&larr; back to all tags', tags_path
 
     = render :partial => "form", :object => f
     .buttons
-      = f.submit "Create"
-
+      = f.submit @tag.new_record? ? "Create" : 'Save'
   - content_for :on_ready do
     PNB.formFocusFirst('new_user')

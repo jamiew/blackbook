@@ -28,7 +28,7 @@ class Tag < ActiveRecord::Base
   has_attached_file :image, 
     :default_style => :medium, 
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
-  validates_attachment_presence :image
+    # validates_attachment_presence :image
   
   after_create :create_notification
   

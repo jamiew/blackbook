@@ -241,6 +241,18 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #flash-warning { color: yellow; }
 #flash-error { color: red; }
 
+/* Form Errors */
+#errorExplanation {
+  -moz-border-radius: 5px;
+  background-color: #faa;
+  border: 1px solid #faa;
+  color: #333;
+  padding: 0 10px 15px;
+} 
+#errorExplanation ul li {
+  list-style-type: square;
+  margin-left: 15px;
+}
 
 /* User navigation: settings, logout, etc. */
 #header ul.user_navigation a img.photo { position: absolute; margin-left: -36px; margin-top: -7px; }

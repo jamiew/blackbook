@@ -15,8 +15,8 @@ Rails::Initializer.run do |config|
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
   # Ripped from GemTools -- support libs we want
-  config.gem 'capistrano'
-  config.gem 'capistrano-ext'
+  # config.gem 'capistrano'
+  # config.gem 'capistrano-ext'
 
   # Actually used by the app
   config.gem 'haml'
