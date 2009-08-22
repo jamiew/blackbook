@@ -1,5 +1,5 @@
 .quarter.centered
-  - uberform_for @user, :url => user_path do |f|
+  - uberform_for @user, :url => users_path do |form|
     %h2 Register #000000book Account
 
     %fieldset
@@ -15,7 +15,7 @@
       = form.text_field :password, :label => "Again"
 
     .buttons
-      = f.submit "Register"
+      = form.submit "Register"
 
   - content_for :on_ready do
     PNB.formFocusFirst('new_user')

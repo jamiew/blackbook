@@ -95,4 +95,11 @@ module ApplicationHelper
       )
     end
   end
+  
+  # Jdubs stylee
+  def pagination
+    will_paginate
+  end
+  
+  
 end

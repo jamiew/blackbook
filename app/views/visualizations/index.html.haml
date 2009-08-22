@@ -1,3 +1,4 @@
+= pagination
 
 %h2 List of Visualizations
 %p
@@ -11,3 +12,5 @@
   %ol.square
     - @visualizations.each do |vis|
       %li= link_to vis.name, visualization_path(vis)
+
+= pagination

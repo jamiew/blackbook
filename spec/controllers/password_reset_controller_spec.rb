@@ -9,7 +9,7 @@ describe PasswordResetController do
 
   describe "requesting a password reset" do
     it "should send an email to the user if found" do
-      Mail.stub!(:password_reset_instructions).and_return(nil)
+      Mailer.stub!(:password_reset_instructions).and_return(nil)
       post :create, :email => 'michael@pixels-and-bits.com'
       users(:mmoen).perishable_token.should_not eql('')
       response.should redirect_to(root_url)

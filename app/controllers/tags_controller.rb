@@ -3,7 +3,8 @@ class TagsController < ApplicationController
   before_filter :get_tag, :only => [:show, :update, :destroy]
 
   def index
-    @tags = Tag.all
+    @page, @per_page = params[:page] || 1, 5
+    @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
   end
   
   def show
@@ -25,10 +26,9 @@ class TagsController < ApplicationController
   end
   
   def create
-    #TODO
-    raise "No params!" if params.blank? || params[:tag].blank?
-    puts params[:tag].inspect
+    raise "No params!" if params.blank? || params[:tag].blank?    
     params[:tag][:user] = current_user #set here vs. in the form
+    
     @tag = Tag.new(params[:tag])
     if @tag.save
       flash[:notice] = "Tag created"

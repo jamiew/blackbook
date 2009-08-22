@@ -3,18 +3,31 @@
 
 %br
 
-%table
+= pagination
+
+%table{:style => 'width: 100%'}
+  %tr
+    %th{:style => 'width: 110px;'}
+    %th title
+    %th app
+    %th who
+    %th when
+    %th
+    
   - @tags.each do |tag|
+    - user = tag.user
     %tr
       %td= image_tag tag.image(:small)
       - txt = tag.title.blank? ? "tag #{tag.id}" : tag.title
       %td= link_to txt, tag_path(tag)
       %td= tag.application
-      %td= tag.user.login if tag.user
+      %td= link_to(user.login, user_path(user)) rescue nil
       %td= tag.created_at.strftime('%D %H:%m')
       
       %td
-        = link_to 'html', tag_path(tag), :class => 'button smallbutton facebox'
+        = link_to 'gml', tag_path(tag, :gml), :class => 'button smallbutton facebox'
         = link_to 'xml', tag_path(tag, :xml), :class => 'button smallbutton facebox'
         = link_to 'json', tag_path(tag, :json), :class => 'button smallbutton facebox'
       
+
+= pagination
