@@ -26,18 +26,18 @@ class TagsController < ApplicationController
   end
   
   def create
-    raise "No params!" if params.blank? || params[:tag].blank?    
-    params[:tag][:user] = current_user #set here vs. in the form
+        
+    raise "No params!" if params.blank?
     
-    @tag = Tag.new(params[:tag])
-    if @tag.save
-      flash[:notice] = "Tag created"
-      redirect_to @tag
+    if !params[:tag].blank? # sent by the form
+      return create_from_form
+    elsif !params[:gml].blank? # sent from an app!
+      return create_from_api
     else
-      flash[:error] = "Could not save tag! #{$!}"
-      error_status = 500
-      render :action => 'new', :status => error_status
-    end        
+      # Otherwise error out
+      render :text => "Cannot create tag from your paramters: #{params.inspect}", :status => 422 #Unprocessable Entity
+      return
+    end
   end
   
   def update
@@ -66,6 +66,29 @@ protected
   def require_owner
     unless @tag.user == current_user
       raise "You don't have permission to do this!"
+    end
+  end
+  
+  def create_from_form
+    params[:tag][:user] = current_user #set here vs. in the form      
+    @tag = Tag.new(params[:tag])
+
+    if @tag.save
+      flash[:notice] = "Tag created"
+      redirect_to @tag
+    else
+      flash[:error] = "Could not save tag! #{$!}"
+      error_status = 500
+      render :action => 'new', :status => error_status
+    end        
+  end
+  
+  def create_from_api
+    @tag = Tag.new(:gml => params[:gml])
+    if @tag.save
+      render :text => @tag.id, :status => 200 #OK
+    else
+      render :text => "ERROR: #{$!}", :status => 422 #Unprocessable Entity
     end
   end
     
