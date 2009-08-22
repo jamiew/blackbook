@@ -46,7 +46,7 @@ hr {
   border: 0;
   height: 1px;
   border-top: 1px solid #333;
-  width: 70%;
+  width: 80%;
   margin: 15px auto 10px auto;
 }
 
@@ -87,7 +87,8 @@ abbr, acronym { border: 0; font-variant: normal; }
 sup { vertical-align: text-top; }
 sub { vertical-align: text-bottom; }
 
-em { background-color: #eea; color: #000; padding: 2px 3px; }
+/*em { background-color: #eea; color: #000; padding: 2px 3px; }*/
+em { font-style: italic; }
 
 /* form sylings */
 input, textarea, select {
@@ -162,7 +163,7 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 /* Fonts & button misc */
 .bigtext { font-size: 1.4em;line-height: 1.6em; }
 
-a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #444; }
+a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 2px solid #444; }
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
@@ -193,12 +194,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   margin: 0 auto -3em;
 }
 
-#header {
-  /* background: #b4b3b3;*/
-  height: 24px;
-  padding: 16px 0;
-  margin-bottom: 8px;
-}
+#header { height: 24px; padding: 16px 0 16px 0; margin-bottom: 25px; border-bottom: 1px solid #333; }
 #header h1 {
   float: left;
   font-family: Verdana, arial, sans-serif;

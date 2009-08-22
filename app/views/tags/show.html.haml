@@ -2,32 +2,46 @@
 -#FIXME do in the controller...
 - @user ||= @tag.user
 
-.prevnext.floatRight{:style => 'font-size: 1.15em;'}
-  - unless @prev.nil?
-    %li.floatLeft
-      = link_to '&larr; prev', tag_path(@prev)
-      - unless @prev.nil?
-        &nbsp;::&nbsp;
-  - unless @next.nil?
-    %li.floatLeft= link_to 'next &rarr;', tag_path(@next)
-
-
 - all_link = @user ? user_tags_path(@user) : tags_path
-%li= link_to '&larr; back', all_link
+.floatLeft= link_to '&larr; back', all_link
+.prevnext{:style => 'font-size: 1.15em; width: 160px; margin: 0 auto;'}
+  %li.floatLeft= @prev.nil? ? '&larr; prev' : link_to('&larr; prev', tag_path(@prev), :class => 'button')
+  %li.floatLeft &nbsp;::&nbsp;
+  %li.floatLeft= @next.nil? ? 'next &rarr;' : link_to('next &rarr;', tag_path(@next), :class => 'button')
+  %br
 %br
 
-.floatRight{:style => 'position: absolute; margin: 20px 0 0 465px; opacity: 0.8; width: 250px; background-color: #151515; padding: 5px 16px;'}
-  %hr.floatLeft
+.infobox.floatRight{:style => 'position: absolute; margin: 20px 0 0 465px; opacity: 1; width: 250px; background-color: #151515; padding: 5px 16px;'}
+  %hr
   %ul
-    %li.clear== Application: #{@tag.application || 'nil'}
+    %li
+      == Uploaded #{@tag.created_at.strftime("%D %T")} 
+      %br== (#{time_ago_in_words(@tag.created_at)} ago)
+  %hr
+  %ul
+    %li== Application: #{@tag.application || 'unknown'}
     - if @user
       %li== Author: #{link_to(@user.login, user_path(@user))}
-    %li== Note: #{@tag.title || 'nil'}
-    %li== Location: #{@tag.location || 'nil'}
-  %hr.floatLeft
+    %li== Location: #{@tag.location || 'unknown'}
+    - unless @tag.title.blank?
+      %li== Title: #{@tag.title}
+    - unless @tag.description.blank?
+      %li== Description: #{@tag.decription}
+  %hr
   %ul
-    %li.clear== Filename: #{File.basename(@tag.image.url(:original))[0..8]}
-    %li== Set: (TODO)
+    - if @tag.image.exists?  
+      - url = @tag.image.url(:original)
+      %li== Image: #{link_to(File.basename(url), url) }
+    - else
+      %li
+        %em No image  
+  %hr
+  %br  
+  .gml
+    %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', tag_path(@tag, :gml), :class => 'button smallbutton')
+    / %span.copy-to-clipboard{:style => 'margin-left: 5px;'}= link_to('copy', '#', :class => 'button smallbutton')
+    %span.what-is-gml{:style => 'margin-left: 2px;'}= link_to('?', '#', :onclick => 'alert("TODO: what is GML page"); return false;')
+    %textarea{:cols => 26, :rows => 12, :onclick => '$(this).select();', :style => 'background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px;'}= @tag.gml
   
   -#TODO: need a sexier way to determine ownership (everywhere)
   - if @user && current_user && @user.id == current_user.id
