@@ -10,6 +10,10 @@
 #  created_at  :datetime
 #  updated_at  :datetime
 #
+# Indexes
+#
+#  index_on_slug  (slug)
+#
 
 class Visualization < ActiveRecord::Base
   acts_as_commentable
