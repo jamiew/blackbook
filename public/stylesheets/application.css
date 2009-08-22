@@ -24,7 +24,7 @@ body {
 body.ie6 { font-size: 16px; }
 
 a { color: #fff; text-decoration: underline; }
-a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }
+a:hover { background-color: #ff0; color: #000; }
 
 
 /* Headers */
@@ -213,7 +213,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #header ul.navigation li { display: block; float: left; }
 #header ul.navigation li { padding-left: 12px; }
 #header ul.navigation.buttons li a { padding: 2px 3px; background-color: #fff; border: 1px solid #fafafa; color: #222; text-decoration: none; }
-/*#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }*/
+#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }
 
 #header ul.navigation.user_navigation { font-size: 1em; float: right; }
 
