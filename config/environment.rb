@@ -14,11 +14,17 @@ Rails::Initializer.run do |config|
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
-  config.gem 'haml'
-  # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  # config.gem "sqlite3-ruby", :lib => "sqlite3"
+  # Ripped from GemTools -- support libs we want
+  config.gem 'capistrano'
+  config.gem 'capistrano-ext'
 
-  # The basics
+  # Actually used by the app
+  config.gem 'haml'
+  config.gem 'config_reader', :version => '0.0.6'
+  config.gem 'RedCloth'
+  config.gem 'expose_model'
+  config.gem 'authlogic', :version => '2.0.9'
+  
   config.gem 'jackdempsey-acts_as_commentable', :lib => 'acts_as_commentable', :source => "http://gems.github.com"
   config.gem 'thoughtbot-paperclip', :lib => 'paperclip', :source => 'http://gems.github.com'
   config.gem "i76-has_slug", :lib => 'has_slug', :source => 'http://gems.github.com'
@@ -35,6 +41,7 @@ Rails::Initializer.run do |config|
   config.gem "rspec", :lib => false, :version => ">= 1.2.0" 
   config.gem "rspec-rails", :lib => false, :version => ">= 1.2.0"   
   config.gem "thoughtbot-factory_girl", :lib => false, :source => "http://gems.github.com"
+  config.gem 'spicycode-rcov', :lib => false, :source => 'http://gems.github.com'
   # config.gem "aslakhellesoy-cucumber", :lib => false, :source => 'http://gems.github.com'
   # config.gem "jscruggs-metric_fu", :lib => false, :source => 'http://gems.github.com'
   # config.gem 'timcharper-spork', :lib => false, :source => 'http://gems.github.com'
