@@ -46,12 +46,6 @@ gems:
     version: '4.1.9'
     load: true
 
-  - name: 'mislav-will_paginate'
-    require_name: 'will_paginate'
-    version: '2.3.8'
-    load: true
-    source: 'http://gems.github.com'
-
   - name: 'expose_model'
     version: '0.0.2'
     load: true
@@ -60,9 +54,4 @@ gems:
     version: '2.0.9'
     load: true
 
-  - name: 'norman-friendly_id'
-    require_name: 'friendly_id'
-    version: '2.1.1'
-    load: true
-    source: 'http://gems.github.com'
     

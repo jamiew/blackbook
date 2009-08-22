@@ -34,8 +34,9 @@ class TagsController < ApplicationController
       flash[:notice] = "Tag created"
       redirect_to @tag
     else
-      flash[:error] = "Could not save tag!"
-      render :action => 'new'
+      flash[:error] = "Could not save tag! #{$!}"
+      error_status = 500
+      render :action => 'new', :status => error_status
     end        
   end
   
