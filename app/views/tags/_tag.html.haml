@@ -1,0 +1,5 @@
+
+-# A single tag pls
+- link = @user ? user_tag_path(@user, tag) : tag_path(tag)
+%h2= tag.application || '(untitled)'
+= link_to image_tag(tag.image.url(:medium)), link
