@@ -20,7 +20,8 @@
   %hr.floatLeft
   %ul
     %li.clear== Application: #{@tag.application || 'nil'}
-    %li== Author: #{link_to(@user.login, user_path(@user))}
+    - if @user
+      %li== Author: #{link_to(@user.login, user_path(@user))}
     %li== Note: #{@tag.title || 'nil'}
     %li== Location: #{@tag.location || 'nil'}
   %hr.floatLeft
