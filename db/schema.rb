@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090822222936) do
+ActiveRecord::Schema.define(:version => 20090822223806) do
 
   create_table "comments", :force => true do |t|
     t.string   "title",            :limit => 50, :default => ""
@@ -66,8 +66,6 @@ ActiveRecord::Schema.define(:version => 20090822222936) do
     t.text     "description"
   end
 
-  add_index "tags", ["slug"], :name => "index_on_slug"
-
   create_table "users", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -100,7 +98,6 @@ ActiveRecord::Schema.define(:version => 20090822222936) do
   add_index "users", ["login"], :name => "index_users_on_login"
   add_index "users", ["perishable_token"], :name => "index_users_on_perishable_token"
   add_index "users", ["persistence_token"], :name => "index_users_on_persistence_token"
-  add_index "users", ["slug"], :name => "index_on_slug"
 
   create_table "visualizations", :force => true do |t|
     t.integer  "user_id"
@@ -110,7 +107,5 @@ ActiveRecord::Schema.define(:version => 20090822222936) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "visualizations", ["slug"], :name => "index_on_slug"
 
 end
