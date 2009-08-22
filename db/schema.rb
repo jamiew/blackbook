@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090720140826) do
+ActiveRecord::Schema.define(:version => 20090822222424) do
 
   create_table "comments", :force => true do |t|
     t.string   "title",            :limit => 50, :default => ""
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(:version => 20090720140826) do
     t.integer  "user_id"
     t.string   "title"
     t.string   "slug"
-    t.text     "description"
+    t.text     "gml"
     t.integer  "comment_count"
     t.integer  "likes_count"
     t.datetime "created_at"
@@ -61,7 +61,11 @@ ActiveRecord::Schema.define(:version => 20090720140826) do
     t.string   "image_content_type"
     t.integer  "image_file_size"
     t.datetime "image_updated_at"
+    t.string   "uuid"
+    t.string   "ip"
   end
+
+  add_index "tags", ["slug"], :name => "index_on_slug"
 
   create_table "users", :force => true do |t|
     t.datetime "created_at"
@@ -83,6 +87,11 @@ ActiveRecord::Schema.define(:version => 20090720140826) do
     t.string   "photo_content_type"
     t.integer  "photo_file_size"
     t.datetime "photo_updated_at"
+    t.string   "website"
+    t.string   "tagline"
+    t.text     "about"
+    t.string   "location"
+    t.string   "slug"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email"
@@ -90,6 +99,7 @@ ActiveRecord::Schema.define(:version => 20090720140826) do
   add_index "users", ["login"], :name => "index_users_on_login"
   add_index "users", ["perishable_token"], :name => "index_users_on_perishable_token"
   add_index "users", ["persistence_token"], :name => "index_users_on_persistence_token"
+  add_index "users", ["slug"], :name => "index_on_slug"
 
   create_table "visualizations", :force => true do |t|
     t.integer  "user_id"
@@ -99,5 +109,7 @@ ActiveRecord::Schema.define(:version => 20090720140826) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "visualizations", ["slug"], :name => "index_on_slug"
 
 end

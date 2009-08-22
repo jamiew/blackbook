@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
 
-  before_filter :get_tag, :only => [:show, :update, :destroy]
+  before_filter :get_tag, :only => [:show, :edit, :update, :destroy]
   protect_from_forgery :except => [:create] # for the "API"
 
   def index
@@ -15,6 +15,7 @@ class TagsController < ApplicationController
     
     respond_to do |wants|
       wants.html { render }
+      wants.gml { render :xml => @tag.to_xml } #GML => XML
       wants.xml { render :xml => @tag.to_xml }
       wants.json { render :json => @tag.to_json }
       wants.rss { render :rss => @tag.to_rss }
@@ -26,8 +27,12 @@ class TagsController < ApplicationController
     @tag = Tag.new
   end
   
-  def create
-        
+  def edit
+    require_user
+    render 'new'
+  end
+  
+  def create        
     raise "No params!" if params.blank?
     
     if !params[:tag].blank? # sent by the form
@@ -78,14 +83,20 @@ protected
       flash[:notice] = "Tag created"
       redirect_to @tag
     else
-      flash[:error] = "Could not save tag! #{$!}"
+      flash[:error] = "Error saving your tag! #{$!}"
       error_status = 500
       render :action => 'new', :status => error_status
     end        
   end
   
   def create_from_api
-    @tag = Tag.new(:gml => params[:gml])
+
+    opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application] }
+    # opts = { :description => params[:gml], :ip => request.remote_ip, :application => params[:application] }    
+    # TODO: add app uuid? or Hash app uuid?
+    puts "Tag.create_from_api: #{opts.inspect}"
+
+    @tag = Tag.new(opts)
     if @tag.save
       render :text => @tag.id, :status => 200 #OK
     else

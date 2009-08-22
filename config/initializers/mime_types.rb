@@ -5,4 +5,5 @@ Mime::Type.register_alias "text/html", :xhr
 # Mime::Type.register "text/richtext", :rtf
 # Mime::Type.register_alias "text/html", :iphone
 
-Mime::Type.register_alias "application/xml", :gml
+Mime::Type.register "application/xml", :gml
+# Mime::Type.register_alias "application/xml", :gml
