@@ -46,13 +46,28 @@ namespace :deploy do
   task :after_update_code, :roles => :app, :except => { :no_release => true } do
     # run "cd #{release_path} && sudo gemtools install"
     # run "cd #{release_path} && RAILS_ENV=#{stage} ./script/runner Sass::Plugin.update_stylesheets"
-    run "cd #{release_path} && RAILS_ENV=#{stage} rake db:migrate"
+
+    # run "cd #{release_path} && RAILS_ENV=#{stage} rake db:migrate"
   end
 
   #########################################################
   # Uncomment the following to symlink an uploads directory.
   # Just change the paths to whatever you need.
   #########################################################
+
+  task :after_symlink do
+    run "ln -nfs #{shared_path}/config/database.yml #{current_path}/config/database.yml"
+    run "ln -nfs #{shared_path}/config/settings.yml #{current_path}/config/settings.yml"
+
+    run "mkdir -p #{release_path}/public/"
+    run "ln -nfs #{shared_path}/public/system #{current_path}/public/system"    
+
+    # metric_fu -- creating dirs just to make sure
+    # run "mkdir -p #{shared_path}/metric_fu"
+    # run "rm -rf #{release_path}/tmp/metric_fu" # ln can't force-overwrite directories
+    # run "ln -nfs #{shared_path}/metric_fu #{current_path}/tmp/metric_fu"
+  end
+
 
   # desc "Symlink the upload directories"
   # task :before_symlink do
