@@ -1,10 +1,17 @@
+- STDERR.puts @tag.inspect
+- STDERR.puts "new_rec = #{@tag.new_record?}  editing = #{@editing}"
+- new_record = !@tag.new_record?
+
 .full.centered
-  - uberform_for @tag, :url => tags_path, :html => { :multipart => true } do |f|
+  - uberform_for @tag, :url => (@tag.new_record? ? tags_path : tag_path(@tag)), :method => (@tag.new_record? ? :post : :put), :html => { :multipart => true } do |form|
+
     %h2= (@tag.new_record? ? 'Adding new tag' : "Editing Tag ##{@tag.id}")
     = link_to '&larr; back to all tags', tags_path
 
-    = render :partial => "form", :object => f
+    = render :partial => "form", :object => form
     .buttons
-      = f.submit @tag.new_record? ? "Create" : 'Save'
-  - content_for :on_ready do
+      = form.submit @tag.new_record? ? "Create" : 'Save'
+
+  -# content_for :on_ready do
+  - if false
     PNB.formFocusFirst('new_user')

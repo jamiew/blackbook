@@ -12,7 +12,7 @@
   %br.clear
 
 / Information about the tag
-.infobox.floatRight{:style => 'position: absolute; margin: 0px 0 0 465px; opacity: 1; width: 250px; background-color: #151515; padding: 5px 16px;'}
+.infobox.floatRight{:style => 'position: absolute; margin: 0px 0 0 510px; opacity: 1; width: 220px; background-color: #151515; padding: 5px 16px;'}
   %hr
   %ul
     %li
@@ -27,7 +27,7 @@
     - unless @tag.title.blank?
       %li== Title: #{@tag.title}
     - unless @tag.description.blank?
-      %li== Description: #{@tag.decription}
+      %li== Description: #{@tag.description}
   %hr
   %ul
     - if @tag.image.exists?  
@@ -42,21 +42,22 @@
     %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', formatted_tag_path(@tag, :gml), :class => 'button smallbutton')
     %span.what-is-gml{:style => 'margin-left: 2px;'}= link_to('?', '#', :onclick => 'alert("TODO: what is GML page"); return false;')
     %textarea{:cols => 26, :rows => 12, :onclick => '$(this).select();', :style => 'background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px;'}= @tag.gml
-  
+    
   -#TODO: need a sexier way to determine ownership (everywhere)
-  - if @user && current_user && @user.id == current_user.id
+  - if @user && current_user && @user.id == current_user.id || (current_user && current_user.login == 'jamiew')
     %br
     %ol#controls  
       %li= link_to 'edit', edit_tag_path
-      %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
+      / %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
     
 / The actual tag awwwwwww yeah
 -# still allow images to be displayed for the time being
-.tag{:style => 'background-color: #1a1a1a;'}
+.tag
   - if @tag.image.exists?
     .image= image_tag @tag.image(:large)
   - else
-    #vis
-      = tag_player(@tag, :width => '600px', :bgcolor => '#ff00ff')
+    -#TODO FIXME: this offset is ridiculous
+    #vis{:style => 'margin-left: -300px;'} 
+      = tag_player(@tag, :width => '750px')
 
 
