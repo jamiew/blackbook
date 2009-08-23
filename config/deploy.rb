@@ -13,16 +13,8 @@ set :application, "blackbook"
 default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
 
-#############################################################
-#	Servers
-#############################################################
+# Server-specific information stored in /config/deploy/#{stage}.rb
 
-set :user, 'oooooobook'
-set :use_sudo, false
-# set :gateway, 'gate.CHANGE_ME.com'
-role :web, '000000book.com'
-role :app, '000000book.com'
-role :db, '000000book.com', :primary => true
 
 #############################################################
 #	Git
@@ -33,7 +25,7 @@ set :scm, :git
 # set :scm_user, 'deploy'
 set :repository, "git@github.com:jamiew/#{application}.git"
 # set (:deploy_to) { "/home/oooooobook/000000book.com2/#{stage}" }
-set (:deploy_to) { "/home/oooooobook/000000book.com2" }
+# set (:deploy_to) { "/home/jamie/blackbook2" }
 set :deploy_via, :remote_cache
 set :scm_verbose, true
 
