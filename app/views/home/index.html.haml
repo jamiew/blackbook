@@ -23,7 +23,8 @@
       %ul
         - @tags.each do |tag|
           - user = tag.user
-          %li.floatLeft= link_to image_tag(tag.image.url(:small)), (user.nil? ? tag_path(tag, :trailing_slash => true) : user_tag_path(user, tag, :trailing_slash => true))
+          - url = (user.nil? ? tag_path(tag, :trailing_slash => true) : user_tag_path(user, tag, :trailing_slash => true))
+          %li.floatLeft= link_to image_tag(tag.image.url(:small)), url
     %br.clear
   / #vis{:style => 'margin-left: -150px; height: 350px;'}
   #vis
