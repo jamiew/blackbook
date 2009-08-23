@@ -8,6 +8,19 @@ class TagsController < ApplicationController
     @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
   end
   
+  # quick hack to dump the latest
+  def latest
+    @tag = Tag.find(:first, :order => 'created_at DESC')
+
+    puts "latest tag = #{@tag.inspect}"
+    # render :xml => @tag.gml and return
+    respond_to do |wants|
+      # wants.html { render :action => 'show' }
+      wants.html  { render :text => 'Try visiting /tags/latest.gml for something interesting' }
+      wants.gml   { render :xml => @tag.gml }
+    end    
+  end
+  
   def show
     @user = User.find(params[:user_id]) if params[:user_id]
     @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")

@@ -26,6 +26,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :tags,
     :has_many => [:comments, :likes],
+    :collection => [:latest],
     :trailing_slash => true
   map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
 
