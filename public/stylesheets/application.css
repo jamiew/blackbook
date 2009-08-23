@@ -167,7 +167,9 @@ a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: non
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
-/* Pagination */
+
+
+/* Real Pagination */
 .pagination { text-align: center; padding: .3em 0 1em 0; }
 /*.pagination a, .pagination span { padding: .2em .5em; }*/
 .pagination a { padding: .2em .5em; }
@@ -183,6 +185,10 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 /*.pagination .next_page { margin-left: 1em; }*/
 
 
+/* Prev/next on show pages */
+.prevnext { display: block; margin: 15px auto; font-size: 1.15em; width: 160px; }
+
+
 /* Main layout */
 #container {
   padding: 0 16px;
@@ -194,17 +200,8 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   margin: 0 auto -3em;
 }
 
-#header { height: 24px; padding: 16px 0 16px 0; margin-bottom: 25px; border-bottom: 1px solid #333; }
-#header h1 {
-  float: left;
-  font-family: Verdana, arial, sans-serif;
-  font-size: 1.8em;
-  font-weight: normal;
-  margin: 0 60px 0 0px;
-  padding: 0;
-  line-height: 1em;
-  letter-spacing: -2px;
-}
+#header { background-color: #1a1a1a; height: 24px; padding: 16px 0 16px 0; border-bottom: 1px solid #333; }
+#header h1 { float: left; font-family: Verdana, arial, sans-serif; font-size: 1.8em; font-weight: normal; margin: 0 60px 0 0px; padding: 0; line-height: 1em; letter-spacing: -2px; }
 #header ul.navigation { float: left; font-size: 1.5em; margin-top: 5px; }
 #header ul.navigation li { display: block; float: left; }
 #header ul.navigation li { padding-left: 12px; }
@@ -212,6 +209,9 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #header ul.navigation.buttons li a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }
 
 #header ul.navigation.user_navigation { font-size: 1em; float: right; }
+
+/* User navigation: settings, logout, etc. */
+#header ul.user_navigation a img.photo { position: absolute; margin-left: -36px; margin-top: -7px; }
 
 #footer { padding: 0 16px; width: 768px; margin: 0 auto; height: 3em; text-align: center; }
 #footer { display: none; } /* REMOVEME disabling for time being */
@@ -222,20 +222,18 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   
   display: none; /* FIXME: obtrusive O_o */  
   position: absolute;
-  margin-top: -20px;
-    
-  width: 700px;
-  
+  margin-top: -20px;    
+  width: 700px;  
   font-size: 1em;
-  font-weight: bold;
-  
-  background: #eec;
+  font-weight: bold;  
+  background: #667;
   padding: 6px 12px 4px;
 }
 
 #flash-notice { color: green; }
 #flash-warning { color: yellow; }
 #flash-error { color: red; }
+
 
 /* Form Errors */
 #errorExplanation {
@@ -250,26 +248,17 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   margin-left: 15px;
 }
 
-/* User navigation: settings, logout, etc. */
-#header ul.user_navigation a img.photo { position: absolute; margin-left: -36px; margin-top: -7px; }
-
-
 
 /* Srs layout business */
 
-#home #intro {
-  line-height: 1.2em;
-  font-size: 1.3em;
-  text-align: center;
-  background: #19181a;
-  border-bottom: 2px solid #505355;
-  padding: 10px 0px;
-}
+#home #intro { line-height: 1.2em; font-size: 1.3em; text-align: center; background: #111015; border-bottom: 2px solid #333; padding: 0px 0 10px 0; }
 #home #intro .left { float: left; margin-right: 20px; padding: 0 10px;}
 #home #intro ol li { float: left; font-size: 1.2em; font-family: serif; }
+#home #tags { margin-top: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
+#home #tags a img { border: 1px solid #555; margin-right: 5px; }
 
-#home #tags { margin-top: 20px; }
-
+#vis { margin-left: -150px; height: 350px; } /* Vanderlin player */
+#home #vis { margin-top: 15px; }
 
 
 #sidebar { width: 220px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; }

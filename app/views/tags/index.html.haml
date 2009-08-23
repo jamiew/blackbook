@@ -16,7 +16,7 @@
     
   - @tags.each do |tag|
     - user = tag.user
-    - url = user.nil? ? tag_path(tag) : user_tag_path(user,tag)
+    - url = user.nil? ? tag_path(tag, :trailing_slash => true) : user_tag_path(user,tag, :trailing_slash => true)
     %tr
       %td= link_to(image_tag(tag.image(:small)), url)
       - txt = tag.title.blank? ? "tag #{tag.id}" : tag.title

@@ -25,7 +25,8 @@ ActionController::Routing::Routes.draw do |map|
     :has_many => [:comments, :likes]
 
   map.resources :tags,
-    :has_many => [:comments, :likes]  
+    :has_many => [:comments, :likes]
+  map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
 
   map.resources :likes    
 
