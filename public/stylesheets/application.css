@@ -24,7 +24,7 @@ body {
 body.ie6 { font-size: 16px; }
 
 a { color: #fff; text-decoration: underline; }
-a:hover { background-color: #ff0; color: #000; }
+a:hover { background-color: #ff0; color: #000; text-decoration: none; }
 
 
 /* Headers */
@@ -256,6 +256,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #home #intro ol li { float: left; font-size: 1.2em; font-family: serif; }
 #home #tags { margin-top: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
 #home #tags a img { border: 1px solid #555; margin-right: 5px; }
+#home #tags a:hover img { border: 1px solid #ff0; background: transparent; }
 
 #vis { margin-left: -150px; height: 350px; } /* Vanderlin player */
 #home #vis { margin-top: 15px; }

@@ -91,10 +91,8 @@ protected
   
   def create_from_api
 
-    opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application] }
-    # opts = { :description => params[:gml], :ip => request.remote_ip, :application => params[:application] }    
     # TODO: add app uuid? or Hash app uuid?
-    puts "Tag.create_from_api: #{opts.inspect}"
+    opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application] }
 
     @tag = Tag.new(opts)
     if @tag.save
