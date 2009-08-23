@@ -5,9 +5,9 @@
         = link_to SiteConfig.site_name, root_path
       %ul.navigation.buttons{:style => 'margin-left: -50px'}
         / %li= link_to 'home', root_path
-        %li= link_to 'archive', tags_path
-        %li= link_to 'activity', activity_path
+        %li= link_to 'all tags', tags_path
         %li= link_to 'apps', visualizations_path
+        %li= link_to 'activity', activity_path
         
       %ul.navigation.user_navigation
         = yield :header_nav

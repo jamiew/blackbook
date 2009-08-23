@@ -37,9 +37,9 @@ var PNB = function() {
 $(document).ready(function(){
 
   // flashing
-  $('#flash-error, #flash-notice, #flash-warning').fadeIn('fast');
+  $('#flash-error, #flash-notice, #flash-warning').slideToggle('slow');
   setTimeout(function(){
-    $('#flash-error, #flash-notice, #flash-warning').fadeOut('slow');
-  }, 2000);
+    $('#flash-error, #flash-notice, #flash-warning').slideToggle('slow');
+  }, 2500);
   
 });

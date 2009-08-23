@@ -1,19 +1,29 @@
 
+- required = '<span style="color: #f55">*</span> '
+
 %fieldset
+
   = form.error_messages
+  == #{required} = required field
+
   %legend  
 
   %hr
-  = form.file_field :image, :size => 10
+  = form.text_area :gml, :label => required+'<abbr>GML</abbr>', :rows => 10
 
   %hr
   = form.text_field :application, :label => 'Application'
   = form.text_field :location, :label => 'Location'
+
   =# form.text_field :title, :label => 'Title/Name'
   =# form.text_field :description
   =# form.text_field :cached_tag_list, :label => 'Tags (comma-separated)'
-  
+
   %hr
-  = form.text_area :description, :label => '<abbr>GML</abbr>', :rows => 10
+  = form.file_field :image, :size => 10, :label => 'Screenshot'
+
+  
+  - unless @tag.new_record?
+    = form.hidden_field :id
   
 

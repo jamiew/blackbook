@@ -29,7 +29,10 @@ class TagsController < ApplicationController
   
   def edit
     require_user
-    render 'new'
+    require_owner
+    @editing = "STUPIDFACE"
+    puts "AHHHHHHHHH"
+    render :action => 'new' # Hmm, doing :action is bunk, and rails 2.2 doesn't have just render 'new'
   end
   
   def create        
@@ -47,9 +50,16 @@ class TagsController < ApplicationController
   end
   
   def update
-    #TODO
     require_user
     require_owner
+    @tag.update_attributes(params[:tag])
+    if @tag.save    
+      flash[:notice] = "Tag ##{@tag.id} updated"
+      redirect_to tag_path(@tag, :trailing_slash => true)
+    else
+      flash[:error] = "Could not update tag: #{$!}"
+      render :action => 'edit'
+    end
   end
   
   def destroy
@@ -65,12 +75,12 @@ class TagsController < ApplicationController
 protected
   
   def get_tag
-    # @tag ||= Tag.find(params[:tag_id])    
-    @tag ||= Tag.find(params[:id])
+    # @tag ||= Tag.find(params[:tag_id])
+    @tag = Tag.find(params[:id])
   end
   
   def require_owner
-    unless @tag.user == current_user
+    unless @tag.user == current_user || current_user.login == "jamiew"
       raise "You don't have permission to do this!"
     end
   end
@@ -81,7 +91,7 @@ protected
 
     if @tag.save
       flash[:notice] = "Tag created"
-      redirect_to @tag
+      redirect_to tag_path(@tag, :trailing_slash => true)
     else
       flash[:error] = "Error saving your tag! #{$!}"
       error_status = 500

@@ -222,21 +222,20 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
 /* Flash */
-#flash-notice, #flash-warning, #flash-error {
-  
-  display: none; /* FIXME: obtrusive O_o */  
+#flash-notice, #flash-warning, #flash-error {  
+  display: none; /* FIXME: obtrusive O_o */
   position: absolute;
   margin-top: -20px;    
-  width: 700px;  
   font-size: 1em;
   font-weight: bold;  
   background: #667;
+  color: #fff;
   padding: 6px 12px 4px;
 }
 
-#flash-notice { color: green; }
-#flash-warning { color: yellow; }
-#flash-error { color: red; }
+#flash-notice   { color: #fff; background-color: #9c9; }
+#flash-warning  { color: #cc9; }
+#flash-error    { color: #c99; }
 
 
 /* Form Errors */
