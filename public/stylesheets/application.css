@@ -13,7 +13,6 @@ body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fiel
 
 
 /* Main */
-
 html, body { width: 100%; height: 100%; }
 html { color: #fff; background: #000; font-size: 100%; }
 body {
@@ -23,13 +22,17 @@ body {
 }
 body.ie6 { font-size: 16px; }
 
+/* Links */
 a { color: #fff; text-decoration: underline; }
 a:hover { background-color: #ff0; color: #000; text-decoration: none; }
 
+/* Image links somewhat differently */
+a img { border: 1px solid #333; background: transparent; }
+a img.noborder { border: 1px solid transparent; } /* default is bordered */
+a:hover img { border: 1px solid #ff0; background: transparent; }
 
 /* Headers */
 h1, h2, h3, h4, h5, h6 {
-/*  font-weight: bold;*/
   font-family: "Century Gothic", sans-serif;
   line-height: 2.125em;
   font-size: 150%;
@@ -164,6 +167,7 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 .bigtext { font-size: 1.4em;line-height: 1.6em; }
 
 a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 2px solid #444; }
+a.button:hover { background: #ff0; } /* Hmm. a:hover getting overriden by a.button */
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
@@ -186,7 +190,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
 /* Prev/next on show pages */
-.prevnext { display: block; margin: 15px auto; font-size: 1.15em; width: 160px; }
+.prevnext { display: block; margin: 25px auto 15px auto; font-size: 1.15em; width: 160px; }
 
 
 /* Main layout */
@@ -255,8 +259,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #home #intro .left { float: left; margin-right: 20px; padding: 0 10px;}
 #home #intro ol li { float: left; font-size: 1.2em; font-family: serif; }
 #home #tags { margin-top: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
-#home #tags a img { border: 1px solid #555; margin-right: 5px; }
-#home #tags a:hover img { border: 1px solid #ff0; background: transparent; }
+#tags a img { margin-right: 5px; }
 
 #vis { margin-left: -150px; height: 350px; } /* Vanderlin player */
 #home #vis { margin-top: 15px; }
