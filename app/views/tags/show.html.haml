@@ -2,16 +2,17 @@
 -#FIXME do in the controller...
 - @user ||= @tag.user
 
+/ Top level navigation
 - all_link = @user ? user_tags_path(@user) : tags_path
-.floatLeft= link_to '&larr; back', all_link
-.prevnext{:style => 'font-size: 1.15em; width: 160px; margin: 0 auto;'}
-  %li.floatLeft= @prev.nil? ? '&larr; prev' : link_to('&larr; prev', tag_path(@prev), :class => 'button')
+/ .floatLeft= link_to '&larr; back', all_link
+.prevnext
+  %li.floatLeft= @prev.nil? ? '&larr; prev' : link_to('&larr; prev', tag_path(@prev, :trailing_slash => true), :class => 'button')
   %li.floatLeft &nbsp;::&nbsp;
-  %li.floatLeft= @next.nil? ? 'next &rarr;' : link_to('next &rarr;', tag_path(@next), :class => 'button')
-  %br
-%br
+  %li.floatLeft= @next.nil? ? 'next &rarr;' : link_to('next &rarr;', tag_path(@next, :trailing_slash => true), :class => 'button')
+  %br.clear
 
-.infobox.floatRight{:style => 'position: absolute; margin: 20px 0 0 465px; opacity: 1; width: 250px; background-color: #151515; padding: 5px 16px;'}
+/ Information about the tag
+.infobox.floatRight{:style => 'position: absolute; margin: 0px 0 0 465px; opacity: 1; width: 250px; background-color: #151515; padding: 5px 16px;'}
   %hr
   %ul
     %li
@@ -50,7 +51,13 @@
       %li= link_to 'edit', edit_tag_path
       %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
     
-  
-.left.image{:style => 'background: #1a1a1a; height: 500px;'}
-  = image_tag @tag.image(:large)
+/ The actual tag awwwwwww yeah
+-# still allow images to be displayed for the time being
+.tag{:style => 'background-color: #1a1a1a;'}
+  - if @tag.image.exists?
+    .image= image_tag @tag.image(:large)
+  - else
+    #vis
+      = tag_player(@tag, :width => '600px', :bgcolor => '#ff00ff')
+
 

@@ -3,7 +3,7 @@
 #############################################################
 require 'capistrano/ext/multistage'
 set :stages, %w(staging production)
-set :default_stage, "staging"
+set :default_stage, "production"
 set :application, "blackbook"
 
 #############################################################
@@ -17,22 +17,23 @@ ssh_options[:forward_agent] = true
 #	Servers
 #############################################################
 
-set :user, 'deploy'
+set :user, 'oooooobook'
 set :use_sudo, false
-set :gateway, 'gate.CHANGE_ME.com'
-role :web, 'web.CHANGE_ME.com'
-role :app, 'app1.CHANGE_ME.com'
-role :db, 'db.CHANGE_ME.com', :primary => true
+# set :gateway, 'gate.CHANGE_ME.com'
+role :web, '000000book.com'
+role :app, '000000book.com'
+role :db, '000000book.com', :primary => true
 
 #############################################################
 #	Git
 #############################################################
 
 set :scm, :git
-set (:branch) { stage }
-set :scm_user, 'deploy'
-set :repository, "git@github.com:CHANGE_ME/#{application}.git"
-set (:deploy_to) { "/var/webapps/#{application}/website/#{stage}" }
+# set (:branch) { stage }
+# set :scm_user, 'deploy'
+set :repository, "git@github.com:jamiew/#{application}.git"
+# set (:deploy_to) { "/home/oooooobook/000000book.com2/#{stage}" }
+set (:deploy_to) { "/home/oooooobook/000000book.com2" }
 set :deploy_via, :remote_cache
 set :scm_verbose, true
 
@@ -43,8 +44,8 @@ set :scm_verbose, true
 namespace :deploy do
   desc "This to do once we get the code up"
   task :after_update_code, :roles => :app, :except => { :no_release => true } do
-    run "cd #{release_path} && sudo gemtools install"
-    run "cd #{release_path} && RAILS_ENV=#{stage} ./script/runner Sass::Plugin.update_stylesheets"
+    # run "cd #{release_path} && sudo gemtools install"
+    # run "cd #{release_path} && RAILS_ENV=#{stage} ./script/runner Sass::Plugin.update_stylesheets"
     run "cd #{release_path} && RAILS_ENV=#{stage} rake db:migrate"
   end
 

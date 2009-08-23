@@ -15,10 +15,10 @@ class TagsController < ApplicationController
     
     respond_to do |wants|
       wants.html { render }
-      wants.gml { render :xml => @tag.to_xml } #GML => XML
-      wants.xml { render :xml => @tag.to_xml }
-      wants.json { render :json => @tag.to_json }
-      wants.rss { render :rss => @tag.to_rss }
+      wants.xml   { render :xml => @tag.to_xml }
+      wants.gml   { render :xml => @tag.gml } #TODO: account for nil gml'z -- e.g. make an empty thing or throw error?
+      wants.json  { render :json => @tag.to_json }
+      wants.rss   { render :rss => @tag.to_rss }
     end
   end
     
