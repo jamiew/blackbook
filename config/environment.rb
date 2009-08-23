@@ -1,10 +1,14 @@
-# Be sure to restart your server when you modify this file
+ ############################################################
+#   __     __              __     __                 __      #
+#  |  |--.|  |.---.-.----.|  |--.|  |--.-----.-----.|  |--.  #
+#  |  _  ||  ||  _  |  __||    < |  _  |  _  |  _  ||    <   #
+#  |_____||__||___._|____||__|__||_____|_____|_____||__|__|  #
+#                                                            #
+ ############################################################
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-# RAILS_GEM_VERSION = '2.3.2' unless defined? RAILS_GEM_VERSION
-
-# Dreamhost only has Rails 2.2.2 -_-
-RAILS_GEM_VERSION = '2.2.2' #unless defined? RAILS_GEM_VERSION
+# Dreamhost only has Rails 2.2.2, so we're freezing Rails to 2.3.2 -- 2.3.3 has weird regressions
+RAILS_GEM_VERSION = '2.3.2' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
