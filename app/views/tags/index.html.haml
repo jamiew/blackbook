@@ -23,7 +23,7 @@
       %td= link_to(txt, url)
       %td= tag.application || '&mdash;'
       %td= link_to(user.login, user_path(user)) rescue '&mdash;'
-      %td= tag.created_at.strftime('%D %H:%m')
+      %td= tag.created_at.strftime('%D %T')
       
       %td      
         = link_to 'download gml', formatted_tag_path(tag, :gml), :class => 'button smallbutton facebox'
