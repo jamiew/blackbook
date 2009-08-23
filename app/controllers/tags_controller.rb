@@ -3,22 +3,10 @@ class TagsController < ApplicationController
   before_filter :get_tag, :only => [:show, :edit, :update, :destroy]
   protect_from_forgery :except => [:create] # for the "API"
 
+  # Display
   def index
     @page, @per_page = params[:page] || 1, 5
     @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
-  end
-  
-  # quick hack to dump the latest
-  def latest
-    @tag = Tag.find(:first, :order => 'created_at DESC')
-
-    puts "latest tag = #{@tag.inspect}"
-    # render :xml => @tag.gml and return
-    respond_to do |wants|
-      # wants.html { render :action => 'show' }
-      wants.html  { render :text => 'Try visiting /tags/latest.gml for something interesting' }
-      wants.gml   { render :xml => @tag.gml }
-    end    
   end
   
   def show
@@ -34,7 +22,18 @@ class TagsController < ApplicationController
       wants.rss   { render :rss => @tag.to_rss }
     end
   end
-    
+  
+  # Quick hack to dump the latest tag -- TODO render HTML too? or redirect
+  def latest
+    @tag = Tag.find(:first, :order => 'created_at DESC')
+    respond_to do |wants|
+      # wants.html { render :action => 'show' }
+      wants.html  { redirect_to(tag_path(@tag, :trailing_slash => true), :status => 302) } #Temporary Redirect
+      wants.gml   { render :xml => @tag.gml }
+    end    
+  end
+  
+  # Create/edit tags
   def new
     require_user
     @tag = Tag.new
