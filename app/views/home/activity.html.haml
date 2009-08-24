@@ -1,10 +1,12 @@
 
 
 
-%h2 All Activity On This Internet Website
+%h2 Latest & Greatest
 %p
   &larr;
   = link_to "back to home", root_path
+
+= pagination(@notifications)
 
 %p
   %br
@@ -23,7 +25,13 @@
               - tag = notif.subject
               - user = tag.user
               = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
-              == created by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
+
+              -# currently no user = API, and Tag should parse application name out of the GML
+              -# so just displa that. In the future we will probably have both
+              - if user.nil?
+                == uploaded via API #{tag.application.blank? ? '' : "(#{tag.application})"}
+              - else
+                == uploaded by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
           
             - when User
               - user = notif.subject            
@@ -31,4 +39,5 @@
               signed up
           - rescue
             == ERROR: #{$!}
-          
+
+= pagination(@notifications)
