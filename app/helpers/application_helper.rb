@@ -96,9 +96,9 @@ module ApplicationHelper
     end
   end
   
-  # Jdubs stylee
-  def pagination
-    will_paginate
+  # Pagination helper; collection optional as will_paginate will guess based on controller name
+  def pagination(collection = nil)
+    collection.nil? ? will_paginate : will_paginate(collection)
   end
   
   

@@ -166,7 +166,7 @@ br.clear { display: block; display: block; clear: both; height: 0; }
 /* Fonts & button misc */
 .bigtext { font-size: 1.4em;line-height: 1.6em; }
 
-a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 2px solid #444; }
+a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #444; }
 a.button:hover { background: #ff0; } /* Hmm. a:hover getting overriden by a.button */
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
@@ -204,7 +204,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   margin: 0 auto -3em;
 }
 
-#header { background-color: #1a1a1a; height: 24px; padding: 16px 0 16px 0; border-bottom: 1px solid #333; }
+#header { background-color: #1f1f1f; height: 24px; padding: 16px 0 16px 0; border-bottom: 2px solid #333; }
 #header h1 { float: left; font-family: Verdana, arial, sans-serif; font-size: 1.8em; font-weight: normal; margin: 0 60px 0 0px; padding: 0; line-height: 1em; letter-spacing: -2px; }
 #header ul.navigation { float: left; font-size: 1.5em; margin-top: 5px; }
 #header ul.navigation li { display: block; float: left; }
@@ -254,7 +254,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 /* Srs layout business */
 
-#home #intro { line-height: 1.2em; font-size: 1.3em; text-align: center; background: #111015; border-bottom: 2px solid #333; padding: 0px 0 10px 0; }
+#home #intro { line-height: 1.2em; font-size: 1.3em; text-align: center; background: #1a1a1a; border-bottom: 1px solid #333; padding: 0px 0 10px 0; }
 #home #intro .left { float: left; margin-right: 20px; padding: 0 10px;}
 #home #intro ol li { float: left; font-size: 1.2em; font-family: serif; }
 #home #tags { margin-top: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
