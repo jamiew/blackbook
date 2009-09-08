@@ -26,7 +26,7 @@
         %span{:style => 'font-weight: normal'}==, #{Tag.count(:conditions => "created_at >= '#{1.day.ago}'")} uploaded today
         %span{:style => 'font-weight: normal'}== &ndash; #{link_to 'view all', tags_path, :style => 'text-decoration: underline;'}
       %ul
-        - @tags.each do |tag|
+        - [].each do |tag|
           - user = tag.user
           - url = (user.nil? ? tag_path(tag, :trailing_slash => true) : user_tag_path(user, tag, :trailing_slash => true))
           %li.floatLeft= link_to image_tag(tag.image.url(:small)), url

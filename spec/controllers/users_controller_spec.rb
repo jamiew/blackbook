@@ -33,7 +33,7 @@ describe UsersController do
     it "should redirect to account on successful :create" do
       post :create, :user => { :login => 'bob', :email => 'bob@example.com',
         :password => 'bobs_pass', :password_confirmation => 'bobs_pass' }
-      response.should redirect_to(user_path(User.find('bob')) #TODO: requires has_slug...?
+      response.should redirect_to(user_path(User.find('bob'))) #TODO: requires has_slug...?
     end
   end
 

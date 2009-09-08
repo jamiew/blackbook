@@ -31,7 +31,7 @@ Rails::Initializer.run do |config|
   config.gem 'RedCloth'
   config.gem 'expose_model'
   config.gem 'authlogic', :version => '2.0.9'
-  
+  config.gem 'hpricot'
   config.gem 'jackdempsey-acts_as_commentable', :lib => 'acts_as_commentable', :source => "http://gems.github.com"
   config.gem 'thoughtbot-paperclip', :lib => 'paperclip', :source => 'http://gems.github.com'
   config.gem "i76-has_slug", :lib => 'has_slug', :source => 'http://gems.github.com'
