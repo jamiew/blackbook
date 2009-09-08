@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_filter :require_no_user, :only => [:new, :create]
-  before_filter :require_user, :only => [:show, :edit, :change_password, :update]
-  before_filter :set_user_from_current_user, :only => [:show, :edit, :change_password, :update]
+  before_filter :require_user, :only => [:edit, :change_password, :update]
+  before_filter :set_user_from_current_user, :only => [:edit, :change_password, :update]
 
   # Show all users
   def index
@@ -13,7 +13,8 @@ class UsersController < ApplicationController
   
   # Show one user
   def show
-    @page, @per_page = params[:page] || 1, 20
+    @page, @per_page = params[:page] || 1, 10
+    @user = User.find(params[:id])    
     @tags = @user.tags.paginate(:page => @page, :per_page => @per_page)
   end
 

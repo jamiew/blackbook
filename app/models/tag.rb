@@ -41,6 +41,7 @@ class Tag < ActiveRecord::Base
   validates_associated :user, :on => :create
   
   before_save :process_gml
+  before_create :validate_tempt
   # before_save :process_app_id
   
   has_attached_file :image, 
@@ -53,6 +54,22 @@ class Tag < ActiveRecord::Base
   def create_notification
     Notification.create(:subject => self, :verb => 'created')
   end
+  
+  # wrap remote_imge to always add our local FFlickr... FIXME
+  def remote_image
+    return nil if self.attributes['remote_image'].blank?
+    "http://fffff.at/tempt1/photos/data/eyetags/#{self.attributes['remote_image'].gsub('gml','png')}"
+  end
+  
+  # if remote image use that...
+  def thumbnail_image
+    if !remote_image.blank?
+      return "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{self.attributes['remote_image'].gsub('gml','png')}"
+    else
+      return self.image(:medium)
+    end
+  end
+  
   
   
 protected
@@ -72,7 +89,7 @@ protected
     attrs[:filename] = (header/'filename')[0].innerHTML rescue nil
 
     obj = (header/'client')[0] rescue nil
-    attrs[:client] = (obj/'name').innerHTML
+    attrs[:client] = (obj/'name').innerHTML rescue nil
 
     puts "Tag.process_gml: #{attrs.inspect}"
 
@@ -85,6 +102,17 @@ protected
   # verify the specified secret, or else say unknown
   def process_app_id
     # TODO
+  end
+  
+  # simpe hack to check secret/appname for if this is tempt...
+  # if so, save it to his User for him
+  def validate_tempt
+    # if secret 
+    if self.application =~ /eyeSaver/ #WEAK as hell son.
+      user = User.find_by_login('tempt1')
+      user.tags << self
+      # user.save! #don't really need to do this... counters, maybe? does .tags << fire?
+    end    
   end
   
   

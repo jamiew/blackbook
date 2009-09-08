@@ -55,6 +55,8 @@
 .tag
   - if @tag.image.exists?
     .image= image_tag @tag.image(:large)
+  - elsif @tag.remote_image
+    .image= image_tag @tag.remote_image
   - else
     -#TODO FIXME: this offset is ridiculous
     #vis{:style => 'margin-left: -300px;'} 

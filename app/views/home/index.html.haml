@@ -22,8 +22,8 @@
       %h2.error No tags yet!
     - else
       %h3
-        == Last #{pluralize @tags.length, 'tag'}
-        %span{:style => 'font-weight: normal'}==, #{Tag.count(:conditions => "created_at >= '#{1.day.ago}'")} uploaded today
+        / == Last #{pluralize @tags.length, 'tag'},
+        %span{:style => 'font-weight: normal'}== #{pluralize Tag.count(:conditions => "created_at >= '#{1.day.ago}'"), 'tag'} uploaded today
         %span{:style => 'font-weight: normal'}== &ndash; #{link_to 'view all', tags_path, :style => 'text-decoration: underline;'}
       %ul
         - [].each do |tag|

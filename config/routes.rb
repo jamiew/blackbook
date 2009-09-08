@@ -36,7 +36,6 @@ ActionController::Routing::Routes.draw do |map|
 
   ## Lastly, flat-style /jamiew URLs -- TODO!
   # map.user '/:id', :controller => 'users', :action => 'show'
-
   
   # Install the default routes as the lowest priority.
   map.connect ':controller/:action/:id'
