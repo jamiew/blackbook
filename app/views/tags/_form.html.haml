@@ -15,7 +15,10 @@
   = form.text_field :application, :label => 'Application'
   = form.text_field :location, :label => 'Location'
 
-  =# form.text_field :title, :label => 'Title/Name'
+  - if admin?
+    .admin{:style => 'background-color: #411; padding: 10px 0; margin: 10px 0;'}
+      = form.text_field :remote_image, :label => 'Filename'
+      = form.text_field :remote_secret, :label => 'Secret'
   =# form.text_field :description
   =# form.text_field :cached_tag_list, :label => 'Tags (comma-separated)'
 
