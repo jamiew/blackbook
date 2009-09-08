@@ -15,11 +15,13 @@
       %li= link_to 'Change Password', edit_user_path(@user)
 
 #main
+  = pagination(@tags)
   - if @tags.blank?
     %strong.empty
       Nothing yet! 
       %br== &rarr; #{link_to 'Upload', new_tag_path}
   - else
     = render :partial => 'tags/tag', :collection => @tags
+  = pagination(@tags)
   
 

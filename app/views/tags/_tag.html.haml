@@ -1,5 +1,21 @@
 
 -# A single tag pls
 - link = @user ? user_tag_path(@user, tag, :trailing_slash => true) : tag_path(tag, :trailing_slash => true)
-%h2= tag.application || '(untitled)'
-= link_to image_tag(tag.image.url(:medium)), link
+%h2= link_to tag.id, link
+
+.meta.floatRight{:style => 'position: absolute; width: 200px; margin: 10px 0 0 320px;'}
+  .posted_at
+    == #{time_ago_in_words(tag.created_at)} ago
+    %br= tag.created_at.strftime('%D %T')    
+  - if tag.application
+    %p.application 
+      w/
+      %b== #{tag.application}
+
+%p
+  =# link_to image_tag(tag.image.url(:medium)), link
+  - if tag.image.exists?
+    .image= image_tag tag.image(:medium)
+  - elsif tag.remote_image
+    .image= image_tag tag.thumbnail_image
+
