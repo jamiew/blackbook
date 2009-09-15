@@ -40,7 +40,7 @@ class Tag < ActiveRecord::Base
   
   validates_associated :user, :on => :create
   
-  before_save :process_gml
+  before_save :process_gml  
   before_create :validate_tempt
   # before_save :process_app_id
   
@@ -78,40 +78,41 @@ protected
   # and insert our server signature
   def process_gml
     return nil if self.gml.blank?
+    
     doc = Hpricot.XML(self.gml)
     header = (doc/'header')
     if header.blank?
       puts "No header in GML: #{self.gml}"
       return nil
     end
-
+    
     attrs = {}
     attrs[:filename] = (header/'filename')[0].innerHTML rescue nil
-
+    
     obj = (header/'client')[0] rescue nil
     attrs[:client] = (obj/'name').innerHTML rescue nil
-
-    puts "Tag.process_gml: #{attrs.inspect}"
-
-    #TODO use hashes for all this, dry
-    self.remote_image = attrs[:filename] unless attrs[:filename].blank?
+    
+    puts "Tag.process_gml: #{attrs.inspect}"    
     self.application = attrs[:client] unless attrs[:client].blank?
-    return attrs    
+    self.remote_image = attrs[:filename] unless attrs[:filename].blank?
+
+    return attrs   
+  rescue
+    STDERR.puts "Tag.process_gml error: #{$!}"
   end
-  
+    
   # verify the specified secret, or else say unknown
   def process_app_id
     # TODO
   end
-  
+    
   # simpe hack to check secret/appname for if this is tempt...
   # if so, save it to his User for him
   def validate_tempt
     # if secret 
     if self.application =~ /eyeSaver/ #WEAK as hell son.
       user = User.find_by_login('tempt1')
-      user.tags << self
-      # user.save! #don't really need to do this... counters, maybe? does .tags << fire?
+      self.user_id = user.id
     end    
   end
   
