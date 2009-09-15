@@ -115,12 +115,14 @@ protected
 
     # TODO: add app uuid? or Hash app uuid?
     opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application], :remote_secret => params[:secret] }
-
+    puts "TagsController.create_from_api, opts=#{opts.inspect}"
+    
     @tag = Tag.new(opts)
     if @tag.save
       render :text => @tag.id, :status => 200 #OK
     else
-      render :text => "ERROR: #{$!}", :status => 422 #Unprocessable Entity
+      logger.error "Could not create tag from API: #{@tag.errors.inspect}"
+      render :text => "ERROR: #{@tag.errors.inspect}", :status => 422 #Unprocessable Entity
     end
   end
     

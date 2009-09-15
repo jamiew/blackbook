@@ -26,7 +26,7 @@
       %td= tag.created_at.strftime('%D %T')
       
       %td      
-        = link_to 'download gml', formatted_tag_path(tag, :gml), :class => 'button smallbutton facebox'
+        = link_to 'download gml', tag_path(tag, :format => :gml), :class => 'button smallbutton facebox'
         =# link_to 'xml', tag_path(tag, :xml), :class => 'button smallbutton facebox'
         =# link_to 'json', tag_path(tag, :json), :class => 'button smallbutton facebox'
         =# link_to 'yaml', tag_path(tag, :yaml), :class => 'button smallbutton facebox'

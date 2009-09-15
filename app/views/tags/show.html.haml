@@ -39,7 +39,7 @@
   %hr
   %br  
   .gml
-    %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', formatted_tag_path(@tag, :gml), :class => 'button smallbutton')
+    %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
     %span.what-is-gml{:style => 'margin-left: 2px;'}= link_to('?', '#', :onclick => 'alert("TODO: what is GML page"); return false;')
     %textarea{:cols => 26, :rows => 12, :onclick => '$(this).select();', :style => 'background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px;'}= @tag.gml
     
