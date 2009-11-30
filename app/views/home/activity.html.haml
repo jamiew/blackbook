@@ -24,6 +24,7 @@
             - when Tag
               - tag = notif.subject
               - user = tag.user
+              = image_tag(tag.image.url(:small))
               = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
 
               -# currently no user = API, and Tag should parse application name out of the GML

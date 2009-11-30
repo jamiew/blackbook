@@ -196,7 +196,8 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 /* Main layout */
 #container {
   padding: 0 16px;
-  width: 768px;
+ /*width: 768px;*/
+  width: 90%;
   margin: 0 auto;
   min-height: 100%;
   height: auto !important;
@@ -204,18 +205,26 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   margin: 0 auto -3em;
 }
 
-#header { background-color: #1f1f1f; height: 24px; padding: 16px 0 16px 0; border-bottom: 2px solid #333; }
-#header h1 { float: left; font-family: Verdana, arial, sans-serif; font-size: 1.8em; font-weight: normal; margin: 0 60px 0 0px; padding: 0; line-height: 1em; letter-spacing: -2px; }
-#header ul.navigation { float: left; font-size: 1.5em; margin-top: 5px; }
+#header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; }
+#header h1.title { font-family: serif; font-size: 2.5em; font-weight: normal; margin: 0 0px 0 0px; padding: 0; line-height: 1em; letter-spacing: -2px; }
+#header h2.byline { display: block; font-size: 10pt; font-weight: normal; }
+#header ul.navigation { float: right; margin: 30px 80px 0 0; font-size: 1.5em;  }
 #header ul.navigation li { display: block; float: left; }
 #header ul.navigation li { padding-left: 12px; }
-#header ul.navigation.buttons li a { padding: 2px 3px; background-color: #fff; border: 1px solid #fafafa; color: #222; text-decoration: none; }
-#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 1px solid #ffa; color: #000; }
+#header ul.navigation.buttons li a { padding: 3px 4px; font-size: 0.9em; text-decoration: none; border-bottom: 1px dotted #555; }
+#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 0; color: #111; -moz-border-radius: 3px; -webkit-border-radius: 3px; }
 
-#header ul.navigation.user_navigation { font-size: 1em; float: right; }
+#header ul.navigation.user_navigation { font-size: 1em; margin-right: 70px; }
 
 /* User navigation: settings, logout, etc. */
 #header ul.user_navigation a img.photo { position: absolute; margin-left: -36px; margin-top: -7px; }
+
+#header h1 {
+  display: block;
+  font-family: "Georgia", serif;
+  font-size: 30pt;
+  font-style: italic;
+}
 
 #footer { padding: 0 16px; width: 768px; margin: 0 auto; height: 3em; text-align: center; }
 #footer { display: none; } /* REMOVEME disabling for time being */

@@ -42,4 +42,13 @@ $(document).ready(function(){
     $('#flash-error, #flash-notice, #flash-warning').slideToggle('slow');
   }, 2500);
   
+  // table stylez
+  // $("div:odd").css("background-color", "#F4F4F8");
+  // $("div:even").css("background-color", "#EFF1F1");
+
+  //for table row
+  $("tr:even").css("background-color", "#F4F4F8");
+  $("tr:odd").css("background-color", "#EFF1F1");
+  </script>
+  
 });
