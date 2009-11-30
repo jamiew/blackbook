@@ -10,8 +10,4 @@
 #  created_at  :datetime
 #  updated_at  :datetime
 #
-# Indexes
-#
-#  index_on_slug  (slug)
-#
 
