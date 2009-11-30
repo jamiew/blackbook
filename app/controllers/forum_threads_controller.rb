@@ -1,0 +1,2 @@
+class ForumThreadsController < ApplicationController
+end
