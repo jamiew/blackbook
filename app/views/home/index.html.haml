@@ -1,22 +1,5 @@
 
 #home
-  #intro.center
-    / Intro text
-    #welcome.left{:style => 'width: 250px;'}
-      %p
-        Sup dawg i herd you liek graf <br />        
-        so I made you a website
-    / Action links  
-    #actions.left{:style => 'width: 250px;'}
-      %p
-        %ol
-          %li
-            = link_to 'Signup', signup_path
-            for an account
-          %li
-            = link_to 'Upload', new_tag_path
-            tag GML
-    %br.clear
   #tags
     - if @tags.blank?
       %h2.error No tags yet!
@@ -33,5 +16,5 @@
     %br.clear
   / #vis{:style => 'margin-left: -150px; height: 350px;'}
   #vis
-    = tag_vis
+    =# tag_vis
 	

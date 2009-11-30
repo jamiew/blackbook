@@ -1,7 +1,10 @@
 ActionController::Routing::Routes.draw do |map|
 
 
-  map.root :controller => 'home'
+
+
+  # map.root :controller => 'home'
+  map.root :controller => 'tags', :action => 'index'
   
   map.admin '/admin', :controller => 'admin/base'
 
@@ -20,11 +23,15 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users,
     :member => [:change_password],
     :has_many => [:tags, :comments]
-  
+
+  # TODO
+  # map.resources :apps
   map.resources :visualizations,
+    :as => 'apps', #TODO DEPRECATEME
     :has_many => [:comments, :likes]
 
   map.resources :tags,
+    :as => 'data', #TODO DEPRECATEME
     :has_many => [:comments, :likes],
     :collection => [:latest],
     :trailing_slash => true

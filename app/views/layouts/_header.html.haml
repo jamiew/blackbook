@@ -1,16 +1,21 @@
 %body 
+
+  #header
+    %ul.navigation.user_navigation
+      = yield :header_nav
+    %ul.navigation.buttons{:style => 'margin-left: -50px'}
+      / %li= link_to 'home', root_path
+      %li= link_to 'data', tags_path
+      %li= link_to 'applications', visualizations_path
+      %li= link_to 'API/docs', visualizations_path
+      %li= link_to 'dev forum', visualizations_path
+      %li= link_to 'activity', activity_path
+      
+    %h1.title
+      = link_to SiteConfig.site_name, root_path
+    %h2.byline= link_to SiteConfig.site_byline, root_path
+      
   #container
-    #header
-      %h1.title
-        = link_to SiteConfig.site_name, root_path
-      %ul.navigation.buttons{:style => 'margin-left: -50px'}
-        / %li= link_to 'home', root_path
-        %li= link_to 'all tags', tags_path
-        / %li= link_to 'apps', visualizations_path
-        %li= link_to 'activity', activity_path
-        
-      %ul.navigation.user_navigation
-        = yield :header_nav
     #content
       = flash_messages
       = yield :layout

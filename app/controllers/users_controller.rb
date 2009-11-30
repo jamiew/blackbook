@@ -7,7 +7,6 @@ class UsersController < ApplicationController
   def index
     @page, @per_page = params[:page] || 1, 20
     @users = User.paginate(:page => @page, :per_page => @per_page)
-    puts @users.inspect
     # default_respond_to(@users, :layout => true, :exclude => [:email,:password,:crypted_password,:persistence_token])
   end
   
@@ -42,7 +41,6 @@ class UsersController < ApplicationController
   end
 
   def update
-    puts params.inspect
     if @user.update_attributes(params[:user])
       flash[:notice] = "Account updated!"
       redirect_to(user_path(@user))
