@@ -41,8 +41,8 @@ Rails::Initializer.run do |config|
   # Spawn installed as a plugin -- not available as a gem
 
   # Plugins I still need to get used to
-  config.gem 'justinfrench-formtastic', :lib => 'formtastic', :source => 'http://gems.github.com'
-  config.gem 'rubymood-jintastic', :lib => 'jintastic', :source => 'http://gems.github.com'
+  # config.gem 'justinfrench-formtastic', :lib => 'formtastic', :source => 'http://gems.github.com'
+  # config.gem 'rubymood-jintastic', :lib => 'jintastic', :source => 'http://gems.github.com'
 
   # Testing
   config.gem "rspec", :lib => false, :version => ">= 1.2.0" 
