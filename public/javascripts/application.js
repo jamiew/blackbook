@@ -47,8 +47,7 @@ $(document).ready(function(){
   // $("div:even").css("background-color", "#EFF1F1");
 
   //for table row
-  $("tr:even").css("background-color", "#F4F4F8");
-  $("tr:odd").css("background-color", "#EFF1F1");
-  </script>
+  $("tr:even").css("background-color", "#000");
+  $("tr:odd").css("background-color", "#111");
   
 });

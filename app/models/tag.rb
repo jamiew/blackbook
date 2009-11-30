@@ -22,10 +22,8 @@
 #  uuid               :string(255)
 #  ip                 :string(255)
 #  description        :text
-#
-# Indexes
-#
-#  index_on_slug  (slug)
+#  remote_image       :string(255)
+#  remote_secret      :string(255)
 #
 
 class Tag < ActiveRecord::Base

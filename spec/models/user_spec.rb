@@ -35,6 +35,5 @@
 #  index_users_on_last_request_at    (last_request_at)
 #  index_users_on_perishable_token   (perishable_token)
 #  index_users_on_email              (email)
-#  index_on_slug                     (slug)
 #
 

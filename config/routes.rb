@@ -1,6 +1,10 @@
 ActionController::Routing::Routes.draw do |map|
 
 
+  map.resources :forums
+
+
+
 
 
   # map.root :controller => 'home'

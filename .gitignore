@@ -8,3 +8,4 @@ db/*.sqlite3
 config/database.yml
 public/javascripts/cache
 public/stylesheets/cache
+public/system/

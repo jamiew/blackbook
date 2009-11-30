@@ -5,7 +5,7 @@ class TagsController < ApplicationController
 
   # Display
   def index
-    @page, @per_page = params[:page] || 1, 5
+    @page, @per_page = params[:page] || 1, 10
     @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
   end
   
