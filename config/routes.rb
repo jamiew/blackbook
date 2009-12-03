@@ -29,8 +29,11 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :account, :controller => "users" #DEPRECATEME
   map.resources :users,
-    :member => [:change_password],
-    :has_many => [:tags, :comments]
+        :member => [:change_password],
+        # :has_many => [:tags, :comments]
+        :has_many => [:comments] do |users|
+    users.resources :tags, :as => 'data'
+  end
 
   # TODO
   # map.resources :apps
@@ -39,12 +42,13 @@ ActionController::Routing::Routes.draw do |map|
     :has_many => [:comments, :likes]
 
   map.resources :tags,
-    :as => 'data', #TODO DEPRECATEME
+    :as => 'data',
     :has_many => [:comments, :likes],
     :collection => [:latest],
     :trailing_slash => true
+  map.resources :tags    
   map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
-
+  
   map.resources :likes    
 
   map.activity '/activity', :controller => 'home', :action => 'activity'

@@ -1,6 +1,7 @@
 
 -# A single tag pls
-- link = @user ? user_tag_path(@user, tag, :trailing_slash => true) : tag_path(tag, :trailing_slash => true)
+-# link = @user ? user_tag_path(@user, tag, :trailing_slash => true) : tag_path(tag, :trailing_slash => true)
+- link = tag_path(tag, :trailing_slash => true)
 %h2= link_to tag.id, link
 
 .meta.floatRight{:style => 'position: absolute; width: 200px; margin: 10px 0 0 320px;'}
