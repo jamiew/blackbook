@@ -55,8 +55,8 @@ hr {
 
 table { border-collapse: collapse; border-spacing: 0; }
 table tr { }
-table th { background-color: #333; padding: 5px; font-weight: bold; }
-table td { padding: 5px 5px; }
+table th { font-family: serif; font-size: 1.2em; background-color: #333; padding: 5px; font-weight: bold; }
+table td { padding: 5px 5px; font-size: 0.9em; }
 
 fieldset, img {
   border: 0;
@@ -174,15 +174,15 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
 /* Real Pagination */
-.pagination { text-align: center; padding: .3em 0 1em 0; }
+.pagination { text-align: left; padding: .3em 0 1em 0; }
 /*.pagination a, .pagination span { padding: .2em .5em; }*/
 .pagination a { padding: .2em .5em; }
 .pagination span.current, .pagination span.disabled { color: #AAA; border: 1px solid #444; padding: 3px 6px; }
 /*.pagination span.current { font-weight: bold; color: #dF5084; }*/
 .pagination span.current { }
-.pagination a { border: 1px solid #333; background-color: #fff; color: #000; text-decoration: none; }
+.pagination a { background-color: #fff; color: #000; text-decoration: none; }
 /*.pagination a:hover, .pagination a:focus { border-color: #003366; background: #0063DC; color: white; }*/
-.pagination a:hover, .pagination a:focus { }
+.pagination a:hover, .pagination a:focus { background: #ff0; color: #000; }
 .pagination .page_info { color: #aaa; padding-top: .8em; }
 .pagination .prev_page, .pagination .next_page { border-width: 2px; }
 .pagination .prev_page { margin-right: 0.5em; }
@@ -190,7 +190,8 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
 /* Prev/next on show pages */
-.prevnext { display: block; margin: 25px auto 15px auto; font-size: 1.15em; width: 160px; }
+/*.prevnext { display: block; margin: 25px auto 15px auto; font-size: 1.15em; width: 200px; }*/
+.prevnext { display: block; margin: 25px 0 15px 0; font-size: 1.15em; width: 200px; }
 
 
 /* Main layout */
@@ -206,13 +207,14 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 }
 
 #header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; }
-#header h1.title { font-family: serif; font-size: 2.5em; font-weight: normal; margin: 0 0px 0 0px; padding: 0; line-height: 1em; letter-spacing: -2px; }
-#header h2.byline { display: block; font-size: 10pt; font-weight: normal; margin-right: 20px; }
+#header h1.title { font-family: "Times", serif; font-size: 3.2em; font-weight: bold; margin: 0 0px 0 0px; padding: 0; line-height: 1em; letter-spacing: 1px; }
+#header h2.byline { display: block; font-size: 10pt; font-weight: normal; margin: -10px 20px 0 1px; }
+#header a.root_link:hover { background: transparent; color: #ff0; }
 #header ul.navigation { float: right; margin: 30px 10px 0 0; font-size: 1.5em;  }
-#header ul.navigation li { display: block; float: left; }
+#header ul.navigation li { font-family: "Times", serif; display: block; float: left; }
 #header ul.navigation li { padding-left: 12px; }
-#header ul.navigation.buttons li a { padding: 3px 4px; font-size: 0.9em; text-decoration: none; border-bottom: 1px dotted #222; }
-#header ul.navigation.buttons li a:hover { background-color: #ff0; border: 0; color: #111; -moz-border-radius: 3px; -webkit-border-radius: 3px; }
+#header ul.navigation.buttons li a { padding: 5px 6px 3px; font-size: 0.9em; text-decoration: none; border: 0; background: #fff; color: #000; -moz-border-radius: 2px; -webkit-border-radius: 2px; }
+#header ul.navigation.buttons li a:hover { background-color: #ff0; border-color: #ff0; color: #111; }
 
 #header ul.navigation.user_navigation { font-size: 1em; margin-right: 70px; }
 
