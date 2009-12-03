@@ -207,8 +207,9 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 }
 
 #header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; }
-#header h1.title { font-family: "Times", serif; font-size: 3.2em; font-weight: bold; margin: 0 0px 0 0px; padding: 0; line-height: 1em; letter-spacing: 1px; }
-#header h2.byline { display: block; font-size: 10pt; font-weight: normal; margin: -10px 20px 0 1px; }
+#header h1.title { display: inline; font-family: "Times", serif; font-size: 3em; font-weight: bold; margin: 0; padding: 0; line-height: 1em; letter-spacing: 1px; }
+#header h2.byline { display: inline; font-size: 10pt; font-weight: normal; margin: 0; padding: 0; }
+#header a.root_link { text-decoration: none; width: 200px;  }
 #header a.root_link:hover { background: transparent; color: #ff0; }
 #header ul.navigation { float: right; margin: 30px 10px 0 0; font-size: 1.5em;  }
 #header ul.navigation li { font-family: "Times", serif; display: block; float: left; }
