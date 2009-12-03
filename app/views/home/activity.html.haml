@@ -1,7 +1,5 @@
 
-
-
-%h2 Latest & Greatest
+%h2 Recent Database Activity
 %p
   &larr;
   = link_to "back to home", root_path
@@ -24,7 +22,7 @@
             - when Tag
               - tag = notif.subject
               - user = tag.user
-              = image_tag(tag.image.url(:small))
+              = image_tag(tag.remote_image || tag.image.url(:small), :height => '100', :style => 'border: 1px solid #444')
               = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
 
               -# currently no user = API, and Tag should parse application name out of the GML
