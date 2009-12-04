@@ -93,20 +93,10 @@ sub { vertical-align: text-bottom; }
 /*em { background-color: #eea; color: #000; padding: 2px 3px; }*/
 em { font-style: italic; }
 
-/* form sylings */
-input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-}
-
-input, textarea, select {
-  font-size: 100%;
-}
-
-legend {
-  color: #fff;
-}
+/* Form styles */
+input, textarea, select { font-family: inherit; font-size: inherit; font-weight: inherit; }
+input, textarea, select { font-size: 100%; }
+legend { color: #fff; }
 
 form label { 
 	display: block;  /* block float the labels to left column, set a width */
@@ -131,20 +121,15 @@ form fieldset {
   clear: both;
   padding: 10px;
   margin: 0;
-  
 }
 
-form fieldset legend {
-	font-size:1.1em;
-}
+form fieldset legend { font-size: 1.1em; }
+form fieldset label:first-letter { text-decoration:underline; } /* Denote accesskey */
+form br { clear:left; }
 
-form fieldset label:first-letter { /* use first-letter pseudo-class to underline accesskey, note that */
-/*  text-decoration:underline;*/
-}
-
-form br {
-	clear:left;
-}
+/* some specifics; TODO REMOVEME! */
+textarea#user_about { margin-left: 8em; }
+.buttons input, .buttons button { font-size: 1.5em; } 
 
 
 /* Custom classes & misc helpers */
@@ -207,10 +192,10 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 }
 
 #header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; }
-#header h1.title { display: inline; font-family: "Times", serif; font-size: 3em; font-weight: bold; margin: 0; padding: 0; line-height: 1em; letter-spacing: 1px; }
-#header h2.byline { display: inline; font-size: 10pt; font-weight: normal; margin: 0; padding: 0; }
-#header a.root_link { text-decoration: none; width: 200px;  }
+#header a.root_link { text-decoration: none;  }
 #header a.root_link:hover { background: transparent; color: #ff0; }
+#header h1.title { font-family: "Times", serif; font-size: 3em; font-weight: bold; margin: 0; padding: 0; line-height: 1em; letter-spacing: 1px; }
+#header h2.byline { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; margin-top: -0.5em; }
 #header ul.navigation { float: right; margin: 30px 10px 0 0; font-size: 1.5em;  }
 #header ul.navigation li { font-family: "Times", serif; display: block; float: left; }
 #header ul.navigation li { padding-left: 12px; }
@@ -220,7 +205,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #header ul.navigation.user_navigation { font-size: 1em; margin-right: 70px; }
 
 /* User navigation: settings, logout, etc. */
-#header ul.user_navigation a img.photo { position: absolute; margin-left: -36px; margin-top: -7px; }
+#header ul.user_navigation .user_photo img { margin-top: -10px; }
 
 #header h1 {
   display: block;
@@ -263,6 +248,13 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   margin-left: 15px;
 }
 
+/* Login form... */
+/*#login input { font-size: 1.5em; }*/
+#login .remember_me { margin-left: 160px; font-size: 0.8em; margin-top: 10px; }
+#login .remember_me input { float: left; }
+#login .remember_me label { text-align: left; margin-left: 3px; }
+#login .buttons, #login .help { margin-left: 6em; }
+#login .help { font-size: 0.9em; margin-top: 2em; }
 
 /* Srs layout business */
 
