@@ -44,11 +44,12 @@
     %textarea{:cols => 26, :rows => 12, :onclick => '$(this).select();', :style => 'background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px;'}= @tag.gml
     
   -#TODO: need a sexier way to determine ownership (everywhere)
-  - if @user && current_user && @user.id == current_user.id || (current_user && current_user.login == 'jamiew')
+  -#FIXME ghetto adminnery
+  - if @user && current_user && @user.id == current_user.id || (current_user && ['jamiew','fi5e','csugrue'].include?(current_user.login))
     %br
     %ol#controls  
       %li= link_to 'edit', edit_tag_path
-      / %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
+      %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
     
 / The actual tag awwwwwww yeah
 -# still allow images to be displayed for the time being

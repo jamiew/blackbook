@@ -11,9 +11,8 @@
       / %li= link_to 'dev forum', forums_path
       %li= link_to 'activity', activity_path
     
-    %a.root_link{:href => root_path}
-      %h1.title= SiteConfig.site_name
-      %h2.byline= SiteConfig.site_byline
+    %h1.title= link_to SiteConfig.site_name, root_path, :class => 'root_link'
+    %h2.byline= link_to SiteConfig.site_byline, root_path, :class => 'root_link'
       
   #container
     #content
