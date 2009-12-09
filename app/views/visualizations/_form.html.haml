@@ -1,0 +1,17 @@
+- required = '<span style="color: #d33">*</span>'
+%p
+  %label{:for => "visualization_name"}== #{required}Name:
+  = f.text_field :name
+%p
+  %label{:for => "visualization_version"} Version:
+  = f.text_field :version
+%p
+  %label{:for => "visualization_website"} Website:
+  = f.text_field :website
+%p
+  %label{:for => "visualization_download"} Download URL:
+  = f.text_field :download
+
+%p
+  %label{:for => "visualization_description"}== #{required}Description:
+  = f.text_area :description

@@ -1,16 +1,7 @@
-= pagination
+/ %h1 Applications
 
-%h2 List of Applications
-%p
-  &larr;
-  = link_to "back to home", root_path
+%p= link_to '+ Register New Application', new_object_path, :class => 'button add facebox'
 
-%p
-  %br
-  - if @visualizations.empty?
-    = "None yet."
-  %ol.square
-    - @visualizations.each do |vis|
-      %li= link_to vis.name, visualization_path(vis)
-
-= pagination
+= render :partial => 'visualization', :collection => current_objects
+- if current_objects.blank?
+  %em None yet!

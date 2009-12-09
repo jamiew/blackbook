@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091130093010) do
+ActiveRecord::Schema.define(:version => 20091209052216) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -29,6 +29,16 @@ ActiveRecord::Schema.define(:version => 20091130093010) do
   add_index "comments", ["commentable_id"], :name => "index_comments_on_commentable_id"
   add_index "comments", ["commentable_type"], :name => "index_comments_on_commentable_type"
   add_index "comments", ["user_id"], :name => "index_comments_on_user_id"
+
+  create_table "forum_posts", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "forum_threads", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "forums", :force => true do |t|
     t.string   "name"
@@ -52,6 +62,11 @@ ActiveRecord::Schema.define(:version => 20091130093010) do
     t.integer  "user_id"
     t.integer  "supplement_id"
     t.string   "supplement_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "subscriptions", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -105,6 +120,7 @@ ActiveRecord::Schema.define(:version => 20091130093010) do
     t.text     "about"
     t.string   "location"
     t.string   "slug"
+    t.string   "name"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email"
@@ -114,12 +130,13 @@ ActiveRecord::Schema.define(:version => 20091130093010) do
   add_index "users", ["persistence_token"], :name => "index_users_on_persistence_token"
 
   create_table "visualizations", :force => true do |t|
-    t.integer  "user_id"
-    t.string   "name"
-    t.string   "slug"
-    t.text     "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.integer "user_id"
+    t.string  "name"
+    t.string  "slug"
+    t.string  "website"
+    t.string  "download"
+    t.string  "version"
+    t.text    "description"
   end
 
 end
