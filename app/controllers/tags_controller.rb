@@ -15,7 +15,7 @@ class TagsController < ApplicationController
     @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
     
     respond_to do |wants|
-      wants.html { render }
+      wants.html  { render }
       wants.xml   { render :xml => @tag.to_xml }
       wants.gml   { render :xml => @tag.gml } #TODO: account for nil gml'z -- e.g. make an empty thing or throw error?
       wants.json  { render :json => @tag.to_json }

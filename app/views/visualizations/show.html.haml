@@ -1,1 +1,24 @@
-= h(@visualization.inspect)
+%h1 Viewing visualization
+
+%div[current_object]
+  %p.user_id
+    %strong User
+    = h current_object.user_id
+  %p.name
+    %strong Name
+    = h current_object.name
+  %p.slug
+    %strong Slug
+    = h current_object.slug
+  %p.description
+    %strong Description
+    = h current_object.description
+  %p.version
+    %strong Version
+    = h current_object.version
+
+= link_to 'Edit', edit_object_path
+|
+= link_to 'Destroy', object_path, :confirm => 'Really destroy visualization?', :method => :delete
+|
+= link_to 'Back', objects_path

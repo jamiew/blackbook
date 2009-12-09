@@ -1,0 +1,22 @@
+%div[visualization]
+  %p.user_id
+    %strong User
+    =h visualization.user.login
+  %p.name
+    %strong Name
+    =h visualization.name
+  %p.slug
+    %strong Slug
+    =h visualization.slug
+  %p.description
+    %strong Description
+    =h visualization.description
+  %p.version
+    %strong Version
+    =h visualization.version
+
+  = link_to 'Show', object_path(visualization)
+  |
+  = link_to 'Edit', edit_object_path(visualization)
+  |
+  = link_to 'Destroy', object_path(visualization), :confirm => 'Are you sure you want to delete this?', :method => :delete

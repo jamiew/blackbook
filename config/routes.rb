@@ -1,15 +1,12 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :forum_posts
-
-  map.resources :forum_threads
 
 
-
-  map.resources :forums
-
-
-
-
+  # Forum
+  map.resources :forums do |forum|
+    forum.resources :forum_threads do |threads|
+      threads.resources :forum_posts
+    end
+  end
 
   # map.root :controller => 'home'
   map.root :controller => 'tags', :action => 'index'

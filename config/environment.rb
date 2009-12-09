@@ -21,12 +21,12 @@ Rails::Initializer.run do |config|
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
-  # Ripped from GemTools -- support libs we want
+  # Ripped from GemTools -- support libs we want; require them as gem dependencies
   # config.gem 'capistrano'
   # config.gem 'capistrano-ext'
 
   # Actually used by the app
-  config.gem 'haml'
+  config.gem 'haml', :version => '2.3.0'
   config.gem 'config_reader', :version => '0.0.6'
   config.gem 'RedCloth'
   config.gem 'expose_model'
@@ -54,7 +54,6 @@ Rails::Initializer.run do |config|
   # config.gem 'timcharper-spork', :lib => false, :source => 'http://gems.github.com'
 
   
-  
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named
   # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
@@ -62,6 +61,7 @@ Rails::Initializer.run do |config|
   # Skip frameworks you're not going to use. To use Rails without a database,
   # you must remove the Active Record framework.
   # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
+  config.frameworks -= [ :active_resource ]
 
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
