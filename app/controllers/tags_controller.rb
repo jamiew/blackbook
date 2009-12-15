@@ -43,7 +43,6 @@ class TagsController < ApplicationController
     require_user
     require_owner
     @editing = "STUPIDFACE"
-    puts "AHHHHHHHHH"
     render :action => 'new' # Hmm, doing :action is bunk, and rails 2.2 doesn't have just render 'new'
   end
   

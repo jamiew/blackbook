@@ -52,7 +52,6 @@
       %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
     
 / The actual tag awwwwwww yeah
--# still allow images to be displayed for the time being
 .tag.tabs
   %ul.tab_navigation
     %li= link_to 'thumbnail', '#thumbnail'
@@ -64,7 +63,8 @@
     - elsif @tag.remote_image
       .image= image_tag @tag.remote_image, imgopts
     - else
-      No thumbnail! This is a big TODO item for us.
+      %br
+      %h4 No thumbnail generated yet.
   #vanderplayer
     = tag_player(@tag, :width => '580px')
 

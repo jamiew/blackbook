@@ -214,8 +214,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   font-style: italic;
 }
 
-#footer { padding: 0 16px; width: 768px; margin: 0 auto; height: 3em; text-align: center; }
-#footer { display: none; } /* REMOVEME disabling for time being */
+#footer { clear: both; padding: 0 16px; margin: 2em 2em 6em 2em; height: 3em; text-align: left; color: #777; font-size: 90%; }
 
 
 /* Flash */
@@ -267,7 +266,6 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #vis { margin-left: -150px; height: 350px; } /* Vanderlin player */
 #home #vis { margin-top: 15px; }
 
-
 #sidebar { width: 220px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; }
 #main { width: 520px; padding: 30px 0 20px 0; }
 
@@ -276,5 +274,8 @@ div.tabs ul.tab_navigation { padding-bottom: 30px; }
 div.tabs ul.tab_navigation li a { float: left; margin-right: 5px; padding: 10px 5px; background-color: #333; text-decoration: none; }
 div.tabs ul.tab_navigation li a:hover { background-color: #555; color: #eee; }
 div.tabs ul.tab_navigation li a.selected { background-color: #ff0; color: #000; }
-div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff9; color: #555; }
+div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: #333; text-shadow: 3px; }
 div.tabs div { clear: both; }
+
+/* Player customizations... */
+#vanderplayer object, #vanderplayer embed { min-height: 800px; } /* hack */
