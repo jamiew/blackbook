@@ -80,7 +80,7 @@ protected
     doc = Hpricot.XML(self.gml)
     header = (doc/'header')
     if header.blank?
-      puts "No header in GML: #{self.gml}"
+      STDERR.puts "No header in GML: #{self.gml}"
       return nil
     end
     
@@ -90,7 +90,7 @@ protected
     obj = (header/'client')[0] rescue nil
     attrs[:client] = (obj/'name').innerHTML rescue nil
     
-    puts "Tag.process_gml: #{attrs.inspect}"    
+    STDERR.puts "Tag.process_gml: #{attrs.inspect}"    
     self.application = attrs[:client] unless attrs[:client].blank?
     self.remote_image = attrs[:filename] unless attrs[:filename].blank?
 

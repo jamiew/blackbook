@@ -75,3 +75,6 @@ Rails::Initializer.run do |config|
   # config.i18n.default_locale = :de
   
 end
+
+# require everything in /lib
+Dir.glob(RAILS_ROOT+"/lib/*.rb").each { |file| require file }
