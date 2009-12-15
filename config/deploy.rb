@@ -30,7 +30,7 @@ set :branch, ENV['BRANCH'] || 'master'
 set :repository, "git@github.com:jamiew/#{application}.git"
 set :deploy_via, :remote_cache
 set :scm_verbose, true
-set :git_enable_submodules, 1
+#set :git_enable_submodules, 1
 
 
 # Hooks
