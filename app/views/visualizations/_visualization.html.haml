@@ -1,7 +1,7 @@
 %div[visualization]
   %p.user_id
     %strong User
-    =h visualization.user.login
+    =h visualization.user.login rescue 'nil'
   %p.name
     %strong Name
     =h visualization.name
@@ -15,8 +15,9 @@
     %strong Version
     =h visualization.version
 
-  = link_to 'Show', object_path(visualization)
-  |
-  = link_to 'Edit', edit_object_path(visualization)
-  |
-  = link_to 'Destroy', object_path(visualization), :confirm => 'Are you sure you want to delete this?', :method => :delete
+  - if admin?
+    = link_to 'Show', object_path(visualization)
+    |
+    = link_to 'Edit', edit_object_path(visualization)
+    |
+    = link_to 'Destroy', object_path(visualization), :confirm => 'Are you sure you want to delete this?', :method => :delete

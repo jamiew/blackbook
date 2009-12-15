@@ -45,7 +45,7 @@
     
   -#TODO: need a sexier way to determine ownership (everywhere)
   -#FIXME ghetto adminnery
-  - if @user && current_user && @user.id == current_user.id || (current_user && ['jamiew','fi5e','csugrue'].include?(current_user.login))
+  - if @user && current_user && @user.id == current_user.id || (current_user && ['jamiew','evan','csugrue','todd'].include?(current_user.login))
     %br
     %ol#controls  
       %li= link_to 'edit', edit_tag_path
@@ -53,16 +53,19 @@
     
 / The actual tag awwwwwww yeah
 -# still allow images to be displayed for the time being
-.tag
-  - imgopts = {:width => 600}
-  - if @tag.image.exists?
-    .image= image_tag @tag.image(:large), imgopts
-  - elsif @tag.remote_image
-    .image= image_tag @tag.remote_image, imgopts
-  - else
-    -#TODO FIXME: this offset is ridiculous
-    Vanderlin flash player:
-    #vis{:style => 'margin-left: -300px;'} 
-      = tag_player(@tag, :width => '750px')
+.tag.tabs
+  %ul.tab_navigation
+    %li= link_to 'thumbnail', '#thumbnail'
+    %li= link_to 'vanderplayer', '#vanderplayer'
+  #thumbnail
+    - imgopts = {:width => 600}
+    - if @tag.image.exists?
+      .image= image_tag @tag.image(:large), imgopts
+    - elsif @tag.remote_image
+      .image= image_tag @tag.remote_image, imgopts
+    - else
+      No thumbnail! This is a big TODO item for us.
+  #vanderplayer
+    = tag_player(@tag, :width => '580px')
 
 
