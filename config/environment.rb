@@ -26,7 +26,7 @@ Rails::Initializer.run do |config|
   # config.gem 'capistrano-ext'
 
   # Actually used by the app
-  config.gem 'haml', :version => '2.3.0'
+  config.gem 'haml'
   config.gem 'config_reader', :version => '0.0.6'
   config.gem 'RedCloth'
   config.gem 'expose_model'
