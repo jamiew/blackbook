@@ -14,6 +14,7 @@ require 'cap_recipes/tasks/passenger'
 set :stages, %w(staging production)
 set :default_stage, "production"
 set :application, "blackbook"
+# set :deploy_to "/home/#{user}/#{application}"
 
 # Settings
 default_run_options[:pty] = true
@@ -24,9 +25,6 @@ ssh_options[:forward_agent] = true
 #	Git
 set :scm, :git
 set :branch, ENV['BRANCH'] || 'master'
-# set :scm_user, 'deploy'
-# set (:deploy_to) { "/home/oooooobook/000000book.com2/#{stage}" }
-# set (:deploy_to) { "/home/jamie/blackbook2" }
 set :repository, "git@github.com:jamiew/#{application}.git"
 set :deploy_via, :remote_cache
 set :scm_verbose, true
@@ -34,19 +32,19 @@ set :scm_verbose, true
 
 
 # Hooks
-before "deploy", "gems:install"
-# ...
+# before "deploy", "gems:install"
 
 
 #	Recipes
 namespace :deploy do
-  desc "This to do once we get the code up"
+  desc "Things to do once we get the code up: install gems, generate Sass, etc."
   task :after_update_code, :roles => :app, :except => { :no_release => true } do
     # run "cd #{release_path} && sudo gemtools install"
     # run "cd #{release_path} && RAILS_ENV=#{stage} ./script/runner Sass::Plugin.update_stylesheets"
     # run "cd #{release_path} && RAILS_ENV=#{stage} rake db:migrate"
   end
 
+  desc "Link database.yml & other shared settings after 'symlink' (what links /releases/YYYYMMDDMMSS to /current)"
   task :after_symlink do
     run "ln -nfs #{shared_path}/config/database.yml #{current_path}/config/database.yml"
     run "ln -nfs #{shared_path}/config/settings.yml #{current_path}/config/settings.yml"
@@ -73,7 +71,7 @@ end
 namespace :gems do
   desc "Install gems via 'rake gems:install'"
   task :install, :roles => :app do
-    run "cd #{current_path} && #{sudo} RAILS_ENV=#{stage} rake gems:install"
+    run "cd #{current_path} && #{sudo if use_sudo} RAILS_ENV=#{stage} rake gems:install"
   end
 end
 
