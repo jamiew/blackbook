@@ -52,7 +52,7 @@
       
     %strong{:style => 'color: #f0f'} GML Header
     %textarea{:rows => 12, :cols => 28, :style => 'border: 2px solid #f0f'}
-      =h (@tag.gml_document/'header').inspect rescue "could not parse: #{$!}"
+      = h(@tag.gml_document/'header'.inspect) rescue "could not parse: #{$!}"
     
     
 / The actual tag awwwwwww yeah
