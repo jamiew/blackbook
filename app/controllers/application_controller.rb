@@ -2,14 +2,14 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  helper :all
 
-  helper_method :current_user_session, :current_user, :page_title,
-    :set_page_title
+  helper :all # Oof, REMOVEME -- don't really need all helpers, all the time
+  helper_method :current_user_session, :current_user, :page_title, :set_page_title
 
   filter_parameter_logging :password, :password_confirmation
 
-  before_filter :blackbird_override, :activate_authlogic, :set_format
+  # Global filters
+  before_filter :activate_authlogic, :set_format, :blackbird_override
 
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
@@ -21,22 +21,51 @@ class ApplicationController < ActionController::Base
     @page_title ? "#{@page_title} - #{SiteConfig.site_name}" : SiteConfig.site_name
   end
 
+
+  # Show a single static file
+  # FIXME -- hardcoded references to haml & erb
+  def static
+    if (File.exist?("#{RAILS_ROOT}/app/views/pages/#{params[:id]}.html.haml") || File.exist?("#{RAILS_ROOT}/app/views/pages/#{params[:id]}.html.erb"))
+      render :template => "pages/#{params[:id]}"
+    else
+      render :file => "public/404.html"
+    end
+  end
+
+
+
   protected
 
+    # Enable blackbird if ?force_blackbird=true
     def blackbird_override
-      if 'true' == params[:force_blackbird]
+      if params[:force_blackbird] == 'true'
         session[:blackbird] = true
       end
     end
-
-  private
-    def current_user_session
-      @current_user_session ||= UserSession.find
+    
+    # Automatically respond with 404 for ActiveRecord::RecordNotFound
+    def record_not_found
+      render :file => File.join(RAILS_ROOT, 'public', '404.html'), :status => 404
     end
 
+    # Render a partial into a string
+    def fetch_partial(file, opts = {})
+      render_to_string :partial => file, :locals => opts
+    end
+    helper_method :fetch_partial
+    
+
+  private
+  
+    # User shortcuts
     def current_user
       @current_user ||= current_user_session && current_user_session.record
     end
+    
+    def current_user_session
+      @current_user_session ||= UserSession.find
+    end
+    
 
     # Authentication checks
     def logged_in?
@@ -55,7 +84,7 @@ class ApplicationController < ActionController::Base
     def require_user
       unless current_user
         store_location
-        flash[:notice] = "You must be logged in to access this page"
+        flash[:error] = "You must be logged in to access this page"
         redirect_to login_url
         return false
       end
@@ -64,12 +93,13 @@ class ApplicationController < ActionController::Base
     def require_no_user
       if current_user
         store_location
-        flash[:notice] = "You must be logged out to access this page"
+        flash[:error] = "You must be logged out to access this page"
         redirect_to(user_path(current_user))
         return false
       end
     end
 
+    # Stash the current page for use in redirection, e.g. login
     def store_location
       session[:return_to] = request.request_uri
     end
@@ -79,18 +109,19 @@ class ApplicationController < ActionController::Base
       session[:return_to] = nil
     end
 
+    # Set XHR as a totally differnet response format than HTML (don't override .js, we use that)
     def set_format
       @template.template_format = 'html'
       request.format = :xhr if request.xhr?
     end
 
+    # Render XHR without :layout by default
     def render(*args)
       if request.xhr?
         if args.blank?
           return(super :layout => false)
         else
-          args.first[:layout] = false if args.first.is_a?(Hash) &&
-            args.first[:layout].blank?
+          args.first[:layout] = false if args.first.is_a?(Hash) && args.first[:layout].blank?
         end
       end
       super
@@ -144,19 +175,5 @@ class ApplicationController < ActionController::Base
         # - atom
       end and return
     end
-
-
-    protected
-
-    # Automatically respond with 404 for ActiveRecord::RecordNotFound
-    def record_not_found
-      render :file => File.join(RAILS_ROOT, 'public', '404.html'), :status => 404
-    end  
-
-    def fetch_partial(file, opts = {})
-      render_to_string :partial => file, :locals => opts
-    end
-    helper_method :fetch_partial
-
 
 end
