@@ -1,5 +1,13 @@
 #footer
-  %br
-  Powered by
-  = link_to 'FAT', 'http://fffff.at'
-  =#link_to 'Pixels and Bits', 'http://pixels-and-bits.com'
+  
+  = link_to 'about', '/about'
+  &nbsp;/&nbsp;
+  %script{:type => 'text/javascript'} document.write('<a href="mailto:info@000000book.com">contact</a>');
+  &nbsp;/&nbsp;
+  = link_to 'source code', 'http://github.com/jamiew/blackbook', :target => '_blank'
+  &nbsp;/&nbsp;
+
+  == powered by #{link_to 'FAT Lab', 'http://fffff.at'}
+  &mdash;
+  == copyfree 2009-#{Date.today.year}
+  

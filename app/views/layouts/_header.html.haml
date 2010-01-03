@@ -1,21 +1,34 @@
+%head
+  %meta{ http_equiv_attrs }
+  %meta{ 'http-equiv' => 'imagetoolbar', :content => 'no' }
+  %meta{ :name => 'distribution', :content => 'all' }
+  %meta{ :name => 'robots', :content => 'all' }
+  %meta{ :name => 'resource-type', :content => 'document' }
+  %meta{ :name => 'MSSmartTagsPreventParsing', :content => 'true' }
+  = stylesheet_link_tag 'application'
+  = stylesheet_link_tag 'print', :media => 'print'
+  = yield :head    
+  %title= page_title
+
+
+= remote_javascript_includes
+- bundle do
+  = local_javascript_includes
+= blackbird_tags
+
 %body 
 
+  -# Common code we're using on every page (for the time being)
   #header
     %ul.navigation.user_navigation
       = yield :header_nav
-    %ul.navigation.buttons{:style => 'margin-left: -50px'}
+    %ul.navigation.buttons
       / %li= link_to 'home', root_path
       %li= link_to 'data', tags_path
       %li= link_to 'applications', visualizations_path
-      %li= link_to 'API/docs', "http://jamiedubs.com/wikis/blackbook"
+      %li= link_to 'API/docs', "http://jamiedubs.com/wikis/blackbook", :target => '_blank'
       / %li= link_to 'dev forum', forums_path
       %li= link_to 'activity', activity_path
     
     %h1.title= link_to SiteConfig.site_name, root_path, :class => 'root_link'
     %h2.byline= link_to SiteConfig.site_byline, root_path, :class => 'root_link'
-      
-  #container
-    #content
-      = flash_messages
-      = yield :layout
-  = render :partial => 'layouts/footer'

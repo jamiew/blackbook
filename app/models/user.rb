@@ -41,12 +41,23 @@
 class User < ActiveRecord::Base
   acts_as_authentic
   acts_as_commentable # user wall
-  # has_many :comments
-  has_many :tags, :order => 'created_at DESC'
-  
+
   has_slug :login
+
+  has_many :comments
+  has_many :tags, :order => 'created_at DESC'
+  has_many :visualizations
   
-  #TODO: validations!  
+  attr_protected :admin
+  
+  #TODO: yet more validations
+  validates_presence_of :login, :on => :create, :message => "can't be blank"
+  validates_uniqueness_of :login, :on => :create, :message => "must be unique"
+  validates_presence_of :email, :on => :create, :message => "can't be blank"
+  validates_uniqueness_of :email, :on => :create, :message => "must be unique"
+  #TODO email regex
+  
+
 
   has_attached_file :photo, 
     :styles => { :medium => "300x300>", :small => "100x100#", :tiny => '32x32#' }

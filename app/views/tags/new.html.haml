@@ -11,7 +11,3 @@
     = render :partial => "form", :object => form
     .buttons
       = form.submit @tag.new_record? ? "Create" : 'Save'
-
-  -# content_for :on_ready do
-  - if false
-    PNB.formFocusFirst('new_user')

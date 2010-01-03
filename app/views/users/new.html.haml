@@ -1,6 +1,6 @@
 .quarter.centered
   - uberform_for @user, :url => users_path do |form|
-    %h2 Register #000000book Account
+    %h2== Register #{SiteConfig.site_name} Account
 
     %fieldset
       = form.error_messages
@@ -16,6 +16,3 @@
 
     .buttons
       = form.submit "Register"
-
-  - content_for :on_ready do
-    PNB.formFocusFirst('new_user')

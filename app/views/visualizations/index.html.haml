@@ -2,6 +2,28 @@
 
 %p= link_to '+ Register New Application', new_object_path, :class => 'button add facebox'
 
-= render :partial => 'visualization', :collection => current_objects
+=# pagination(current_objects)
+
+%table{:style => 'width: 100%'}
+  %tr
+    / %th{:style => 'width: 110px;'}
+    %th name
+    %th language
+    %th author
+    %th{:style => 'width: 130px'} submitted
+    %th
+    
+  - current_objects.each do |app|
+    %tr
+      / %td= link_to(image_tag(app.thumbnail_image), url)
+      %td= link_to app.name, visualization_path(app)
+      %td= app.kind || '&mdash;'
+      %td= link_to user.login, user_path(user) rescue '&mdash;'
+      %td=# app.created_at.strftime('%D %T')
+      
+=# pagination(current_objects)
+
+=# render :partial => 'visualization', :collection => current_objects
+
 - if current_objects.blank?
   %em None yet!

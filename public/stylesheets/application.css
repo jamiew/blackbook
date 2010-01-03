@@ -97,15 +97,16 @@ em { font-style: italic; }
 input, textarea, select { font-family: inherit; font-size: inherit; font-weight: inherit; }
 input, textarea, select { font-size: 100%; }
 legend { color: #fff; }
+/*input[disabled="disabled"] { background-color: #f0f; color: #666; }*/
+input[disabled], button[disabled] { color:#999; background-color: #bbb; border-color: #999; }
 
 form label { 
 	display: block;  /* block float the labels to left column, set a width */
-	float: left; 
-	width: 150px; 
-/*  padding: 0; */
+	text-align: left; 	
+/*  float: left;*/
+/*  width: 150px;*/
   padding: 0 5px 5px 5px;
 	margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
-	text-align: right; 
 }
 
 form {  /* set width in form, not fieldset (still takes up more room w/ fieldset width */
@@ -133,15 +134,10 @@ textarea#user_about { margin-left: 8em; }
 
 
 /* Custom classes & misc helpers */
-.clear { display: block; clear: both; }
-br.clear { display: block; display: block; clear: both; height: 0; }
-
-.left { text-align: left; }
-.right { text-align: right; }
-.center { text-align: center; }
-.centered { margin-left: auto; margin-right: auto; }
-.float_right, .floatRight { float: right; margin-left: 0.2em; }
-.float_left, .floatLeft { float: left; margin-right: 0.2em; }
+.row, .clear { display: block; clear: both; }
+.left, .floatLeft { float: left; }
+.right, .floatRight { float: right; }
+.center, .centered { margin-left: auto; margin-right: auto; }
 
 .full { width: 100%; }
 .half { width: 50%; }
@@ -157,8 +153,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
 
-
-/* Real Pagination */
+/* Pagination */
 .pagination { text-align: left; padding: .3em 0 1em 0; }
 /*.pagination a, .pagination span { padding: .2em .5em; }*/
 .pagination a { padding: .2em .5em; }
@@ -172,6 +167,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 .pagination .prev_page, .pagination .next_page { border-width: 2px; }
 .pagination .prev_page { margin-right: 0.5em; }
 .pagination .next_page { margin-left: 0.5em; }
+
 
 
 /* Prev/next on show pages */
@@ -214,12 +210,16 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
   font-style: italic;
 }
 
-#footer { clear: both; padding: 0 16px; margin: 2em 2em 6em 2em; height: 3em; text-align: left; color: #777; font-size: 90%; }
+#footer { clear: both; padding: 0 16px; margin: 5em 2em 1em 2em; height: 3em; text-align: right; color: #777; font-size: 90%; }
+
+/* Standardish layouts... */
+.left_column { width: 60%; }
+.right_column { float: right; width: 40%; }
 
 
 /* Flash */
 #flash-notice, #flash-warning, #flash-error {  
-  display: none; /* FIXME: obtrusive O_o */
+  display: none; /* FIXME: should be obtrusive O_o */
   position: absolute;
   margin-top: -20px;    
   font-size: 1em;
@@ -231,24 +231,14 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 #flash-notice   { color: #fff; background-color: #9c9; }
 #flash-warning  { color: #cc9; }
-#flash-error    { color: #c99; }
+#flash-error    { color: #fff; background-color: #c99; }
 
 
 /* Form Errors */
-#errorExplanation {
-  -moz-border-radius: 5px;
-  background-color: #faa;
-  border: 1px solid #faa;
-  color: #333;
-  padding: 0 10px 15px;
-} 
-#errorExplanation ul li {
-  list-style-type: square;
-  margin-left: 15px;
-}
+#errorExplanation { background-color: #faa; border: 1px solid #faa; color: #333; padding: 0 10px 15px; } 
+#errorExplanation ul li { list-style-type: square; margin-left: 15px; }
 
 /* Login form... */
-/*#login input { font-size: 1.5em; }*/
 #login .remember_me { margin-left: 160px; font-size: 0.8em; margin-top: 10px; }
 #login .remember_me input { float: left; }
 #login .remember_me label { text-align: left; margin-left: 3px; }
@@ -256,7 +246,6 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #login .help { font-size: 0.9em; margin-top: 2em; }
 
 /* Srs layout business */
-
 #home #intro { line-height: 1.2em; font-size: 1.3em; text-align: center; background: #1a1a1a; border-bottom: 1px solid #333; padding: 0px 0 10px 0; }
 #home #intro .left { float: left; margin-right: 20px; padding: 0 10px;}
 #home #intro ol li { float: left; font-size: 1.2em; font-family: serif; }
@@ -264,6 +253,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 #tags a img { margin-right: 5px; }
 
 #vis { margin-left: -150px; height: 350px; } /* Vanderlin player */
+#vanderplayer object, #vanderplayer embed { min-height: 800px; } /* hack */
 #home #vis { margin-top: 15px; }
 
 #sidebar { width: 220px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; }
@@ -277,5 +267,7 @@ div.tabs ul.tab_navigation li a.selected { background-color: #ff0; color: #000; 
 div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: #333; text-shadow: 3px; }
 div.tabs div { clear: both; }
 
-/* Player customizations... */
-#vanderplayer object, #vanderplayer embed { min-height: 800px; } /* hack */
+
+/* Add new application/visualization... */
+.embed_toggle { margin-top: 40px; }
+.embed_details.disabled { color: #555; }

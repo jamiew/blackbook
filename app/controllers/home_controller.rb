@@ -9,4 +9,5 @@ class HomeController < ApplicationController
     @page, @per_page = params[:page] || 1, 20
     @notifications = Notification.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
   end
+  
 end
