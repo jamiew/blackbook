@@ -14,7 +14,7 @@
           -# url = (user.nil? ? tag_path(tag, :trailing_slash => true) : user_tag_path(user, tag, :trailing_slash => true))
           - url = tag_path(tag, :trailing_slash => true)
           %li.floatLeft= link_to image_tag(tag.image.url(:small)), url
-  / #vis{:style => 'margin-left: -150px; height: 350px;'}
+
   %br.clear
   - #FIXM baconhand
   - @tags = Tag.find(:all, :order => 'created_at DESC', :limit => 30)
@@ -24,11 +24,15 @@
     %ul.square
       - @tags.each do |tag|
         %li
-          %a{:href => tag_path(@tag)}
-            = tag.title || "##{@tag.id}"
-            %span.location== , #{tag.location || ''}
-          %em.username #{tag.user || '(nil user)'}
-          %span.created_at.timeago= tag.created_at.strftime('%D')
+          %a{:href => tag_path(tag)}= tag.title || "##{tag.id}"
+          %small
+            - unless tag.application.blank?
+              %span.application== / #{tag.application}          
+            - unless tag.location.blank?
+              %span.location== / #{tag.location}
+            - unless tag.user.nil?
+              %span.username / #{tag.user.login}            
+            %span.created_at.timeago== / #{tag.created_at.strftime('%D')}
 
   #vanderplayer.column_left
     %h2= link_to @tag.title || "##{@tag.id}", tag_path(@tag)
