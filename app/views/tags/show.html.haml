@@ -42,11 +42,17 @@
     
   -#TODO: need a sexier way to determine ownership (everywhere)
   -#FIXME ghetto adminnery
-  - if @user && current_user && @user.id == current_user.id || (current_user && ['jamiew','evan','csugrue','todd'].include?(current_user.login))
+  - if @tag.user && current_user && @tag.user == current_user || is_admin?
     %br
+    %h2{:style => 'color: #f0f'} MODBOX
     %ol#controls  
       %li= link_to 'edit', edit_tag_path
       %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete'
+      
+    GML Header
+    %textarea{:rows => 12, :cols => 28}
+      =h (@tag.gml_document/'header').inspect rescue "could not parse: #{$!}"
+    
     
 / The actual tag awwwwwww yeah
 .tag.tabs

@@ -71,16 +71,24 @@ class Tag < ActiveRecord::Base
     end
   end
   
+
+  def gml_document
+    parse_gml_document
+  end
   
   
 protected
 
+  def parse_gml_document
+    return nil if self.gml.blank?
+    @document ||= Hpricot.XML(self.gml)
+  end
+    
+
   # extract some information from the GML
   # and insert our server signature
   def process_gml
-    return nil if self.gml.blank?
-    
-    doc = Hpricot.XML(self.gml)
+    doc = parse_gml_document
     header = (doc/'header')
     if header.blank?
       STDERR.puts "No header in GML: #{self.gml}"
