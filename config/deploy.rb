@@ -85,13 +85,14 @@ namespace :sync do
     filename = "dump.#{Time.now.strftime '%Y-%m-%d_%H:%M:%S'}.sql.gz"
     # on_rollback { delete "/tmp/#{filename}" }
 
+    # Run a dump & download from remote
     # run "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{database['production']['database']} > /tmp/#{filename}" do |channel, stream, data|
     ignores = "--ignore-table=#{database['production']['database']}.sessions"
     run "mysqldump -u #{database['production']['username']} --password=#{database['production']['password']} #{ignores} #{database['production']['database']} | gzip > /tmp/#{filename}"
     get "/tmp/#{filename}", filename
 
+    # Load the dump
     # exec "mysql -u #{database['development']['username']} #{password} #{database['development']['database']} < #{filename}; rm -f #{filename}"
-    # FIXME exec and run w/ localhost as host not working :\
     puts "Loading #{filename} => #{database['development']['database']} ..."
     system("gunzip -c #{filename} | mysql -u '#{database['development']['username']}' '#{database['development']['database']}' && rm -f #{filename}")
   end

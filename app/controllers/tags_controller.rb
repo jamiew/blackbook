@@ -10,9 +10,12 @@ class TagsController < ApplicationController
   end
   
   def show
-    @user = User.find(params[:user_id]) if params[:user_id]
+    
     @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
     @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
+    
+    @user = User.find(params[:user_id]) if params[:user_id]
+    @user ||= @tag.user # ...
     
     respond_to do |wants|
       wants.html  { render }
