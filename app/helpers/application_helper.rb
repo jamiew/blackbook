@@ -102,7 +102,7 @@ module ApplicationHelper
         axis: '#{axis}',
         containment: '#{containment}',
         handle: '#{handle}',
-        stop: function() { PNB.updateSortables('#{parent}') }
+        // stop: function() { PNB.updateSortables('#{parent}') }
       })
     EOC
   end

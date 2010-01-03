@@ -74,7 +74,7 @@ class ApplicationController < ActionController::Base
     helper_method :logged_in?
   
     def admin?
-      return (!current_user.nil? && current_user.login == "jamiew") #FIXME!
+      !current_user.nil? && current_user.admin?
     end
     alias :is_admin? :admin?
     helper_method :admin?, :is_admin?
@@ -84,7 +84,7 @@ class ApplicationController < ActionController::Base
     def require_user
       unless current_user
         store_location
-        flash[:error] = "You must be logged in to access this page"
+        flash[:error] = "You must be logged in to access that page"
         redirect_to login_url
         return false
       end
@@ -93,7 +93,7 @@ class ApplicationController < ActionController::Base
     def require_no_user
       if current_user
         store_location
-        flash[:error] = "You must be logged out to access this page"
+        flash[:error] = "You must be logged out to access that page"
         redirect_to(user_path(current_user))
         return false
       end

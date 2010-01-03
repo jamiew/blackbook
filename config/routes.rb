@@ -7,24 +7,19 @@ ActionController::Routing::Routes.draw do |map|
       threads.resources :forum_posts
     end
   end
-
-  # map.root :controller => 'home'
-  map.root :controller => 'tags', :action => 'index'
   
   map.admin '/admin', :controller => 'admin/base'
 
-  map.forgot_password '/forgot_password',
-  :controller => 'password_reset',
-  :action => 'new'
-
-  map.resources :password_reset
-
-  map.resource :user_session
+  map.resource :user_session # is this 100% necessary? we've explicitly mapped the important routes
   map.signup '/signup', :controller => 'users', :action => 'new'
   map.login '/login', :controller => 'user_sessions', :action => 'new'
   map.logout '/logout', :controller => 'user_sessions', :action => 'destroy'
+  map.forgot_password '/forgot_password',
+    :controller => 'password_reset',
+    :action => 'new'
+  map.resources :password_reset # also not my favorite.
 
-  map.resource :account, :controller => "users" #DEPRECATEME
+  map.resource :account, :controller => "users" #FIXME DEPRECATEME
   map.resources :users,
         :member => [:change_password],
         # :has_many => [:tags, :comments]
@@ -32,10 +27,8 @@ ActionController::Routing::Routes.draw do |map|
     users.resources :tags, :as => 'data'
   end
 
-  # TODO
-  # map.resources :apps
   map.resources :visualizations,
-    :as => 'apps', #TODO DEPRECATEME
+    :as => 'apps', #TODO FIXME
     :has_many => [:comments, :likes]
 
   map.resources :tags,
@@ -45,15 +38,20 @@ ActionController::Routing::Routes.draw do |map|
     :trailing_slash => true
   map.resources :tags    
   map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
-  
-  map.resources :likes    
+
+  # TODO...
+  # map.resources :likes    
+
 
   map.activity '/activity', :controller => 'home', :action => 'activity'
-
-  ## Lastly, flat-style /jamiew URLs -- TODO!
-  # map.user '/:id', :controller => 'users', :action => 'show'
   
-  # Install the default routes as the lowest priority.
-  map.connect ':controller/:action/:id'
-  map.connect ':controller/:action/:id.:format'
+  # # Install the default routes
+  # map.connect ':controller/:action/:id'
+  # map.connect ':controller/:action/:id.:format'
+  
+  # map.root :controller => 'home', :action => 'index'  
+  map.root :controller => 'tags', :action => 'index'    
+  
+  # Lastly, serve up static pages when available
+  map.connect '/:id', :controller => 'application', :action => 'static'
 end

@@ -10,16 +10,13 @@
 
 !!!
 %html{html_attrs}
-  %head
-    = render :partial => 'layouts/common_headers'
-    %title= page_title
   = render :partial => 'layouts/header'
-  = remote_javascript_includes
-  - bundle do
-    = local_javascript_includes
-  = blackbird_tags
-  = render :partial => 'layouts/on_ready'
-
+  #container
+    #content
+      = flash_messages
+      = yield :layout
+  = render :partial => 'layouts/footer'
+  
   - if RAILS_ENV == 'production'  
     = render :partial => 'layouts/stats'
 

@@ -1,9 +1,10 @@
-%h1 New Visualization
+%h1 Register New Application
 
 = error_messages_for :visualization
 
 - form_for(:visualization, :url => objects_url) do |f|
-  = render :partial => "form", :locals => {:f => f}
+  = render :partial => "form", :object => @visualization, :locals => {:f => f}
+  %br
   %p= submit_tag "Create"
 
 = link_to 'Back', objects_path

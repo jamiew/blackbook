@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091209052216) do
+ActiveRecord::Schema.define(:version => 20100103090006) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(:version => 20091209052216) do
     t.integer  "user_id"
     t.string   "title"
     t.string   "slug"
-    t.text     "gml"
+    t.text     "gml",                :limit => 2147483647
     t.integer  "comment_count"
     t.integer  "likes_count"
     t.datetime "created_at"
@@ -130,13 +130,18 @@ ActiveRecord::Schema.define(:version => 20091209052216) do
   add_index "users", ["persistence_token"], :name => "index_users_on_persistence_token"
 
   create_table "visualizations", :force => true do |t|
-    t.integer "user_id"
-    t.string  "name"
-    t.string  "slug"
-    t.string  "website"
-    t.string  "download"
-    t.string  "version"
-    t.text    "description"
+    t.integer  "user_id"
+    t.string   "name"
+    t.string   "slug"
+    t.text     "description"
+    t.string   "download"
+    t.string   "website"
+    t.string   "version"
+    t.string   "kind",          :default => ""
+    t.boolean  "is_embeddable", :default => false
+    t.string   "embed_url"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end

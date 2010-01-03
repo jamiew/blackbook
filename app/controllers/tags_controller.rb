@@ -39,7 +39,7 @@ class TagsController < ApplicationController
   # Create/edit tags
   def new
     require_user
-    @tag = Tag.new
+    @tag = Tag.new(:gml => "<gml>\n\n</gml>")
   end
   
   def edit
@@ -94,9 +94,7 @@ protected
   end
   
   def require_owner
-    unless @tag.user == current_user || current_user.login == "jamiew"
-      raise "You don't have permission to do this!"
-    end
+    raise "You don't have permission to do this!" unless current_user && (@tag.user == current_user || is_admin?)
   end
   
   def create_from_form

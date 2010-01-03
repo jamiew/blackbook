@@ -11,7 +11,7 @@ class Admin::BaseController < ApplicationController
   def admin_required
     unless current_user && current_user.admin?
       store_location
-      flash[:warn] = "You must be an admin to access this page"
+      flash[:warn] = "You must be an admin to access that page"
       redirect_to login_url
       return false
     end
