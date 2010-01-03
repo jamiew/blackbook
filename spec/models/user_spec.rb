@@ -1,3 +1,4 @@
+
 # == Schema Information
 #
 # Table name: users
@@ -27,6 +28,7 @@
 #  about              :text
 #  location           :string(255)
 #  slug               :string(255)
+#  name               :string(255)
 #
 # Indexes
 #

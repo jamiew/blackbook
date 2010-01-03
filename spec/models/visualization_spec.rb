@@ -1,3 +1,4 @@
+
 # == Schema Information
 #
 # Table name: visualizations
@@ -6,8 +7,9 @@
 #  user_id     :integer(4)
 #  name        :string(255)
 #  slug        :string(255)
+#  website     :string(255)
+#  download    :string(255)
+#  version     :string(255)
 #  description :text
-#  created_at  :datetime
-#  updated_at  :datetime
 #
 
