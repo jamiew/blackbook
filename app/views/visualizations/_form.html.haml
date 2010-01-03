@@ -3,6 +3,9 @@
 
 .right_column
   %p
+    %label{:for => "visualization_authors"} Authors:
+    = f.text_area :authors, :rows => 2
+  %p
     %label{:for => "visualization_website"} Website:
     = f.text_field :website
   %p
@@ -24,15 +27,19 @@
     %label{:for => 'visualization_is_embeddable', :style => 'margin-left: 1em', :onclick => "$('#embeddable_toggle').click();"}== Embeddable?  
   .embed_details{:class => @visualization.is_embeddable ? '' : 'disabled'}
     %label{:for => "visualization_embed_url"}== #{required} URL to .swf, .js, etc
-    = f.text_field :embed_url, :disabled => !visualization.is_embeddable
+    = f.text_field :embed_url
 
-    %label{:for => "visualization_embed_callback"}== The name of a callback function if desired
-    = f.text_field :embed_callback, :disabled => !visualization.is_embeddable
+    %label{:for => "visualization_embed_callback"}== The name of a callback function, e.g. 'drawGML'
+    = f.text_field :embed_callback
 
-    %label{:for => "visualization_embed_params"}==  onus parameters
-    = f.text_field :embed_params, :disabled => !visualization.is_embeddable
+    %label{:for => "visualization_embed_params"}==  Bonus parameters, foo=bar&bob=joe&...
+    = f.text_field :embed_params
+
+    %label{:for => "visualization_embed_params"}==  Embed code (read the docs)
+    = f.text_area :embed_code, :rows => 3
+
     
-    %input{:type => 'button', :id => 'preview_embed', :value => 'Preview'}
+    %a{:id => 'preview_embed', :class => 'preview'} Preview
     
     
 
@@ -42,6 +49,7 @@
     $('#embeddable_toggle').click(function(){
       var deets = $('.embed_details');
       // $(this).is(':checked')
+      deets.find(':input').attr('disabled', !$(this).is(':checked'));
       if(deets.hasClass('disabled')){ 
         deets.removeClass('disabled');
         deets.find(':input').attr('disabled', false);
