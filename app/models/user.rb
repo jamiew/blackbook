@@ -1,34 +1,3 @@
-class User < ActiveRecord::Base
-  acts_as_authentic
-  acts_as_commentable # user wall
-  # has_many :comments
-  has_many :tags, :order => 'created_at DESC'
-  
-  has_slug :login
-  
-  #TODO: validations!  
-
-  has_attached_file :photo, 
-    :styles => { :medium => "300x300>", :small => "100x100#", :tiny => '32x32#' }
-
-
-  after_create :create_notification
-  def create_notification
-    Notification.create(:subject => self, :verb => 'created')
-  end
-
-  def deliver_password_reset_instructions!
-    reset_perishable_token!
-    Mailer.deliver_password_reset_instructions(self)
-  end
-
-  class << self
-    def find_by_login_or_email(val)
-      find_by_login(val) || find_by_email(val)
-    end
-  end # class << self
-end
-
 # == Schema Information
 #
 # Table name: users
@@ -68,4 +37,35 @@ end
 #  index_users_on_perishable_token   (perishable_token)
 #  index_users_on_email              (email)
 #
+
+class User < ActiveRecord::Base
+  acts_as_authentic
+  acts_as_commentable # user wall
+  # has_many :comments
+  has_many :tags, :order => 'created_at DESC'
+  
+  has_slug :login
+  
+  #TODO: validations!  
+
+  has_attached_file :photo, 
+    :styles => { :medium => "300x300>", :small => "100x100#", :tiny => '32x32#' }
+
+
+  after_create :create_notification
+  def create_notification
+    Notification.create(:subject => self, :verb => 'created')
+  end
+
+  def deliver_password_reset_instructions!
+    reset_perishable_token!
+    Mailer.deliver_password_reset_instructions(self)
+  end
+
+  class << self
+    def find_by_login_or_email(val)
+      find_by_login(val) || find_by_email(val)
+    end
+  end # class << self
+end
 
