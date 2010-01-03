@@ -1,1 +1,0 @@
-﻿package com {		import flash.display.*;	import flash.events.*;	import flash.utils.Timer;	import flash.net.*;	import flash.ui.Mouse;	import flash.system.Security;    import flash.system.SecurityPanel;	import flash.geom.*;			// ---------------------------------------	public class TagPlayer extends Sprite {				TagPlayer() {		}		}}
