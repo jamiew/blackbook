@@ -52,7 +52,7 @@
       
     %strong{:style => 'color: #f0f'} GML Header
     %textarea{:cols => 24, :rows => 8, :style => 'border: 1px solid #f0f'}
-      = h(@tag.gml_document/'header'.inspect) rescue "could not parse: #{$!}"
+      = h(@tag.gml_document/'header').to_s.gsub('    ',' ') rescue "Could not parse GML: #{$!}"
     
     
 / The actual tag awwwwwww yeah
@@ -60,8 +60,8 @@
   %ul.tab_navigation
     %li= link_to 'player', '#vanderplayer'
     %li= link_to 'thumbnail', '#thumbnail'
-  #vanderplayer
-    = tag_player(@tag, :width => '580px')
+  #vanderplayer    
+    %p= tag_player(@tag, :width => '580px')
   #thumbnail
     - imgopts = {:width => 600}
     - if @tag.image.exists?
