@@ -137,7 +137,8 @@ textarea#user_about { margin-left: 8em; }
 .row, .clear { display: block; clear: both; }
 .left, .floatLeft { float: left; }
 .right, .floatRight { float: right; }
-.center, .centered { margin-left: auto; margin-right: auto; }
+.center { text-align: center; }
+.centered { margin-left: auto; margin-right: auto; }
 
 .full { width: 100%; }
 .half { width: 50%; }
@@ -154,7 +155,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 a.delete { color: #fbb; }
 
 .create_new { margin: 25px 0 25px; text-align: right; }
-.create_new a { background-color: #ff0; }
+.create_new a { background-color: #ff0; font-weight: bold; }
 
 
 
