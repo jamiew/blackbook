@@ -31,10 +31,11 @@ class ApplicationController < ActionController::Base
       @page_title ? "#{@page_title} - #{SiteConfig.site_name}" : SiteConfig.site_name
     end
   
-    def permission_denied      
+    # Catch-all render for no-permission errors
+    def permission_denied
       logger.error "Permission denied to user #{current_user.login} (##{current_user.id})"
       flash[:error] = "You don't have permission to do that"
-      redirect_back_or_default(root_path) #, :status => 403
+      redirect_back_or_default(logged_in? ? root_path : login_path) #, :status => 403
     end
 
 
@@ -94,7 +95,7 @@ class ApplicationController < ActionController::Base
       unless current_user
         store_location
         flash[:error] = "You must be logged in to access that page"
-        redirect_to login_url
+        redirect_to(login_path)
         return false
       end
     end
@@ -103,28 +104,35 @@ class ApplicationController < ActionController::Base
       if current_user
         store_location
         flash[:error] = "You must be logged out to access that page"
-        redirect_to(user_path(current_user))
+        redirect_back_or_default(user_path(current_user))
         return false
       end
     end
     
     def require_admin
-      raise NoPermissionError if !is_admin?        
+      unless current_user && is_admin?
+        store_location
+        flash[:error] = "You must be an admin to access that page"
+        # redirect_to login_url
+        # raise NoPermissionError
+        redirect_back_or_default(logged_in? ? root_path : login_path)
+      end      
     end
 
     # Stash the current page for use in redirection, e.g. login
+    # using :back doesn't work inside a POST (and isn't reliable either way, or testable)
     def store_location
       session[:return_to] = request.request_uri
     end
 
-    # Allow for using all 3 of: a specific redirect_to; general :back; OR the default
-    def redirect_back_or_default(default)
-      unless session[:return_to].blank?        
+    # Allow for using all 3 of: a specific redirect_to, a general :back, OR the specified default
+    def redirect_back_or_default(default)      
+      if session[:return_to].blank?
+        redirect_to(:back)
+      else
         redirect_to(session[:return_to])
         session[:return_to] = nil
-        return
       end
-      redirect_to(:back) and return
     rescue ActionController::RedirectBackError
       redirect_to(default)
     end
