@@ -5,7 +5,7 @@ defaults:
   site_name: "#000000book"
   site_byline: "An open database for Graffiti Markup Language (GML) files"
   admin_email: admin@000000book.com
-  blackbird: true
+  blackbird: false
 
 production:
   site_url: http://000000book.com

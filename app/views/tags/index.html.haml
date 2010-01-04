@@ -18,14 +18,19 @@
     -# url = user.nil? ? tag_path(tag, :trailing_slash => true) : user_tag_path(user,tag, :trailing_slash => true)
     - url = tag_path(tag, :trailing_slash => true)
     %tr
-      %td= link_to(image_tag(tag.thumbnail_image), url)
+      %td= link_to(image_tag(tag.thumbnail_image(:small)), url)
       - txt = tag.title.blank? ? "tag #{tag.id}" : tag.title
       %td= link_to(txt, url)
       %td= tag.application || '&mdash;'
       %td= link_to(user.login, user_path(user)) rescue '&mdash;'
-      %td= tag.created_at.strftime('%D %T')
+      %td.timeago= tag.created_at.strftime('%D %T')
       
       %td      
         = link_to 'download gml', tag_path(tag, :format => :gml), :class => 'button smallbutton'
+        - if is_admin? || is_owner?
+          .controls.right
+            = link_to 'edit', edit_tag_path(tag)          
+            &nbsp;
+            = link_to 'delete', tag_path(tag), :method => 'delete', :class => 'delete', :style => 'color: #fbb'
 
 = pagination

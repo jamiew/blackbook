@@ -42,5 +42,5 @@ class Visualization < ActiveRecord::Base
   
   # Protect from mass assignment
   attr_protected :user_id, :slug
-
+  
 end

@@ -1,30 +1,41 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
+# Some globally used exceptions we catch from; MOVEME?
+class NoPermissionError < RuntimeError; end
+
 class ApplicationController < ActionController::Base
 
   helper :all # Oof, REMOVEME -- don't really need all helpers, all the time
   helper_method :current_user_session, :current_user, :page_title, :set_page_title
 
   filter_parameter_logging :password, :password_confirmation
-
+  protect_from_forgery
+  
   # Global filters
   before_filter :activate_authlogic, :set_format, :blackbird_override
-
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
-
-  def set_page_title(title)
-    @page_title = title
-  end
-
-  def page_title
-    @page_title ? "#{@page_title} - #{SiteConfig.site_name}" : SiteConfig.site_name
-  end
-
+  
+  # Catch standard exceptions
+  rescue_from NoPermissionError, :with => :permission_denied
+  
 
 
 
   protected
+
+    def set_page_title(title)
+      @page_title = title
+    end
+
+    def page_title
+      @page_title ? "#{@page_title} - #{SiteConfig.site_name}" : SiteConfig.site_name
+    end
+  
+    def permission_denied      
+      flash[:error] = "You don't have permission to do that"
+      render_back_or_default(root_path, :status => 403)
+    end
+
 
     # Enable blackbird if ?force_blackbird=true
     def blackbird_override
@@ -63,11 +74,16 @@ class ApplicationController < ActionController::Base
     end
     helper_method :logged_in?
   
-    def admin?
+    def is_admin?
       !current_user.nil? && current_user.admin?
     end
-    alias :is_admin? :admin?
-    helper_method :admin?, :is_admin?
+    alias :admin? :is_admin?
+    helper_method :is_admin?, :admin?
+    
+    def is_owner?
+      # TODO: smarter evaluation (or re-evaluation) of current_object and/or "owner"...
+      !current_user.nil? && !current_object.nil? && current_object.respond_to?(:user) && current_object.user == current_user
+    end
 
 
     # Permission requirements

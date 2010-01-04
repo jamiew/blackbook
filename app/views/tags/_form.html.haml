@@ -4,16 +4,24 @@
 %fieldset
 
   = form.error_messages
-  == #{required} = required field
+  .right== #{required} = required field
 
-  %legend  
+  %legend
+  -#TODO: add radio buttons so it feels like only one is selected at a time
+  .left{:style => 'width: 180px;'}
+    %br
+    = form.file_field :gml_file, :size => 5, :label => '<strong><abbr>GML</abbr> file</strong>'+required
+  = form.text_area :gml, :label => 'or paste raw GML', :rows => 10
 
   %hr
-  = form.text_area :gml, :label => required+'<abbr>GML</abbr>', :rows => 10
-
-  %hr
-  = form.text_field :application, :label => 'Application'
-  = form.text_field :location, :label => 'Location'
+  -#FIXME baconhand...
+  .row
+    .left= form.select :existing_application_id, Visualization.find(:all, :select => 'id, name').map { |v| [v.name, v.id] }, :label => 'Application'+required, :empty => true
+    .left{:style => 'margin-left: 30px; font-size: 90%;'}= form.text_field :application, :label => 'or other'
+    %br
+  %hr.clear
+  = form.text_field :title, :label => 'Who (writer/artist/author)' #title/authors ... desync FIXME
+  = form.text_field :location, :label => 'Where <span>(e.g. NYC, SF)</span>'
 
   - if admin?
     .admin{:style => 'background-color: #411; padding: 10px 0; margin: 10px 0;'}
@@ -24,7 +32,6 @@
 
   %hr
   = form.file_field :image, :size => 10, :label => 'Screenshot'
-
   
   - unless @tag.new_record?
     = form.hidden_field :id

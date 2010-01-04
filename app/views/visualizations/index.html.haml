@@ -1,8 +1,9 @@
 / %h1 Applications
 
-%p= link_to '+ Register New Application', new_object_path, :class => 'button add facebox'
+%p.new
+  = link_to '+ Register New Application', new_object_path, :class => 'button add facebox'
 
-=# pagination(current_objects)
+= pagination(@visualizations)
 
 %table{:style => 'width: 100%'}
   %tr
@@ -11,7 +12,7 @@
     %th language
     %th author
     %th{:style => 'width: 130px'} submitted
-    %th
+    %th{:style => 'width: 80px;'}
     
   - current_objects.each do |app|
     %tr
@@ -20,6 +21,11 @@
       %td= app.kind || '&mdash;'
       %td= link_to user.login, user_path(user) rescue '&mdash;'
       %td=# app.created_at.strftime('%D %T')
+      %td
+        - if is_admin? || is_owner?
+          = link_to 'edit', edit_visualization_path(app)
+          &nbsp;
+          = link_to 'delete', visualization_path(app), :method => :delete, :confirm => "Are you sure?", :class => 'delete'
       
 =# pagination(current_objects)
 

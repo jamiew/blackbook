@@ -44,11 +44,15 @@ class Tag < ActiveRecord::Base
   
   # Security: protect from mass assignment
   attr_protected :user_id
-  
+    
   has_attached_file :image, 
     :default_style => :medium, 
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
     # validates_attachment_presence :image
+    
+  # Placeholders for assigning data from forms  
+  attr_accessor :gml_file, :existing_application_id
+  
   
   after_create :create_notification
   
@@ -62,26 +66,30 @@ class Tag < ActiveRecord::Base
     "http://fffff.at/tempt1/photos/data/eyetags/#{self.attributes['remote_image'].gsub('gml','png')}"
   end
   
-  # if remote image use that...
-  def thumbnail_image
+  # if we have a remote image (for Tempt) use that...
+  def thumbnail_image(size = :medium)
     if !remote_image.blank?
       return "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{self.attributes['remote_image'].gsub('gml','png')}"
     else
-      return self.image(:medium)
+      return self.image(size)
     end
   end
   
-
+  # GML document as a Nokogiri object...
   def gml_document
     parse_gml_document
   end
+
+  
+  
+  
   
   
 protected
 
   def parse_gml_document
     return nil if self.gml.blank?
-    @document ||= Hpricot.XML(self.gml)
+    @document ||= Nokogiri::XML(self.gml)
   end
     
 
