@@ -2,16 +2,16 @@ class TagsController < ApplicationController
   
   # We allow access to :create for the ghetto-API, which doesn't require real authentication
   #TODO: change it to something like 'require_api_key' for if it doesn't have a user, or requires http basic...
+  before_filter :get_tag, :only => [:show, :edit, :update, :destroy]
   before_filter :require_user, :only => [:new,:edit,:update,:destroy] # <-- but not create
   protect_from_forgery :except => [:create] # for the "API"  
   before_filter :require_owner, :only => [:edit,:update,:destroy]
-  before_filter :get_tag, :only => [:show, :edit, :update, :destroy]
 
 
   # Display
   def index
     @page, @per_page = params[:page] || 1, 10
-    @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
+    @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user])
   end
   
   def show
@@ -83,19 +83,25 @@ class TagsController < ApplicationController
   
   def destroy
     @tag.destroy
-    flash[:notice]
-    redirect_back_or_default(tags_index)
+    if @tag.destroy
+      flash[:notice] = "Tag ##{@tag.id} destroyed"
+    else
+      flash[:error] = "Could not destroy tag: #{$!}"
+    end
+    redirect_back_or_default(tags_path)
   end
   
 protected
   
   def get_tag
     # @tag ||= Tag.find(params[:tag_id])
+    logger.info "params[:id]=#{params[:id]}"
     @tag = Tag.find(params[:id])
   end
   
   def require_owner
-    raise NoPermissionError unless current_user && (@tag.user == current_user || is_admin?)
+    logger.info "require_owner: current_user=#{current_user.id rescue nil}; tag=#{@tag.id rescue nil}; @tag.user=#{@tag.user rescue nil}"
+    raise NoPermissionError unless current_user && @tag && (@tag.user == current_user || is_admin?)
   end
   
   
