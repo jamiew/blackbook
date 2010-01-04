@@ -1,6 +1,6 @@
 / %h1 Applications
 
-%p.new
+%p.create_new
   = link_to '+ Register New Application', new_object_path, :class => 'button add facebox'
 
 = pagination(@visualizations)
@@ -9,25 +9,36 @@
   %tr
     / %th{:style => 'width: 110px;'}
     %th name
-    %th language
+    %th{:style => 'width: 100px;'} language
+    %th{:style => 'width: 100px;'} embeddable    
     %th author
     %th{:style => 'width: 130px'} submitted
-    %th{:style => 'width: 80px;'}
+    - if is_admin? || is_owner?
+      %th.admin{:style => 'width: 70px;'}
+      %th.admin{:style => 'width: 150px;'}
     
   - current_objects.each do |app|
-    %tr
+    %tr.fat
       / %td= link_to(image_tag(app.thumbnail_image), url)
-      %td= link_to app.name, visualization_path(app)
-      %td= app.kind || '&mdash;'
-      %td= link_to app.user.login, user_path(app.user) rescue "&mdash;"
-      %td=# app.created_at.strftime('%D %T')
       %td
-        - if is_admin? || is_owner?
+        %strong= link_to app.name, visualization_path(app)
+      %td= app.kind.blank? ? '&mdash;' : app.kind
+      %td= app.is_embeddable? ? 'yes' : 'no'      
+      %td= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
+      %td= app.created_at.strftime('%D %T')
+
+      -#Admin debuggery & controls
+      - if is_admin?
+        %td.admin= app.approved? ? 'Approved' : 'Pending'
+        %td.admin
+          - if app.approved?
+            = link_to 'unapprove', unapprove_visualization_path(app), :method => :put, :confirm => 'Are you sure?'
+          - else
+            = link_to 'approve', approve_visualization_path(app), :method => :put, :confirm => 'Are you sure?'
           = link_to 'edit', edit_visualization_path(app)
-          &nbsp;
           = link_to 'delete', visualization_path(app), :method => :delete, :confirm => "Are you sure?", :class => 'delete'
       
-=# pagination(current_objects)
+%p= pagination(current_objects)
 
 =# render :partial => 'visualization', :collection => current_objects
 

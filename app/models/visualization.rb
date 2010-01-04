@@ -26,7 +26,6 @@ class Visualization < ActiveRecord::Base
       ['Ruby','ruby'],
       ['Python','python'],
       ['Java','java'],
-      # Not sure what else we want -- probably don't need all of these just yet
     ]
     
   acts_as_commentable
@@ -42,5 +41,12 @@ class Visualization < ActiveRecord::Base
   
   # Protect from mass assignment
   attr_protected :user_id, :slug
+  
+  named_scope :approved, { :conditions => ['approved_at > ?', Time.now] }
+  named_scope :pending, { :conditions => ['approved_at IS NULL OR approved_at < ?', Time.now] }
+  
+  def approved?
+    self.approved_at && self.approved_at < Time.now
+  end
   
 end

@@ -1,6 +1,6 @@
 
-%p= link_to '+ Upload GML', new_tag_path, :class => 'button facebox add'
-%br
+%p.create_new
+  = link_to '+ Upload GML', new_tag_path, :class => 'button facebox add'
 
 = pagination
 
@@ -31,6 +31,6 @@
           .controls.right
             = link_to 'edit', edit_tag_path(tag)          
             &nbsp;
-            = link_to 'delete', tag_path(tag), :method => 'delete', :class => 'delete', :style => 'color: #fbb'
+            = link_to 'delete', tag_path(tag), :method => 'delete', :class => 'delete', :confirm => 'Are you sure?'
 
-= pagination
+%p= pagination

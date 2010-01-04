@@ -32,8 +32,9 @@ class ApplicationController < ActionController::Base
     end
   
     def permission_denied      
+      logger.error "Permission denied to user #{current_user.login} (##{current_user.id})"
       flash[:error] = "You don't have permission to do that"
-      render_back_or_default(root_path, :status => 403)
+      redirect_back_or_default(root_path) #, :status => 403
     end
 
 
@@ -105,15 +106,27 @@ class ApplicationController < ActionController::Base
         return false
       end
     end
+    
+    def require_admin
+      raise NoPermissionError if !is_admin?        
+    end
 
     # Stash the current page for use in redirection, e.g. login
     def store_location
       session[:return_to] = request.request_uri
     end
 
+    # Allow for using all 3 of: a specific redirect_to; general :back; OR the default
     def redirect_back_or_default(default)
-      redirect_to(session[:return_to] || default)
-      session[:return_to] = nil
+      puts "redirect_back_or_default(default = #{default}, return_to = #{session[:return_to]}"
+      unless session[:return_to].blank?        
+        redirect_to(session[:return_to])
+        session[:return_to] = nil
+        return
+      end
+      redirect_to(:back) and return
+    rescue ActionController::RedirectBackError
+      redirect_to(default)
     end
 
     # Set XHR as a totally differnet response format than HTML (don't override .js, we use that)

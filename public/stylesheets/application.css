@@ -58,6 +58,10 @@ table tr { }
 table th { font-family: serif; font-size: 1.2em; background-color: #333; padding: 5px; font-weight: bold; }
 table td { padding: 5px 5px; font-size: 0.9em; }
 
+table tr.fat { line-height: 3em; }
+table th.admin { background-color: #422; text-align: center; }
+table td.admin { background-color: #200; text-align: center; }
+
 fieldset, img {
   border: 0;
 }
@@ -146,6 +150,11 @@ textarea#user_about { margin-left: 8em; }
 a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #444; }
 a.button:hover { background: #ff0; } /* Hmm. a:hover getting overriden by a.button */
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
+
+a.delete { color: #fbb; }
+
+.create_new { margin: 25px 0 25px; text-align: right; }
+.create_new a { background-color: #ff0; }
 
 
 
