@@ -32,12 +32,11 @@ class Tag < ActiveRecord::Base
   #TODO: convert to a whitelisted approach...
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret]
 
-  acts_as_commentable
   # is_taggable :tags
-  # has_many :comments  
+
   
   belongs_to :user
-  # has_many :comments
+  has_many :comments, :as => :commentable
   has_many :likes
   
   validates_associated :user, :on => :create

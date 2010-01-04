@@ -26,7 +26,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users,
         :member => [:change_password],
         # :has_many => [:tags, :comments]
-        :has_many => [:comments, :visualizations] do |users| #FIXME remove visualizations nested association -- not being used
+        :has_many => [:visualizations, :comments, :favorites] do |users| #FIXME remove visualizations nested association -- not being used
     users.resources :tags, :as => 'data'
   end
 
@@ -45,6 +45,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # TODO...
   map.resources :favorites
+  map.resources :comments
 
 
   map.activity '/activity', :controller => 'home', :action => 'activity'

@@ -28,9 +28,9 @@ class Visualization < ActiveRecord::Base
       ['Java','java'],
     ]
     
-  acts_as_commentable
   
-  belongs_to :user
+  belongs_to :user  
+  has_many :comments, :as => :commentable
   
   validates_associated :user, :on => :create    
   validates_presence_of :name, :on => :create, :message => "can't be blank"
