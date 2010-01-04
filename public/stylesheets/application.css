@@ -200,7 +200,7 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
   margin: 0 auto -3em;
 }
 
-#header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; min-width: 720px; }
+#header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; min-width: 820px; } /* min-width doesn't work with all the floating... */
 #header a.root_link, #header a.root_link img { text-decoration: none; border: 0; }
 #header a.root_link:hover, #header a.root_link:hover img { background-color: transparent; border: 0; padding: 0; text-decoration: none; }
 #header a.root_link img { margin-top: -40px; height: 100px; } 
@@ -214,8 +214,7 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 #header ul.navigation li { padding-left: 12px; }
 #header ul.navigation.buttons li a { padding: 5px 6px 3px; font-size: 0.9em; text-decoration: none; border: 0; background: #fff; color: #000; -moz-border-radius: 1px; -webkit-border-radius: 1px; }
 #header ul.navigation.buttons li a:hover { background-color: #ff0; border-color: #ff0; color: #111; }
-
-#header ul.navigation.user_navigation { font-size: 1em; margin-right: 70px; }
+#header ul.navigation.user_navigation { font-size: 1em; }
 
 /* User navigation: settings, logout, etc. */
 #header ul.user_navigation .user_photo img { margin-top: -10px; }
