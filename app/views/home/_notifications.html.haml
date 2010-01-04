@@ -14,7 +14,7 @@
             - tag = notif.subject
             - user = tag.user
             = image_tag(tag.remote_image || tag.image.url(:small), :height => '100', :style => 'border: 1px solid #444')
-            = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
+            = link_to tag_title(tag), url_for(notif.subject)          
 
             -# currently no user = API, and Tag should parse application name out of the GML
             -# so just displa that. In the future we will probably have both
