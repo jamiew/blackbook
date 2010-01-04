@@ -1,15 +1,17 @@
 ActionController::Routing::Routes.draw do |map|
 
   # Requests I'd like to blackhole -- ideally these wouldn't flood my logs either O_o
-  map.discard_tag_temp_png '/tags/temp.:format', :controller => 'home', :action => 'discard'
+  #FIXME; what's a better way to handle this idom?
+  map.discard_temp_png '/temp.png', :controller => 'home', :action => 'discard'
+  map.discard_data_temp_png '/data/temp.png', :controller => 'home', :action => 'discard'
+  map.discard_tags_temp_png '/tags/temp.png', :controller => 'home', :action => 'discard'
   
-
-  # Forum -- REMOVEME
-  map.resources :forums do |forum|
-    forum.resources :forum_threads do |threads|
-      threads.resources :forum_posts
-    end
-  end
+  # Forum (TODO)
+  # map.resources :forums do |forum|
+  #   forum.resources :forum_threads do |threads|
+  #     threads.resources :forum_posts
+  #   end
+  # end
   
   map.admin '/admin', :controller => 'admin/base'
 
