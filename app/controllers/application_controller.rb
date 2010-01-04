@@ -118,7 +118,6 @@ class ApplicationController < ActionController::Base
 
     # Allow for using all 3 of: a specific redirect_to; general :back; OR the default
     def redirect_back_or_default(default)
-      puts "redirect_back_or_default(default = #{default}, return_to = #{session[:return_to]}"
       unless session[:return_to].blank?        
         redirect_to(session[:return_to])
         session[:return_to] = nil
@@ -170,10 +169,8 @@ class ApplicationController < ActionController::Base
     def default_respond_to(object, opts={})
 
       opts = { :exclude => [:id, :created_at, :cached_tag_list] }.merge(opts)
-      puts "exclude = #{opts[:exclude].inspect}"
       which_layout = opts[:layout] || false
-      puts "which_layout => #{which_layout}"
-      # TODO: strip out excluded attributes
+      # TODO: strip out excluded attributes...
 
       respond_to do |format|
 

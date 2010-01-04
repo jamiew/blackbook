@@ -271,13 +271,13 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 /* User/Entry.show sidebar */
 /*#main { width: 600px; padding: 30px 0 20px 0; }*/
 #main { width: 600px; padding: 0; }
-#sidebar { width: 260px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; }
+#sidebar { width: 260px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; font-size: 92%; }
 #sidebar.tag_sidebar { margin-top: 30px; padding: 0; border: 0; }
 
 /*.infobox { position: absolute; margin: 30px 0 0 600px; opacity: 1; width: 220px; background-color: #151515; padding: 5px 16px; }*/
 #sidebar .infobox, #sidebar .modbox { background-color: #151515; padding: 5px 16px; } /* just used in entry.show */
 #sidebar .infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
-#sidebar .infobox textarea { background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px; }
+#sidebar textarea { background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px; }
 #sidebar .modbox { margin-top: 30px; }
 
 
