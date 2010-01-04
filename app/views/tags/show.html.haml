@@ -8,51 +8,49 @@
   %li= @next.nil? ? 'next &rarr;' : link_to('next &rarr;', tag_path(@next, :trailing_slash => true), :class => 'button')
   %br.clear
 
-/ Information about the tag
-#sidebar.infobox
 
-  %h2= tag_title(@tag)
+#sidebar.tag_sidebar
+  / Information about the tag
+  .infobox
+    %h2= tag_title(@tag)
+    %hr
+    %ul
+      %li
+        == Uploaded #{@tag.created_at.strftime("%D %T")} 
+        %br== (#{time_ago_in_words(@tag.created_at)} ago)
+    %hr
+    %ul
+      - unless @user.nil?
+        %li== By: #{link_to(@user.login, user_path(@user))}
+      %li== Application: #{@tag.application.blank? ? '<em>unknown</em>' : @tag.application}
+      %li== Location: #{@tag.location.blank? ? '<em>unknown</em>' : @tag.location}
+      - unless @tag.title.blank?
+        %li== Title: #{@tag.title}
+      - unless @tag.description.blank?
+        %li== Description: #{@tag.description}
+    %hr
+    %ul
+      - if @tag.image.exists? || @tag.remote_image
+        - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
+        %li== Image: #{link_to(File.basename(url), url, :target => '_blank') }      
+    %hr
+    %br  
+    .gml
+      %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
+      %span.what-is-gml{:style => 'margin-left: 2px;'}= link_to('?', '#', :onclick => 'alert("TODO: what is GML page"); return false;')
+      %textarea{:cols => 24, :rows => 12, :onclick => '$(this).select();'}= @tag.gml
 
-  %hr
-  %ul
-    %li
-      == Uploaded #{@tag.created_at.strftime("%D %T")} 
-      %br== (#{time_ago_in_words(@tag.created_at)} ago)
-  %hr
-  %ul
-    %li== Application: #{@tag.application.blank? ? '<em>unknown</em>' : @tag.application}
-    - if @user
-      %li== Author: #{link_to(@user.login, user_path(@user))}
-    %li== Location: #{@tag.application.blank? ? '<em>umknown</em>' : @tag.location}
-    - unless @tag.title.blank?
-      %li== Title: #{@tag.title}
-    - unless @tag.description.blank?
-      %li== Description: #{@tag.description}
-  %hr
-  %ul
-    - if @tag.image.exists? || @tag.remote_image
-      - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
-      %li== Image: #{link_to(File.basename(url), url, :target => '_blank') }      
-
-  %hr
-  %br  
-  .gml
-    %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
-    %span.what-is-gml{:style => 'margin-left: 2px;'}= link_to('?', '#', :onclick => 'alert("TODO: what is GML page"); return false;')
-    %textarea{:cols => 24, :rows => 12, :onclick => '$(this).select();'}= @tag.gml
-    
-  -#TODO: need a sexier way to determine ownership (everywhere)
-  -#FIXME ghetto adminnery
+  -# Tag modbox -- edit/delete/debugging etc.
   - if is_owner?(@tag) || is_admin?
-    %br
-    %h2{:style => 'color: #f0f'} MODBOX
-    %ol#controls  
-      %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
-      %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
+    .modbox 
+      %h2{:style => 'color: #f0f'} MODBOX
+      %ol#controls  
+        %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
+        %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
       
-    %strong{:style => 'color: #f0f'} GML Header
-    %textarea{:cols => 24, :rows => 8, :style => 'border: 1px solid #f0f'}
-      = h(@tag.gml_document/'header').to_s.gsub('    ',' ') rescue "Could not parse GML: #{$!}"
+      %strong{:style => 'color: #f0f'} GML Header
+      %textarea{:cols => 24, :rows => 8, :style => 'border: 1px solid #f0f'}
+        = h(@tag.gml_document/'header').to_s.gsub('    ',' ') rescue "Could not parse GML: #{$!}"
     
     
 / The actual tag awwwwwww yeah
