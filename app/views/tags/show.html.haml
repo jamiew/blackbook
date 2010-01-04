@@ -21,18 +21,18 @@
     %hr
     %ul
       - unless @user.nil?
-        %li== By: #{link_to(@user.login, user_path(@user))}
-      %li== Application: #{@tag.application.blank? ? '<em>unknown</em>' : @tag.application}
-      %li== Location: #{@tag.location.blank? ? '<em>unknown</em>' : @tag.location}
-      - unless @tag.title.blank?
-        %li== Title: #{@tag.title}
+        %li== <strong>Author:</strong> #{link_to(@user.login, user_path(@user))}
+      %li== <strong>Application:</strong> #{@tag.application.blank? ? '<em>unknown</em>' : @tag.application}
+      %li== <strong>Location:</strong> #{@tag.location.blank? ? '<em>unknown</em>' : @tag.location}
       - unless @tag.description.blank?
-        %li== Description: #{@tag.description}
-    %hr
-    %ul
-      - if @tag.image.exists? || @tag.remote_image
+        %li== <strong>Description:</strong> #{@tag.description}
+
+    - if @tag.image.exists? || @tag.remote_image
+      %hr    
+      %ul
         - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
-        %li== Image: #{link_to(File.basename(url), url, :target => '_blank') }      
+        - #Quick little gsub to remove the queryvars... not ideal
+        %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, :target => '_blank') }      
     %hr
     %br  
     .gml
@@ -47,19 +47,29 @@
       %ol#controls  
         %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
         %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
-      
-      %strong{:style => 'color: #f0f'} GML Header
-      %textarea{:cols => 24, :rows => 8, :style => 'border: 1px solid #f0f'}
-        = h(@tag.gml_document/'header').to_s.gsub('    ',' ') rescue "Could not parse GML: #{$!}"
+      %p
+        %strong{:style => 'color: #f0f'} GML Header
+        %textarea{:cols => 24, :rows => 10, :style => 'border: 1px solid #f0f'}
+          = h(@tag.gml_document/'header').to_s.gsub('    ',' ') rescue "Could not parse GML: #{$!}"
     
     
 / The actual tag awwwwwww yeah
 #main.tag.tabs
   %ul.tab_navigation
-    %li= link_to 'player', '#vanderplayer'
+    %li= link_to 'flashplayer', '#vanderplayer'
     %li= link_to 'thumbnail', '#thumbnail'
+
   #vanderplayer    
-    %p= tag_player(@tag, :width => '580px')
+    - player = tag_player(@tag, :width => '580px')
+    %p= player
+    
+    -# Embed code -- take it with you
+    - encoded_embed = HTMLEntities.new.encode(player).gsub("\n",'').squeeze(" ").chomp
+    %label{:for => 'player_embed'} Embed Code
+    %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}  
+    
+  / TODO: canvasplayer
+    
   #thumbnail
     - imgopts = {:width => 600}
     - if @tag.image.exists?

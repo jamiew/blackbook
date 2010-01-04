@@ -47,7 +47,7 @@ module TagsHelper
         
         #{embed}
         
-      </object>
+      </object>      
     }
   end
   alias :tag_vis :tag_player

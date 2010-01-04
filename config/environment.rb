@@ -38,6 +38,7 @@ Rails::Initializer.run do |config|
   config.gem "configatron", :version => ">= 2.2.2"
   config.gem "mislav-will_paginate", :lib => "will_paginate", :version => "~>2.3.6"
   # config.gem 'giraffesoft-is_taggable', :lib => 'is_taggable', :source => 'http://gems.github.com'
+  config.gem "htmlentities"
   # Spawn installed as a plugin -- not available as a gem
 
   # Plugins I still need to get used to
