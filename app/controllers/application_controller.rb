@@ -151,8 +151,8 @@ class ApplicationController < ActionController::Base
     # moar 
     def url_escape(str, whitelist=false)
       if whitelist
-        # Append to whatever else domains magma may be under
-        if !(/^(http|https)(\:\/\/)(www\.)?(lh|localhost|magma\.rocketboom\.com|mag\.ma|hotlikemagma\.com)/i.match(str))
+        # Append to whatever else domains app may be under
+        if !(/^(http|https)(\:\/\/)(www\.)?(lh|localhost|000000book\.com)/i.match(str))
           return ''
         end
       end
@@ -163,6 +163,10 @@ class ApplicationController < ActionController::Base
     end
     helper_method :url_escape
 
+    def dev?
+      return RAILS_ENV == 'developmet'
+    end
+    helper_method :dev?
 
     # shell for a future a Merb-esque displays/provides syntax
     # TODO: handle arrays better
