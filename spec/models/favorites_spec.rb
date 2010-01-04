@@ -6,6 +6,7 @@ describe Favorite do
   end
 
   it "should be valid" do
+    pending
     @favorite.should be_valid
   end
 end
