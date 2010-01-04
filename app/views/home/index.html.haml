@@ -25,7 +25,7 @@
     %ul.square
       - @tags.each do |tag|
         %li
-          %a{:href => tag_path(tag)}= tag.title || "##{tag.id}"
+          %a{:href => tag_path(tag)}= tag.title.blank? ? "##{tag.id}" : title
           %small
             - unless tag.application.blank?
               %span.application== / #{tag.application}          

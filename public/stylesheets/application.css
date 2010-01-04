@@ -62,7 +62,7 @@ fieldset, img {
   border: 0;
 }
 
-address, caption, cite, code, dfn, em, strong, th, var {
+address, caption, cite, code, dfn, th, var {
   font-style: normal;
   font-weight: normal;
 }
@@ -109,20 +109,16 @@ form label {
 	margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
 }
 
-form {  /* set width in form, not fieldset (still takes up more room w/ fieldset width */
+/* set width in form, not fieldset (still takes up more room w/ fieldset width */
+form {  
   font:100% verdana,arial,sans-serif;
   margin: 0;
   padding: 0;
   min-width: 500px;
-  max-width: 600px;
-  width: 560px; 
+  width: 700px; 
 }
 
-form fieldset {
-  clear: both;
-  padding: 10px;
-  margin: 0;
-}
+form fieldset { clear: both; padding: 10px; margin: 0; }
 
 form fieldset legend { font-size: 1.1em; }
 form fieldset label:first-letter { text-decoration:underline; } /* Denote accesskey */
@@ -154,7 +150,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 
 /* Pagination */
-.pagination { float: right; text-align: right; padding: .3em 0 1em 0; }
+.pagination { text-align: left; padding: .3em 0 1em 0; }
 /*.pagination a, .pagination span { padding: .2em .5em; }*/
 .pagination a { padding: .2em .5em; }
 .pagination span.current, .pagination span.disabled { color: #AAA; border: 1px solid #444; padding: 3px 6px; }
@@ -178,7 +174,6 @@ div.tabs div { clear: both; }
 
 
 /* Prev/next on show pages */
-/*.prevnext { display: block; margin: 25px auto 15px auto; font-size: 1.15em; width: 200px; }*/
 .prevnext { display: block; /*width: 200px;*/ text-align: right; margin: 25px 100px 0px 0; font-size: 1.3em; }
 .prevnext li { display: inline; }
 
@@ -187,6 +182,7 @@ div.tabs div { clear: both; }
 #container {
   padding: 0 16px;
   width: 880px;
+  min-width: 800px;
   margin: 0 auto;
   min-height: 100%;
   height: auto !important;
@@ -194,15 +190,16 @@ div.tabs div { clear: both; }
   margin: 0 auto -3em;
 }
 
-#header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; }
+#header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; min-width: 720px; }
 #header a.root_link { text-decoration: none;  }
 #header a.root_link:hover { background: transparent; color: #ff0; }
+#header .masthead { width: 450px; white-space:nowrap; }
 #header h1.title { font-family: "Times", serif; font-size: 3em; font-weight: bold; margin: 0; padding: 0; line-height: 1em; letter-spacing: 1px; }
 #header h2.byline { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; margin-top: -0.5em; }
-#header ul.navigation { float: right; margin: 30px 10px 0 0; font-size: 1.5em;  }
+#header ul.navigation { float: right; margin: 20px 10px 0 0; font-size: 1.5em;  }
 #header ul.navigation li { font-family: "Times", serif; display: block; float: left; }
 #header ul.navigation li { padding-left: 12px; }
-#header ul.navigation.buttons li a { padding: 5px 6px 3px; font-size: 0.9em; text-decoration: none; border: 0; background: #fff; color: #000; -moz-border-radius: 2px; -webkit-border-radius: 2px; }
+#header ul.navigation.buttons li a { padding: 5px 6px 3px; font-size: 0.9em; text-decoration: none; border: 0; background: #fff; color: #000; -moz-border-radius: 1px; -webkit-border-radius: 1px; }
 #header ul.navigation.buttons li a:hover { background-color: #ff0; border-color: #ff0; color: #111; }
 
 #header ul.navigation.user_navigation { font-size: 1em; margin-right: 70px; }

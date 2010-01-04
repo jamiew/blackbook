@@ -1,7 +1,12 @@
 class TagsController < ApplicationController
-
+  
+  # We allow access to :create for the ghetto-API, which doesn't require real authentication
+  #TODO: change it to something like 'require_api_key' for if it doesn't have a user, or requires http basic...
+  before_filter :require_user, :only => [:new,:edit,:update,:destroy] # <-- but not create
+  protect_from_forgery :except => [:create] # for the "API"  
+  before_filter :require_owner, :only => [:edit,:update,:destroy]
   before_filter :get_tag, :only => [:show, :edit, :update, :destroy]
-  protect_from_forgery :except => [:create] # for the "API"
+
 
   # Display
   def index
@@ -38,13 +43,10 @@ class TagsController < ApplicationController
   
   # Create/edit tags
   def new
-    require_user
     @tag = Tag.new(:gml => "<gml>\n\n</gml>")
   end
   
   def edit
-    require_user
-    require_owner
     @editing = "STUPIDFACE"
     render :action => 'new' # Hmm, doing :action is bunk, and rails 2.2 doesn't have just render 'new'
   end
@@ -64,8 +66,6 @@ class TagsController < ApplicationController
   end
   
   def update
-    require_user
-    require_owner
     @tag.update_attributes(params[:tag])
     if @tag.save    
       flash[:notice] = "Tag ##{@tag.id} updated"
@@ -77,13 +77,9 @@ class TagsController < ApplicationController
   end
   
   def destroy
-    #TODO
-    require_user
-    require_owner
-
     @tag.destroy
     flash[:notice]
-    redirect_to user_path(@tag.user)
+    redirect_back_or_default(tags_index)
   end
   
 protected
@@ -94,23 +90,12 @@ protected
   end
   
   def require_owner
-    raise "You don't have permission to do this!" unless current_user && (@tag.user == current_user || is_admin?)
+    raise NoPermissionError unless current_user && (@tag.user == current_user || is_admin?)
   end
   
-  def create_from_form
-    params[:tag][:user] = current_user #set here vs. in the form      
-    @tag = Tag.new(params[:tag])
-
-    if @tag.save
-      flash[:notice] = "Tag created"
-      redirect_to tag_path(@tag, :trailing_slash => true)
-    else
-      flash[:error] = "Error saving your tag! #{$!}"
-      error_status = 500
-      render :action => 'new', :status => error_status
-    end        
-  end
   
+  # Create a tag uploaded w/o a user or authentication, via the ghetto-API
+  # this is currently used for tempt from the Eyewriter, but will be expanded...
   def create_from_api
 
     # TODO: add app uuid? or Hash app uuid?
@@ -125,7 +110,44 @@ protected
       render :text => "ERROR: #{@tag.errors.inspect}", :status => 422 #Unprocessable Entity
     end
   end
+
+
+  # construct & save a tag submitted manually, through the website
+  # We do some strange field expansion right now that could be moved into filters or model accessors
+  def create_from_form
     
+    # Translate/expand some params
+    params[:tag][:user] = current_user    
+    
+    # Sub in an existing application if specified...
+    if params[:tag][:existing_application_id] && !params[:tag][:application]
+      puts 'we got a pre-existing...'
+      # FIXME use internal ids if available? string matching all the time is ghetto
+      app = Visualization.find(params[:tag][:existing_application_id])
+      params[:tag][:application] = app.name
+      puts "  name = #{app.name.inspect}"
+    end
+    
+    # Read the GML uploaded gml file and dump it into the GML field
+    # GML file overrides anything in the textarea -- that was probably accidental input
+    file = params[:tag][:gml_file]
+    if file
+      puts "GML_FILE == #{file.inspect}"
+      params[:tag][:gml] = file.read
+    end
+    
+    # Build object
+    @tag = Tag.new(params[:tag])
+
+    if @tag.save
+      flash[:notice] = "Tag created"
+      redirect_to tag_path(@tag, :trailing_slash => true)
+    else
+      flash[:error] = "Error saving your tag! #{$!}"
+      error_status = 500
+      render :action => 'new', :status => error_status
+    end        
+  end    
   
   
   

@@ -1,24 +1,43 @@
-%h1== Viewing visualization #{current_object.id}
 
-%div[current_object]
-  %p.user_id
-    %strong User
-    = h current_object.user_id
-  %p.name
-    %strong Name
-    = h current_object.name
-  %p.slug
-    %strong Slug
-    = h current_object.slug
-  %p.description
-    %strong Description
-    = h current_object.description
-  %p.version
-    %strong Version
-    = h current_object.version
+%p.back= link_to '&larr; back to applications', visualizations_path
 
-= link_to 'Edit', edit_object_path
-|
-= link_to 'Destroy', object_path, :confirm => 'Really destroy visualization?', :method => :delete
-|
-= link_to 'Back', objects_path
+.left{:style => 'margin-top: 40px;'}
+  = image_tag("/images/medium/missing.png", :width => 300)  
+  
+.centered{:style => 'width: 400px; margin: 20px 0 0 330px;'}
+  %h1
+    =h current_object.name
+    %span.version=h current_object.version
+  %div[current_object]
+    - unless current_object.user.nil?
+      %span.user= link_to current_object.user.login, user_path(current_object.user)
+    %hr
+    %p.authors
+      %strong Author(s):
+      =h current_object.authors
+    %p.website
+      %strong Website:
+      = link_to current_object.website, "http://#{current_object.website.gsub("http://",'')}"
+  
+    %hr
+
+    - unless current_object.kind.blank?
+      %p
+        %strong Language:
+        =h current_object.kind
+    - unless current_object.download.blank?
+      %p
+        %strong Download:
+        = link_to(current_object.download, current_object.download)
+  
+    .description
+      %strong Description:
+      %p= h current_object.description || '(none)'
+
+
+  - if logged_in? && (current_object.respond_to?(:user) && current_object.user == current_user) || is_admin?
+    %hr
+    %p.controls
+      = link_to 'Edit', edit_object_path
+      |
+      = link_to 'Delete', object_path, :confirm => 'Are you sure?', :method => :delete

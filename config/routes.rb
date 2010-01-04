@@ -10,8 +10,8 @@ ActionController::Routing::Routes.draw do |map|
   
   map.admin '/admin', :controller => 'admin/base'
 
-  map.resource :user_session # is this 100% necessary? we've explicitly mapped the important routes
   map.signup '/signup', :controller => 'users', :action => 'new'
+  map.resource :user_session # For create/destroy associated with login/logout
   map.login '/login', :controller => 'user_sessions', :action => 'new'
   map.logout '/logout', :controller => 'user_sessions', :action => 'destroy'
   map.forgot_password '/forgot_password',
@@ -23,7 +23,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users,
         :member => [:change_password],
         # :has_many => [:tags, :comments]
-        :has_many => [:comments] do |users|
+        :has_many => [:comments,:visualizations] do |users|
     users.resources :tags, :as => 'data'
   end
 
