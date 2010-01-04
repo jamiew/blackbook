@@ -16,8 +16,8 @@ class TagsController < ApplicationController
   
   def show
     
-    # Only need to find these instance vars for HTML
-    if params[:format] == 'html' || params[:format] == nil
+    # Only need these instance vars with full HTML display; this could be Interlok'ed
+     if params[:format] == 'html' || params[:format] == nil
       @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
       @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
     
@@ -27,9 +27,9 @@ class TagsController < ApplicationController
     
     respond_to do |wants|
       wants.html  { render }
-      wants.xml   { render :xml => @tag.to_xml }
-      wants.gml   { render :xml => @tag.gml } #TODO: account for nil gml'z -- e.g. make an empty thing or throw error?
-      wants.json  { render :json => @tag.to_json }
+      wants.xml   { render :xml => @tag.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }      
+      wants.gml   { render :xml => @tag.gml } #TODO: account for empty GML field?
+      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
       wants.rss   { render :rss => @tag.to_rss }
     end
   end
@@ -38,9 +38,11 @@ class TagsController < ApplicationController
   def latest
     @tag = Tag.find(:first, :order => 'created_at DESC')
     respond_to do |wants|
-      # wants.html { render :action => 'show' }
-      wants.html  { redirect_to(tag_path(@tag, :trailing_slash => true), :status => 302) } #Temporary Redirect
+      wants.html  { redirect_to(tag_path(@tag), :status => 302) } #Temporary Redirect
+      wants.xml   { render :xml => @tag.to_xml(:dasherize => false, :skip_types => true, :except => Tag::HIDDEN_ATTRIBUTES) }      
       wants.gml   { render :xml => @tag.gml }
+      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
+      wants.rss   { render :rss => @tag.to_rss }      
     end    
   end
   
@@ -72,7 +74,7 @@ class TagsController < ApplicationController
     @tag.update_attributes(params[:tag])
     if @tag.save    
       flash[:notice] = "Tag ##{@tag.id} updated"
-      redirect_to tag_path(@tag, :trailing_slash => true)
+      redirect_to tag_path(@tag)
     else
       flash[:error] = "Could not update tag: #{$!}"
       render :action => 'edit'
@@ -144,7 +146,7 @@ protected
 
     if @tag.save
       flash[:notice] = "Tag created"
-      redirect_to tag_path(@tag, :trailing_slash => true)
+      redirect_to tag_path(@tag)
     else
       flash[:error] = "Error saving your tag! #{$!}"
       error_status = 500

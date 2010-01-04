@@ -28,6 +28,10 @@
 
 class Tag < ActiveRecord::Base
 
+  #Blacklisted attributes not to show in the API
+  #TODO: convert to a whitelisted approach...
+  HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret]
+
   acts_as_commentable
   # is_taggable :tags
   # has_many :comments  
@@ -53,7 +57,6 @@ class Tag < ActiveRecord::Base
   # Placeholders for assigning data from forms  
   attr_accessor :gml_file, :existing_application_id
   
-  
   after_create :create_notification
   
   def create_notification
@@ -78,6 +81,27 @@ class Tag < ActiveRecord::Base
   # GML document as a Nokogiri object...
   def gml_document
     parse_gml_document
+  end
+  
+  # Wrap to_json so the .gml string gets converted to a hash, then to json
+  # 
+  # TODO we could use a 'GML' object type!
+  def to_json(options = {})
+    self.gml = Hash.from_xml(self.gml)
+    self.gml = self.gml['gml'] if self.gml['gml'] # drop any duplicate parent-level <gml>'s
+    super(options)
+  end
+
+  # Possibly strip all empty attributes... not sure if serving blank or not serving is better
+  # def to_xml(options = {})
+  #   options[:except] ||= []
+  #   options[:except] += self.attributes.select { |key,value| puts "#{key}"; value.blank? }
+  #   super(options)
+  # end
+
+  # convert directly from the GML string to JSON
+  def gml_to_json
+    Hash.from_xml(self.gml).to_json
   end
 
   

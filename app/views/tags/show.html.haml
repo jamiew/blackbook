@@ -3,9 +3,9 @@
 - all_link = @user ? user_tags_path(@user) : tags_path
 / .floatLeft= link_to '&larr; back', all_link
 .prevnext
-  %li= @prev.nil? ? '&larr; prev' : link_to('&larr; prev', tag_path(@prev, :trailing_slash => true), :class => 'button')
+  %li= @prev.nil? ? '&larr; prev' : link_to('&larr; prev', tag_path(@prev), :class => 'button')
   %li &nbsp;::&nbsp;
-  %li= @next.nil? ? 'next &rarr;' : link_to('next &rarr;', tag_path(@next, :trailing_slash => true), :class => 'button')
+  %li= @next.nil? ? 'next &rarr;' : link_to('next &rarr;', tag_path(@next), :class => 'button')
   %br.clear
 
 
