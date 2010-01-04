@@ -49,8 +49,8 @@ ActionController::Routing::Routes.draw do |map|
   # map.connect ':controller/:action/:id'
   # map.connect ':controller/:action/:id.:format'
   
+  # Home, & lastly serve up static pages when available
   map.root :controller => 'home', :action => 'index'  
-  
-  # Finally serve up static pages when available
-  map.connect '/:id', :controller => 'application', :action => 'static'
+  map.connect '/:id.:format', :controller => 'home', :action => 'static'
+
 end

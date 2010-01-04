@@ -7,7 +7,7 @@
 .meta.floatRight{:style => 'position: absolute; width: 200px; margin: 10px 0 0 320px;'}
   .posted_at
     == #{time_ago_in_words(tag.created_at)} ago
-    %br= tag.created_at.strftime('%D %T')    
+    %br= tag.created_at.strftime('%D %T')
   - if tag.application
     %p.application 
       w/

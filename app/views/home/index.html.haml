@@ -17,10 +17,11 @@
 
   %br.clear
   - #FIXM baconhand
-  - @tags = Tag.find(:all, :order => 'created_at DESC', :limit => 30)
-  - @tag = @tags.first
+  - @tags = Tag.find(:all, :order => 'created_at DESC', :limit => 35)
+  - @tag = @tags.shift
 
-  .column_right.right{:style => 'width: 380px; text-align: left; margin-top: 40px;'}
+  / .right_column{:style => 'width: 280px; text-align: left; margin-top: 40px;'}
+  .right_column{:style => "margin-top: 40px;"}
     %ul.square
       - @tags.each do |tag|
         %li
@@ -31,10 +32,12 @@
             - unless tag.location.blank?
               %span.location== / #{tag.location}
             - unless tag.user.nil?
-              %span.username / #{tag.user.login}            
+              %span.username== / #{link_to tag.user.login, user_path(tag.user)}            
             %span.created_at.timeago== / #{tag.created_at.strftime('%D')}
+    %p.right
+      %strong= link_to '<span>View all &raquo;</span>', tags_path, :class => 'button ghost small'
 
-  #vanderplayer.column_left
+  #vanderplayer.left_column
     %h2= link_to @tag.title || "##{@tag.id}", tag_path(@tag)
     = tag_player(@tag, :width => '580px')
     
