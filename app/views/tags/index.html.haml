@@ -7,8 +7,8 @@
 %table{:style => 'width: 100%'}
   %tr
     %th{:style => 'width: 110px;'}
-    %th title
-    %th app
+    %th name
+    %th application
     %th who
     %th{:style => 'width: 130px'} when
     %th
@@ -19,8 +19,7 @@
     - url = tag_path(tag)
     %tr
       %td= link_to(image_tag(tag.thumbnail_image(:small)), url)
-      - txt = tag.title.blank? ? "tag #{tag.id}" : tag.title
-      %td= link_to(txt, url)
+      %td= link_to(tag_title(tag), url)
       %td= tag.application || '&mdash;'
       %td= link_to(user.login, user_path(user)) rescue '&mdash;'
       %td.timeago= tag.created_at.strftime('%D %T')
