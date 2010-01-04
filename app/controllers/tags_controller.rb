@@ -16,11 +16,14 @@ class TagsController < ApplicationController
   
   def show
     
-    @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
-    @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
+    # Only need to find these instance vars for HTML
+    if params[:format] == 'html' || params[:format] == nil
+      @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
+      @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
     
-    @user = User.find(params[:user_id]) if params[:user_id]
-    @user ||= @tag.user # ...
+      @user = User.find(params[:user_id]) if params[:user_id]
+      @user ||= @tag.user # ...
+    end
     
     respond_to do |wants|
       wants.html  { render }

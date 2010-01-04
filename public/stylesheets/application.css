@@ -170,7 +170,7 @@ div.tabs ul.tab_navigation li a { float: left; margin-right: 5px; padding: 10px 
 div.tabs ul.tab_navigation li a:hover { background-color: #555; color: #eee; }
 div.tabs ul.tab_navigation li a.selected { background-color: #ff0; color: #000; }
 div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: #333; text-shadow: 3px; }
-div.tabs div { clear: both; }
+/*div.tabs div { clear: both; }*/
 
 
 /* Prev/next on show pages */
@@ -214,7 +214,7 @@ div.tabs div { clear: both; }
   font-style: italic;
 }
 
-#footer { clear: both; padding: 0 16px; margin: 5em 2em 1em 2em; height: 3em; text-align: right; color: #777; font-size: 90%; }
+#footer { clear: both; padding: 0 16px; margin: 8em 2em 1em 2em; height: 3em; text-align: right; color: #777; font-size: 90%; }
 
 
 /* Flash */
@@ -259,11 +259,18 @@ div.tabs div { clear: both; }
 #home #tags { margin-top: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
 #tags a img { margin-right: 5px; }
 
+/* User/Entry.show sidebar */
+/*#main { width: 600px; padding: 30px 0 20px 0; }*/
+#main { width: 600px; padding: 0; }
 #sidebar { width: 220px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; }
-#main { width: 520px; padding: 30px 0 20px 0; }
 
-/* Entry.show sidebar */
-.infobox { position: absolute; margin: 30px 0 0 600px; opacity: 1; width: 220px; background-color: #151515; padding: 5px 16px; }
+/*.infobox { position: absolute; margin: 30px 0 0 600px; opacity: 1; width: 220px; background-color: #151515; padding: 5px 16px; }*/
+#sidebar.infobox { background-color: #151515; margin-top: 30px; padding: 5px 16px; border: 0; } /* just used in entry.show */
+#sidebar.infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
+#sidebar.infobox textarea { background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px; }
+
+
+
 
 /* Players */
 #vanderplayer object, #vanderplayer embed { min-height: 800px; } /* hack */
