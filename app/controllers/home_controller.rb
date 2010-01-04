@@ -19,5 +19,10 @@ class HomeController < ApplicationController
       render :file => "public/404.html"
     end
   end
-  
+
+  # Ghetto handling for "bad" URLs -- I'm mapping them here as a blackhole
+  def discard
+    logger.warn "Discarding request..."
+    render :nothing => true, :status => 200 #OK
+  end
 end

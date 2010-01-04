@@ -80,10 +80,11 @@ class ApplicationController < ActionController::Base
     alias :admin? :is_admin?
     helper_method :is_admin?, :admin?
     
-    def is_owner?
-      # TODO: smarter evaluation (or re-evaluation) of current_object and/or "owner"...
-      !current_user.nil? && !current_object.nil? && current_object.respond_to?(:user) && current_object.user == current_user
+    def is_owner?(object = current_object)
+      # TODO: smarter evaluation of object and "owner" (e.g. use more than just .user...)
+      !current_user.nil? && !object.nil? && object.respond_to?(:user) && object.user == current_user
     end
+    helper_method :is_owner?
 
 
     # Permission requirements

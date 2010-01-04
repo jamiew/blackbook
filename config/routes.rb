@@ -1,5 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
 
+  # Requests I'd like to blackhole -- ideally these wouldn't flood my logs either O_o
+  map.discard_tag_temp_png '/tags/temp.png', :controller => 'home', :action => 'discard'
 
   # Forum
   map.resources :forums do |forum|

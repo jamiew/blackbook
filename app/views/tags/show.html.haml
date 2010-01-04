@@ -9,7 +9,10 @@
   %br.clear
 
 / Information about the tag
-.infobox
+#sidebar.infobox
+
+  %h2= tag_title(@tag)
+
   %hr
   %ul
     %li
@@ -17,10 +20,10 @@
       %br== (#{time_ago_in_words(@tag.created_at)} ago)
   %hr
   %ul
-    %li== Application: #{@tag.application || 'unknown'}
+    %li== Application: #{@tag.application.blank? ? '<em>unknown</em>' : @tag.application}
     - if @user
       %li== Author: #{link_to(@user.login, user_path(@user))}
-    %li== Location: #{@tag.location || 'unknown'}
+    %li== Location: #{@tag.application.blank? ? '<em>umknown</em>' : @tag.location}
     - unless @tag.title.blank?
       %li== Title: #{@tag.title}
     - unless @tag.description.blank?
@@ -30,32 +33,30 @@
     - if @tag.image.exists? || @tag.remote_image
       - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
       %li== Image: #{link_to(File.basename(url), url, :target => '_blank') }      
-    - else
-      %li
-        %em No image  
+
   %hr
   %br  
   .gml
     %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
     %span.what-is-gml{:style => 'margin-left: 2px;'}= link_to('?', '#', :onclick => 'alert("TODO: what is GML page"); return false;')
-    %textarea{:cols => 26, :rows => 12, :onclick => '$(this).select();', :style => 'background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px;'}= @tag.gml
+    %textarea{:cols => 24, :rows => 12, :onclick => '$(this).select();'}= @tag.gml
     
   -#TODO: need a sexier way to determine ownership (everywhere)
   -#FIXME ghetto adminnery
-  - if @tag.user && current_user && @tag.user == current_user || is_admin?
+  - if is_owner?(@tag) || is_admin?
     %br
     %h2{:style => 'color: #f0f'} MODBOX
     %ol#controls  
-      %li= link_to '<strong>edit</strong>', edit_tag_path, :class => 'button'
+      %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
       %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
       
     %strong{:style => 'color: #f0f'} GML Header
-    %textarea{:rows => 12, :cols => 28, :style => 'border: 2px solid #f0f'}
+    %textarea{:cols => 24, :rows => 8, :style => 'border: 1px solid #f0f'}
       = h(@tag.gml_document/'header'.inspect) rescue "could not parse: #{$!}"
     
     
 / The actual tag awwwwwww yeah
-.tag.tabs
+#main.tag.tabs
   %ul.tab_navigation
     %li= link_to 'player', '#vanderplayer'
     %li= link_to 'thumbnail', '#thumbnail'
