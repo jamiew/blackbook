@@ -40,11 +40,12 @@
 
 class User < ActiveRecord::Base
   acts_as_authentic
-  acts_as_commentable # user wall
 
   has_slug :login
 
-  has_many :comments
+  has_many :comments # Owns/has made
+  has_many :wall_posts, :class_name => 'Comment', :as => :commentable # Comments *on* this user
+  has_many :favorites
   has_many :tags, :order => 'created_at DESC'
   has_many :visualizations
   

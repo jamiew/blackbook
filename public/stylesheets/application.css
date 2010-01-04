@@ -155,7 +155,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 a.delete { color: #fbb; }
 
 .create_new { margin: 25px 0 25px; text-align: right; }
-.create_new a { background-color: #ff0; font-weight: bold; }
+.create_new a { background-color: #ff0; }
 
 
 
