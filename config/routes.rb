@@ -1,9 +1,10 @@
 ActionController::Routing::Routes.draw do |map|
 
   # Requests I'd like to blackhole -- ideally these wouldn't flood my logs either O_o
-  map.discard_tag_temp_png '/tags/temp.png', :controller => 'home', :action => 'discard'
+  map.discard_tag_temp_png '/tags/temp.:format', :controller => 'home', :action => 'discard'
+  
 
-  # Forum
+  # Forum -- REMOVEME
   map.resources :forums do |forum|
     forum.resources :forum_threads do |threads|
       threads.resources :forum_posts
@@ -31,19 +32,19 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :visualizations,
     :as => 'apps', #TODO FIXME
-    :has_many => [:comments, :likes],
+    :has_many => [:comments, :favorites],
     :member => {:approve => :put, :unapprove => :put}
 
   map.resources :tags,
     :as => 'data',
-    :has_many => [:comments, :likes],
+    :has_many => [:comments, :favorites],
     :collection => [:latest],
     :trailing_slash => true
   map.resources :tags    
   map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
 
   # TODO...
-  # map.resources :likes    
+  map.resources :favorites
 
 
   map.activity '/activity', :controller => 'home', :action => 'activity'
