@@ -1,0 +1,31 @@
+- notifications ||= @notifications 
+- if notifications.blank?
+  = "None yet."
+- else
+  %ol.square
+    - notifications.each do |notif|
+      %li
+        = time_ago_in_words(notif.created_at).gsub('about ','')
+        ago
+        == &mdash;
+        - begin
+          - case notif.subject
+          - when Tag
+            - tag = notif.subject
+            - user = tag.user
+            = image_tag(tag.remote_image || tag.image.url(:small), :height => '100', :style => 'border: 1px solid #444')
+            = link_to "tag #{tag.id}".inspect, url_for(notif.subject)          
+
+            -# currently no user = API, and Tag should parse application name out of the GML
+            -# so just displa that. In the future we will probably have both
+            - if user.nil?
+              == uploaded via API #{tag.application.blank? ? '' : "(#{tag.application})"}
+            - else
+              == uploaded by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
+        
+          - when User
+            - user = notif.subject            
+            = link_to user.login, user_path(user)
+            signed up
+        - rescue
+          == ERROR: #{$!}
