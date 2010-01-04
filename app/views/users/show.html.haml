@@ -15,18 +15,33 @@
       %li= link_to 'Change Password', edit_user_path(@user)
 
 #main
+
+  - if true
+    - if @user.visualizations.blank?
+      / None
+    - else
+      %h1 Applications
+      %ul.square
+        - @user.visualizations.each do |vis|
+          %li= link_to vis.name, visualization_path(vis)
+
   - if false
-    = pagination(@tags)
+    %h2 Notifications
+    - if @notifications.blank?
+      = "None yet."
+    - else
+      - @notifications = Notification.find(:all, :conditions => ['user_id = ?', @user.id])
+      = render :partial => 'home/notifications', :object => @notifications
+
+  - if true
+    %hr
     - if @tags.blank?
       %strong.empty
         Nothing yet! 
         %br== &rarr; #{link_to 'Upload', new_tag_path}
     - else
+      %h1 Tags
       = render :partial => 'tags/tag', :collection => @tags
+    %br.clear
     = pagination(@tags)
-    - if @notifications.blank?
-      = "None yet."
-    - else
-  - @notifications = Notification.find(:all, :conditions => ['user_id = ?', @user.id])
-  = render :partial => 'home/notifications', :object => @notifications
-
+  

@@ -19,7 +19,7 @@
       / %td= link_to(image_tag(app.thumbnail_image), url)
       %td= link_to app.name, visualization_path(app)
       %td= app.kind || '&mdash;'
-      %td= link_to user.login, user_path(user) rescue '&mdash;'
+      %td= link_to app.user.login, user_path(app.user) rescue "&mdash;"
       %td=# app.created_at.strftime('%D %T')
       %td
         - if is_admin? || is_owner?
