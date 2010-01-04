@@ -6,7 +6,7 @@ class AddFieldsToVisualizations < ActiveRecord::Migration
     add_column :visualizations, :embed_url, :string
     add_column :visualizations, :embed_callback, :string
     add_column :visualizations, :embed_params, :string
-    add_column :visualizations, :embed_code, :bigtext
+    add_column :visualizations, :embed_code, :longtext
     
   end
 
