@@ -1,5 +1,11 @@
 module TagsHelper
   
+  # default a title for a piece of data...
+  def tag_title(tag)
+    tag.title.blank? ? "##{tag.id}" : tag.title
+  end
+  
+  
   # Tag flash visualizer -- allow people to customize
   # If no tag specified try to do "slideshow" mode (??)
   def tag_player(tag = nil, args = {})

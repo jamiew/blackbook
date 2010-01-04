@@ -25,19 +25,29 @@
     %ul.square
       - @tags.each do |tag|
         %li
-          %a{:href => tag_path(tag)}= tag.title.blank? ? "##{tag.id}" : title
+          %a{:href => tag_path(tag)}= tag_title(tag)
           %small
             - unless tag.application.blank?
-              %span.application== / #{tag.application}          
+              %span.application== | #{tag.application}          
             - unless tag.location.blank?
-              %span.location== / #{tag.location}
+              %span.location== | #{tag.location}
             - unless tag.user.nil?
-              %span.username== / #{link_to tag.user.login, user_path(tag.user)}            
-            %span.created_at.timeago== / #{tag.created_at.strftime('%D')}
+              %span.username== | #{link_to tag.user.login, user_path(tag.user)}            
+            %span.created_at.timeago== | #{tag.created_at.strftime('%D')}
     %p.right
       %strong= link_to '<span>View all &raquo;</span>', tags_path, :class => 'button ghost small'
 
   #vanderplayer.left_column
-    %h2= link_to @tag.title || "##{@tag.id}", tag_path(@tag)
+    %h2
+      %a{:href => tag_path(@tag)}= tag_title(@tag)
+      %small
+        - unless @tag.application.blank?
+          %span.application== | #{@tag.application}          
+        - unless @tag.location.blank?
+          %span.location== | #{@tag.location}
+        - unless @tag.user.nil?
+          %span.username== | #{link_to @tag.user.login, user_path(@tag.user)}            
+        %span.created_at.timeago== | #{@tag.created_at.strftime('%D')}
+      
     = tag_player(@tag, :width => '580px')
     
