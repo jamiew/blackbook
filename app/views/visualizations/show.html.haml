@@ -2,7 +2,8 @@
 %p.back= link_to '&larr; back to applications', visualizations_path
 
 .left{:style => 'margin-top: 40px;'}
-  = image_tag("/images/medium/missing.png", :width => 300)  
+  = image_tag("/images/defaults/app_large.jpg", :width => 300)  
+  =# image_tag(current_object.image(:large), :width => 300)  
   
 .centered{:style => 'width: 400px; margin: 20px 0 0 330px;'}
   %h1
