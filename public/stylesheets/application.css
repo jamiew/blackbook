@@ -148,14 +148,14 @@ textarea#user_about { margin-left: 8em; }
 /* Fonts & button misc */
 .bigtext { font-size: 1.4em;line-height: 1.6em; }
 
-a.button { background: #fff; padding: 3px 5px; color: #000; text-decoration: none; border: 3px solid #444; }
+a.button { background: #fff; border: 1px solid #bbb; padding: 3px 5px; color: #000; text-decoration: none; }
 a.button:hover { background: #ff0; } /* Hmm. a:hover getting overriden by a.button */
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 a.delete { color: #fbb; }
 
-.create_new { margin: 25px 0 25px; text-align: right; }
-.create_new a { background-color: #ff0; }
+.create_new { margin: 25px 0 25px; text-align: right; font-size: 11pt; font-weight: bold; }
+.create_new a { background-color: #ff0; border: none; }
 
 
 
