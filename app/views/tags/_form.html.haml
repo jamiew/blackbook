@@ -8,10 +8,12 @@
 
   %legend
   -#TODO: add radio buttons so it feels like only one is selected at a time
-  .left{:style => 'width: 180px;'}
+  .left{:style => 'width: 190px;'}
     %br
-    = form.file_field :gml_file, :size => 5, :label => '<strong><abbr>GML</abbr> file</strong>'+required
-  = form.text_area :gml, :label => 'or paste raw GML', :rows => 10
+    = form.file_field :gml_file, :size => 10, :label => '<strong>Upload <abbr>GML</abbr> file</strong>'+required
+  .left{:style => 'margin-top: 50px; margin-right: 30px;'} 
+    %em or
+  = form.text_area :gml, :label => 'paste raw GML', :rows => 10
 
   %hr
   -#FIXME baconhand...
@@ -20,7 +22,7 @@
     .left{:style => 'margin-left: 30px; font-size: 90%;'}= form.text_field :application, :label => 'or other'
     %br
   %hr
-  = form.file_field :image, :size => 10, :label => 'Screenshot'    
+  = form.file_field :image, :size => 10, :label => 'Screenshot (jpg/gif/png, up to 2MB)'    
   %hr.clear
   = form.text_field :title, :label => 'Who (writer/artist/author)' #title/authors ... desync FIXME
   = form.text_field :location, :label => 'Where <span>(e.g. NYC, SF)</span>'
