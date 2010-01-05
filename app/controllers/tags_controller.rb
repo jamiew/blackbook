@@ -112,7 +112,8 @@ protected
     opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application], :remote_secret => params[:secret] }
     puts "TagsController.create_from_api, opts=#{opts.inspect}"
     
-    @tag = Tag.new(opts)
+    # Merge opts & params to let people add whatever...
+    @tag = Tag.new(opts.merge(params))
     if @tag.save
       render :text => @tag.id, :status => 200 #OK
     else
@@ -142,7 +143,7 @@ protected
     # GML file overrides anything in the textarea -- that was probably accidental input
     file = params[:tag][:gml_file]
     if file
-      puts "GML_FILE == #{file.inspect}"
+      logger.info "Reading from GML file = #{file.inspect}"
       params[:tag][:gml] = file.read
     end
     
