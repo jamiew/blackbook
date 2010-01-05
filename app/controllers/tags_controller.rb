@@ -48,11 +48,10 @@ class TagsController < ApplicationController
   
   # Create/edit tags
   def new
-    @tag = Tag.new(:gml => "<gml>\n\n</gml>")
+    @tag = Tag.new    
   end
   
   def edit
-    @editing = "STUPIDFACE"
     render :action => 'new' # Hmm, doing :action is bunk, and rails 2.2 doesn't have just render 'new'
   end
   

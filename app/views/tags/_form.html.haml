@@ -16,22 +16,22 @@
   %hr
   -#FIXME baconhand...
   .row
-    .left= form.select :existing_application_id, Visualization.find(:all, :select => 'id, name').map { |v| [v.name, v.id] }, :label => 'Application'+required, :empty => true
+    .left= form.select :existing_application_id, Visualization.find(:all, :select => 'id, name').map { |v| [v.name, v.id] }, :label => 'Application'+required, :include_blank => true
     .left{:style => 'margin-left: 30px; font-size: 90%;'}= form.text_field :application, :label => 'or other'
     %br
+  %hr
+  = form.file_field :image, :size => 10, :label => 'Screenshot'    
   %hr.clear
   = form.text_field :title, :label => 'Who (writer/artist/author)' #title/authors ... desync FIXME
   = form.text_field :location, :label => 'Where <span>(e.g. NYC, SF)</span>'
 
-  - if admin?
+  -# Not using these anymore
+  - if false && admin?
     .admin{:style => 'background-color: #411; padding: 10px 0; margin: 10px 0;'}
       = form.text_field :remote_image, :label => 'Filename'
       = form.text_field :remote_secret, :label => 'Secret'
   =# form.text_field :description
   =# form.text_field :cached_tag_list, :label => 'Tags (comma-separated)'
-
-  %hr
-  = form.file_field :image, :size => 10, :label => 'Screenshot'
   
   - unless @tag.new_record?
     = form.hidden_field :id
