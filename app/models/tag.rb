@@ -49,9 +49,10 @@ class Tag < ActiveRecord::Base
   attr_protected :user_id
     
   has_attached_file :image, 
-    :default_style => :medium, 
+    :default_style => :medium,
+    :default_url => "/images/defaults/tag_:style.jpg",
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
-    # validates_attachment_presence :image
+  # validates_attachment_presence :image
     
   # Placeholders for assigning data from forms  
   attr_accessor :gml_file, :existing_application_id
