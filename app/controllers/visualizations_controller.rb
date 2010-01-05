@@ -28,8 +28,8 @@ class VisualizationsController < ApplicationController
 
   def current_objects
     @page, @per_page = params[:page] || 1, 20
-    which = is_admin? ? current_model.all : current_model.approved
-    @visualizations = which.paginate(:page => @page, :per_page => @per_page)
+    which = is_admin? ? current_model : current_model.approved
+    @visualizations = which.paginate(:page => @page, :per_page => @per_page, :include => [:user])
   end
   
   
