@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   helper :all # Oof, REMOVEME -- don't really need all helpers, all the time
   helper_method :current_user_session, :current_user, :page_title, :set_page_title
 
-  filter_parameter_logging :password, :password_confirmation
+  filter_parameter_logging :password, :password_confirmation, :gml #Don't show the raw GML in the logs
   protect_from_forgery
   
   # Global filters
