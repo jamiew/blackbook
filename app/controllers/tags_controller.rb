@@ -109,11 +109,11 @@ protected
   def create_from_api
 
     # TODO: add app uuid? or Hash app uuid?
-    opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application], :remote_secret => params[:secret] }
+    opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application], :remote_secret => params[:secret], :image => params[:image] }
     puts "TagsController.create_from_api, opts=#{opts.inspect}"
     
     # Merge opts & params to let people add whatever...
-    @tag = Tag.new(opts.merge(params))
+    @tag = Tag.new(opts)
     if @tag.save
       render :text => @tag.id, :status => 200 #OK
     else
