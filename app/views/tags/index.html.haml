@@ -20,7 +20,7 @@
     %tr
       %td= link_to(image_tag(tag.thumbnail_image(:small)), url)
       %td= link_to(tag_title(tag), url)
-      %td= tag.application || '&mdash;'
+      %td= tag.gml_application || tag.application || '&mdash;'
       %td= link_to(user.login, user_path(user)) rescue '&mdash;'
       %td.timeago= tag.created_at.strftime('%D %T')
       

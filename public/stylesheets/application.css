@@ -156,7 +156,7 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 a.delete { color: #fbb; }
 
 .create_new { margin: 25px 0 25px; text-align: right; font-size: 11pt;  }
-.create_new a { color: #fff; background-color: #e00; border: none; font-weight: normal; }
+.create_new a { /*color: #fff; background-color: #e00*/ background-color: #ff0; border: none; font-weight: normal; } /* don't actaully want to emphasize */
 
 
 

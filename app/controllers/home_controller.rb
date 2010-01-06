@@ -1,5 +1,7 @@
 class HomeController < ApplicationController
   
+  # caches_page :index, :expires_in => 10.minutes, :unless => logged_in?
+  
   def index
     # @users = User.find(:all, :order => 'created_at DESC', :limit => 10)
     

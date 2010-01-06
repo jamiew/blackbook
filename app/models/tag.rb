@@ -44,7 +44,7 @@ class Tag < ActiveRecord::Base
   before_save :process_gml  
   before_create :validate_tempt
   # before_save :process_app_id
-  before_save :save_header!
+  before_save :save_header
   
   # Security: protect from mass assignment
   attr_protected :user_id
@@ -124,17 +124,16 @@ class Tag < ActiveRecord::Base
     attrs[:gml_uniquekey] = (client/'uniqueKey').text rescue nil
     
     # encode the uniquekey with SHA-1 immediately
-    attrs[:gml_uniquekey] = Digest::SHA1.hexdigest(attrs[:gml_uniquekey]) unless attrs[:gml_uniquekey].blank?    
+    attrs[:gml_uniquekey_hash] = Digest::SHA1.hexdigest(attrs[:gml_uniquekey]) unless attrs[:gml_uniquekey].blank?    
     
     return attrs
   end
   
-  def save_header! #Forceful; should make you save instead
+  def save_header
     # only save attributes we actually have please, but allow displaying everything we can parse
     # this could be confusing later -- document well or refactor...
-    attrs = gml_header.select { |k,v| self.respond_to?(k) }.to_hash
-    puts attrs.inspect
-    self.update_attributes(attrs)
+    attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
+    puts "Tag.save_header: #{attrs.inspect}"
   end
   
   # def self.read_gml_header(gml)

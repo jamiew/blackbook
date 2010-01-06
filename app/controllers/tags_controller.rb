@@ -7,6 +7,8 @@ class TagsController < ApplicationController
   protect_from_forgery :except => [:create] # for the "API"  
   before_filter :require_owner, :only => [:edit,:update,:destroy]
 
+  # caches_page :index, :expires_in => 10.minutes, :unless => logged_in?
+
 
   # Display
   def index
@@ -70,6 +72,7 @@ class TagsController < ApplicationController
       render :text => "Cannot create tag from your paramters: #{params.inspect}", :status => 422 #Unprocessable Entity
       return
     end
+    expire_page(:index)
   end
   
   def update
@@ -97,7 +100,6 @@ protected
   
   def get_tag
     # @tag ||= Tag.find(params[:tag_id])
-    logger.info "params[:id]=#{params[:id]}"
     @tag = Tag.find(params[:id])
   end
   
