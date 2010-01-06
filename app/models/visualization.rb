@@ -42,8 +42,8 @@ class Visualization < ActiveRecord::Base
   # Protect from mass assignment
   attr_protected :user_id, :slug
   
-  named_scope :approved, { :conditions => ['approved_at > ?', Time.now] }
-  named_scope :pending, { :conditions => ['approved_at IS NULL OR approved_at < ?', Time.now] }
+  named_scope :approved, { :conditions => ['approved_at < ?', Time.now] }
+  named_scope :pending, { :conditions => ['approved_at IS NULL OR approved_at > ?', Time.now] }
   
   # has_attached_file :image, 
   #   :default_style => :medium,
