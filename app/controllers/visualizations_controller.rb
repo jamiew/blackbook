@@ -36,7 +36,6 @@ class VisualizationsController < ApplicationController
 
   def current_objects
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    puts "page = #{@page}"
     which = is_admin? ? current_model : current_model.approved
     @visualizations = which.paginate(:page => @page, :per_page => @per_page, :include => [:user], :order => 'approved_at DESC, name ASC')
   end
