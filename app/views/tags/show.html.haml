@@ -49,9 +49,12 @@
         %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
       %p
         %strong{:style => 'color: #f0f'} GML Header
-        %textarea{:cols => 24, :rows => 10, :style => 'border: 1px solid #f0f'}
-          = h(@tag.gml_document/'header').to_s.gsub('    ',' ') rescue "Could not parse GML: #{$!}"
-    
+        / %textarea{:cols => 24, :rows => 10, :style => 'border: 1px solid #f0f'}
+        - @tag.gml_header.each do |k,v|
+          %p{:style => 'overflow: hidden;'}
+            %strong= k
+            %br
+            %span= v || 'NULL'
     
 / The actual tag awwwwwww yeah
 #main.tag.tabs

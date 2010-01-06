@@ -8,14 +8,16 @@
 %table{:style => 'width: 100%'}
   %tr
     / %th{:style => 'width: 110px;'}
-    %th name
-    %th{:style => 'width: 100px;'} language
-    %th{:style => 'width: 100px;'} embeddable    
-    %th author
-    %th{:style => 'width: 130px'} submitted
+    %th{:style => 'width: 150px;'} application
+    %th{:style => 'width: 100px;'} <!--language-->
+    
+    / %th{:style => 'width: 100px;'} embeddable    
+    %th{:style => 'width: 500px;'} authors
+    %th submitted by
+    %th{:style => 'width: 130px'} <!--submitted-->
     - if is_admin? || is_owner?
-      %th.admin{:style => 'width: 70px;'}
-      %th.admin{:style => 'width: 150px;'}
+      %th.admin{:style => 'width: 40px;'}
+      %th.admin{:style => 'width: 80px;'}
     
   - current_objects.each do |app|
     %tr.fat
@@ -23,14 +25,15 @@
       %td
         %strong= link_to app.name, visualization_path(app)
       %td= app.kind.blank? ? '&mdash;' : app.kind
-      %td= app.is_embeddable? ? 'yes' : 'no'      
+      / %td= app.is_embeddable? ? 'yes' : 'no'      
+      %td{:style => 'line-height: 1.3em; padding: 0px 15px;'}= app.authors[0..100] || '&mdash;'
       %td= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
       %td= app.created_at.strftime('%D %T')
 
       -#Admin debuggery & controls
       - if is_admin?
         %td.admin= app.approved? ? 'Approved' : 'Pending'
-        %td.admin
+        %td.admin.controls
           - if app.approved?
             = link_to 'unapprove', unapprove_visualization_path(app), :method => :put, :confirm => 'Are you sure?'
           - else

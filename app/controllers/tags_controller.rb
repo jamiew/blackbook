@@ -27,6 +27,9 @@ class TagsController < ApplicationController
       @user ||= @tag.user # ...
     end
     
+    # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
+    @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
+    
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
     respond_to do |wants|
       wants.html  { render }

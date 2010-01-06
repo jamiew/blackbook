@@ -29,7 +29,8 @@
       %li= link_to 'applications', visualizations_path
       %li= link_to 'API/docs', "http://jamiedubs.com/wikis/blackbook", :target => '_blank'
       / %li= link_to 'dev forum', forums_path
-      - if logged_in?
+      %li= link_to 'about', "/about"
+      - if false
         %li= link_to 'activity', activity_path
     .masthead
       / %h1.title= link_to SiteConfig.site_name, root_path, :class => 'root_link'

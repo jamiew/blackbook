@@ -9,6 +9,7 @@ module TagsHelper
   # Tag flash visualizer -- allow people to customize
   # If no tag specified try to do "slideshow" mode (??)
   def tag_player(tag = nil, args = {})
+    return '[disabled in dev mode]' if dev?
     
     # No longer specifying a specific height, just width
     opts = { :width => '100%', :src => 'http://toddvanderlin.com/content/000000book/BlackBook.swf', :bgcolor => '#000000' }.merge(args)
