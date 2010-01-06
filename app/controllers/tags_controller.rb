@@ -10,13 +10,15 @@ class TagsController < ApplicationController
 
   # Display
   def index
-    @page, @per_page = params[:page] || 1, 10
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 10
     @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user])
+    set_page_title "Tag Data"+(@page > 1 ? " (page #{@page})" : '')
   end
   
-  def show
+  def show    
+    set_page_title "Tag ##{@tag.id}"
     
-    # Only need these instance vars with full HTML display; this could be Interlok'ed
+    # Only need these instance variables when rendering full HTML display (aka ghetto interlok)
      if params[:format] == 'html' || params[:format] == nil
       @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
       @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
@@ -25,6 +27,7 @@ class TagsController < ApplicationController
       @user ||= @tag.user # ...
     end
     
+    # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
     respond_to do |wants|
       wants.html  { render }
       wants.xml   { render :xml => @tag.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }      
@@ -34,17 +37,14 @@ class TagsController < ApplicationController
     end
   end
   
-  # Quick hack to dump the latest tag -- TODO render HTML too? or redirect
+  # Quick hack to dump the latest tag -- 
+  # Hand off to :show except for HTML, which should redirect -- keep permalinks happy
   def latest
     @tag = Tag.find(:first, :order => 'created_at DESC')
-    respond_to do |wants|
-      wants.html  { redirect_to(tag_path(@tag), :status => 302) } #Temporary Redirect
-      wants.xml   { render :xml => @tag.to_xml(:dasherize => false, :skip_types => true, :except => Tag::HIDDEN_ATTRIBUTES) }      
-      wants.gml   { render :xml => @tag.gml }
-      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
-      wants.rss   { render :rss => @tag.to_rss }      
-    end    
+    redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
+    show
   end
+  
   
   # Create/edit tags
   def new
