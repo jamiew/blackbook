@@ -14,6 +14,14 @@ class VisualizationsController < ApplicationController
       format.js
       format.xml
     end
+    
+    before :index do
+      set_page_title "Applications"+(@page > 1 ? " (page #{@page})" : '')
+    end
+    
+    before :show do
+      set_page_title @visualization.name
+    end
 
     response_for :create do |format| # Don't use nested route
       format.html { flash[:notice] = "Application submitted"; redirect_to visualization_path(current_object) }      
@@ -27,7 +35,8 @@ class VisualizationsController < ApplicationController
   end  
 
   def current_objects
-    @page, @per_page = params[:page] || 1, 20
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 20
+    puts "page = #{@page}"
     which = is_admin? ? current_model : current_model.approved
     @visualizations = which.paginate(:page => @page, :per_page => @per_page, :include => [:user])
   end

@@ -172,7 +172,7 @@ class ApplicationController < ActionController::Base
     helper_method :url_escape
 
     def dev?
-      return RAILS_ENV == 'developmet'
+      RAILS_ENV == 'development'
     end
     helper_method :dev?
 

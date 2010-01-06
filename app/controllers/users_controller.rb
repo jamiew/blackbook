@@ -5,15 +5,17 @@ class UsersController < ApplicationController
 
   # Show all users
   def index
-    @page, @per_page = params[:page] || 1, 20
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 20
     @users = User.paginate(:page => @page, :per_page => @per_page)
+    set_page_title "Users"    
     # default_respond_to(@users, :layout => true, :exclude => [:email,:password,:crypted_password,:persistence_token])
   end
   
   # Show one user
   def show
-    @page, @per_page = params[:page] || 1, 10
-    @user = User.find(params[:id])    
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 10
+    @user = User.find(params[:id])
+    set_page_title @user.name || @user.login    
     @tags = @user.tags.paginate(:page => @page, :per_page => @per_page)
   end
 
