@@ -44,6 +44,7 @@ class Tag < ActiveRecord::Base
   before_save :process_gml  
   before_create :validate_tempt
   # before_save :process_app_id
+  before_save :save_header!
   
   # Security: protect from mass assignment
   attr_protected :user_id
@@ -78,18 +79,17 @@ class Tag < ActiveRecord::Base
     end
   end
   
-  # GML document as a Nokogiri object...
-  def gml_document
-    parse_gml_document
-  end
-  
   # Wrap to_json so the .gml string gets converted to a hash, then to json
-  # 
   # TODO we could use a 'GML' object type!
   def to_json(options = {})
     self.gml = Hash.from_xml(self.gml)
     self.gml = self.gml['gml'] if self.gml['gml'] # drop any duplicate parent-level <gml>'s
     super(options)
+  end
+
+  # convert directly from the GML string to JSON
+  def gml_to_json
+    Hash.from_xml(self.gml).to_json
   end
 
   # Possibly strip all empty attributes... not sure if serving blank or not serving is better
@@ -99,40 +99,73 @@ class Tag < ActiveRecord::Base
   #   super(options)
   # end
 
-  # convert directly from the GML string to JSON
-  def gml_to_json
-    Hash.from_xml(self.gml).to_json
-  end
-
-  
-  
-  
-  
-  
-protected
-
-  def parse_gml_document
+  # GML as a Nokogiri object...
+  def gml_document
     return nil if self.gml.blank?
     @document ||= Nokogiri::XML(self.gml)
   end
+  alias :document :gml_document # Can't decide on the name; how much gml_ prefixing do we want?
+  
+  # Read the important bits of the GML -- this is also used
+  # by the before_save processing method to add
+  def gml_header
+    # doc = self.class.read_gml_header(self.gml)
+    doc = gml_document
+    return nil if doc.nil? || (doc/'header').nil?
+    attrs = {}
+
+    attrs[:filename] = (doc/'header'/'filename')[0].text rescue nil    
     
+    # whitelist approach, explicitly name things
+    client = (doc/'header'/'client')[0] rescue nil
+    attrs[:gml_application] = (client/'name').text rescue nil
+    attrs[:gml_username] = (client/'username').text rescue nil
+    attrs[:gml_keywords] = (client/'keywords').text rescue nil
+    attrs[:gml_uniquekey] = (client/'uniqueKey').text rescue nil
+    
+    # encode the uniquekey with SHA-1 immediately
+    attrs[:gml_uniquekey] = Digest::SHA1.hexdigest(attrs[:gml_uniquekey]) unless attrs[:gml_uniquekey].blank?    
+    
+    return attrs
+  end
+  
+  def save_header! #Forceful; should make you save instead
+    # only save attributes we actually have please, but allow displaying everything we can parse
+    # this could be confusing later -- document well or refactor...
+    attrs = gml_header.select { |k,v| self.respond_to?(k) }.to_hash
+    puts attrs.inspect
+    self.update_attributes(attrs)
+  end
+  
+  # def self.read_gml_header(gml)
+  #   # DRY with Tag.new.gml_document
+  #   doc = Nokogiri::XML(self.gml)
+  # end
+  
+  #TODO: inject 000000book infos into this GML...
+  
+  
+  
+  
+  
+protected    
 
   # extract some information from the GML
   # and insert our server signature
   def process_gml
-    doc = parse_gml_document
+    doc = gml_document
     header = (doc/'header')
     if header.blank?
       STDERR.puts "No header in GML: #{self.gml}"
       return nil
     end
-    
+  
     attrs = {}
-    attrs[:filename] = (header/'filename')[0].innerHTML rescue nil
-    
+    attrs[:filename] = (header/'filename')[0].inner_html rescue nil
+  
     obj = (header/'client')[0] rescue nil
-    attrs[:client] = (obj/'name').innerHTML rescue nil
-    
+    attrs[:client] = (obj/'name').inner_html rescue nil
+  
     STDERR.puts "Tag.process_gml: #{attrs.inspect}"    
     self.application = attrs[:client] unless attrs[:client].blank?
     self.remote_image = attrs[:filename] unless attrs[:filename].blank?
@@ -140,11 +173,6 @@ protected
     return attrs   
   rescue
     STDERR.puts "Tag.process_gml error: #{$!}"
-  end
-    
-  # verify the specified secret, or else say unknown
-  def process_app_id
-    # TODO
   end
     
   # simpe hack to check secret/appname for if this is tempt...

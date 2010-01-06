@@ -3,13 +3,16 @@
 
 .right_column
   %p
-    %label{:for => "visualization_authors"} Authors:
+    %label Submitter:
+    %strong{:style => 'margin-left: 3px;'}= link_to current_user.login
+  %p
+    %label{:for => "visualization_authors"}== #{required}Authors:
     = f.text_area :authors, :rows => 2
   %p
     %label{:for => "visualization_website"} Website:
     = f.text_field :website
   %p
-    %label{:for => "visualization_description"}== Description:
+    %label{:for => "visualization_description"}== #{required}Description:
     = f.text_area :description, :rows => 6
 
 .left_column

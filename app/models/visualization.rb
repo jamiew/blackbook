@@ -26,6 +26,7 @@ class Visualization < ActiveRecord::Base
       ['Ruby','ruby'],
       ['Python','python'],
       ['Java','java'],
+      ['Other','other'],
     ]
     
   
@@ -33,9 +34,11 @@ class Visualization < ActiveRecord::Base
   has_many :comments, :as => :commentable
   
   validates_associated :user, :on => :create    
-  validates_presence_of :name, :on => :create, :message => "can't be blank"
-  validates_uniqueness_of :name, :on => :create, :message => "must be unique"
-  # validates_presence_of :description, :on => :create, :message => "can't be blank"
+  validates_presence_of :name, :on => :create, :message => "can't be blank (and should be cool)"
+  validates_uniqueness_of :name, :on => :create, :message => "must be unique & that name already exists"
+  validates_presence_of :description, :on => :create, :message => "can't be blank, what is this supposed to do?"
+  validates_presence_of :authors, :on => :create, :message => "can't be blank, put your username if nothing else"
+  # validates_presence_of :website, :on => :create, :message => "can't be blank"
   validates_presence_of :embed_url, :on => :create, :message => "can't be blank", :if => :is_embeddable
   # Optional: version, website, download (?), license (?)
   

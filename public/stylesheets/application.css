@@ -61,6 +61,7 @@ table td { padding: 5px 5px; font-size: 0.9em; }
 table tr.fat { line-height: 3em; }
 table th.admin { background-color: #422; text-align: center; }
 table td.admin { background-color: #200; text-align: center; }
+table td.controls { text-align: right; }
 
 fieldset, img {
   border: 0;
@@ -154,8 +155,8 @@ a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 a.delete { color: #fbb; }
 
-.create_new { margin: 25px 0 25px; text-align: right; font-size: 11pt; font-weight: bold; }
-.create_new a { background-color: #ff0; border: none; }
+.create_new { margin: 25px 0 25px; text-align: right; font-size: 11pt;  }
+.create_new a { color: #fff; background-color: #e00; border: none; font-weight: normal; }
 
 
 

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100104083207) do
+ActiveRecord::Schema.define(:version => 20100106035911) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -101,6 +101,12 @@ ActiveRecord::Schema.define(:version => 20100104083207) do
     t.text     "description"
     t.string   "remote_image"
     t.string   "remote_secret"
+    t.string   "gml_application"
+    t.string   "gml_version"
+    t.string   "gml_username"
+    t.string   "gml_uniquekey"
+    t.string   "gml_uniquekey_hash"
+    t.string   "gml_keywords"
   end
 
   create_table "users", :force => true do |t|
@@ -141,10 +147,10 @@ ActiveRecord::Schema.define(:version => 20100104083207) do
     t.integer  "user_id"
     t.string   "name"
     t.string   "slug"
-    t.text     "description"
-    t.string   "download"
     t.string   "website"
+    t.string   "download"
     t.string   "version"
+    t.text     "description"
     t.string   "authors"
     t.string   "kind",                                 :default => ""
     t.boolean  "is_embeddable",                        :default => false
