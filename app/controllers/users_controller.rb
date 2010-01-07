@@ -36,7 +36,7 @@ class UsersController < ApplicationController
   end
 
   # Change information about ourselves
-  def edit
+  def edit    
   end
 
   def change_password

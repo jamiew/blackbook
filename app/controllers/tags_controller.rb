@@ -3,13 +3,25 @@ class TagsController < ApplicationController
   # We allow access to :create for the ghetto-API, which doesn't require real authentication
   #TODO: change it to something like 'require_api_key' for if it doesn't have a user, or requires http basic...
   before_filter :get_tag, :only => [:show, :edit, :update, :destroy]
-  before_filter :require_user, :only => [:new,:edit,:update,:destroy] # <-- but not create
+  before_filter :require_user, :only => [:new, :edit, :update, :destroy] # <-- but not create
   protect_from_forgery :except => [:create] # for the "API"  
-  before_filter :require_owner, :only => [:edit,:update,:destroy]
+  before_filter :require_owner, :only => [:edit, :update, :destroy]
 
-  # caches_page :index, :expires_in => 10.minutes, :unless => logged_in?
-
-
+  # Basic caching for :index?page=1 and :show actions
+  after_filter :expire_caches, :only => [:update, :create, :destroy]
+  caches_action :index, :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
+  caches_action :show,  :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
+  
+  #TODO: this should be a Sweeper. but it doesn't *have* to be...
+  def expire_caches
+    if @tag
+      [nil,'json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
+    end
+    expire_fragment(:controller => 'tags', :action => 'index')
+    # expire_fragment(:controller => 'home', :action => 'index')
+    expire_fragment('home/index')
+  end
+  
   # Display
   def index
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10

@@ -10,7 +10,7 @@ class UserSessionsController < ApplicationController
     @user_session = UserSession.new(params[:user_session])
     if @user_session.save
       flash[:notice] = "Login successful!"
-      redirect_back_or_default(user_path(current_user)) #FIXME is current_user correct here?
+      redirect_back_or_default(user_path(current_user))
     else
       render :action => :new
     end

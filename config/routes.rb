@@ -32,6 +32,7 @@ ActionController::Routing::Routes.draw do |map|
     users.resources :tags, :as => 'data'
     #FIXME remove above visualizations nested association -- not being used
   end
+  map.settings '/settings', :controller => 'users', :action => 'edit'
 
   map.resources :visualizations,
     :as => 'apps', #TODO FIXME
