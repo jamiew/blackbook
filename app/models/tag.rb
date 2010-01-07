@@ -132,6 +132,7 @@ class Tag < ActiveRecord::Base
   def save_header
     # only save attributes we actually have please, but allow displaying everything we can parse
     # this could be confusing later -- document well or refactor...
+    return if gml_header.blank?
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
     puts "Tag.save_header: #{attrs.inspect}"
   end
