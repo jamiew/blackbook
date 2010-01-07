@@ -75,6 +75,7 @@ class TagsController < ApplicationController
   # branches into create_from_form (on-site, more strict) vs. create_from_api (less strict)
   def create
     raise "No params!" if params.blank?
+    render :nothing => true, :status => 200 and return if params[:check] == 'connected' #DustTag weirdness?
     
     if !params[:tag].blank? # sent by the form
       return create_from_form
