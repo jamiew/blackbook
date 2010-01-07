@@ -80,5 +80,3 @@ end
 # require everything in /lib
 Dir.glob(RAILS_ROOT+"/lib/*.rb").each { |file| require file }
 
-# Exception notification...
-ExceptionNotifier.exception_recipients = %w(jamie@tramchase.com)
