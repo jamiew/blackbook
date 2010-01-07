@@ -36,7 +36,8 @@ class UsersController < ApplicationController
   end
 
   # Change information about ourselves
-  def edit    
+  def edit
+    set_page_title "My Settings"    
   end
 
   def change_password

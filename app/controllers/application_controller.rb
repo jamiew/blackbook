@@ -5,8 +5,6 @@
 class NoPermissionError < RuntimeError; end
 
 class ApplicationController < ActionController::Base
-
-  include ExceptionNotifiable # no Hoptoad just yet.
     
   helper :all # Oof, REMOVEME -- don't really need all helpers, all the time
   helper_method :current_user_session, :current_user, :page_title, :set_page_title
