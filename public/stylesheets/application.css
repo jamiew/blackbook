@@ -130,7 +130,7 @@ form fieldset label:first-letter { text-decoration:underline; } /* Denote access
 form br { clear:left; }
 
 /* some specifics; TODO REMOVEME! */
-textarea#user_about { margin-left: 8em; }
+/*textarea#user_about { margin-left: 8em; }*/
 .buttons input, .buttons button { font-size: 1.5em; } 
 
 
