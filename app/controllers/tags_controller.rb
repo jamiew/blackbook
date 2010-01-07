@@ -42,7 +42,7 @@ class TagsController < ApplicationController
     end
   end
   
-  # Quick hack to dump the latest tag -- 
+  # Quick accessor to grab the latest tag -- great for running installations with the freshest GML
   # Hand off to :show except for HTML, which should redirect -- keep permalinks happy
   def latest
     @tag = Tag.find(:first, :order => 'created_at DESC')
@@ -60,7 +60,8 @@ class TagsController < ApplicationController
     render :action => 'new' # Hmm, doing :action is bunk, and rails 2.2 doesn't have just render 'new'
   end
   
-  def create        
+  # branches into create_from_form (on-site, more strict) vs. create_from_api (less strict)
+  def create
     raise "No params!" if params.blank?
     
     if !params[:tag].blank? # sent by the form
@@ -68,8 +69,10 @@ class TagsController < ApplicationController
     elsif !params[:gml].blank? # sent from an app!
       return create_from_api
     else
-      # Otherwise error out
-      render :text => "Cannot create tag from your paramters: #{params.inspect}", :status => 422 #Unprocessable Entity
+      # Otherwise error out, without displaying any sensitive or internal params
+      clean_params = params
+      [:action, :controller].each { |k| clean_params.delete(k) }
+      render :text => "Error, could not create tag from your parameters: #{clean_params.inspect}", :status => 422 #Unprocessable Entity
       return
     end
     expire_page(:index)
@@ -160,8 +163,7 @@ protected
       redirect_to tag_path(@tag)
     else
       flash[:error] = "Error saving your tag! #{$!}"
-      error_status = 500
-      render :action => 'new', :status => error_status
+      render :action => 'new', :status => 422 #Unprocessable entity
     end        
   end    
   
