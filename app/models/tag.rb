@@ -30,10 +30,10 @@ class Tag < ActiveRecord::Base
 
   #Blacklisted attributes not to show in the API
   #TODO: convert to a whitelisted approach...
-  HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret]
+  HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list]
 
   # is_taggable :tags
-
+  #TODO: cache_money indexes
   
   belongs_to :user
   has_many :comments, :as => :commentable
@@ -80,7 +80,8 @@ class Tag < ActiveRecord::Base
   end
   
   # Wrap to_json so the .gml string gets converted to a hash, then to json
-  # TODO we could use a 'GML' object type!
+  #TODO: we could use a 'GML' object type! it should have its own table -- all this stuff is quite slow...
+  #TODO: this is quite an expensive operation :(
   def to_json(options = {})
     self.gml = Hash.from_xml(self.gml)
     self.gml = self.gml['gml'] if self.gml['gml'] # drop any duplicate parent-level <gml>'s
@@ -111,9 +112,9 @@ class Tag < ActiveRecord::Base
   def gml_header
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
-    return nil if doc.nil? || (doc/'header').nil?
-    attrs = {}
+    return {} if doc.nil? || (doc/'header').nil?
 
+    attrs = {}
     attrs[:filename] = (doc/'header'/'filename')[0].text rescue nil    
     
     # whitelist approach, explicitly name things

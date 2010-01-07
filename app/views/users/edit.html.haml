@@ -1,5 +1,5 @@
 
-- uberform_for @user, :url => user_path, :html => { :multipart => true } do |form|
+- uberform_for @user, :url => user_path(@user), :html => { :multipart => true } do |form|
   %h2 Edit My Account
 
   %fieldset

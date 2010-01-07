@@ -106,7 +106,9 @@ class ApplicationController < ActionController::Base
       if current_user
         store_location
         flash[:error] = "You must be logged out to access that page"
-        redirect_back_or_default(user_path(current_user))
+        # Can cause infinite redirects if on /login => /login ... FIXME
+        # redirect_back_or_default(user_path(current_user))
+        redirect_to(user_path(current_user))
         return false
       end
     end
@@ -128,10 +130,15 @@ class ApplicationController < ActionController::Base
     end
 
     # Allow for using all 3 of: a specific redirect_to, a general :back, OR the specified default
+    # Update: skipping out on using :back -- it causes a lot of goofiness. If you want that kind of functionality,
+    #  use :store_location explicitly on the callin page
     def redirect_back_or_default(default)      
       if session[:return_to].blank?
-        redirect_to(:back)
+        # puts "Redirecting to :back ..."
+        # redirect_to(:back)
+        redirect_to(default)
       else
+        puts "Redirecting to #{session[:return_to]}"
         redirect_to(session[:return_to])
         session[:return_to] = nil
       end
@@ -156,8 +163,7 @@ class ApplicationController < ActionController::Base
       end
       super
     end
-    
-    
+        
     # moar 
     def url_escape(str, whitelist=false)
       if whitelist
@@ -173,6 +179,7 @@ class ApplicationController < ActionController::Base
     end
     helper_method :url_escape
 
+    # Quick check if we're in devmode
     def dev?
       RAILS_ENV == 'development'
     end
@@ -207,5 +214,20 @@ class ApplicationController < ActionController::Base
         # - atom
       end and return
     end
+    
+    
+    # Caching related -- should we cache this request?
+    # 1) if it's not HTML, cache it -- .gml/.xml/.json/etc
+    # 2) if it's HTML and we're logged in, don't cache
+    # 3) if it's HTML and we're paginating, also don't cache (lazy)
+    def logged_out_and_no_query_vars?
+      # puts "format = #{request.parameters[:format].inspect}, session = #{request.session.inspect}, params = #{request.parameters.inspect}"
+      return true unless [nil,'','html'].include?(request.parameters[:format].to_s)
+      
+      logged_out = request.session['user_credentials_id'].blank?
+      no_query_vars = request.parameters[:page].blank? || request.parameters[:page].to_s == '1'
+      return logged_out && no_query_vars
+    end
+    
 
 end

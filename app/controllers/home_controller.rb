@@ -1,13 +1,11 @@
 class HomeController < ApplicationController
   
-  # caches_page :index, :expires_in => 10.minutes, :unless => logged_in?
+  caches_action :index, :cache_path => 'home/index', :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
   
   def index
-    # @users = User.find(:all, :order => 'created_at DESC', :limit => 10)
-    
+    # @users = User.find(:all, :order => 'created_at DESC', :limit => 10)    
     @tags = Tag.find(:all, :order => 'created_at DESC', :limit => 30, :include => [:user])
-    @tag = @tags.shift
-    
+    @tag = @tags.shift    
   end
   
   def activity
