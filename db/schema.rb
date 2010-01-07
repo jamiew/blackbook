@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100106035911) do
+ActiveRecord::Schema.define(:version => 20100107072020) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -135,6 +135,7 @@ ActiveRecord::Schema.define(:version => 20100106035911) do
     t.string   "location"
     t.string   "slug"
     t.string   "name"
+    t.string   "iphone_uniquekey"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email"
