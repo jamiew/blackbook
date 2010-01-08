@@ -194,7 +194,7 @@ protected
   def convert_app_id_to_app_name
     # Sub in an existing application if specified...
     puts "Create from form... #{params.inspect}"
-    return unless params[:tag][:existing_application_id] && !params[:tag][:existing_application_id].blank? && params[:tag][:application].blank?
+    return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
     puts "OK! got an existing and no specific application selecetd"
 
     # FIXME use internal ids if available? string matching all the time is ghetto
