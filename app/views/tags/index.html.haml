@@ -24,7 +24,7 @@
       %td
         - if !user.nil?
           = link_to(user.login, user_path(user))
-        - elsif !tag.user_secret_name
+        - elsif tag.user_secret_name
           = tag.user_secret_name
         - else
           &mdash;
