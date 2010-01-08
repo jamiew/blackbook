@@ -20,10 +20,13 @@
         %br== (#{time_ago_in_words(@tag.created_at)} ago)
     %hr
     %ul
-      - unless @user.nil?
-        %li== <strong>Author:</strong> #{link_to(@user.login, user_path(@user))}
-      %li== <strong>Application:</strong> #{@tag.application.blank? ? '<em>unknown</em>' : @tag.application}
-      %li== <strong>Location:</strong> #{@tag.location.blank? ? '<em>unknown</em>' : @tag.location}
+      %li== <strong>Application:</strong> #{@tag.application.blank? ? 'NULL' : application_link(@tag.application)}          
+    %hr
+    %ul
+      - if !@tag.author.blank?
+        %li== <strong>Author:</strong> #{@tag.author}
+      %li== <strong>Uploader:</strong> #{@user.blank? ? (@tag.secret_username.blank? ? 'NULL' : @tag.secret_username) : link_to(@user.login, user_path(@user)) }
+      %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : @tag.location}
       - unless @tag.description.blank?
         %li== <strong>Description:</strong> #{@tag.description}
 
@@ -48,13 +51,22 @@
         %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
         %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
       %p
-        %strong{:style => 'color: #f0f'} GML Header
+        %strong{:style => 'color: #f0f'} Secret Fields
+        - ['gml_uniquekey', 'gml_uniquekey_hash'].each do |field|
+          %p{:style => 'overflow: hidden;'}
+            %strong= field
+            %br
+            %input{:type => 'text', :readonly => 'readonly', :value => @tag.attributes[field], :onclick => '$(this).select();'}
+      %p
+        %strong{:style => 'color: #f0f'} Parsed GML Header
         / %textarea{:cols => 24, :rows => 10, :style => 'border: 1px solid #f0f'}
+        - STDERR.puts @tag.inspect
+        - STDERR.puts @tag.gml_header.inspect
         - @tag.gml_header.each do |k,v|
           %p{:style => 'overflow: hidden;'}
             %strong= k
             %br
-            %span= v || 'NULL'
+            %span=h v
     
 / The actual tag awwwwwww yeah
 #main.tag.tabs
@@ -62,14 +74,20 @@
     %li= link_to 'flashplayer', '#vanderplayer'
     %li= link_to 'thumbnail', '#thumbnail'
 
-  #vanderplayer    
-    - player = tag_player(@tag, :width => '580px')
-    %p= player
+  #vanderplayer 
+    -#FIXME -- this causes us to load one more way-large object per request -- currently not bothering...
+    -#  should we stash a 'valid_gml' boolean? Hmm.
+    - if false && @tag.gml.blank?
+      %p
+        %h4 Missing or invalid GML data; playback disabled
+    - else
+      - player = tag_player(@tag, :width => '580px')
+      %p= player
     
-    -# Embed code -- take it with you
-    - encoded_embed = HTMLEntities.new.encode(player).gsub("\n",'').squeeze(" ").chomp
-    %label{:for => 'player_embed'} Embed Code
-    %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}  
+      -# Embed code -- take it with you
+      - encoded_embed = HTMLEntities.new.encode(player).gsub("\n",'').squeeze(" ").chomp
+      %label{:for => 'player_embed'} Embed Code
+      %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}  
     
   / TODO: canvasplayer
     

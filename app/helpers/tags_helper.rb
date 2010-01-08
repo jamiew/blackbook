@@ -5,6 +5,23 @@ module TagsHelper
     tag.title.blank? ? "##{tag.id}" : tag.title
   end
   
+  # ...
+  def secret_username_link(secret_username)
+    link_to secret_username, tags_path(:user => secret_username), :class => 'username_link anon'
+  end
+  
+  # ...DOCME
+  def application_link(app_name, opts = {})
+    if app_name.blank?
+      "[manual]"
+    else
+      # Strip out the long-ass GA name...
+      shortname = app_name.gsub!('Graffiti Analysis ','GA') if opts[:short] == true      
+      link_to app_name, tags_path(:app => app_name), :class => 'application_link anon'
+    end
+  end  
+  
+  
   
   # Tag flash visualizer -- allow people to customize
   # If no tag specified try to do "slideshow" mode (??)

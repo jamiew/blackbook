@@ -31,8 +31,7 @@ $(document).ready(function(){
 	// relevant StackOverflow thread... http://stackoverflow.com/questions/1384500/activate-url-anchor-but-dont-scroll-to-it
 	$('div.tabs ul.tab_navigation li a').each(function(){ 
 	  var pattern = $(this).attr('href'); 
-	  if(window.location.href.match(pattern)) 
-	    $(this).click();
+	  if(window.location.href.match(pattern)) { $(this).click(); }
 	});  
   
 });

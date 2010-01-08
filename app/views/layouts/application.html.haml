@@ -16,8 +16,7 @@
       = flash_messages
       = yield :layout unless dev? && params[:noyield] == '1'
   = render :partial => 'layouts/footer'
-  
-  
+    
   - if RAILS_ENV == 'production'  
     = render :partial => 'layouts/stats'
 

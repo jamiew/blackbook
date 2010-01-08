@@ -12,22 +12,19 @@
   %br.clear
   / .right_column{:style => 'width: 280px; text-align: left; margin-top: 40px;'}
   -# TODO: convert this to a table
-  .right_column{:style => "margin-top: 40px;"}
+  .right_column{:style => "margin-top: 40px; overflow: visible;"}
     %ul#frontpage_tags
       - @tags.each do |tag|
         %li
           %a{:href => tag_path(tag)}= tag_title(tag)
           %small
-            - unless tag.application.blank? && tag.gml_application.blank?
-              - name = tag.gml_application || tag.application || 'NULL'
-              %span.application== <em>|</em> #{name.gsub('Graffiti Analysis ','GA')}          
-            - unless tag.location.blank?
-              %span.location== <em>|</em> #{tag.location}
-            / %br
+            -# unless tag.application.blank? && tag.gml_application.blank?
+            - if true
+              %span.application== <em>|</em> #{application_link(tag.sexy_app_name, :short => true)}
             - unless tag.user.nil?
-              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)} | 
-            - unless tag.user_secret_name.blank?
-              %span.uniquekey== <em>|</em> #{tag.user_secret_name}
+              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
+            - unless tag.secret_username.blank?
+              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}              
             %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
     %p.right
       %strong= link_to '<span>View all &raquo;</span>', tags_path, :class => 'button ghost small'
