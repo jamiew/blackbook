@@ -223,7 +223,11 @@ class ApplicationController < ActionController::Base
       return true unless [nil,'','html'].include?(request.parameters[:format].to_s)
       
       logged_out = request.session['user_credentials_id'].blank?
-      no_query_vars = request.parameters[:page].blank? || request.parameters[:page].to_s == '1'
+
+      # FIXME; make this no_query_vars blacklist against particular cachables instead of whitelisting un-cachables
+      no_query_vars = (request.parameters[:page].blank? || request.parameters[:page].to_s == '1') && request.parameters[:app].blank? && request.parameters[:user].blank?
+      logger.debug "no_query_vars?=#{no_query_vars}  params=#{request.parameters.inspect}"
+
       return logged_out && no_query_vars
     end
     
