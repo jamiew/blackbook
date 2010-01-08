@@ -42,17 +42,17 @@ class Tag < ActiveRecord::Base
   
   validates_associated :user, :on => :create
   
-  before_save :process_gml  
+  # before_save :process_gml  
+  # before_save :save_header #Done inside build_gml_object now; HACK FIXME
   before_create :validate_tempt
   # before_save :process_app_id
-  # before_save :save_header #Done inside copy_gm_temp now; HACK FIXME
-    
-  after_create :create_gml_object
+  #Hackish; need a "filler" obj while we're building... don't have an ID before create.
+  before_save :copy_gml_temp_to_gml_object
+  before_create :build_gml_object  
+  after_create :save_gml_object
+  
   after_create :create_notification
 
-  #Hackish; need a "filler" obj while we're building... don't have an ID before create.
-  # and don't wanna save it to ourselves before committing
-  before_save :copy_gml_temp_to_gml_object
   
   # Security: protect from mass assignment
   attr_protected :user_id
@@ -94,12 +94,7 @@ class Tag < ActiveRecord::Base
     @gml_temp = fresh
   end
   
-  def copy_gml_temp_to_gml_object
-    return if @gml_temp.blank? || gml_object.nil?
-    gml_object.data = @gml_temp
-    gml_object.save! if gml_object.data_changed? #we might be double-saving...
-    save_header
-  end
+
   
   # Wrap to_json so the .gml string gets converted to a hash, then to json
   #TODO: we could use a 'GML' object type! it should have its own table -- all this stuff is quite slow...
@@ -134,10 +129,14 @@ class Tag < ActiveRecord::Base
   def gml_header
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
-    return {} if doc.nil? || (doc/'header').nil?
+
+    if doc.nil? || (doc/'header').nil?
+      puts "NIL OR NO HEADER DOC"
+      return {} 
+    end
 
     attrs = {}
-    attrs[:filename] = (doc/'header'/'filename')[0].text rescue nil    
+    attrs[:filename] = (doc/'header'/'filename')[0].text rescue nil        
     
     # whitelist approach, explicitly name things
     client = (doc/'header'/'client')[0] rescue nil
@@ -145,7 +144,6 @@ class Tag < ActiveRecord::Base
     attrs[:gml_username] = (client/'username').text rescue nil
     attrs[:gml_keywords] = (client/'keywords').text rescue nil
     attrs[:gml_uniquekey] = (client/'uniqueKey').text rescue nil
-    
     # encode the uniquekey with SHA-1 immediately
     attrs[:gml_uniquekey_hash] = Digest::SHA1.hexdigest(attrs[:gml_uniquekey]) unless attrs[:gml_uniquekey].blank?    
     
@@ -182,20 +180,27 @@ protected
   end
   
   # make sure we have a gml
-  def create_gml_object
+  def build_gml_object
     STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
-    obj = GMLObject.new(:tag => self)
+    obj = GMLObject.new
     obj.data = @gml_temp || self.attributes['gml'] || '' # attr_protected
-    obj.save!
-    self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...
+    self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...  
+    process_gml
+    save_header
   end
 
+  def save_gml_object
+    self.gml_object.tag = self
+    self.gml_object.save!
+  end
 
 
   # extract some information from the GML
   # and insert our server signature
   def process_gml
     doc = gml_document
+    return if doc.nil?
+      
     header = (doc/'header')
     if header.blank?
       STDERR.puts "No header in GML: #{self.gml}"
@@ -226,6 +231,13 @@ protected
       self.user_id = user.id
     end    
   end
+  
+  def copy_gml_temp_to_gml_object
+    return if @gml_temp.blank? || gml_object.nil?
+    gml_object.data = @gml_temp
+    gml_object.save! if gml_object.data_changed? #we might be double-saving...
+  end
+  
   
   
 end
