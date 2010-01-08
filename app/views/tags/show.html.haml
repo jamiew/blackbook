@@ -25,7 +25,7 @@
     %ul
       - if !@tag.author.blank?
         %li== <strong>Author:</strong> #{@tag.author}
-      %li== <strong>Uploader:</strong> #{@user.blank? ? (@tag.secret_username.blank? ? 'NULL' : @tag.secret_username) : link_to(@user.login, user_path(@user)) }
+      %li== <strong>Uploader:</strong> #{@user.blank? ? (@tag.secret_username.blank? ? 'NULL' : secret_username_link(@tag.secret_username)) : link_to(@user.login, user_path(@user)) }
       %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : @tag.location}
       - unless @tag.description.blank?
         %li== <strong>Description:</strong> #{@tag.description}

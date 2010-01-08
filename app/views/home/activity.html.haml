@@ -5,9 +5,5 @@
   = link_to "back to home", root_path
 
 = pagination(@notifications)
-
-%p
-  %br
-  = render :partial => 'notifications', :object => @notifications #not :collection
-
-= pagination(@notifications)
+= render :partial => 'notifications', :object => @notifications #not :collection
+%p= pagination(@notifications)
