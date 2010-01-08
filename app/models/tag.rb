@@ -45,7 +45,7 @@ class Tag < ActiveRecord::Base
   before_save :process_gml  
   before_create :validate_tempt
   # before_save :process_app_id
-  before_save :save_header
+  after_save :save_header #HACK fixme, create order issue...
   
   # Security: protect from mass assignment
   attr_protected :user_id
@@ -156,6 +156,7 @@ class Tag < ActiveRecord::Base
     return if gml_header.blank?
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
     puts "Tag.save_header: #{attrs.inspect}"
+    save! #HACK FIXME, header save issue goddamnit...
   end
   
   # def self.read_gml_header(gml)
