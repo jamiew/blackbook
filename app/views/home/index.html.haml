@@ -19,7 +19,8 @@
           %a{:href => tag_path(tag)}= tag_title(tag)
           %small
             - unless tag.application.blank? && tag.gml_application.blank?
-              %span.application== <em>|</em> #{tag.application || tag.gml_application}          
+              - name = tag.gml_application || tag.application || 'NULL'
+              %span.application== <em>|</em> #{name.gsub('Graffiti Analysis ','GA')}          
             - unless tag.location.blank?
               %span.location== <em>|</em> #{tag.location}
             / %br
