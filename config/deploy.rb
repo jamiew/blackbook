@@ -89,6 +89,7 @@ namespace :sync do
     # Load the dump
     # exec "mysql -u #{database['development']['username']} #{password} #{database['development']['database']} < #{filename}; rm -f #{filename}"
     puts "Loading #{filename} => #{database['development']['database']} ..."
+    #TODO: drop & re-create the database -- causes newer migrations to fail sometimes otherwise, lingering new tables...
     system("gunzip -c #{filename} | mysql -u '#{database['development']['username']}' '#{database['development']['database']}' && rm -f #{filename}")
   end
 

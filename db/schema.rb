@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100107072020) do
+ActiveRecord::Schema.define(:version => 20100108063726) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -55,6 +55,15 @@ ActiveRecord::Schema.define(:version => 20100107072020) do
     t.datetime "updated_at"
   end
 
+  create_table "gml_objects", :force => true do |t|
+    t.integer  "tag_id"
+    t.text     "data",       :limit => 2147483647
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "gml_objects", ["tag_id"], :name => "index_gml_objects_on_tag_id"
+
   create_table "likes", :force => true do |t|
     t.integer  "object_id"
     t.string   "object_type"
@@ -74,16 +83,10 @@ ActiveRecord::Schema.define(:version => 20100107072020) do
     t.datetime "updated_at"
   end
 
-  create_table "subscriptions", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "tags", :force => true do |t|
     t.integer  "user_id"
     t.string   "title"
     t.string   "slug"
-    t.text     "gml",                :limit => 2147483647
     t.integer  "comment_count"
     t.integer  "likes_count"
     t.datetime "created_at"

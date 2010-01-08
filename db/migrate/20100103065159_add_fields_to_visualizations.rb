@@ -6,7 +6,7 @@ class AddFieldsToVisualizations < ActiveRecord::Migration
     add_column :visualizations, :embed_url, :string
     add_column :visualizations, :embed_callback, :string
     add_column :visualizations, :embed_params, :string
-    add_column :visualizations, :embed_code, :longtext
+    add_column :visualizations, :embed_code, :mediumtext # Allow medium-sized applications; 16 million chars; longtext is 4 billion...
     
   end
 

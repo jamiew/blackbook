@@ -36,6 +36,7 @@ class Tag < ActiveRecord::Base
   #TODO: cache_money indexes
   
   belongs_to :user
+  has_one :gml_object, :class_name => 'GMLObject' #used to store the actual data, nice & gzipped
   has_many :comments, :as => :commentable
   has_many :likes
   
@@ -58,11 +59,10 @@ class Tag < ActiveRecord::Base
   # Placeholders for assigning data from forms  
   attr_accessor :gml_file, :existing_application_id
   
+  after_create :create_gml_object
   after_create :create_notification
   
-  def create_notification
-    Notification.create(:subject => self, :verb => 'created')
-  end
+  
   
   # wrap remote_imge to always add our local FFlickr... FIXME
   def remote_image
@@ -77,6 +77,15 @@ class Tag < ActiveRecord::Base
     else
       return self.image(size)
     end
+  end
+  
+  # Wrapper accessors for the GML data, now stored in another object
+  def gml
+    gml_object && gml_object.data || self.attributes['gml'] || ''
+  end
+  
+  def gml=(fresh)
+    gml_object.data = fresh
   end
   
   # Wrap to_json so the .gml string gets converted to a hash, then to json
@@ -145,11 +154,30 @@ class Tag < ActiveRecord::Base
   
   #TODO: inject 000000book infos into this GML...
   
-  
+  # Dump some chars from the uniquekey as a Secret User Codename
+  def user_secret_name
+    gml_uniquekey_hash && gml_uniquekey_hash[-6..-1]
+  end
   
   
   
 protected    
+
+  def create_notification
+    Notification.create(:subject => self, :verb => 'created')
+  end
+  
+  # make sure we have a gml
+  def create_gml_object
+    STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length} bytes"
+    obj = GMLObject.new(:tag => self)
+    obj.data = self.attributes['gml'] || '' #attr_protected due to gzip love
+    puts "obj=#{obj.inspect}"
+    obj.save!
+    self.gml_object = obj # Is this automatically assigned to us? Making sure...
+  end
+
+
 
   # extract some information from the GML
   # and insert our server signature
