@@ -45,7 +45,14 @@ class Tag < ActiveRecord::Base
   before_save :process_gml  
   before_create :validate_tempt
   # before_save :process_app_id
-  after_save :save_header #HACK fixme, create order issue...
+  # before_save :save_header #Done inside copy_gm_temp now; HACK FIXME
+    
+  after_create :create_gml_object
+  after_create :create_notification
+
+  #Hackish; need a "filler" obj while we're building... don't have an ID before create.
+  # and don't wanna save it to ourselves before committing
+  before_save :copy_gml_temp_to_gml_object
   
   # Security: protect from mass assignment
   attr_protected :user_id
@@ -58,13 +65,7 @@ class Tag < ActiveRecord::Base
     
   # Placeholders for assigning data from forms  
   attr_accessor :gml_file, :existing_application_id
-  
-  after_create :create_gml_object
-  after_create :create_notification
 
-  #Hackish; need a "filler" obj while we're building... don't have an ID before create.
-  # and don't wanna save it to ourselves before committing
-  before_save :copy_gml_temp_to_gml_object  
   
   
   # wrap remote_imge to always add our local FFlickr... FIXME
@@ -97,6 +98,7 @@ class Tag < ActiveRecord::Base
     return if @gml_temp.blank? || gml_object.nil?
     gml_object.data = @gml_temp
     gml_object.save! if gml_object.data_changed? #we might be double-saving...
+    save_header
   end
   
   # Wrap to_json so the .gml string gets converted to a hash, then to json
@@ -156,7 +158,6 @@ class Tag < ActiveRecord::Base
     return if gml_header.blank?
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
     puts "Tag.save_header: #{attrs.inspect}"
-    save! #HACK FIXME, header save issue goddamnit...
   end
   
   # def self.read_gml_header(gml)
