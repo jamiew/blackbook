@@ -161,7 +161,7 @@ protected
   def create_from_form
     
     # Translate/expand some params
-    params[:tag][:user] = current_user    
+    params[:tag][:user] = current_user  
         
     # Read the GML uploaded gml file and dump it into the GML field
     # GML file overrides anything in the textarea -- that was probably accidental input
@@ -193,14 +193,11 @@ protected
   # GHETTO. FIXME... Undescriptive method name. 
   def convert_app_id_to_app_name
     # Sub in an existing application if specified...
-    puts "Create from form... #{params.inspect}"
     return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
-    puts "OK! got an existing and no specific application selecetd"
 
     # FIXME use internal ids if available? string matching all the time is ghetto
     app = Visualization.find(params[:tag][:existing_application_id])
     params[:tag][:application] = app.name
-    puts "  name = #{app.name.inspect}"
   end
     
   

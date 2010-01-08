@@ -20,7 +20,8 @@
         %br== (#{time_ago_in_words(@tag.created_at)} ago)
     %hr
     %ul
-      %li== <strong>Application:</strong> #{@tag.application.blank? ? 'NULL' : application_link(@tag.application)}          
+      - app = !@tag.gml_application.blank? && @tag.gml_application || @tag.application
+      %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(@tag.application)}
     %hr
     %ul
       - if !@tag.author.blank?
@@ -59,9 +60,6 @@
             %input{:type => 'text', :readonly => 'readonly', :value => @tag.attributes[field], :onclick => '$(this).select();'}
       %p
         %strong{:style => 'color: #f0f'} Parsed GML Header
-        / %textarea{:cols => 24, :rows => 10, :style => 'border: 1px solid #f0f'}
-        - STDERR.puts @tag.inspect
-        - STDERR.puts @tag.gml_header.inspect
         - @tag.gml_header.each do |k,v|
           %p{:style => 'overflow: hidden;'}
             %strong= k

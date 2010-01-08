@@ -16,8 +16,8 @@ module TagsHelper
       "[manual]"
     else
       # Strip out the long-ass GA name...
-      shortname = app_name.gsub!('Graffiti Analysis ','GA') if opts[:short] == true      
-      link_to app_name, tags_path(:app => app_name), :class => 'application_link anon'
+      shortname = (opts[:short] == true ? app_name.gsub('Graffiti Analysis ','GA') : app_name)
+      link_to shortname, tags_path(:app => app_name), :class => 'application_link anon'
     end
   end  
   
