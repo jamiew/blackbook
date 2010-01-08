@@ -3,7 +3,8 @@
 
   #intro
     .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 6px; color: #777;'}
-      == #{pluralize Tag.count(:conditions => "created_at >= '#{1.day.ago}'"), 'tag'} uploaded today
+      == #{pluralize Tag.count(:conditions => ["created_at >= ?",Date.today]), 'tag'} uploaded 
+      == by #{pluralize Tag.count(:conditions => ["created_at >= ?",Date.today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
       == &ndash; #{link_to 'view activity', activity_path, :style => 'text-decoration: underline;'}
 
     / == Last #{pluralize @tags.length, 'tag'},
