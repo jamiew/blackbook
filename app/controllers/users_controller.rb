@@ -37,7 +37,7 @@ class UsersController < ApplicationController
 
   # Change information about ourselves
   def edit
-    set_page_title "My Settings"    
+    set_page_title "Your Settings"    
   end
 
   def change_password
@@ -45,8 +45,9 @@ class UsersController < ApplicationController
 
   def update
     if @user.update_attributes(params[:user])
-      flash[:notice] = "Account updated!"
-      redirect_to(user_path(@user))
+      flash[:notice] = "Settings updated!"
+      # redirect_to(user_path(@user))
+      redirect_to(settings_path)
     else
       # Errors printed to form
       render :action => :edit
