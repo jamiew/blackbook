@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100108063726) do
+ActiveRecord::Schema.define(:version => 20100108103528) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -93,7 +93,7 @@ ActiveRecord::Schema.define(:version => 20100108063726) do
     t.datetime "updated_at"
     t.string   "location"
     t.string   "application"
-    t.string   "set"
+    t.string   "author"
     t.string   "cached_tag_list"
     t.string   "image_file_name"
     t.string   "image_content_type"

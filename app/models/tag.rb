@@ -61,7 +61,10 @@ class Tag < ActiveRecord::Base
   
   after_create :create_gml_object
   after_create :create_notification
-  
+
+  #Hackish; need a "filler" obj while we're building... don't have an ID before create.
+  # and don't wanna save it to ourselves before committing
+  before_save :copy_gml_temp_to_gml_object  
   
   
   # wrap remote_imge to always add our local FFlickr... FIXME
@@ -84,8 +87,16 @@ class Tag < ActiveRecord::Base
     gml_object && gml_object.data || self.attributes['gml'] || ''
   end
   
-  def gml=(fresh)
-    gml_object.data = fresh
+  # Hacks for GML copying...
+  def gml=(fresh)  
+    # gml_object && gml_object.data = fresh
+    @gml_temp = fresh
+  end
+  
+  def copy_gml_temp_to_gml_object
+    return if @gml_temp.blank? || gml_object.nil?
+    gml_object.data = @gml_temp
+    gml_object.save! if gml_object.data_changed? #we might be double-saving...
   end
   
   # Wrap to_json so the .gml string gets converted to a hash, then to json
@@ -170,9 +181,9 @@ protected
   
   # make sure we have a gml
   def create_gml_object
-    STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length} bytes"
+    STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
     obj = GMLObject.new(:tag => self)
-    obj.data = self.attributes['gml'] || '' # attr_protected
+    obj.data = @gml_temp || self.attributes['gml'] || '' # attr_protected
     obj.save!
     self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...
   end
