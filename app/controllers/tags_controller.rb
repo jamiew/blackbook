@@ -196,8 +196,8 @@ protected
     return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
 
     # FIXME use internal ids if available? string matching all the time is ghetto
-    app = Visualization.find(params[:tag][:existing_application_id])
-    params[:tag][:application] = app.name
+    app = Visualization.find(params[:tag][:existing_application_id]) rescue nil
+    params[:tag][:application] = app.name unless app.blank?
   end
     
   
