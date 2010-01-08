@@ -5,6 +5,9 @@ class GMLObject < ActiveRecord::Base
   validates_presence_of :tag_id, :on => :create, :message => "must have a tag_id"
   validates_uniqueness_of :tag_id, :on => :create, :message => "must be unique; currently a Tag can only have one (1) GML object"  
   validates_associated :tag, :on => :create
+
+  # temporarily allowing blank data...
+  # Need to make the process a little more clear; FIXME. Also some magic in TagsController to link into this
   # validates_presence_of :data, :on => :create, :message => "can't be blank"
   
   #TODO: Wrappers to inflate/deflate our data attribute

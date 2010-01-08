@@ -144,18 +144,12 @@ class Tag < ActiveRecord::Base
     attrs[:gml_username] = (client/'username').text rescue nil
     attrs[:gml_keywords] = (client/'keywords').text rescue nil
     attrs[:gml_uniquekey] = (client/'uniqueKey').text rescue nil
+
     # encode the uniquekey with SHA-1 immediately
+    # FIXME this slows this method down significantly -- denormalize whole hash to the model on save...?
     attrs[:gml_uniquekey_hash] = Digest::SHA1.hexdigest(attrs[:gml_uniquekey]) unless attrs[:gml_uniquekey].blank?    
     
     return attrs
-  end
-  
-  def save_header
-    # only save attributes we actually have please, but allow displaying everything we can parse
-    # this could be confusing later -- document well or refactor...
-    return if gml_header.blank?
-    attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
-    puts "Tag.save_header: #{attrs.inspect}"
   end
   
   # def self.read_gml_header(gml)
@@ -166,9 +160,15 @@ class Tag < ActiveRecord::Base
   #TODO: inject 000000book infos into this GML...
   
   # Dump some chars from the uniquekey as a Secret User Codename
-  def user_secret_name
-    return if gml_uniquekey_hash.nil?
+  def secret_username
+    return nil if gml_uniquekey_hash.blank?
     "anon-"+gml_uniquekey_hash[-5..-1]
+  end
+    
+  # Sexify the app name (this could be a helper)
+  # TODO: link  
+  def sexy_app_name
+    (!gml_application.blank? && gml_application) || (!application.blank? && application) || ''
   end
   
   
@@ -183,7 +183,7 @@ protected
   def build_gml_object
     STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
     obj = GMLObject.new
-    obj.data = @gml_temp || self.attributes['gml'] || '' # attr_protected
+    obj.data = @gml_temp || self.attributes['gml'] #attr_protected
     self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...  
     process_gml
     save_header
@@ -194,9 +194,17 @@ protected
     self.gml_object.save!
   end
 
+  def save_header
+    # only save attributes we actually have please, but allow displaying everything we can parse
+    # this could be confusing later -- document well or refactor...
+    return if gml_header.blank?
+    attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
+    puts "Tag.save_header: #{attrs.inspect}"
+  end
 
   # extract some information from the GML
   # and insert our server signature
+  #FIXME: duplicating some stuff from save_header
   def process_gml
     doc = gml_document
     return if doc.nil?
@@ -214,7 +222,7 @@ protected
     attrs[:client] = (obj/'name').inner_html rescue nil
   
     STDERR.puts "Tag.process_gml: #{attrs.inspect}"    
-    self.application = attrs[:client] unless attrs[:client].blank?
+    # self.application = attrs[:client] unless attrs[:client].blank?
     self.remote_image = attrs[:filename] unless attrs[:filename].blank?
 
     return attrs   

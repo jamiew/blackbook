@@ -6,7 +6,8 @@ class TagsController < ApplicationController
   before_filter :require_user, :only => [:new, :edit, :update, :destroy] # <-- but not create
   protect_from_forgery :except => [:create] # for the "API"  
   before_filter :require_owner, :only => [:edit, :update, :destroy]
-
+  before_filter :convert_app_id_to_app_name, :only => [:update, :create]
+  
   # Basic caching for :index?page=1 and :show actions
   after_filter :expire_caches, :only => [:update, :create, :destroy]
   caches_action :index, :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
@@ -24,9 +25,20 @@ class TagsController < ApplicationController
   
   # Display
   def index
+    
+    # Setup a 'search' context -- user or app currently, for finding things not really 'in' the database... more TODO    
+    if !params[:app].blank?
+      @search_context = {:key => :application, :value => params[:app], :conditions => ["application = ? OR gml_application = ?",params[:app],params[:app]] }
+    elsif !params[:user].blank?
+      # Specifically customized for the secret_username using gml_uniquekey_hash trailing 5 digits! breakable coupling!
+      @search_context = {:key => :user, :value => params[:user], :conditions => ["gml_uniquekey_hash LIKE ?",'%'+params[:user].gsub('anon-','')] }
+    end
+    
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10
-    @tags = Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user])
-    set_page_title "Tag Data"+(@page > 1 ? " (page #{@page})" : '')
+    @tags ||= Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user], :conditions => (@search_context && @search_context[:conditions]))
+    
+    
+    set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')+(@page > 1 ? " (page #{@page})" : '')
   end
   
   def show    
@@ -120,7 +132,7 @@ protected
   end
   
   def require_owner
-    logger.info "require_owner: current_user=#{current_user.id rescue nil}; tag=#{@tag.id rescue nil}; @tag.user=#{@tag.user rescue nil}"
+    logger.info "require_owner (tag.id=#{@tag.id rescue nil}): current_user=#{current_user.id rescue nil}; tag.user.id=#{@tag.user.id rescue nil}"
     raise NoPermissionError unless current_user && @tag && (@tag.user == current_user || is_admin?)
   end
   
@@ -150,16 +162,7 @@ protected
     
     # Translate/expand some params
     params[:tag][:user] = current_user    
-    
-    # Sub in an existing application if specified...
-    if params[:tag][:existing_application_id] && !params[:tag][:application]
-      puts 'we got a pre-existing...'
-      # FIXME use internal ids if available? string matching all the time is ghetto
-      app = Visualization.find(params[:tag][:existing_application_id])
-      params[:tag][:application] = app.name
-      puts "  name = #{app.name.inspect}"
-    end
-    
+        
     # Read the GML uploaded gml file and dump it into the GML field
     # GML file overrides anything in the textarea -- that was probably accidental input
     file = params[:tag][:gml_file]
@@ -167,18 +170,39 @@ protected
       logger.info "Reading from GML file = #{file.inspect}"
       params[:tag][:gml] = file.read
     end
-    
-    # Build object
+        
+    # Build object    
     @tag = Tag.new(params[:tag])
+    
+    # GML data of some kind is required -- catching this ourselves due to GMLObject complexity...
+    # Allowing screenshot-only's for now... delete later.
+    # if params[:tag].blank? || params[:tag][:gml].blank?
+    #   @tag.errors.add("You must provide valid GML data to upload (no screenshots only, sorry)")
+    #   raise "bad GML data"      
+    # end
+    
+    @tag.save!
+    flash[:notice] = "Tag created"
+    redirect_to tag_path(@tag)      
+  rescue      
+    flash[:error] = "Error saving your tag! #{$!}"
+    render :action => 'new', :status => 422 #Unprocessable entity
+  end
+  
+  # For converting from the pre-existing 'Application' params into a string in create/update
+  # GHETTO. FIXME... Undescriptive method name. 
+  def convert_app_id_to_app_name
+    # Sub in an existing application if specified...
+    puts "Create from form... #{params.inspect}"
+    return unless params[:tag][:existing_application_id] && !params[:tag][:existing_application_id].blank? && params[:tag][:application].blank?
+    puts "OK! got an existing and no specific application selecetd"
 
-    if @tag.save
-      flash[:notice] = "Tag created"
-      redirect_to tag_path(@tag)
-    else
-      flash[:error] = "Error saving your tag! #{$!}"
-      render :action => 'new', :status => 422 #Unprocessable entity
-    end        
-  end    
+    # FIXME use internal ids if available? string matching all the time is ghetto
+    app = Visualization.find(params[:tag][:existing_application_id])
+    params[:tag][:application] = app.name
+    puts "  name = #{app.name.inspect}"
+  end
+    
   
   
   
