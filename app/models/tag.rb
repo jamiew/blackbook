@@ -156,7 +156,8 @@ class Tag < ActiveRecord::Base
   
   # Dump some chars from the uniquekey as a Secret User Codename
   def user_secret_name
-    gml_uniquekey_hash && gml_uniquekey_hash[-6..-1]
+    return if gml_uniquekey_hash.nil?
+    "anon-"+gml_uniquekey_hash[-5..-1]
   end
   
   
@@ -171,10 +172,9 @@ protected
   def create_gml_object
     STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length} bytes"
     obj = GMLObject.new(:tag => self)
-    obj.data = self.attributes['gml'] || '' #attr_protected due to gzip love
-    puts "obj=#{obj.inspect}"
+    obj.data = self.attributes['gml'] || '' # attr_protected
     obj.save!
-    self.gml_object = obj # Is this automatically assigned to us? Making sure...
+    self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...
   end
 
 
