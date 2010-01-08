@@ -269,10 +269,7 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 
 
 /* Main page layout biz */
-#home #intro { line-height: 1.2em; font-size: 1.3em; text-align: center; background: #1a1a1a; border-bottom: 1px solid #333; padding: 0px 0 10px 0; }
-#home #intro .left { float: left; margin-right: 20px; padding: 0 10px;}
-#home #intro ol li { float: left; font-size: 1.2em; font-family: serif; }
-#home #tags { margin-top: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
+#home #intro { line-height: 1.2em; font-size: 90%; color: #aaa; margin: 5px 0 5px 0; padding: 5px 5px 7px 5px; background-color: #0f0f0f; border-bottom: 1px solid #222; }
 #tags a img { margin-right: 5px; }
 
 /* User/Entry.show sidebar */

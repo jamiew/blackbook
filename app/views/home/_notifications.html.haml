@@ -2,30 +2,36 @@
 - if notifications.blank?
   = "None yet."
 - else
-  %ol.square
+  %table.notifications
     - notifications.each do |notif|
-      %li
-        = time_ago_in_words(notif.created_at).gsub('about ','')
-        ago
-        == &mdash;
+      - next if notif.nil? || notif.subject.nil?
+      %tr
+        %td
+          = time_ago_in_words(notif.created_at).gsub('about ','')
+          ago
+          
         - begin
           - case notif.subject
           - when Tag
             - tag = notif.subject
             - user = tag.user
-            = image_tag(tag.remote_image || tag.image.url(:small), :height => '100', :style => 'border: 1px solid #444')
-            = link_to tag_title(tag), url_for(notif.subject)          
+            %td= image_tag(tag.remote_image || tag.image.url(:small), :height => '50', :style => 'border: 1px solid #444')
+            %td= link_to tag_title(tag), url_for(notif.subject)          
 
             -# currently no user = API, and Tag should parse application name out of the GML
             -# so just displa that. In the future we will probably have both
             - if user.nil?
-              == uploaded via API #{tag.application.blank? ? '' : "(#{tag.application})"}
+              %td== uploaded via API #{tag.application.blank? ? '' : "from #{application_link(tag.application)}"}
             - else
-              == uploaded by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
+              %td== uploaded by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
         
           - when User
             - user = notif.subject            
-            = link_to user.login, user_path(user)
-            signed up
+            %td{:colspan => 3}
+              = link_to user.login, user_path(user)
+              signed up
+          - else
+            %td{:colspan => 3}
+              %em== No support for #{notif.subject.class.to_s} notification yet.
         - rescue
           == ERROR: #{$!}

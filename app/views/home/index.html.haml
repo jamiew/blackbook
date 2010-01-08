@@ -1,13 +1,17 @@
 
 #home
-  #tags{:style => 'display: none;'}
-    - if @tags.blank?
-      %h2.error No tags yet!
-    - else
-      %h3
-        / == Last #{pluralize @tags.length, 'tag'},
-        %span{:style => 'font-weight: normal'}== #{pluralize Tag.count(:conditions => "created_at >= '#{1.day.ago}'"), 'tag'} uploaded today
-        %span{:style => 'font-weight: normal'}== &ndash; #{link_to 'view all', tags_path, :style => 'text-decoration: underline;'}
+
+  #intro
+    .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 6px; color: #777;'}
+      == #{pluralize Tag.count(:conditions => "created_at >= '#{1.day.ago}'"), 'tag'} uploaded today
+      == &ndash; #{link_to 'view activity', activity_path, :style => 'text-decoration: underline;'}
+
+    / == Last #{pluralize @tags.length, 'tag'},
+    .welcome{:style => 'width: 600px;'}
+      %strong Welcome to #000000book
+      == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
+      == &ndash; uploading tags? #{link_to 'register an account', signup_path} 
+      == <br/> Don't forget to add your iPhone UUID in your #{link_to 'settings', settings_path} (full support coming soon)
 
   %br.clear
   / .right_column{:style => 'width: 280px; text-align: left; margin-top: 40px;'}
@@ -27,7 +31,7 @@
               %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}              
             %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
     %p.right
-      %strong= link_to '<span>View all &raquo;</span>', tags_path, :class => 'button ghost small'
+      %strong= link_to '<span>View all data &raquo;</span>', tags_path, :class => 'button ghost small'
 
   #vanderplayer.left_column
     %h2
