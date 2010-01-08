@@ -1,29 +1,35 @@
 
+%h2 Your Settings
 - uberform_for @user, :url => user_path(@user), :html => { :multipart => true } do |form|
-  %h2 My Settings
-
-  %fieldset
-    = form.error_messages
-    %legend  
-    .right= image_tag(@user.photo.url(:small))
-    %hr
-    = form.file_field :photo, :size => 10
-
-    %hr
-    - if false && is_admin?
-      = form.text_field :login, :disabled => true
-      = form.text_field :slug, :disabled => true
-    = form.text_field :email
-    = form.text_field :location
   
-    %hr   
-    = form.text_field :website
-    = form.text_field :tagline  
-    = form.text_area :about, :rows => 8
-    
-    %hr
-    = form.text_field :iphone_uniquekey, :size => 50, :label => 'iPhone key/unique ID (for claiming your uploads; to be fully implemented shortly)'
-  
-    
+  .right_column{:style => 'margin-top: 100px;'}
+    %h3 Device Pairing
+    = form.text_field :iphone_uniquekey, :size => 35, :label => 'iPhone key/unique ID (for claiming your uploads; to be fully implemented shortly)'
+
     %p.buttons
-      = form.submit "Update"
+      = form.submit "Save"
+
+  .left_column
+    %p
+      = form.error_messages
+
+      / .right{:style => 'margin-right: 15px;'}
+      = image_tag(@user.photo.url(:small))
+      = form.file_field :photo, :size => 9
+          
+      %hr
+      - if false && is_admin?
+        = form.text_field :login, :disabled => true
+        = form.text_field :slug, :disabled => true
+      = form.text_field :email
+      = form.text_field :location
+  
+      / %hr   
+      = form.text_field :website
+      = form.text_field :tagline  
+      = form.text_area :about, :rows => 8
+      
+      %p.buttons
+        = form.submit "Save"
+      
+    

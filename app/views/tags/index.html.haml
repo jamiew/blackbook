@@ -10,7 +10,7 @@
     %th name
     %th application
     %th who
-    %th{:style => 'width: 130px'} when
+    %th{:style => 'width: 130px'} uploaded
     %th
     
   - @tags.each do |tag|
@@ -21,8 +21,15 @@
       %td= link_to(image_tag(tag.thumbnail_image(:small)), url)
       %td= link_to(tag_title(tag), url)
       %td= tag.gml_application || tag.application || '&mdash;'
-      %td= link_to(user.login, user_path(user)) rescue '&mdash;'
-      %td.timeago= tag.created_at.strftime('%D %T')
+      %td
+        - if !user.nil?
+          = link_to(user.login, user_path(user))
+        - elsif !tag.user_secret_name
+          = tag.user_secret_name
+        - else
+          &mdash;
+      %td.timeago
+        %abbr{:title => tag.created_at.strftime('%D %T')}== #{timeago(tag.created_at)} ago      
       
       %td.center
         = link_to 'download GML', tag_path(tag, :format => :gml), :class => 'button smallbutton'

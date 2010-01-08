@@ -90,7 +90,7 @@ caption, th {
 
 q:before, q:after { content: ''; }
 
-abbr, acronym { border: 0; font-variant: normal; }
+abbr, acronym { border: 0; font-variant: normal; border-bottom: 1px dashed #444; }
 
 sup { vertical-align: text-top; }
 sub { vertical-align: text-bottom; }
@@ -120,8 +120,11 @@ form {
   margin: 0;
   padding: 0;
   min-width: 500px;
-  width: 700px; 
 }
+
+/* two column forms are more 50/50 than 70/30 */
+form .left_column { width: 440px; }
+form .right_column { width: 470px; }
 
 form fieldset { clear: both; padding: 10px; margin: 0; }
 
@@ -191,10 +194,10 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 
 /* Main layout */
 #container {
-  padding: 0 16px;
-  width: 880px;
-  min-width: 800px;
+  padding: 0 0;
   margin: 0 auto;
+  width: 920px;
+  min-width: 820px;
   min-height: 100%;
   height: auto !important;
   height: 100%;
@@ -243,8 +246,8 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 }
 
 /* Standardish layouts, dependent on the container size */
-.left_column { width: 500px; }
-.right_column { float: right; width: 260px; }
+.left_column { width: 580px; }
+.right_column { float: right; width: 330px; }
 
 
 #flash-notice   { color: #fff; background-color: #9c9; }
@@ -293,3 +296,7 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 /* Add new application/visualization... */
 .embed_toggle { margin-top: 40px; }
 .embed_details.disabled { color: #555; }
+
+/* Frontpaging... */
+ul#frontpage_tags li { line-height: 1.3em; }
+ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* span is occupied */

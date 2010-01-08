@@ -11,22 +11,23 @@
 
   %br.clear
   / .right_column{:style => 'width: 280px; text-align: left; margin-top: 40px;'}
+  -# TODO: convert this to a table
   .right_column{:style => "margin-top: 40px;"}
-    %ul.square
+    %ul#frontpage_tags
       - @tags.each do |tag|
         %li
           %a{:href => tag_path(tag)}= tag_title(tag)
           %small
             - unless tag.application.blank? && tag.gml_application.blank?
-              %span.application== &ndash; #{tag.application || tag.gml_application}          
+              %span.application== <em>|</em> #{tag.application || tag.gml_application}          
             - unless tag.location.blank?
-              %span.location== &ndash; #{tag.location}
-            %br
+              %span.location== <em>|</em> #{tag.location}
+            / %br
             - unless tag.user.nil?
-              %span.username== #{link_to tag.user.login, user_path(tag.user)} | 
-            - unless tag.gml_uniquekey_hash.blank?
-              %span.uniquekey== #{tag.gml_uniquekey_hash[0..5]}
-            %span.created_at.timeago== &ndash; #{tag.created_at.strftime('%D')}
+              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)} | 
+            - unless tag.user_secret_name.blank?
+              %span.uniquekey== <em>|</em> #{tag.user_secret_name}
+            %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
     %p.right
       %strong= link_to '<span>View all &raquo;</span>', tags_path, :class => 'button ghost small'
 

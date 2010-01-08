@@ -50,6 +50,11 @@ module ApplicationHelper
     collection.nil? ? will_paginate : will_paginate(collection)
   end
   
+  # Time wrappers; TODO add jquery.timeago and stop using time_ago_in_words...
+  def timeago(timestamp)
+    time_ago_in_words(timestamp)
+  end
+  
   
 
   # Enabled and disabled modes for blackbird javascript console()
