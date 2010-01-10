@@ -17,6 +17,7 @@ class TagsController < ApplicationController
   def expire_caches
     if @tag
       [nil,'json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
+      Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash) #Model caching, but handling all in the controller
     end
     expire_fragment(:controller => 'tags', :action => 'index')
     # expire_fragment(:controller => 'home', :action => 'index')
@@ -51,10 +52,11 @@ class TagsController < ApplicationController
     
       @user = User.find(params[:user_id]) if params[:user_id]
       @user ||= @tag.user # ...
+
+      # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
+      @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
     
-    # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
-    @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
     respond_to do |wants|
