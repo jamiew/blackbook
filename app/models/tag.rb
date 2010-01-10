@@ -52,6 +52,10 @@ class Tag < ActiveRecord::Base
   after_create :save_gml_object
   
   after_create :create_notification
+  
+  # Caching related
+  # after_save    :expire_gml_hash_cache #<-- handling in the Controller
+  # after_destroy :delete_gml_hash_cache #TODO; do we need this?
 
   
   # Security: protect from mass assignment
@@ -94,17 +98,27 @@ class Tag < ActiveRecord::Base
     @gml_temp = fresh
   end
   
-  # convert the GML string into a Hash
+  # the GML data (String) as a Hash
+  # w/ caching, it's an expensive operation
   def gml_hash
+    Rails.cache.fetch(gml_hash_cache_key) { convert_gml_to_hash }
+  end
+  def gml_hash_cache_key; "tag/#{id}/gml_hash"; end  
+  
+  #TODO make these all below protected
+  def convert_gml_to_hash
+    #TODO: possibly use Nokogiri to do string->XML->JSON? Potentially faster?
     Hash.from_xml(self.gml)['gml']
   end
+
   
+    
   # Wrap to_json so the .gml string gets converted to a hash, then to json
   # Reimplementing rails to_json because we can't do :methods => {:gml_hash=>:gml}, 
   #  and end up with an attribute called 'gml_hash' which doesn't work
   #TODO OPTIMIZEME: memcache this! expensive operation
   def to_json(options = {})
-    logger.info "Tag.to_json(opts=#{options.inspect})"
+    logger.info "Tag.to_json(#{options.inspect})"
     hash = Serializer.new(self, options).serializable_record
     hash[:gml] = gml_hash
     

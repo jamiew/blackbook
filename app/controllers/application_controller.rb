@@ -9,7 +9,8 @@ class ApplicationController < ActionController::Base
   helper :all # Oof, REMOVEME -- don't really need all helpers, all the time
   helper_method :current_user_session, :current_user, :page_title, :set_page_title
 
-  filter_parameter_logging :password, :password_confirmation, :gml #Don't show the raw GML in the logs
+  #Don't show the raw GML (or GMLObject.data) in the logs
+  filter_parameter_logging :password, :password_confirmation, :gml, :data 
   protect_from_forgery
   
   # Global filters
@@ -28,7 +29,7 @@ class ApplicationController < ActionController::Base
       super
       if logger && logger.info?
         logger.info("  HTTP Referer: #{request.referer}") if !request.referer.blank?
-        logger.info("  clean_params: #{clean_params.inspect}") unless clean_params.blank?
+        # logger.info("  clean_params: #{clean_params.inspect}") unless clean_params.blank?
       end
     end
    
