@@ -23,7 +23,17 @@ class ApplicationController < ActionController::Base
 
   protected
 
-    def set_page_title(title)
+    # Extra logging info we like -- referrers for now, possibly user agent?
+    def log_processing
+      super
+      if logger && logger.info?
+        logger.info("  HTTP Referer: #{request.referer}") if !request.referer.blank?
+        logger.info("  clean_params: #{clean_params.inspect}") unless clean_params.blank?
+      end
+    end
+   
+    # Modify the global page title -- could also use @page_title
+    def set_page_title(title) #TODO change to page_title= (or just use @page_title/@title directly)
       @page_title = title
     end
 
@@ -220,16 +230,21 @@ class ApplicationController < ActionController::Base
     # 3) if it's HTML and we're paginating, also don't cache (lazy)
     def logged_out_and_no_query_vars?
       # puts "format = #{request.parameters[:format].inspect}, session = #{request.session.inspect}, params = #{request.parameters.inspect}"
-      return true unless [nil,'','html'].include?(request.parameters[:format].to_s)
+
+      # restrict to HTML only (DISABLED now that we have clean_params)
+      # return true unless [nil,'','html'].include?(request.parameters[:format].to_s)
       
       logged_out = request.session['user_credentials_id'].blank?
-
-      # FIXME; make this no_query_vars blacklist against particular cachables instead of whitelisting un-cachables
-      no_query_vars = (request.parameters[:page].blank? || request.parameters[:page].to_s == '1') && request.parameters[:app].blank? && request.parameters[:user].blank?
-      logger.debug "no_query_vars?=#{no_query_vars}  params=#{request.parameters.inspect}"
-
+      no_query_vars = clean_params.blank?
       return logged_out && no_query_vars
     end
+    
+    # params stripped of internal route info
+    def clean_params
+      excludes = [:controller, :action, :id, :format]
+      return params.reject { |k,v| excludes.include?(k.to_sym) }
+    end
+
     
 
 end

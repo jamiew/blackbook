@@ -1,12 +1,9 @@
 %div[visualization]
-  %p.user_id
-    %strong User
-    =h visualization.user.login rescue 'nil'
   %p.name
     %strong Name
     =h visualization.name
-  %p.slug
-    %strong Slug
+  %p.website
+    %strong Website
     =h visualization.slug
   %p.description
     %strong Description
@@ -14,6 +11,11 @@
   %p.version
     %strong Version
     =h visualization.version
+
+  %p.user_id
+    %strong Submitted by
+    =h visualization.user.login rescue 'nil'
+
 
   - if admin?
     = link_to 'Show', object_path(visualization)

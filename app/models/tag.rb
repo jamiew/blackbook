@@ -30,7 +30,7 @@ class Tag < ActiveRecord::Base
 
   #Blacklisted attributes not to show in the API
   #TODO: convert to a whitelisted approach...
-  HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list]
+  HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   # is_taggable :tags
   #TODO: cache_money indexes
@@ -94,28 +94,34 @@ class Tag < ActiveRecord::Base
     @gml_temp = fresh
   end
   
-
+  # convert the GML string into a Hash
+  def gml_hash
+    Hash.from_xml(self.gml)['gml']
+  end
   
   # Wrap to_json so the .gml string gets converted to a hash, then to json
-  #TODO: we could use a 'GML' object type! it should have its own table -- all this stuff is quite slow...
-  #TODO: this is quite an expensive operation :(
+  # Reimplementing rails to_json because we can't do :methods => {:gml_hash=>:gml}, 
+  #  and end up with an attribute called 'gml_hash' which doesn't work
+  #TODO OPTIMIZEME: memcache this! expensive operation
   def to_json(options = {})
-    self.gml = Hash.from_xml(self.gml)
-    self.gml = self.gml['gml'] if self.gml['gml'] # drop any duplicate parent-level <gml>'s
+    logger.info "Tag.to_json(opts=#{options.inspect})"
+    hash = Serializer.new(self, options).serializable_record
+    hash[:gml] = gml_hash
+    
+    # Strip empty records -- it's mostly 'planning' stuff at this point...
+    hash.reject! { |k,v| v.blank? }
+    
+    ActiveSupport::JSON.encode(hash)
+    # super(options.merge(:methods => :gml))
+  end
+  
+  # Also hide what we'd like, and strip empty records (for now)
+  def to_xml(options = {})
+    puts "To_xml"
+    options[:except] ||= []
+    options[:except] += self.attributes.select { |key,value| STDERR.puts "#{key}=#{value.inspect}"; value.blank? }
     super(options)
   end
-
-  # convert directly from the GML string to JSON
-  def gml_to_json
-    Hash.from_xml(self.gml).to_json
-  end
-
-  # Possibly strip all empty attributes... not sure if serving blank or not serving is better
-  # def to_xml(options = {})
-  #   options[:except] ||= []
-  #   options[:except] += self.attributes.select { |key,value| puts "#{key}"; value.blank? }
-  #   super(options)
-  # end
 
   # GML as a Nokogiri object...
   def gml_document
@@ -227,7 +233,9 @@ protected
 
     return attrs   
   rescue
-    STDERR.puts "Tag.process_gml error: #{$!}"
+    msg = "Tag.process_gml error: #{$!}"
+    STDERR.puts msg
+    logger.error msg #TODO standardize this dev-friendly idiom
   end
     
   # simpe hack to check secret/appname for if this is tempt...
