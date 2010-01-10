@@ -1,0 +1,19 @@
+development:
+  adapter: mysql
+  database: blackbook_dev
+  username: root
+  password: 
+
+# Tests working ok with sqlite3 still,
+# but will eventually move to MySQL for consistentcy
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+
+production:
+  adapter: mysql
+  host: localhost
+  database: blackbook_prod
+  username: blackbook
+  password: topsecretyo
+
