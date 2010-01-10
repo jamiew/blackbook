@@ -224,19 +224,11 @@ class ApplicationController < ActionController::Base
     end
     
     
-    # Caching related -- should we cache this request?
-    # 1) if it's not HTML, cache it -- .gml/.xml/.json/etc
-    # 2) if it's HTML and we're logged in, don't cache
-    # 3) if it's HTML and we're paginating, also don't cache (lazy)
-    def logged_out_and_no_query_vars?
-      # puts "format = #{request.parameters[:format].inspect}, session = #{request.session.inspect}, params = #{request.parameters.inspect}"
-
-      # restrict to HTML only (DISABLED now that we have clean_params)
-      # return true unless [nil,'','html'].include?(request.parameters[:format].to_s)
-      
-      logged_out = request.session['user_credentials_id'].blank?
-      no_query_vars = clean_params.blank?
-      return logged_out && no_query_vars
+    # Should we cache this request? A good question!
+    def cache_request?
+      return false unless clean_params.blank? #Never cache if we have query vars (e.g. ?page=1, or ?callback=setup)
+      return true unless [nil,'','html'].include?(request.parameters[:format].to_s) #Always cache if it's not HTML (.json/gml/xml the same for everyone)
+      return true if request.session['user_credentials_id'].blank? #Don't cache if logged in
     end
     
     # params stripped of internal route info

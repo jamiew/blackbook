@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   
-  caches_action :index, :cache_path => 'home/index', :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
+  caches_action :index, :cache_path => 'home/index', :expires_in => 30.minutes, :if => :cache_request?
   
   def index
     # @users = User.find(:all, :order => 'created_at DESC', :limit => 10)    

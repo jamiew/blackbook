@@ -117,9 +117,8 @@ class Tag < ActiveRecord::Base
   
   # Also hide what we'd like, and strip empty records (for now)
   def to_xml(options = {})
-    puts "To_xml"
     options[:except] ||= []
-    options[:except] += self.attributes.select { |key,value| STDERR.puts "#{key}=#{value.inspect}"; value.blank? }
+    options[:except] += self.attributes.select { |key,value| value.blank? }
     super(options)
   end
 
@@ -137,7 +136,7 @@ class Tag < ActiveRecord::Base
     doc = gml_document
 
     if doc.nil? || (doc/'header').nil?
-      puts "NIL OR NO HEADER DOC"
+      STDERR.puts "NIL OR NO HEADER DOC"
       return {} 
     end
 
