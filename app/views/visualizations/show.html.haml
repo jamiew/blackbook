@@ -10,9 +10,6 @@
     =h current_object.name
     %span.version=h current_object.version
   %div[current_object]
-    - unless current_object.user.nil?
-      %span.user= link_to current_object.user.login, user_path(current_object.user)
-    %hr
     %p.authors
       %strong Author(s):
       =h current_object.authors
@@ -33,7 +30,15 @@
   
     .description
       %strong Description:
-      %p= h current_object.description || '(none)'
+      = h current_object.description || '(none)'
+
+    - unless current_object.user.nil?
+      %hr
+      %p
+        %strong Submitted by:
+        %span.user
+          = link_to current_object.user.login, user_path(current_object.user)                 
+        %span.submitted_at= current_object.created_at.strftime('%D')
 
 
   - if logged_in? && (current_object.respond_to?(:user) && current_object.user == current_user) || is_admin?

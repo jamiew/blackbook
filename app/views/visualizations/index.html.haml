@@ -10,10 +10,11 @@
     / %th{:style => 'width: 110px;'}
     %th{:style => 'width: 150px;'} application
     %th{:style => 'width: 100px;'} <!--language-->
-    
-    / %th{:style => 'width: 100px;'} embeddable
+    %th
+    / %th{:style => 'width: 40px;'} embeddable
     %th{:style => 'width: 500px; padding: 0px 0px 0 25px;'} authors
-    %th{:style => 'width: 150px;'} submitted
+    / %th{:style => 'width: 150px;'} submitted    
+    %th.controls
     - if is_admin? || is_owner?
       %th.admin{:style => 'width: 40px;'}
       %th.admin{:style => 'width: 80px;'}
@@ -24,10 +25,13 @@
       %td
         %strong= link_to app.name, visualization_path(app)
       %td= app.kind.blank? ? '&mdash;' : app.kind
-      / %td= app.is_embeddable? ? 'yes' : 'no'      
-      %td{:style => 'line-height: 1.3em; padding: 0px 10px 0 25px;'}= app.authors[0..100] || '&mdash;'
+      %td.website{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= link_to app.website.gsub('http://',''), app.website || '&mdash;'
+      / %td= app.is_embeddable? ? 'y' : 'n'
+      %td{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'
       / %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
-      %td{:style => 'width: 150px;'}= app.created_at.strftime('%D %T')
+      / %td{:style => 'width: 150px;'}= app.created_at.strftime('%D')
+      %td.controls
+        = link_to "more&nbsp;&raquo;", visualization_path(app), :class => 'ghost button'
 
       -#Admin debuggery & controls
       - if is_admin?

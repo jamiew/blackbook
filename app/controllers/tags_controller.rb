@@ -59,10 +59,10 @@ class TagsController < ApplicationController
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
     respond_to do |wants|
       wants.html  { render }
-      wants.xml   { render :xml => @tag.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }      
-      wants.gml   { render :xml => @tag.gml } #TODO: account for empty GML field?
-      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
-      wants.rss   { render :rss => @tag.to_rss }
+      wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }      
+      wants.gml   { render :xml => @tag.gml }
+      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES, :processingjs => params[:processingjs]), :callback => params[:callback] }
+      wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
     end
   end
   
@@ -95,8 +95,6 @@ class TagsController < ApplicationController
       return create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
-      clean_params = params
-      [:action, :controller].each { |k| clean_params.delete(k) }
       render :text => "Error, could not create tag from your parameters: #{clean_params.inspect}", :status => 422 #Unprocessable Entity
       return
     end
