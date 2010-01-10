@@ -1,6 +1,6 @@
-.quarter.centered
+#signup.signup_or_login.quarter.centered
   - uberform_for @user, :url => users_path do |form|
-    %h2== Register #{SiteConfig.site_name} Account
+    %h2== Create a #{SiteConfig.site_name} account
 
     %fieldset
       = form.error_messages
@@ -14,5 +14,9 @@
       = form.password_field :password
       = form.password_field :password, :label => "Again"
 
-    .buttons
-      = form.submit "Register"
+    %p.buttons
+      = form.submit "Signup"      
+      
+    .help
+      %ol.square
+        %li= link_to 'already have an account? login here', login_path, :class => 'login'

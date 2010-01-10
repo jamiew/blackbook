@@ -1,4 +1,4 @@
-#login.quarter.centered
+#login.signup_or_login.user_form.quarter.centered
   - uberform_for @user_session, :url => user_session_path do |f|
     %h2 Login
     = f.text_field :login, :label => 'Username'
@@ -8,7 +8,7 @@
     %br
     .buttons
       = f.submit "Login"
-
     .help
       %ol.square
+        %li= link_to 'no account? signup here', signup_path, :class => 'signup'
         %li= link_to 'forgot your password?', forgot_password_path, :class => 'forgotten_password'
