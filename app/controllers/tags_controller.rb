@@ -10,8 +10,8 @@ class TagsController < ApplicationController
   
   # Basic caching for :index?page=1 and :show actions
   after_filter :expire_caches, :only => [:update, :create, :destroy]
-  caches_action :index, :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
-  caches_action :show,  :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
+  caches_action :index, :expires_in => 30.minutes, :if => :cache_request?
+  caches_action :show,  :expires_in => 30.minutes, :if => :cache_request?
   
   #TODO: this should be a Sweeper. but it doesn't *have* to be...
   def expire_caches
@@ -61,7 +61,7 @@ class TagsController < ApplicationController
       wants.html  { render }
       wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }      
       wants.gml   { render :xml => @tag.gml }
-      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES, :processingjs => params[:processingjs]), :callback => params[:callback] }
+      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
       wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
     end
   end
