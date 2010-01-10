@@ -107,7 +107,8 @@ class Tag < ActiveRecord::Base
   
   #TODO make these all below protected
   def convert_gml_to_hash
-    #TODO: possibly use Nokogiri to do string->XML->JSON? Potentially faster?
+    return {} if self.gml.blank? || self.gml['gml'].blank? #FIXME; really should never have blank GML...
+    #TODO: possibly use Nokogiri to do string->XML->JSON? Potentially faster?    
     Hash.from_xml(self.gml)['gml']
   end
 
