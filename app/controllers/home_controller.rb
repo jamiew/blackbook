@@ -10,7 +10,7 @@ class HomeController < ApplicationController
   
   def activity
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    @notifications = Notification.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
+    @notifications = Notification.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:subject])
   end
   
   # Show a single static file
