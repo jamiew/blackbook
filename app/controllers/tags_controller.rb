@@ -40,6 +40,14 @@ class TagsController < ApplicationController
     
     
     set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')+(@page > 1 ? " (page #{@page})" : '')
+    
+    respond_to do |wants|
+      format.html { render }      
+      format.xml  { render :xml => @tags.(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
+      format.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
+      format.rss  { render :rss => @tags.to_rss } #TODO: customize RSS feeds more!
+      #TODO: .js => Embeddable widget
+    end
   end
   
   def show    
@@ -61,10 +69,11 @@ class TagsController < ApplicationController
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
     respond_to do |wants|
       wants.html  { render }
+      wants.gml   { render :xml => @tag.gml }      
       wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }      
-      wants.gml   { render :xml => @tag.gml }
       wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
       wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
+      #TODO: .js => Embeddable widget
     end
   end
   
@@ -75,6 +84,14 @@ class TagsController < ApplicationController
     redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
     show
   end
+  
+  # Just a random tag -- redirect to canonical for HTML, but otherwise don't bother (API)
+  # TODO DRY with .latest above! generic 'solo' method? wrap into show? hmm
+  def random
+    @tag = Tag.random
+    redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
+    show
+  end    
   
   
   # Create/edit tags

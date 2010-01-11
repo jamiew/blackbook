@@ -110,13 +110,11 @@ class Tag < ActiveRecord::Base
     #TODO: possibly use Nokogiri to do string->XML->JSON? Potentially faster?
     Hash.from_xml(self.gml)['gml']
   end
-
   
     
   # Wrap to_json so the .gml string gets converted to a hash, then to json
   # Reimplementing rails to_json because we can't do :methods => {:gml_hash=>:gml}, 
   #  and end up with an attribute called 'gml_hash' which doesn't work
-  #TODO OPTIMIZEME: memcache this! expensive operation
   def to_json(options = {})
     logger.info "Tag.to_json(#{options.inspect})"
     hash = Serializer.new(self, options).serializable_record
@@ -135,6 +133,7 @@ class Tag < ActiveRecord::Base
     options[:except] += self.attributes.select { |key,value| value.blank? }
     super(options)
   end
+
 
   # GML as a Nokogiri object...
   def gml_document

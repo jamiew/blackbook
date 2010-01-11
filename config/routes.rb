@@ -39,12 +39,11 @@ ActionController::Routing::Routes.draw do |map|
     :has_many => [:comments, :favorites],
     :member => {:approve => :put, :unapprove => :put}
 
-  map.resources :tags,
+  map.resources :tags, # /data
     :as => 'data',
     :has_many => [:comments, :favorites],
-    :collection => [:latest],
-    :trailing_slash => true
-  map.resources :tags    
+    :collection => [:latest, :random]
+  map.resources :tags # vanilla /tags, for backwards-compat
   map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
 
   # TODO...
