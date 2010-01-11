@@ -10,13 +10,14 @@ class TagsController < ApplicationController
   
   # Basic caching for :index?page=1 and :show actions
   after_filter :expire_caches, :only => [:update, :create, :destroy]
-  caches_action :index, :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
-  caches_action :show,  :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
+  caches_action :index, :expires_in => 30.minutes, :if => :cache_request?
+  caches_action :show,  :expires_in => 30.minutes, :if => :cache_request?
   
   #TODO: this should be a Sweeper. but it doesn't *have* to be...
   def expire_caches
     if @tag
       [nil,'json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
+      Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash) #Model caching, but handling all in the controller
     end
     expire_fragment(:controller => 'tags', :action => 'index')
     # expire_fragment(:controller => 'home', :action => 'index')
@@ -51,18 +52,19 @@ class TagsController < ApplicationController
     
       @user = User.find(params[:user_id]) if params[:user_id]
       @user ||= @tag.user # ...
+
+      # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
+      @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
     
-    # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
-    @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
     respond_to do |wants|
       wants.html  { render }
-      wants.xml   { render :xml => @tag.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }      
-      wants.gml   { render :xml => @tag.gml } #TODO: account for empty GML field?
+      wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }      
+      wants.gml   { render :xml => @tag.gml }
       wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
-      wants.rss   { render :rss => @tag.to_rss }
+      wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
     end
   end
   
@@ -95,8 +97,6 @@ class TagsController < ApplicationController
       return create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
-      clean_params = params
-      [:action, :controller].each { |k| clean_params.delete(k) }
       render :text => "Error, could not create tag from your parameters: #{clean_params.inspect}", :status => 422 #Unprocessable Entity
       return
     end

@@ -8,6 +8,7 @@ coverage
 db/*.sqlite3
 config/database.yml
 config/memcached.yml
+config/newrelic.yml
 public/javascripts/cache
 public/stylesheets/cache
 public/system/

@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   
-  caches_action :index, :cache_path => 'home/index', :expires_in => 30.minutes, :if => :logged_out_and_no_query_vars?
+  caches_action :index, :cache_path => 'home/index', :expires_in => 30.minutes, :if => :cache_request?
   
   def index
     # @users = User.find(:all, :order => 'created_at DESC', :limit => 10)    
@@ -10,7 +10,7 @@ class HomeController < ApplicationController
   
   def activity
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    @notifications = Notification.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC')
+    @notifications = Notification.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:subject])
   end
   
   # Show a single static file
