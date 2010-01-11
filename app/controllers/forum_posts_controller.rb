@@ -1,2 +1,0 @@
-class ForumPostsController < ApplicationController
-end
