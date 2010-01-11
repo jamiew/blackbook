@@ -50,7 +50,7 @@ class Visualization < ActiveRecord::Base
   has_attached_file :image, 
     :default_style => :medium,
     # :default_url => "/images/defaults/app_:style.jpg",
-    :default_url => "/images/defaults/app_large.jpg",
+    :default_url => "/images/defaults/app_:style.jpg",
     :url => "/system/:class/:attachment/:id/:basename_:style.:extension",
     # :path => ":rails_root/public/system/:class/:attachment/:id/:basename_:style.:extension",
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }

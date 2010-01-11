@@ -8,7 +8,8 @@
 %table{:style => 'width: 100%'}
   %tr
     / %th{:style => 'width: 110px;'}
-    %th{:style => 'width: 200px;'} application
+    %th{:style => 'width: 100px;'} application
+    %th{:style => 'width: 200px;'} 
     %th{:style => 'width: 220px; padding: 0px 0px 0 25px;'} authors    
     %th
     %th
@@ -21,12 +22,12 @@
     
   - current_objects.each do |app|
     %tr.fat
-      / %td= link_to(image_tag(app.thumbnail_image), url)
+      %td= link_to(image_tag(app.image(:small), :width => 100), visualization_path(app))
       %td.name
         %strong= link_to app.name, visualization_path(app)
       %td.authors{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'        
       %td.language= app.kind.blank? ? '&mdash;' : app.kind
-      %td.website{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= link_to app.website.gsub('http://','') || '&mdash;', app.website
+      %td.website{:style => 'padding: 0px 5px 0 15px;'}= link_to app.website.gsub('http://','') || '&mdash;', app.website
       / %td= app.is_embeddable? ? 'y' : 'n'
       / %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
       / %td{:style => 'width: 150px;'}= app.created_at.strftime('%D')
