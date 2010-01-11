@@ -21,7 +21,7 @@
     - unless current_object.kind.blank?
       %p
         %strong Language:
-        =h current_object.kind
+        =h Visualization::KINDS.select { |k,v| v == current_object.kind }[0][0] rescue current_object.kind
     - unless current_object.download.blank?
       %p
         %strong Download:
