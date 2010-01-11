@@ -1,7 +1,7 @@
 /*
-* 000000book.com
+* #000000book stylesheet
 * Jamie Wilkinson <http://jamiedubs.com>
-* Free Art & Technology Lab
+* (cc) Free Art & Technology Lab
 */
 
 
@@ -29,7 +29,7 @@ a:hover { background-color: #ff0; color: #000; text-decoration: none; }
 /* Image links somewhat differently */
 a img { border: 1px solid #333; background: transparent; }
 a img.noborder { border: 1px solid transparent; } /* default is bordered */
-a:hover img { border: 1px solid #ff0; background: transparent; }
+a:hover img { border: 1px solid #ff0; background-color: transparent; }
 
 /* Headers */
 h1, h2, h3, h4, h5, h6 {
@@ -58,10 +58,13 @@ table tr { }
 table th { font-family: serif; font-size: 1.2em; background-color: #333; padding: 5px; font-weight: bold; }
 table td { padding: 5px 5px; font-size: 0.9em; }
 
-table tr.fat { line-height: 3em; }
+/*table tr.fat { line-height: 3em; }*/
+table tr.fat td { padding: 20px 0; }
+table tr.fat td.name { padding-left: 10px; }
+
 table th.admin { background-color: #422; text-align: center; }
-table td.admin { background-color: #200; text-align: center; }
-table td.controls { text-align: right; }
+table tr.fat td.admin { background-color: #200; text-align: center; }
+table tr.fat td.controls { text-align: right; padding-right: 10px; }
 
 fieldset, img {
   border: 0;
@@ -102,17 +105,9 @@ em { font-style: italic; }
 input, textarea, select { font-family: inherit; font-size: inherit; font-weight: inherit; }
 input, textarea, select { font-size: 100%; }
 legend { color: #fff; }
-/*input[disabled="disabled"] { background-color: #f0f; color: #666; }*/
-input[disabled], button[disabled] { color:#999; background-color: #bbb; border-color: #999; }
+input[disabled], button[disabled] { color: #777; background-color: #bbb; border-color: #999; }
 
-form label { 
-	display: block;  /* block float the labels to left column, set a width */
-	text-align: left; 	
-/*  float: left;*/
-/*  width: 150px;*/
-  padding: 0 5px 5px 5px;
-	margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
-}
+form label { display: block; text-align: left; padding: 0px 0px 5px 0px; margin-top: 5px; }
 
 /* set width in form, not fieldset (still takes up more room w/ fieldset width */
 form {  
@@ -150,10 +145,10 @@ form br { clear:left; }
 .quarter { width: 25%; }
 
 /* Fonts & button misc */
-.bigtext { font-size: 1.4em;line-height: 1.6em; }
+.bigtext { font-size: 1.4em; line-height: 1.6em; }
 
 a.button { background: #fff; border: 1px solid #bbb; padding: 3px 5px; color: #000; text-decoration: none; }
-a.button:hover { background: #ff0; } /* Hmm. a:hover getting overriden by a.button */
+a.button:hover { background-color: #ff0; } /* Hmm. a:hover getting overriden by a.button */
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 a.delete { color: #fbb; }
@@ -171,7 +166,7 @@ a.delete { color: #fbb; }
 /*.pagination span.current { font-weight: bold; color: #dF5084; }*/
 .pagination span.current { }
 .pagination a { background-color: #fff; color: #000; text-decoration: none; }
-.pagination a:hover, .pagination a:focus { background: #ff0; color: #000; }
+.pagination a:hover, .pagination a:focus { background-color: #ff0; color: #000; }
 .pagination .page_info { color: #aaa; padding-top: .8em; }
 .pagination .prev_page, .pagination .next_page { border-width: 2px; }
 .pagination .prev_page { margin-right: 0.5em; }
@@ -272,13 +267,14 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 #home #intro { line-height: 1.2em; font-size: 90%; color: #aaa; margin: 5px 0 5px 0; padding: 5px 5px 7px 5px; background-color: #0f0f0f; border-bottom: 1px solid #222; }
 #tags a img { margin-right: 5px; }
 
+ul#frontpage_tags li { line-height: 1.3em; }
+ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* span is occupied */
+
 /* User/Entry.show sidebar */
-/*#main { width: 600px; padding: 30px 0 20px 0; }*/
 #main { width: 600px; padding: 0; }
 #sidebar { width: 260px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; font-size: 92%; }
 #sidebar.tag_sidebar { margin-top: 30px; padding: 0; border: 0; }
 
-/*.infobox { position: absolute; margin: 30px 0 0 600px; opacity: 1; width: 220px; background-color: #151515; padding: 5px 16px; }*/
 #sidebar .infobox, #sidebar .modbox { background-color: #151515; padding: 5px 16px; } /* just used in entry.show */
 #sidebar .infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
 #sidebar textarea { background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px; }
@@ -288,7 +284,6 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 a.username_link, a.application_link { }
 a.username_link.anon, a.application_link.anon { text-decoration: none; border-bottom: 1px dotted #888; }
 
-
 /* Players */
 #vanderplayer object, #vanderplayer embed { min-height: 800px; } /* hack */
 #home #vis { margin-top: 15px; }
@@ -297,7 +292,10 @@ a.username_link.anon, a.application_link.anon { text-decoration: none; border-bo
 .embed_toggle { margin-top: 40px; }
 .embed_details.disabled { color: #555; }
 
-/* Frontpaging... */
-/*ul#frontpage_tags, ul#frontpage_tags li { white-space: none; overflow: visible;  }*/ /* doesn't really work */
-ul#frontpage_tags li { line-height: 1.3em; }
-ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* span is occupied */
+/* Favorites */
+.favorite { margin-top: 4px; }
+.favorite a { background: #fff url(/images/heart.png) 2px 0 no-repeat; padding: 4px 4px 2px 24px; display: inline-block; line-height: 10px; font-weight: bold; color: #808080; border: 2px solid #aaa; }
+.favorite a:hover { background-position: 2px -32px; color: #B33d33; text-decoration: none; }
+.favorite a.on, .favorite a.on:hover { background-position: 2px -16px; color: #c80000; }
+
+

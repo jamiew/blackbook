@@ -64,6 +64,7 @@ class Tag < ActiveRecord::Base
   has_attached_file :image, 
     :default_style => :medium,
     :default_url => "/images/defaults/tag_:style.jpg",
+    # :path => ":rails_root/public/system/:class/:attachment/:id_partition/:basename_:style.:extension"
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
   # validates_attachment_presence :image
     
@@ -186,7 +187,14 @@ class Tag < ActiveRecord::Base
   # Sexify the app name (this could be a helper)
   # TODO: link  
   def sexy_app_name
-    (!gml_application.blank? && gml_application) || (!application.blank? && application) || ''
+    # puts "gml_application=#{gml_application.inspect} application=#{application.inspect}"
+    (!application.blank? && application) || (!gml_application.blank? && gml_application) || ''
+  end
+  
+  # Favorites-related -- TODO this should be elsewhere/via named_scopes
+  def favorited_by?(user)
+    puts "tag.favorited_by?(#{user.inspect})"
+    Favorite.count(:conditions => ['object_id = ? AND object_type = ? AND user_id = ?', self.id, self.class.to_s, user.id]) > 0
   end
   
   

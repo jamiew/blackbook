@@ -2,7 +2,7 @@
 
 = error_messages_for :visualization
 
-- form_for(:visualization, :url => objects_url) do |f|
+- form_for(:visualization, :url => objects_url, :html => { :multipart => true }) do |f|
   = render :partial => "form", :object => @visualization, :locals => {:f => f}
   %br
   %p= submit_tag "Create"

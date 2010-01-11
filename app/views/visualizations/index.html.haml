@@ -8,11 +8,11 @@
 %table{:style => 'width: 100%'}
   %tr
     / %th{:style => 'width: 110px;'}
-    %th{:style => 'width: 150px;'} application
-    %th{:style => 'width: 100px;'} <!--language-->
+    %th{:style => 'width: 200px;'} application
+    %th{:style => 'width: 220px; padding: 0px 0px 0 25px;'} authors    
+    %th
     %th
     / %th{:style => 'width: 40px;'} embeddable
-    %th{:style => 'width: 500px; padding: 0px 0px 0 25px;'} authors
     / %th{:style => 'width: 150px;'} submitted    
     %th.controls
     - if is_admin? || is_owner?
@@ -22,16 +22,15 @@
   - current_objects.each do |app|
     %tr.fat
       / %td= link_to(image_tag(app.thumbnail_image), url)
-      %td
+      %td.name
         %strong= link_to app.name, visualization_path(app)
-      %td= app.kind.blank? ? '&mdash;' : app.kind
-      %td.website{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= link_to app.website.gsub('http://',''), app.website || '&mdash;'
+      %td.authors{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'        
+      %td.language= app.kind.blank? ? '&mdash;' : app.kind
+      %td.website{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= link_to app.website.gsub('http://','') || '&mdash;', app.website
       / %td= app.is_embeddable? ? 'y' : 'n'
-      %td{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'
       / %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
       / %td{:style => 'width: 150px;'}= app.created_at.strftime('%D')
-      %td.controls
-        = link_to "more&nbsp;&raquo;", visualization_path(app), :class => 'ghost button'
+      %td.controls= link_to "more&nbsp;&raquo;", visualization_path(app), :class => 'ghost button'
 
       -#Admin debuggery & controls
       - if is_admin?
@@ -41,6 +40,7 @@
             = link_to 'unapprove', unapprove_visualization_path(app), :method => :put, :confirm => 'Are you sure?'
           - else
             = link_to 'approve', approve_visualization_path(app), :method => :put, :confirm => 'Are you sure?'
+          %br
           = link_to 'edit', edit_visualization_path(app)
           = link_to 'delete', visualization_path(app), :method => :delete, :confirm => "Are you sure?", :class => 'delete'
       

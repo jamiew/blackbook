@@ -16,7 +16,8 @@ module TagsHelper
       "[manual]"
     else
       # Strip out the long-ass GA name...
-      shortname = (opts[:short] == true ? app_name.gsub('Graffiti Analysis ','GA') : app_name)
+      # shortname = (opts[:short] == true ? app_name.gsub('Graffiti Analysis ','GrafAnalysis') : app_name)
+      shortname = app_name
       link_to shortname, tags_path(:app => app_name), :class => 'application_link anon'
     end
   end  
@@ -26,7 +27,8 @@ module TagsHelper
   # Tag flash visualizer -- allow people to customize
   # If no tag specified try to do "slideshow" mode (??)
   def tag_player(tag = nil, args = {})
-    # return '[disabled in dev mode]' if dev? && !params[:flash]
+
+    return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
     
     # No longer specifying a specific height, just width
     opts = { :width => '100%', :src => 'http://toddvanderlin.com/content/000000book/BlackBook.swf', :bgcolor => '#000000' }.merge(args)

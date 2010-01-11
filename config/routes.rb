@@ -30,24 +30,24 @@ ActionController::Routing::Routes.draw do |map|
         # :has_many => [:tags, :comments]
         :has_many => [:visualizations, :comments, :favorites] do |users| 
     users.resources :tags, :as => 'data'
-    #FIXME remove above visualizations nested association -- not being used
   end
   map.settings '/settings', :controller => 'users', :action => 'edit'
 
-  map.resources :visualizations,
-    :as => 'apps', #TODO FIXME
-    :has_many => [:comments, :favorites],
-    :member => {:approve => :put, :unapprove => :put}
-
-  map.resources :tags, # /data
+  # tags => /data
+  map.resources :tags,
     :as => 'data',
     :has_many => [:comments, :favorites],
     :collection => [:latest, :random]
-  map.resources :tags # vanilla /tags, for backwards-compat
-  map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
+  map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
+
+  # visualizations => /apps
+  map.resources :visualizations,
+    :as => 'apps',
+    :has_many => [:comments, :favorites],
+    :member => {:approve => :put, :unapprove => :put}
 
   # TODO...
-  map.resources :favorites
+  # map.resources :favorites
   map.resources :comments
 
   map.activity '/activity', :controller => 'home', :action => 'activity'

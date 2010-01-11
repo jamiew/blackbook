@@ -35,17 +35,17 @@ class TagsController < ApplicationController
       @search_context = {:key => :user, :value => params[:user], :conditions => ["gml_uniquekey_hash LIKE ?",'%'+params[:user].gsub('anon-','')] }
     end
     
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 10
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 15
     @tags ||= Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user], :conditions => (@search_context && @search_context[:conditions]))
     
     
     set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')+(@page > 1 ? " (page #{@page})" : '')
     
     respond_to do |wants|
-      format.html { render }      
-      format.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
-      format.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
-      format.rss  { render :rss => @tags.to_rss } #TODO: customize RSS feeds more!
+      wants.html { render }      
+      wants.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
+      wants.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
+      wants.rss  { render :rss => @tags.to_rss } #TODO: customize RSS feeds more!
       #TODO: .js => Embeddable widget
     end
   end
