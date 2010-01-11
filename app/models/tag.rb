@@ -40,9 +40,9 @@ class Tag < ActiveRecord::Base
   has_many :comments, :as => :commentable
   has_many :likes
   
-  validates_presence_of :user_id, :on => :create, :message => "can't be blank"
+  # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
-  #TODO: *seriously* need better validation on this mother
+  #TODO: *seriously* need better validation on this mother... but can't cuz of API
   
   # before_save :process_gml  
   # before_save :save_header #Done inside build_gml_object now; HACK FIXME
