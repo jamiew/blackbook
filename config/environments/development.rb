@@ -11,9 +11,30 @@ config.whiny_nils = true
 # Show full error reports and disable caching
 config.action_controller.consider_all_requests_local = true
 config.action_view.debug_rjs                         = true
-config.action_controller.perform_caching             = true
+config.action_controller.perform_caching             = false
 
 config.cache_store = :mem_cache_store
 
-# Don't care if the mailer can't send
+# Don't care if the mailer can't send, and stash mails in ActionMailer::Base.deliveries (:test)
 config.action_mailer.raise_delivery_errors = false
+config.action_mailer.delivery_method = :test
+
+# in dev use Bullet to auto-analyze easy DB optimizations
+# http://github.com/flyerhzm/bullet
+config.after_initialize do
+  Bullet.enable = true
+  Bullet.alert = false # intense alert() notification action
+  Bullet.bullet_logger = true # log/bullet.log
+  Bullet.console = true #javascript console()
+  Bullet.rails_logger = false # log/#{environment}.log
+  Bullet.disable_browser_cache = true #...DOCME
+
+  # Display growl notifications on Mac
+  # begin
+  #   require 'ruby-growl'
+  #   Bullet.growl = false
+  # rescue MissingSourceFile
+  #   STDERR.puts "$$ Bullet: could not initialize Growl; skipping..."
+  # end
+
+end
