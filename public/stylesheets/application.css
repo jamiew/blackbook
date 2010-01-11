@@ -287,7 +287,7 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 /* User.show-specific */
 #profile .role.admin { text-transform: uppercase; color: #666; }
 #profile .owner { margin: 15px 0 0px 0; }
-#profile #main { width: 500px; overflow: hidden; font-size: .9em; }
+#profile #main { width: 460px; overflow: hidden; font-size: .9em; }
 #profile #sidebar { width: 170px; margin-right: -100px; }
 #profile #activity { float: right; width: 340px; min-height: 250px; border-left: 1px solid #222; padding: 10px 0 0 15px; }
 

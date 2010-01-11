@@ -14,9 +14,6 @@
       == &ndash; uploading tags? #{link_to 'register an account', signup_path} 
       == <br/> Don't forget to add your iPhone UUID in your #{link_to 'settings', settings_path} to link your uploads (<span style="color:red">*</span>now supported!)
 
-  %br.clear
-  / .right_column{:style => 'width: 280px; text-align: left; margin-top: 40px;'}
-  -# TODO: convert this to a table
   .right_column{:style => "margin-top: 40px; overflow: visible;"}
     %ul#frontpage_tags
       - @tags.each do |tag|
@@ -27,9 +24,9 @@
             -# unless tag.application.blank? && tag.gml_application.blank?
             - if true
               %span.application== <em>|</em> #{application_link(tag.sexy_app_name, :short => true)}
-            - unless tag.user.nil?
+            - if !tag.user.nil?
               %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
-            - unless tag.secret_username.blank?
+            - elsif !tag.secret_username.blank?
               %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}              
             / %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
     %p.right
@@ -43,9 +40,9 @@
           %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
         - unless @tag.location.blank?
           %span.location== &ndash; #{@tag.location}
-        - unless @tag.user.nil?
+        - if !@tag.user.nil?
           %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
-        - unless @tag.secret_username.blank?
+        - elsif @tag.secret_username.blank?
           %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}                  
         / %span.created_at.timeago== &ndash; #{@tag.created_at.strftime('%D')}
       
