@@ -110,6 +110,8 @@ class Tag < ActiveRecord::Base
   # the GML data (String) as a Hash
   # w/ caching, it's an expensive operation
   def gml_hash
+    puts "LOLWUT"
+    puts convert_gml_to_hash
     Rails.cache.fetch(gml_hash_cache_key) { convert_gml_to_hash }
   end
   def gml_hash_cache_key; "tag/#{id}/gml_hash"; end  
@@ -117,7 +119,7 @@ class Tag < ActiveRecord::Base
   #TODO make these all below protected
   # possibly use Nokogiri to do string->XML->JSON? Potentially faster?  
   def convert_gml_to_hash
-    return if self.gml.blank? || !self.gml['gml']
+    return if self.gml.blank?
     Hash.from_xml(self.gml)['gml']
   end
   
