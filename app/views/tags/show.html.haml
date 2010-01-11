@@ -12,7 +12,11 @@
 #sidebar.tag_sidebar
   / Information about the tag
   .infobox
-    %h2= tag_title(@tag)
+    - if true # show for logged-out users as well to encourage logging in
+      .right.favorite
+        - on = current_user && @tag.favorited_by?(current_user) || false
+        = link_to 'Favorite', tag_favorites_path(@tag), :method => 'post', :class => "favorite button #{on ? 'on' : 'off'}"        
+    %h2= tag_title(@tag)    
     %hr
     %ul
       %li

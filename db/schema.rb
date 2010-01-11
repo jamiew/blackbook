@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100108103528) do
+ActiveRecord::Schema.define(:version => 20100111070757) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -156,16 +156,19 @@ ActiveRecord::Schema.define(:version => 20100108103528) do
     t.string   "version"
     t.text     "description"
     t.string   "authors"
-    t.string   "kind",                                 :default => ""
-    t.boolean  "is_embeddable",                        :default => false
+    t.string   "kind",                                     :default => ""
+    t.boolean  "is_embeddable",                            :default => false
     t.string   "embed_url"
     t.string   "embed_callback"
     t.string   "embed_params"
-    t.text     "embed_code",     :limit => 2147483647
+    t.text     "embed_code",         :limit => 2147483647
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "approved_at"
     t.integer  "approved_by"
+    t.string   "image_file_name"
+    t.string   "image_content_type"
+    t.integer  "image_file_size"
   end
 
 end

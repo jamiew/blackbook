@@ -31,7 +31,8 @@
     - url = tag_path(tag)
     %tr
       %td.thumbnail= link_to(image_tag(tag.thumbnail_image(:small)), url)
-      %td.name= link_to(tag_title(tag), url)
+      %td.name
+        %strong= link_to(tag_title(tag), url)
       %td.application
         = application_link(tag.sexy_app_name)
       %td.who

@@ -21,7 +21,8 @@
     %ul#frontpage_tags
       - @tags.each do |tag|
         %li
-          %a{:href => tag_path(tag)}= tag_title(tag)
+          %span
+            %a{:href => tag_path(tag)}= tag_title(tag)
           %small
             -# unless tag.application.blank? && tag.gml_application.blank?
             - if true
@@ -30,7 +31,7 @@
               %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
             - unless tag.secret_username.blank?
               %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}              
-            %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
+            / %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
     %p.right
       %strong= link_to '<span>View all data &raquo;</span>', tags_path, :class => 'button ghost small'
 
