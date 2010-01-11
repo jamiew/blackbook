@@ -21,10 +21,9 @@
 class Comment < ActiveRecord::Base
 
   belongs_to :commentable, :polymorphic => true
-
-  # NOTE: Comments belong to a user
   belongs_to :user
   
+  validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
   validates_presence_of :comment, :on => :create, :message => "can't be blank"
   # TODO: validate not spam!

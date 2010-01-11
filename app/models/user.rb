@@ -48,7 +48,8 @@ class User < ActiveRecord::Base
   has_many :wall_posts, :class_name => 'Comment', :as => :commentable # Comments *on* this user
   has_many :favorites
   has_many :tags, :order => 'created_at DESC'
-  has_many :visualizations
+  has_many :visualizations  
+  has_many :notifications
   
   attr_protected :admin
   
@@ -85,7 +86,7 @@ class User < ActiveRecord::Base
 protected
 
   def create_notification
-    Notification.create(:subject => self, :verb => 'created')
+    Notification.create(:subject => self, :verb => 'created', :user => self)
   end
 
   # Claim some tags if our user iphone_uniquekey changed  

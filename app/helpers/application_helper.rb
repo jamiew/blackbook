@@ -111,6 +111,12 @@ module ApplicationHelper
       })
     EOC
   end
+  
+  
+  # Some common elements
+  def redstar
+    '<span style="color: #f55">*</span>'
+  end
 
   
   

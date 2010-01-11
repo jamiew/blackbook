@@ -88,6 +88,7 @@ ol.square li, ul.square li {
   margin-left: 15px;
   margin-bottom: 3px;
 }
+ul.circle li { list-style-type: circle; margin-left: 15px; }
 
 caption, th {
   text-align: left;
@@ -275,13 +276,21 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 
 /* User/Entry.show sidebar */
 #main { width: 600px; padding: 0; }
-#sidebar { width: 260px; float: right; border-left: 1px solid #333; padding: 10px 0 0 30px; font-size: 92%; }
+#sidebar { width: 260px; float: right; border-left: 1px solid #222; padding: 10px 0 0 25px; font-size: 92%; }
 #sidebar.tag_sidebar { margin-top: 30px; padding: 0; border: 0; }
 
 #sidebar .infobox, #sidebar .modbox { background-color: #151515; padding: 5px 16px; } /* just used in entry.show */
 #sidebar .infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
 #sidebar textarea { background-color: #222; color: #ccc; border: 1px solid #ff0; padding: 8px 8px 5px; margin-top: 10px; }
 #sidebar .modbox { margin-top: 30px; }
+
+/* User.show-specific */
+#profile .role.admin { text-transform: uppercase; color: #666; }
+#profile .owner { margin: 15px 0 0px 0; }
+#profile #main { width: 500px; overflow: hidden; font-size: .9em; }
+#profile #sidebar { width: 170px; margin-right: -100px; }
+#profile #activity { float: right; width: 340px; min-height: 250px; border-left: 1px solid #222; padding: 10px 0 0 15px; }
+
 
 /* Some metaclasses for quasi-searches */
 a.username_link, a.application_link { }
@@ -302,8 +311,8 @@ a.username_link.anon, a.application_link.anon { text-decoration: none; border-bo
 .favorite a.on, .favorite a.on:hover { background-position: 2px -16px; color: #c80000; }
 
 
-/* Profile.show */
-#profile .role.admin { text-transform: uppercase; color: #666; }
-/*#profile .owner { padding: 5px; background-color: #222; padding: 10px 20px 10px 15px; border: 1px solid #222; display: inline-block; }*/
-#profile .owner { margin: 15px 0 0px 0; }
 
+
+/* User.index */
+ul.users li { float: left; text-align: center; margin: 0 15px 15px 0; width: 110px; height: 150px; overflow: hidden; }
+ul.users li img { display: block; margin-bottom: 5px; }
