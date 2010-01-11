@@ -39,13 +39,15 @@
     %h2
       %a{:href => tag_path(@tag)}= tag_title(@tag)
       %small
-        - unless @tag.application.blank?
-          %span.application== &ndash; #{@tag.application}          
+        - if true
+          %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
         - unless @tag.location.blank?
           %span.location== &ndash; #{@tag.location}
         - unless @tag.user.nil?
-          %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}            
-        %span.created_at.timeago== &ndash; #{@tag.created_at.strftime('%D')}
+          %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
+        - unless @tag.secret_username.blank?
+          %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}                  
+        / %span.created_at.timeago== &ndash; #{@tag.created_at.strftime('%D')}
       
     = render :partial => 'tags/tag_playback', :object => @tag
     

@@ -85,6 +85,8 @@ ol li {
 }
 ol.square li, ul.square li {
   list-style-type: square;
+  margin-left: 15px;
+  margin-bottom: 3px;
 }
 
 caption, th {
@@ -149,6 +151,7 @@ form br { clear:left; }
 
 a.button { background: #fff; border: 1px solid #bbb; padding: 3px 5px; color: #000; text-decoration: none; }
 a.button:hover { background-color: #ff0; } /* Hmm. a:hover getting overriden by a.button */
+a.button.small { font-size: 90%; padding: 0px 2px; margin: 0; }
 a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
 
 a.delete { color: #fbb; }
@@ -298,4 +301,9 @@ a.username_link.anon, a.application_link.anon { text-decoration: none; border-bo
 .favorite a:hover { background-position: 2px -32px; color: #B33d33; text-decoration: none; }
 .favorite a.on, .favorite a.on:hover { background-position: 2px -16px; color: #c80000; }
 
+
+/* Profile.show */
+#profile .role.admin { text-transform: uppercase; color: #666; }
+/*#profile .owner { padding: 5px; background-color: #222; padding: 10px 20px 10px 15px; border: 1px solid #222; display: inline-block; }*/
+#profile .owner { margin: 15px 0 0px 0; }
 

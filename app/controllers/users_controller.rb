@@ -16,7 +16,8 @@ class UsersController < ApplicationController
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10
     @user = User.find(params[:id])
     set_page_title @user.name || @user.login    
-    @tags = @user.tags.paginate(:page => @page, :per_page => @per_page)
+
+    @tags = @user.tags.paginate(:page => @page, :per_page => @per_page, :include => [:user])
   end
 
   # Setup a new user
@@ -41,12 +42,14 @@ class UsersController < ApplicationController
   end
 
   def change_password
+    #TODO? ack    
   end
 
-  def update
+  def update    
+    @user.attributes = params[:user]
+
     if @user.update_attributes(params[:user])
-      flash[:notice] = "Settings updated!"
-      # redirect_to(user_path(@user))
+      flash[:notice] = "Settings updated! "
       redirect_to(settings_path)
     else
       # Errors printed to form
@@ -55,10 +58,10 @@ class UsersController < ApplicationController
   end
   
   
-  protected
+protected
   
   def set_user_from_current_user
     @user = @current_user  # makes our views "cleaner" and more consistent
-  end
+  end  
   
 end

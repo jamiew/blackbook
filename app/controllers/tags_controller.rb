@@ -138,7 +138,8 @@ class TagsController < ApplicationController
     else
       flash[:error] = "Could not destroy tag: #{$!}"
     end
-    redirect_to(tags_path)
+    # redirect_to(tags_path)
+    redirect_to :back
   end
   
 protected
