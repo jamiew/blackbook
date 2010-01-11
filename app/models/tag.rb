@@ -211,22 +211,24 @@ protected
     Notification.create(:subject => self, :verb => 'created')
   end
   
-  # make sure we have a gml
+  # before_create hook to build, copy over our temp data & then read our GML
   def build_gml_object
-    STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
+    # STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
     obj = GMLObject.new
     obj.data = @gml_temp || self.attributes['gml'] #attr_protected
     self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...  
     process_gml
     save_header
-    find_paired_user
+    find_paired_user #...
   end
 
+  # after_create hook to finalize the GMLObject
   def save_gml_object
     self.gml_object.tag = self
     self.gml_object.save!
   end
 
+  # Parse & assign variables from the GML header
   def save_header
     # only save attributes we actually have please, but allow displaying everything we can parse
     # this could be confusing later -- document well or refactor...
@@ -237,11 +239,12 @@ protected
   
   # assign a user if there's a paired iPhone uniquekey
   def find_paired_user
-    puts "find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
+    logger.debug "Tag.find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
     return if self.gml_uniquekey.blank?
-    user = User.find_by_iphone_uniquekey(self.gml_uniquekey)
-    puts "found user = #{user.inspect}"
-    self.user = user unless user.nil?
+    user = User.find_by_iphone_uniquekey(self.gml_uniquekey) rescue nil
+    return if user.nil?
+    logger.info "Pairing with user=#{user.login.inspect}"
+    self.user = user
   end
     
 
@@ -254,7 +257,7 @@ protected
       
     header = (doc/'header')
     if header.blank?
-      STDERR.puts "No header in GML: #{self.gml}"
+      STDERR.puts "Tag.process_gml: no header found in GML"
       return nil
     end
   
