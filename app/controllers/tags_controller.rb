@@ -15,9 +15,8 @@ class TagsController < ApplicationController
   
   #TODO: this should be a Sweeper. but it doesn't *have* to be...
   def expire_caches
-    if @tag
-      expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id)
-      ['json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
+    if @tag && !@tag.new_record?
+      [nil,'json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
       Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash) #Model caching, but handling all in the controller
     end
     expire_fragment(:controller => 'tags', :action => 'index')
