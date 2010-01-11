@@ -1,47 +1,51 @@
 - @user ||= current_user
+#profile
+  #sidebar
+    %h2.login
+      = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
+      .clear= @user.login
+    -# Roles + personal edit
+    - if @user.admin?
+      %strong.role.admin Admin
+    - if current_user == @user
+      %br
+      .owner
+        %em This is you!
+        %ol
+          %li= link_to 'Edit Settings', edit_user_path(@user)
+          %li= link_to 'Change Password', edit_user_path(@user)
+    -# Apps
+    - if true
+      - if @user.visualizations.blank?
+        / None
+      - else
+        %br
+        %h3 Applications
+        %ul.square
+          - @user.visualizations.each do |vis|
+            %li= link_to vis.name, visualization_path(vis)
 
-#sidebar
-  %h2
-    = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
-    .clear= @user.login
+  #main
+    -#Notifis... activity feed? comments etc.
+    - if false
+      %h2 Notifications
+      - if @notifications.blank?
+        = "None yet."
+      - else
+        - @notifications = Notification.find(:all, :conditions => ['user_id = ?', @user.id])
+        = render :partial => 'home/notifications', :object => @notifications
 
-  - if current_user == @user
-    %p
-      %em This is you!
+    -#TODO: Show favorites!
 
-    %ol
-      %li= link_to "Upload new tag", new_tag_path
-      %li= link_to 'Edit Profile', edit_user_path(@user)
-      %li= link_to 'Change Password', edit_user_path(@user)
+    -# User's tags
+    - if true
+      - if @tags.blank?
+        %p.empty
+          %strong Nothing yet! 
+      - else
+        %h1== #{@tags.total_entries} Uploaded Tags
+        = render :partial => 'tags/tag', :collection => @tags
 
-#main
-
-  - if true
-    - if @user.visualizations.blank?
-      / None
-    - else
-      %h1 Applications
-      %ul.square
-        - @user.visualizations.each do |vis|
-          %li= link_to vis.name, visualization_path(vis)
-
-  - if false
-    %h2 Notifications
-    - if @notifications.blank?
-      = "None yet."
-    - else
-      - @notifications = Notification.find(:all, :conditions => ['user_id = ?', @user.id])
-      = render :partial => 'home/notifications', :object => @notifications
-
-  - if true
-    %hr
-    - if @tags.blank?
-      %strong.empty
-        Nothing yet! 
-        %br== &rarr; #{link_to 'Upload', new_tag_path}
-    - else
-      %h1 Tags
-      = render :partial => 'tags/tag', :collection => @tags
-    %br.clear
-    = pagination(@tags)
+      %br.clear
+      %p= pagination(@tags)
   

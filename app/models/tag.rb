@@ -57,10 +57,16 @@ class Tag < ActiveRecord::Base
   # after_save    :expire_gml_hash_cache #<-- handling in the Controller
   # after_destroy :delete_gml_hash_cache #TODO; do we need this?
 
-  
   # Security: protect from mass assignment
   attr_protected :user_id
-    
+
+  # Scopes -- mostly related to presence of uniquekeys
+  named_scope :from_device, {:conditions => 'gml_uniquekey IS NOT NULL'}
+  named_scope :claimed, {:conditions => 'gml_uniquekey IS NOT NULL AND user_id IS NOT NULL'}
+  named_scope :unclaimed, {:conditions => 'gml_uniquekey IS NOT NULL AND user_id IS NULL' }
+  named_scope :by_uniquekey, lambda { |key| {:conditions => ['gml_uniquekey = ?',key]} }
+
+      
   has_attached_file :image, 
     :default_style => :medium,
     :default_url => "/images/defaults/tag_:style.jpg",
@@ -213,6 +219,7 @@ protected
     self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...  
     process_gml
     save_header
+    find_paired_user
   end
 
   def save_gml_object
@@ -227,6 +234,16 @@ protected
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
     puts "Tag.save_header: #{attrs.inspect}"
   end
+  
+  # assign a user if there's a paired iPhone uniquekey
+  def find_paired_user
+    puts "find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
+    return if self.gml_uniquekey.blank?
+    user = User.find_by_iphone_uniquekey(self.gml_uniquekey)
+    puts "found user = #{user.inspect}"
+    self.user = user unless user.nil?
+  end
+    
 
   # extract some information from the GML
   # and insert our server signature
@@ -257,6 +274,7 @@ protected
     STDERR.puts msg
     logger.error msg #TODO standardize this dev-friendly idiom
   end
+    
     
   # simpe hack to check secret/appname for if this is tempt...
   # if so, save it to his User for him

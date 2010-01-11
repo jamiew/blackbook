@@ -9,11 +9,18 @@
   .posted_at
     == #{time_ago_in_words(tag.created_at)} ago
     %br= tag.created_at.strftime('%D %T')
-  - unless tag.application.blank?
+  - unless tag.sexy_app_name.blank?
     %p.application 
       %strong Application: <br />
-      = tag.application || '(null)'
+      = tag.sexy_app_name || 'NULL'
 
+  - if is_owner?(tag) && is_admin?
+    .controls.left
+      %small
+        = link_to 'edit', edit_tag_path(tag)          
+        &nbsp;
+        = link_to 'delete', tag_path(tag), :method => 'delete', :class => 'delete', :confirm => 'Are you sure?'
+    
 %p
   =# link_to image_tag(tag.image.url(:medium)), link
   -# if tag.image.exists?    
