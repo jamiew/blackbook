@@ -32,6 +32,7 @@ class Visualization < ActiveRecord::Base
   belongs_to :user  
   has_many :comments, :as => :commentable
   
+  validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create    
   validates_presence_of :name, :on => :create, :message => "can't be blank (and should be cool)"
   validates_uniqueness_of :name, :on => :create, :message => "must be unique & that name already exists"
@@ -46,6 +47,8 @@ class Visualization < ActiveRecord::Base
   
   named_scope :approved, { :conditions => ['approved_at < ?', Time.now] }
   named_scope :pending, { :conditions => ['approved_at IS NULL OR approved_at > ?', Time.now] }
+  
+  after_create :create_notification
   
   has_attached_file :image, 
     :default_style => :medium,
@@ -62,6 +65,11 @@ class Visualization < ActiveRecord::Base
   
   def approved?
     self.approved_at && self.approved_at < Time.now
+  end
+  
+protected
+  def create_notification
+    Notification.create(:subject => self, :verb => 'created', :user => self.user)
   end
   
 end

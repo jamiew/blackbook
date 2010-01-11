@@ -40,7 +40,9 @@ class Tag < ActiveRecord::Base
   has_many :comments, :as => :commentable
   has_many :likes
   
+  validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
+  #TODO: *seriously* need better validation on this mother
   
   # before_save :process_gml  
   # before_save :save_header #Done inside build_gml_object now; HACK FIXME
@@ -113,8 +115,9 @@ class Tag < ActiveRecord::Base
   def gml_hash_cache_key; "tag/#{id}/gml_hash"; end  
   
   #TODO make these all below protected
+  # possibly use Nokogiri to do string->XML->JSON? Potentially faster?  
   def convert_gml_to_hash
-    #TODO: possibly use Nokogiri to do string->XML->JSON? Potentially faster?
+    return if self.gml.blank? || !self.gml['gml']
     Hash.from_xml(self.gml)['gml']
   end
   
@@ -208,7 +211,7 @@ class Tag < ActiveRecord::Base
 protected    
 
   def create_notification
-    Notification.create(:subject => self, :verb => 'created')
+    Notification.create(:subject => self, :verb => 'created', :user => self.user)
   end
   
   # before_create hook to build, copy over our temp data & then read our GML
