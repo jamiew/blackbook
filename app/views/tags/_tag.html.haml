@@ -13,7 +13,7 @@
   - unless tag.sexy_app_name.blank?
     %p.application 
       %strong Application: <br />
-      = tag.sexy_app_name || 'NULL'
+      = application_link(tag.sexy_app_name) || 'NULL'
 
   - if is_owner?(tag) && is_admin?
     .controls.left
