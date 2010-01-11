@@ -1,8 +1,8 @@
-- tag = tag_players #be semantic
+- tag = tag_playback #be semantic
 #main.tag.tabs
   %ul.tab_navigation
     %li= link_to 'flashplayer', '#vanderplayer'
-    %li= link_to 'thumbnail', '#thumbnail'
+    %li= link_to 'image', '#image'
 
   #vanderplayer 
     -#FIXME -- this causes us to load one more way-large object per request -- currently not bothering...
@@ -21,12 +21,12 @@
     
   / TODO: canvasplayer
     
-  #thumbnail
+  #image
     - imgopts = {:width => 600}
     - if tag.image.exists?
       .image= image_tag tag.image(:large), imgopts
     - elsif tag.remote_image
       .image= image_tag tag.remote_image, imgopts
     - else
-      %br
-      %h4 No thumbnail generated yet.
+      %p
+        %h4 No thumbnail generated yet.

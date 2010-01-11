@@ -21,7 +21,7 @@
     %hr
     %ul
       - app = !@tag.gml_application.blank? && @tag.gml_application || @tag.application
-      %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(@tag.application)}
+      %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(@tag.sexy_app_name)}
     %hr
     %ul
       - if !@tag.author.blank?
@@ -67,5 +67,5 @@
             %span=h v
     
 / The actual tag awwwwwww yeah
-= render :partial => "tag_players", :object => @tag
+= render :partial => "tags/tag_playback", :object => @tag
 
