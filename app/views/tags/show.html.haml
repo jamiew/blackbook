@@ -67,35 +67,5 @@
             %span=h v
     
 / The actual tag awwwwwww yeah
-#main.tag.tabs
-  %ul.tab_navigation
-    %li= link_to 'flashplayer', '#vanderplayer'
-    %li= link_to 'thumbnail', '#thumbnail'
-
-  #vanderplayer 
-    -#FIXME -- this causes us to load one more way-large object per request -- currently not bothering...
-    -#  should we stash a 'valid_gml' boolean? Hmm.
-    - if false && @tag.gml.blank?
-      %p
-        %h4 Missing or invalid GML data; playback disabled
-    - else
-      - player = tag_player(@tag, :width => '580px')
-      %p= player
-    
-      -# Embed code -- take it with you
-      - encoded_embed = HTMLEntities.new.encode(player).gsub("\n",'').squeeze(" ").chomp
-      %label{:for => 'player_embed'} Embed Code
-      %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}  
-    
-  / TODO: canvasplayer
-    
-  #thumbnail
-    - imgopts = {:width => 600}
-    - if @tag.image.exists?
-      .image= image_tag @tag.image(:large), imgopts
-    - elsif @tag.remote_image
-      .image= image_tag @tag.remote_image, imgopts
-    - else
-      %br
-      %h4 No thumbnail generated yet.
+= render :partial => "tag_players", :object => @tag
 
