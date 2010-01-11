@@ -10,14 +10,16 @@
 
 !!!
 %html{html_attrs}  
-  = render :partial => 'layouts/header'
-  #container
-    #content
-      = flash_messages
-      = yield :layout unless dev? && params[:noyield] == '1'
-  = render :partial => 'layouts/footer'
+  = render :partial => 'layouts/template_header'
+  %body
+    = render :partial => 'layouts/header'
+    #container
+      #content
+        = flash_messages
+        = yield :layout unless dev? && params[:noyield] == '1'
+    = render :partial => 'layouts/footer'
     
-  - if RAILS_ENV == 'production'  
-    = render :partial => 'layouts/stats'
+    - if RAILS_ENV == 'production'  
+      = render :partial => 'layouts/stats'
 
 
