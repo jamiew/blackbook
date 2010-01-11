@@ -49,6 +49,8 @@ namespace :deploy do
   task :create_symlinks do
     run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
     run "ln -nfs #{shared_path}/config/settings.yml #{release_path}/config/settings.yml"
+    run "ln -nfs #{shared_path}/config/memcached.yml #{release_path}/config/memcached.yml"
+    run "ln -nfs #{shared_path}/config/newrelic.yml #{release_path}/config/newrelic.yml"
 
     run "mkdir -p #{release_path}/public/"
     run "ln -nfs #{shared_path}/public/system #{release_path}/public/system"    

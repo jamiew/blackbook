@@ -9,7 +9,8 @@ class ApplicationController < ActionController::Base
   helper :all # Oof, REMOVEME -- don't really need all helpers, all the time
   helper_method :current_user_session, :current_user, :page_title, :set_page_title
 
-  filter_parameter_logging :password, :password_confirmation, :gml #Don't show the raw GML in the logs
+  #Don't show the raw GML (or GMLObject.data) in the logs
+  filter_parameter_logging :password, :password_confirmation, :gml, :data 
   protect_from_forgery
   
   # Global filters
@@ -23,7 +24,17 @@ class ApplicationController < ActionController::Base
 
   protected
 
-    def set_page_title(title)
+    # Extra logging info we like -- referrers for now, possibly user agent?
+    def log_processing
+      super
+      if logger && logger.info?
+        logger.info("  HTTP Referer: #{request.referer}") if !request.referer.blank?
+        # logger.info("  clean_params: #{clean_params.inspect}") unless clean_params.blank?
+      end
+    end
+   
+    # Modify the global page title -- could also use @page_title
+    def set_page_title(title) #TODO change to page_title= (or just use @page_title/@title directly)
       @page_title = title
     end
 
@@ -214,22 +225,19 @@ class ApplicationController < ActionController::Base
     end
     
     
-    # Caching related -- should we cache this request?
-    # 1) if it's not HTML, cache it -- .gml/.xml/.json/etc
-    # 2) if it's HTML and we're logged in, don't cache
-    # 3) if it's HTML and we're paginating, also don't cache (lazy)
-    def logged_out_and_no_query_vars?
-      # puts "format = #{request.parameters[:format].inspect}, session = #{request.session.inspect}, params = #{request.parameters.inspect}"
-      return true unless [nil,'','html'].include?(request.parameters[:format].to_s)
-      
-      logged_out = request.session['user_credentials_id'].blank?
-
-      # FIXME; make this no_query_vars blacklist against particular cachables instead of whitelisting un-cachables
-      no_query_vars = (request.parameters[:page].blank? || request.parameters[:page].to_s == '1') && request.parameters[:app].blank? && request.parameters[:user].blank?
-      logger.debug "no_query_vars?=#{no_query_vars}  params=#{request.parameters.inspect}"
-
-      return logged_out && no_query_vars
+    # Should we cache this request? A good question!
+    def cache_request?
+      return false unless clean_params.blank? #Never cache if we have query vars (e.g. ?page=1, or ?callback=setup)
+      return true unless [nil,'','html'].include?(request.parameters[:format].to_s) #Always cache if it's not HTML (.json/gml/xml the same for everyone)
+      return true if request.session['user_credentials_id'].blank? #Don't cache if logged in
     end
+    
+    # params stripped of internal route info
+    def clean_params
+      excludes = [:controller, :action, :id, :format]
+      return params.reject { |k,v| excludes.include?(k.to_sym) }
+    end
+
     
 
 end
