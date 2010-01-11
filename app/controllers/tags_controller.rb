@@ -43,7 +43,7 @@ class TagsController < ApplicationController
     
     respond_to do |wants|
       format.html { render }      
-      format.xml  { render :xml => @tags.(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
+      format.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
       format.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
       format.rss  { render :rss => @tags.to_rss } #TODO: customize RSS feeds more!
       #TODO: .js => Embeddable widget

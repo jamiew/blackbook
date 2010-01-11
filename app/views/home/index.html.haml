@@ -46,6 +46,5 @@
           %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}            
         %span.created_at.timeago== &ndash; #{@tag.created_at.strftime('%D')}
       
-    =# tag_player(@tag, :width => '580px')
-    = render :partial => 'tag_playback', :object => @tag
+    = render :partial => 'tags/tag_playback', :object => @tag
     
