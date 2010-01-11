@@ -18,7 +18,7 @@ class UsersController < ApplicationController
     set_page_title @user.name || @user.login    
 
     @tags = @user.tags.paginate(:page => @page, :per_page => @per_page, :include => [:user])
-    @notifications = @user.notifications.paginate(:page => 1, :per_page => 60, :include => [:subject, :user])
+    @notifications = @user.notifications.paginate(:page => 1, :per_page => 30, :order => 'created_at DESC', :include => [:subject, :user])
     # ...
   end
 
