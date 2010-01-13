@@ -107,7 +107,7 @@ class ApplicationController < ActionController::Base
       unless current_user
         logger.info "require_user failed"
         store_location
-        flash[:error] = "You must be logged in to access that page"
+        flash[:notice] = "You must be logged in to access that page"
         redirect_to(login_path)
         return false
       end
@@ -117,7 +117,7 @@ class ApplicationController < ActionController::Base
       if current_user
         logger.info "require_no_user failed"      
         store_location
-        flash[:error] = "You must be logged out to access that page"
+        flash[:error] = "You must not be logged-in in order to to access that page"
         # Can cause infinite redirects if on /login => /login ... FIXME
         # redirect_back_or_default(user_path(current_user))
         redirect_to(user_path(current_user))
@@ -129,7 +129,7 @@ class ApplicationController < ActionController::Base
       unless current_user && is_admin?
         logger.warn "require_admin failed (!!)"        
         store_location
-        flash[:error] = "You must be an admin to access that page"
+        flash[:error] = "You must be an admin to access this (Event logged)"
         # redirect_to login_url
         # raise NoPermissionError
         redirect_back_or_default(logged_in? ? root_path : login_path)

@@ -289,10 +289,11 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 
 /* User.show-specific */
 #profile #main { width: 460px; overflow: hidden; font-size: .9em; position: relative; left: -50px; }
-#profile #sidebar { width: 170px; margin-right: -20px; }
+#profile #sidebar { width: 190px; margin-right: -20px; }
+#profile #activity { float: right; width: 340px; min-height: 250px; padding: 10px 0 0 15px; }
+#profile #activity td.timeago { border-left: 1px solid #222; }
 
-#profile #activity { float: right; width: 340px; min-height: 250px; border-left: 1px solid #222; padding: 10px 0 0 15px; }
-#profile #activity td.timeago { text-align: right; padding-right: 8px; width: 84px; }
+#profile #activity td.timeago { text-align: right; padding-right: 8px; width: 84px; overflow: visible; }
 #profile #activity .notifications .thumbnail { width: 50px; }
 
 #profile #sidebar .roles { float: right; margin-top: 50px; }
@@ -302,7 +303,7 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 #profile #sidebar .website a { color: #aaa; }
 #profile #sidebar h4 { color: #666; text-transform: uppercase; margin: 10px 0 0 0; padding: 0; }
 #profile #sidebar .about { color: #ccc; font-size: 0.9em; }
-
+#profile #sidebar .stats { font-size: 1.4em; line-height: 1.6em; }
 
 /* Some metaclasses for quasi-searches */
 a.username_link, a.application_link { }
