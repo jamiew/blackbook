@@ -96,6 +96,14 @@ class Tag < ActiveRecord::Base
     end
   end
   
+  # a quick hard-code check to see if we're from iPhone, which means we'll need to rotate
+  def from_iphone?
+    app_matcher = /(DustTag|Dust Tag|Fat Tag|Katsu)/
+    test = !(self.gml_application =~ app_matcher || self.application =~ app_matcher).blank?
+    # puts "from_iphone?(#{self.gml_application} || #{self.application}) = #{test}"
+    return res
+  end
+  
   # Wrapper accessors for the GML data, now stored in another object
   #TODO: memoize this; can't quite with the 
   def gml(opts = {})
@@ -103,7 +111,7 @@ class Tag < ActiveRecord::Base
     @memoized_gml ||= gml_object && gml_object.data || self.attributes['gml'] || ''
     return @memoized_gml
   end
-  
+    
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
   # FIXME protectme etc.
   def rotated_gml; Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml }; end  

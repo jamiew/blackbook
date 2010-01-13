@@ -35,7 +35,7 @@ module TagsHelper
     
     # image_urls = tag.image.styles.keys.map { |s| ["image_#{s}", "http://#{request.host}:#{request.port}"+tag.image.url(s)] }.to_hash
     image_urls = {:image_large => tag.image.url(:large)}
-    flashvars = { :gml_url => tag_url(tag, :format => 'gml', :iphone_rotate => '1'), :embed => "&lt;embed&gt;TODOWHATUP&lt;/embed&gt;",
+    flashvars = { :gml_url => tag_url(tag, :format => 'gml', :iphone_rotate => (tag.from_iphone? ? '1' : nil)), :embed => "&lt;embed&gt;TODOWHATUP&lt;/embed&gt;",
         :user => (tag.user.login rescue nil), 
         :created_at => tag.created_at.to_s, :created_date => tag.created_at.strftime("%D")
       }.merge(image_urls)

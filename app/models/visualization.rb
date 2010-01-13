@@ -47,6 +47,7 @@ class Visualization < ActiveRecord::Base
   
   named_scope :approved, { :conditions => ['approved_at < ?', Time.now] }
   named_scope :pending, { :conditions => ['approved_at IS NULL OR approved_at > ?', Time.now] }
+  named_scope :by_user, lambda { |user_id| {:conditions => ['user_id = ?', user_id]} }
   
   after_create :create_notification
   

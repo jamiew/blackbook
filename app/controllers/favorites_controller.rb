@@ -5,12 +5,13 @@ class FavoritesController < ApplicationController
   def index
     @user = User.find(params[:user_id])
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10 #FIXME align with Tags.index...    
-    
+          
     # Goofy association-association loading for compat with will_paginate
     # There MUST be a better idiom for this...
     # Using double paginate as a 'ghetto limit'. doesn't cause trouble (??)
     fave_objects = @user.favorites.tags.find(:all, :select => 'object_id, created_at')  #TODO FIXME: this could get very large!!! How to best do this...?
-    @tags = @favorites = Tag.paginate(:page => @page, :per_page => @per_page, :conditions => ['id in (?)', fave_objects.map(&:object_id)])
+    #FIXME: object_id causing headaches... rename to 'favorited_id' or something. hmm. 
+    @tags = @favorites = Tag.paginate(:page => @page, :per_page => @per_page, :conditions => ['id in (?)', fave_objects.map{|f| f.attributes['object_id']} ] )
     @favorites = @tags #for will_paginate, and to minimize confusion. Assuming all faves = Tags right now
 
     set_page_title "#{@user.login}'s Favorites"
