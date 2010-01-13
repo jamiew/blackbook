@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100111070757) do
+ActiveRecord::Schema.define(:version => 20100113002753) do
 
   create_table "apps", :force => true do |t|
     t.datetime "created_at"
@@ -17,13 +17,17 @@ ActiveRecord::Schema.define(:version => 20100111070757) do
   end
 
   create_table "comments", :force => true do |t|
-    t.string   "title",            :limit => 50, :default => ""
-    t.text     "comment"
+    t.string   "title",             :limit => 50, :default => ""
+    t.text     "text"
     t.integer  "commentable_id"
     t.string   "commentable_type"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "cached_user_login"
+    t.string   "cached_user_url"
+    t.string   "ip_address"
+    t.datetime "hidden_at"
   end
 
   add_index "comments", ["commentable_id"], :name => "index_comments_on_commentable_id"

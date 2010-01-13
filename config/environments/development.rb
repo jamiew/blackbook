@@ -21,6 +21,7 @@ config.action_mailer.delivery_method = :test
 
 # in dev use Bullet to auto-analyze easy DB optimizations
 # http://github.com/flyerhzm/bullet
+config.gem 'bullet', :source => 'http://gemcutter.org' #only used in dev mode
 config.after_initialize do
   Bullet.enable = true
   Bullet.alert = false # intense alert() notification action

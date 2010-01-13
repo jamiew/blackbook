@@ -1,13 +1,27 @@
 - @user ||= current_user
 #profile
   #sidebar
+  
+    -# Roles
+    - if @user.admin?
+      .roles
+        %strong.role.admin Admin
+  
     %h2.login
       = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
       .clear= @user.login
+    - unless @user.tagline.blank?
+      .tagline== "#{@user.tagline}"
 
-    -# Roles
-    - if @user.admin?
-      %strong.role.admin Admin
+    - unless @user.website.blank?
+      .website
+        = link_to @user.website.gsub('http://',''), @user.website =~ /^http/ ? @user.website : "http://#{@user.website}", :rel => 'nofollow'
+
+    -# About/Bio down low...
+    - unless @user.about.blank?
+      .about
+        / %h4 Bio:
+        = @user.about
 
     -# Meta
     %p 
@@ -18,19 +32,19 @@
     -# Simple stats
     %ul.stats.circle
       %li= pluralize @user.tags.count, 'tag'
-      %li= pluralize @user.comments.count, 'comment'
-      %li= pluralize @user.favorites.count, 'favorite'
+      %li= link_to(pluralize(@user.comments.count, 'comment'), user_comments_path(@user))
+      %li= link_to(pluralize(@user.favorites.count, 'favorite'), user_favorites_path(@user))
 
     -# Personal editing...
-    - if current_user == @user
-      .owner
+    - if false && current_user == @user
+      .ownerbox
         %em This is you!
         %ol
           %li= link_to 'Edit Settings', edit_user_path(@user)
           %li= link_to 'Change Password', edit_user_path(@user)
 
     -# Apps
-    - if true
+    - if false
       - if @user.visualizations.blank?
         / None
       - else
@@ -40,6 +54,14 @@
           - @user.visualizations.each do |vis|
             %li= link_to vis.name, visualization_path(vis)
 
+    
+    -# Wall posts yall
+    - if true
+      %br
+      #wall
+        %h4 Wall/Drop Bombs
+        = render :partial => 'comments/comments', :object => @wall_posts, :locals => {:commentable=>@user}
+
   -#Notifis... activity feed? comments etc.
   - if true
     #activity
@@ -47,7 +69,6 @@
       - if @notifications.blank?
         = "None yet."
       - else
-        - @notifications = Notification.find(:all, :conditions => ['user_id = ?', @user.id])
         = render :partial => 'home/notifications', :object => @notifications
 
   -# User's tags

@@ -29,7 +29,6 @@ Rails::Initializer.run do |config|
   config.gem "configatron", :version => ">= 2.2.2"
   config.gem "mislav-will_paginate", :lib => "will_paginate", :version => "~>2.3.6"
   config.gem "htmlentities"
-  config.gem 'bullet', :source => 'http://gemcutter.org' #only used in dev mode
   # config.gem 'giraffesoft-is_taggable', :lib => 'is_taggable', :source => 'http://gems.github.com'
 
   # Testing

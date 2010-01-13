@@ -24,9 +24,9 @@
   #image
     - imgopts = {:width => 600}
     - if tag.image.exists?
-      .image= image_tag tag.image(:large), imgopts
+      %p.image= image_tag tag.image(:large), imgopts
     - elsif tag.remote_image
-      .image= image_tag tag.remote_image, imgopts
+      %p.image= image_tag tag.remote_image, imgopts
     - else
       %p
         %h4 No thumbnail generated yet.
