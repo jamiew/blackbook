@@ -30,6 +30,7 @@ class ApplicationController < ActionController::Base
       if logger && logger.info?
         logger.info("  HTTP Referer: #{request.referer}") if !request.referer.blank?
         # logger.info("  clean_params: #{clean_params.inspect}") unless clean_params.blank?
+        logger.info("  User Agent: #{request.env["HTTP_USER_AGENT"]}")
       end
     end
    
