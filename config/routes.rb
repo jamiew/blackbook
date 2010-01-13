@@ -33,11 +33,14 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.settings '/settings', :controller => 'users', :action => 'edit'
 
+  # intercept robot GETS to /data/:id/favorites -- TODO should have a 'are you sure you wanna favorite this?' page for GETs
+  map.discard_tag_favorites_get '/data/:tag_id/favorites', :method => 'get', :controller => 'home', :action => 'discard'
+
   # tags => /data
   map.resources :tags,
     :as => 'data',
     :has_many => [:comments, :favorites],
-    :member => [:upload_thumbnail],
+    :member => [:upload_thumbnail, :flipped],
     :collection => [:latest, :random]
   map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
 

@@ -28,6 +28,6 @@ class HomeController < ApplicationController
   # Ghetto handling for "bad" URLs -- I'm mapping them here as a blackhole
   def discard
     logger.warn "Discarding request..."
-    render :nothing => true, :status => 200 #OK
+    render :nothing => true, :status => 420 #LOL
   end
 end
