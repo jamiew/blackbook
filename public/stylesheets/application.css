@@ -288,8 +288,9 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 
 
 /* User.show-specific */
-#profile #main { width: 460px; overflow: hidden; font-size: .9em; position: relative; left: -50px; }
-#profile #sidebar { width: 190px; margin-right: -20px; }
+#profile { width: 980px; margin: 0 auto; margin-left: -50px; }
+#profile #main { width: 425px; overflow: hidden; font-size: .9em; }
+#profile #sidebar { float: right; width: 190px; margin-right: -20px; }
 #profile #activity { float: right; width: 340px; min-height: 250px; padding: 10px 0 0 15px; }
 #profile #activity td.timeago { border-left: 1px solid #222; }
 
