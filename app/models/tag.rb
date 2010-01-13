@@ -101,7 +101,7 @@ class Tag < ActiveRecord::Base
     app_matcher = /(DustTag|Dust Tag|Fat Tag|Katsu)/
     test = !(self.gml_application =~ app_matcher || self.application =~ app_matcher).blank?
     # puts "from_iphone?(#{self.gml_application} || #{self.application}) = #{test}"
-    return res
+    return test
   end
   
   # Wrapper accessors for the GML data, now stored in another object
