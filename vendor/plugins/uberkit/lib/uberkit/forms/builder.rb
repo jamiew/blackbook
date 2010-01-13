@@ -21,6 +21,7 @@ class Uberkit::Forms::Builder < ActionView::Helpers::FormBuilder
     required = options.delete(:required)
     content_tag(:div, :class => "field_row#{' required' if required}#{' labelless' if label_text == ""}") do
       ret = label(field, (label_text || field.to_s.titleize).to_s + ":") unless label_text == ""
+      ret ||= [] #TODO: submit patch back for this; replicate using = f.text_area :text, :rows => 2, :label => '' (also can't use nil...)
       ret << content
       ret << content_tag(:span, options.delete(:help), :class => "help") if options[:help]
       ret << content_tag(:span, options.delete(:description), :class => "description") if options[:description]
