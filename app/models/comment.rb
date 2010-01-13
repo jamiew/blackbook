@@ -41,6 +41,7 @@ class Comment < ActiveRecord::Base
   
   # before_save :denormalize_user_fields  
   after_create :create_notification
+  after_create :send_email
   
   
   # Helper class method to lookup all comments assigned to all commentable types for a given user.
@@ -70,6 +71,10 @@ protected
   
   def create_notification
     Notification.create(:subject => self, :verb => 'created', :user => self.user)        
+  end
+  
+  def send_email
+    logger.error "TODO: send someone an email that a comment was made bitch!"
   end
 
 end
