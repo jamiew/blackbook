@@ -256,8 +256,8 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 #errorExplanation ul li { list-style-type: square; margin-left: 15px; }
 
 /* Login form... */
-#login .remember_me { margin-left: 160px; font-size: 0.8em; margin-top: 10px; }
-#login .remember_me input { float: left; }
+#login .remember_me { margin-left: 100px; font-size: 0.8em; margin-top: 10px; }
+#login .remember_me input { float: left; margin-right: 10px; }
 #login .remember_me label { text-align: left; margin-left: 3px; }
 #login .buttons, #login .help { margin-left: 6em; }
 #login .help { font-size: 0.9em; margin-top: 2em; }
