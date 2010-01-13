@@ -33,8 +33,8 @@ ActionController::Routing::Routes.draw do |map|
   end
   map.settings '/settings', :controller => 'users', :action => 'edit'
 
-  # intercept robot GETS to /data/:id/favorites -- TODO should have a 'are you sure you wanna favorite this?' page for GETs
-  map.discard_tag_favorites_get '/data/:tag_id/favorites', :method => 'get', :controller => 'home', :action => 'discard'
+  # intercept bad js/robot GETS to /data/:id/favorites -- TODO should have a 'are you sure you wanna favorite this?' page for GETs
+  map.backup_tag_favorites_get '/data/:tag_id/favorites', :method => 'get', :controller => 'favorites', :action => 'create'
 
   # tags => /data
   map.resources :tags,
