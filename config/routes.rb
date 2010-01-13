@@ -37,6 +37,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :tags,
     :as => 'data',
     :has_many => [:comments, :favorites],
+    :member => [:upload_thumbnail],
     :collection => [:latest, :random]
   map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
 

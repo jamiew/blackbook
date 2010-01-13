@@ -37,7 +37,7 @@ class Tag < ActiveRecord::Base
   
   belongs_to :user
   has_one :gml_object, :class_name => 'GMLObject' #used to store the actual data, nice & gzipped
-  has_many :comments, :as => :commentable
+  has_many :comments, :as => :commentable, :order => 'created_at DESC'
   has_many :likes
   
   # validates_presence_of :user_id, :on => :create, :message => "can't be blank"

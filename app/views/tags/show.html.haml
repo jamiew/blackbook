@@ -11,7 +11,7 @@
 
 #sidebar.tag_sidebar
   / Information about the tag
-  .infobox
+  .metadata.infobox
     - if true # show for logged-out users as well to encourage logging in
       .right.favorite
         - on = current_user && @tag.favorited_by?(current_user) || false
@@ -34,23 +34,26 @@
       %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : @tag.location}
       - unless @tag.description.blank?
         %li== <strong>Description:</strong> #{@tag.description}
-
-    - if @tag.image.exists? || @tag.remote_image
-      %hr    
-      %ul
+      - if @tag.image.exists? || @tag.remote_image
         - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
         - #Quick little gsub to remove the queryvars... not ideal
         %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, :target => '_blank') }      
     %hr
     %br  
     .gml
-      %span.download{:style => 'margin-left: 5px;'}= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
-      %span.what-is-gml{:style => 'margin-left: 2px;'}= link_to('?', '#', :onclick => 'alert("TODO: what is GML page"); return false;')
-      %textarea{:cols => 24, :rows => 12, :onclick => '$(this).select();'}= @tag.gml
+      %span.download= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
+      %span.what-is-gml= link_to('?', 'http://fffff.at/gml-week-graffiti-markup-language/', :target => '_blank')
+      %textarea.gml{:cols => 24, :rows => 12, :onclick => '$(this).select();'}= @tag.gml
 
+  -# Comments display
+  .comments.infobox
+    %h3== #{@comments.total_entries} Comments
+    = render :partial => 'comments/comments', :object => @comments, :locals => {:commentable => @tag}
+    
+    
   -# Tag modbox -- edit/delete/debugging etc.
   - if is_owner?(@tag) || is_admin?
-    .modbox 
+    .modbox.infobox
       %h2{:style => 'color: #f0f'} MODBOX
       %ol#controls  
         %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
@@ -68,8 +71,8 @@
           %p{:style => 'overflow: hidden;'}
             %strong= k
             %br
-            %span=h v
-    
+            %span=h !v.blank? && v || 'NULL'
+  
 / The actual tag awwwwwww yeah
 = render :partial => "tags/tag_playback", :object => @tag
 

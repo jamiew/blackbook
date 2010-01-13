@@ -61,6 +61,9 @@ class TagsController < ApplicationController
       @user = User.find(params[:user_id]) if params[:user_id]
       @user ||= @tag.user # ...
 
+      @comments = @tag.comments.visible.paginate(:page => 1, :per_page => 10) # No pagination yet
+      # favorites...?
+
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
       @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
@@ -141,6 +144,12 @@ class TagsController < ApplicationController
     # redirect_to(tags_path)
     redirect_to :back
   end
+  
+  # intended for canvasplayer dataURI callback
+  def upload_thumbnail
+    render :text => "YEAH BOY", :layout => false
+  end
+  
   
 protected
   
