@@ -47,11 +47,13 @@
         = application_link(tag.sexy_app_name)
       %td.who
         - if !user.nil?
-          = link_to(user.login, user_path(user))
-        - elsif tag.author
-          = link_to tag.author
+          %a{:href => user_path(user)}
+            .user_photo.left{:style => 'margin-top: -7px; padding-right: 5px;'}= image_tag(user.photo(:tiny))
+            = user.login
         - elsif tag.secret_username
           = secret_username_link(tag.secret_username)
+        - elsif false && tag.author
+          = link_to tag.author
         - else
           &mdash;
       %td.timeago.uploaded
