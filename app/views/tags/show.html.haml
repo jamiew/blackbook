@@ -49,7 +49,9 @@
   .comments.infobox
     %h3== #{@comments.total_entries} Comments
     = render :partial => 'comments/comments', :object => @comments, :locals => {:commentable => @tag}
-    
+  
+  -# Faves display...
+  -# TODO!!
     
   -# Tag modbox -- edit/delete/debugging etc.
   - if is_owner?(@tag) || is_admin?

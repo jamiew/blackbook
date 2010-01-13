@@ -4,15 +4,14 @@
 - if show_commentable
   .commentable
     - obj = comment.commentable
-    %span.commentable== #{link_to commentable_name(obj), url_for(obj)}:
-      
+    %span.commentable= link_to commentable_name(obj), url_for(obj)
 
 .comment
   .info
     %span.author_photo= link_to image_tag(user.photo(:tiny)), user_path(user)
     %span.author= link_to user.login, user_path(user)
     - if is_admin? || is_owner?(comment)
-      .right.controls{:style => 'margin-left: 5px;'}
+      .right.controls
         %small= link_to 'delete', comment_path(comment), :method => 'delete', :class => 'delete'
     %span.timeago== #{timeago(comment.created_at)} ago
     
