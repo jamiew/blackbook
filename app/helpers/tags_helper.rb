@@ -28,14 +28,14 @@ module TagsHelper
   # If no tag specified try to do "slideshow" mode (??)
   def tag_player(tag = nil, args = {})
 
-    return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
+    # return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
     
     # No longer specifying a specific height, just width
     opts = { :width => '100%', :src => 'http://toddvanderlin.com/content/000000book/BlackBook.swf', :bgcolor => '#000000' }.merge(args)
     
     # image_urls = tag.image.styles.keys.map { |s| ["image_#{s}", "http://#{request.host}:#{request.port}"+tag.image.url(s)] }.to_hash
     image_urls = {:image_large => tag.image.url(:large)}
-    flashvars = { :gml_url => tag_url(tag, :format => 'gml'), :embed => "&lt;embed&gt;TODOWHATUP&lt;/embed&gt;",
+    flashvars = { :gml_url => tag_url(tag, :format => 'gml', :iphone_rotate => '1'), :embed => "&lt;embed&gt;TODOWHATUP&lt;/embed&gt;",
         :user => (tag.user.login rescue nil), 
         :created_at => tag.created_at.to_s, :created_date => tag.created_at.strftime("%D")
       }.merge(image_urls)

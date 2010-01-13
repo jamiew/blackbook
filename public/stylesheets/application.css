@@ -311,7 +311,7 @@ a.username_link, a.application_link { }
 a.username_link.anon, a.application_link.anon { text-decoration: none; border-bottom: 1px dotted #888; }
 
 /* Players */
-#vanderplayer object, #vanderplayer embed { min-height: 800px; } /* hack */
+#vanderplayer object, #vanderplayer embed { min-height: 460px; } /* hack */
 #home #vis { margin-top: 15px; }
 
 /* Add new application/visualization... */

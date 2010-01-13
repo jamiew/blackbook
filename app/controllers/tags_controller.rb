@@ -74,7 +74,7 @@ class TagsController < ApplicationController
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
     respond_to do |wants|
       wants.html  { render }
-      wants.gml   { render :xml => @tag.gml }      
+      wants.gml   { render :xml => @tag.gml(:iphone_rotate => params[:iphone_rotate]) }      
       wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }      
       wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
       wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
