@@ -12,6 +12,8 @@ class Favorite < ActiveRecord::Base
   validates_associated :user, :on => :create
 
   after_create :create_notification
+  
+  named_scope :tags, {:conditions => 'object_type = "Tag"'}
 
 protected
 

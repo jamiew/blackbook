@@ -35,6 +35,7 @@ class ApplicationController < ActionController::Base
    
     # Modify the global page title -- could also use @page_title
     def set_page_title(title) #TODO change to page_title= (or just use @page_title/@title directly)
+      title += " (page #{@page})" if @page.to_i > 1
       @page_title = title
     end
 

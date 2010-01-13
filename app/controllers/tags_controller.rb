@@ -37,9 +37,8 @@ class TagsController < ApplicationController
     
     @page, @per_page = params[:page] && params[:page].to_i || 1, 15
     @tags ||= Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user], :conditions => (@search_context && @search_context[:conditions]))
-    
-    
-    set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')+(@page > 1 ? " (page #{@page})" : '')
+        
+    set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
     
     respond_to do |wants|
       wants.html { render }      

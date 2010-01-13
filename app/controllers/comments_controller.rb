@@ -23,15 +23,16 @@ class CommentsController < ApplicationController
   
   def create
     
-    #TODO: some rudiemtnary rate limiting
+    #TODO: add some rudimentary rate limiting & IP banning
         
     @comment = Comment.new(params[:comment])
     @comment.user = current_user # Hard-assign (attr_protected)
     @comment.commentable = @commentable
     @comment.ip_address = request.remote_addr
+
     # redirect_back_or_default(url_for(@commentable))
     if @comment.save
-      flash[:notice] = "Yo your wit & candor will live forever"
+      flash[:notice] = "Succesfully posted."
     else
       flash[:error] = "Failed to save your comment: #{@comment.errors.map(&:to_s)}"
     end

@@ -16,7 +16,7 @@ class VisualizationsController < ApplicationController
     end
     
     before :index do
-      set_page_title "Applications"+(@page > 1 ? " (page #{@page})" : '')
+      set_page_title "Applications"
     end
     
     before :show do

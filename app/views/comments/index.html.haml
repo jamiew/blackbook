@@ -3,7 +3,7 @@
 
 = pagination
 
-%h1 Comments for #{@commentable.class} #{@commentable.respond_to?(:name) && !@commentable.name.blank? ? @commentable.name : "##{@commentable.id}"}
+%h1 Comments by #{commentable_name(@commentable)}
 - if @comments.blank?
   %em No comments!
 = render :partial => 'comments/comment', :collection => @comments, :locals => {:show_commentable => true}

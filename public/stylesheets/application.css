@@ -248,6 +248,8 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 
 .graytext { color: #aaa; }
 .redtext  { color: #e33; }
+.timeago { color: #666; font-size: 9pt; }
+
 
 /* Form Errors */
 #errorExplanation { background-color: #faa; border: 1px solid #faa; color: #333; padding: 0 10px 15px; } 
@@ -288,7 +290,10 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 /* User.show-specific */
 #profile #main { width: 460px; overflow: hidden; font-size: .9em; position: relative; left: -50px; }
 #profile #sidebar { width: 170px; margin-right: -20px; }
+
 #profile #activity { float: right; width: 340px; min-height: 250px; border-left: 1px solid #222; padding: 10px 0 0 15px; }
+#profile #activity td.timeago { text-align: right; padding-right: 8px; width: 84px; }
+#profile #activity .notifications .thumbnail { width: 50px; }
 
 #profile #sidebar .roles { float: right; margin-top: 50px; }
 #profile #sidebar .role.admin { font-size: 0.9em; text-transform: uppercase; color: #444; }
@@ -322,10 +327,11 @@ a.username_link.anon, a.application_link.anon { text-decoration: none; border-bo
 .comment .info { line-height: 1.1em; }
 .comment .info .author_photo { float: left; margin-right: 8px; border: 1px solid #333; }
 .comment .info .author, .comment .timeago { }
-.comment .info .timeago { color: #666; margin-left: 5px; font-size: 90%; }
+.comment .info .timeago { margin-left: 5px; }
+/*.comment .controls { margin-left: 2px; margin-bottom: 5px; }*/
 .comment p.text { color: #bbb; margin: 3px 0 0 43px; }
 
-.commentable { display: inline; margin-right: 20px; padding-top: 10px; }
+.commentable { float: left; text-align: center; width: 100px; margin-right: 20px; padding-top: 10px; }
 
 
 /* User.index */

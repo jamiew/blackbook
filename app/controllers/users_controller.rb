@@ -13,14 +13,14 @@ class UsersController < ApplicationController
   
   # Show one user
   def show
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 10
     @user = User.find(params[:id])
-    set_page_title @user.name || @user.login    
-
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 10
+    
     @tags = @user.tags.paginate(:page => @page, :per_page => @per_page, :include => [:user])
     @wall_posts = @user.wall_posts.paginate(:page => 1, :per_page => 10, :order => 'created_at DESC', :include => [:user])
-    @notifications = @user.notifications.paginate(:page => 1, :per_page => 30, :order => 'created_at DESC', :include => [:subject, :user])
+    @notifications = @user.notifications.paginate(:page => 1, :per_page => 15, :order => 'created_at DESC', :include => [:subject, :user])
 
+    set_page_title @user.name || @user.login    
   end
 
   # Setup a new user
