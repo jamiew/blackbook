@@ -97,8 +97,32 @@ class Tag < ActiveRecord::Base
   end
   
   # Wrapper accessors for the GML data, now stored in another object
-  def gml
-    gml_object && gml_object.data || self.attributes['gml'] || ''
+  #TODO: memoize this; can't quite with the 
+  def gml(opts = {})
+    return rotated_gml if opts[:iphone_rotate].to_s == '1' #handoff for backwards compt; DEPRECATEME
+    @memoized_gml ||= gml_object && gml_object.data || self.attributes['gml'] || ''
+    return @memoized_gml
+  end
+  
+  # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
+  # FIXME protectme etc.
+  def rotated_gml; Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml }; end  
+  def rotated_gml_cache_key; "tag/#{id}/rotated_gml"; end
+  def rotate_gml
+    puts 'ROTATE_GML'
+    doc = gml_document
+    strokes = (doc/'drawing'/'stroke')
+    strokes.each { |stroke|
+      (stroke/'pt').each { |pt|
+        _x = (pt/'x')[0].inner_html
+        (pt/'x')[0].inner_html = (pt/'y')[0].inner_html
+        (pt/'y')[0].inner_html = (1.0 - _x.to_f).to_s
+      }
+    }    
+    return doc.to_s #gets cached so convert to string right away... w/e    
+  rescue
+    logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
+    return nil
   end
   
   # Hacks for GML copying...
@@ -120,7 +144,7 @@ class Tag < ActiveRecord::Base
     return {} if self.gml.blank?
     Hash.from_xml(self.gml)['gml']
   rescue
-    logger.error "Could not parse GML for Tag #{self.id} into a hash"
+    logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
     return {}
   end
   

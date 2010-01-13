@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
         # logger.info("  clean_params: #{clean_params.inspect}") unless clean_params.blank?
         logger.info("  User Agent: #{request.env["HTTP_USER_AGENT"]}")
       end
-    end
+    end    
    
     # Modify the global page title -- could also use @page_title
     def set_page_title(title) #TODO change to page_title= (or just use @page_title/@title directly)
@@ -69,8 +69,7 @@ class ApplicationController < ActionController::Base
       render_to_string :partial => file, :locals => opts
     end
     helper_method :fetch_partial
-    
-
+      
   private
   
     # User shortcuts
