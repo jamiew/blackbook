@@ -47,7 +47,7 @@ module TagsHelper
     embed = %{<embed src="#{opts[:src]}?#{querified_flashvars}" quality="high" scale="noscale" wmode="gpu" loop="true" bgcolor="#{opts[:bgcolor]}" width="#{opts[:width]}" name="BlackBook" align="middle" allowScriptAccess="always" allowFullScreen="true" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" />}
     
     %{    
-      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="#{opts[:width]}" id="BlackBook" align="middle">
+      <object width="#{opts[:width]}">
 
         <!-- typical flash noise; note allowScriptAccess (for js), allowFullScreen=true, loop=true, bgcolor=BLACK -->
         <param name="allowScriptAccess" value="always" />
