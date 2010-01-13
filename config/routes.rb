@@ -28,7 +28,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users,
         :member => [:change_password],
         # :has_many => [:tags, :comments]
-        :has_many => [:visualizations, :comments, :favorites] do |users| 
+        :has_many => [:tags, :visualizations, :comments, :favorites] do |users| 
     users.resources :tags, :as => 'data'
   end
   map.settings '/settings', :controller => 'users', :action => 'edit'

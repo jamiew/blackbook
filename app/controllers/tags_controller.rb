@@ -33,6 +33,9 @@ class TagsController < ApplicationController
     elsif !params[:user].blank?
       # Specifically customized for the secret_username using gml_uniquekey_hash trailing 5 digits! breakable coupling!
       @search_context = {:key => :user, :value => params[:user], :conditions => ["gml_uniquekey_hash LIKE ?",'%'+params[:user].gsub('anon-','')] }
+    elsif !params[:user_id].blank?
+      @user = User.find(params[:user_id])    
+      @search_context = {:key => :user, :value => @user.login, :conditions => ["user_id = ?",@user.id]}
     end
     
     @page, @per_page = params[:page] && params[:page].to_i || 1, 15

@@ -31,7 +31,7 @@
       
     -# Simple stats
     %ul.stats.circle
-      %li= pluralize @user.tags.count, 'tag'
+      %li= link_to(pluralize(@user.tags.count, 'tag'), user_tags_path(@user))
       %li= link_to(pluralize(@user.comments.count, 'comment'), user_comments_path(@user))
       %li= link_to(pluralize(@user.favorites.count, 'favorite'), user_favorites_path(@user))
 
