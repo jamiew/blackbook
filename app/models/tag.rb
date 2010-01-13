@@ -114,9 +114,9 @@ class Tag < ActiveRecord::Base
     strokes = (doc/'drawing'/'stroke')
     strokes.each { |stroke|
       (stroke/'pt').each { |pt|
-        _x = (pt/'x')[0].inner_html
-        (pt/'x')[0].inner_html = (pt/'y')[0].inner_html
-        (pt/'y')[0].inner_html = (1.0 - _x.to_f).to_s
+        _x = (pt/'x')[0].content
+        (pt/'x')[0].content = (pt/'y')[0].content
+        (pt/'y')[0].content = (1.0 - _x.to_f).to_s
       }
     }    
     return doc.to_s #gets cached so convert to string right away... w/e    
