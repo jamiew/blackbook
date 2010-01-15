@@ -1,4 +1,3 @@
-/ %h1 Applications
 
 %p.create_new
   = link_to '+ Register New Application', new_object_path, :class => 'button add facebox'
@@ -13,8 +12,9 @@
     %th{:style => 'width: 220px; padding: 0px 0px 0 25px;'} authors    
     %th
     %th
-    / %th{:style => 'width: 40px;'} embeddable
-    / %th{:style => 'width: 150px;'} submitted    
+    - if false
+      %th{:style => 'width: 40px;'} embeddable
+      %th{:style => 'width: 150px;'} submitted    
     %th.controls
     - if is_admin? || is_owner?
       %th.admin{:style => 'width: 40px;'}
@@ -28,9 +28,10 @@
       %td.authors{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'        
       %td.language= app.kind.blank? ? '&mdash;' : app.kind
       %td.website{:style => 'padding: 0px 5px 0 15px;'}= link_to app.website.gsub('http://','') || '&mdash;', app.website
-      / %td= app.is_embeddable? ? 'y' : 'n'
-      / %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
-      / %td{:style => 'width: 150px;'}= app.created_at.strftime('%D')
+      - if false
+        %td= app.is_embeddable? ? 'y' : 'n'
+        %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
+        %td{:style => 'width: 150px;'}= app.created_at.strftime('%D')
       %td.controls= link_to "more&nbsp;&raquo;", visualization_path(app), :class => 'ghost button'
 
       -#Admin debuggery & controls
