@@ -7,7 +7,6 @@
       == by #{pluralize Tag.count(:conditions => ["created_at >= ?",Date.today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
       == &ndash; #{link_to 'view activity', activity_path, :style => 'text-decoration: underline;'}
 
-    / == Last #{pluralize @tags.length, 'tag'},
     .welcome{:style => 'width: 600px;'}
       %strong Welcome to #000000book
       == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
@@ -28,7 +27,6 @@
               %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
             - elsif !tag.secret_username.blank?
               %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}              
-            / %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
     %p.right
       %strong= link_to '<span>View all data &raquo;</span>', tags_path, :class => 'button ghost small'
 
@@ -44,7 +42,6 @@
           %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
         - elsif @tag.secret_username.blank?
           %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}                  
-        / %span.created_at.timeago== &ndash; #{@tag.created_at.strftime('%D')}
       
     = render :partial => 'tags/tag_playback', :object => @tag
     

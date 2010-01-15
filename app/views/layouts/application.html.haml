@@ -4,9 +4,10 @@
     %li.user_name= link_to current_user.login, user_path(current_user)      
     %li
       = link_to 'settings', settings_path
-      / %ul.hover_menu      
-      /   %li= link_to 'favorites', user_favorites_path(current_user)
-      /   %li= link_to 'applications', user_visualizations_path(current_user)
+      - if false
+        %ul.hover_menu      
+          %li= link_to 'favorites', user_favorites_path(current_user)
+          %li= link_to 'applications', user_visualizations_path(current_user)
     %li= link_to 'favorites', user_favorites_path(current_user)            
     %li.logout= link_to 'logout', logout_path, :class => 'logout'
   - else
