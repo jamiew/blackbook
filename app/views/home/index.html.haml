@@ -1,10 +1,14 @@
 
+-# Be a little more specific about what 'today' is.
+- timezone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
+- today = DateTime.now.in_time_zone(timezone).to_date
+
 #home
 
   #intro
     .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 6px; color: #777;'}
-      == #{pluralize Tag.count(:conditions => ["created_at >= ?",Date.today]), 'tag'} uploaded 
-      == by #{pluralize Tag.count(:conditions => ["created_at >= ?",Date.today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
+      == #{pluralize Tag.count(:conditions => ["created_at >= ?", today]), 'tag'} uploaded 
+      == by #{pluralize Tag.count(:conditions => ["created_at >= ?", today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
       == &ndash; #{link_to 'view activity', activity_path, :style => 'text-decoration: underline;'}
 
     .welcome{:style => 'width: 600px;'}
