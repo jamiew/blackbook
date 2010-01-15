@@ -282,9 +282,9 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 /*#sidebar .infobox.comments { margin-top: 40px; }*/
 #sidebar .infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
 
-#sidebar .meta span.download { margin-left: 5px; }
-#sidebar .meta span.what-is-gml { margin-left: 2px; }
-#sidebar .meta textarea.gml { border: 1px solid #ff0; }
+#sidebar span.download { margin-left: 5px; }
+#sidebar span.what-is-gml { margin-left: 2px; }
+#sidebar textarea.gml { border: 1px solid #ff0; }
 
 
 /* User.show-specific */
@@ -313,6 +313,9 @@ a.username_link.anon, a.application_link.anon { text-decoration: none; border-bo
 /* Players */
 #vanderplayer object, #vanderplayer embed { min-height: 460px; } /* hack */
 #home #vis { margin-top: 15px; }
+input.embed { font-size: 8pt; color: #999; background-color: #2f2f2f; border: 1px solid #555; padding: 4px 5px 3px 2px; width: 350px; }
+input.embed:hover { border-color: #ff0; }
+
 
 /* Add new application/visualization... */
 .embed_toggle { margin-top: 40px; }

@@ -61,9 +61,6 @@ module TagsHelper
         
         <!-- blackbook data, also passed as flashvars -->
         #{flashvars.map { |key, value| "<param name=\"#{key}\" value=\"#{value}\" />\n        " } }
-
-        <!-- embed; does not include the embed code itself atm -->
-        <param name="blackbook_embed" value="#{CGI.escape(embed)}" />
         
         #{embed}
         
