@@ -177,7 +177,11 @@ protected
     # Merge opts & params to let people add whatever...
     @tag = Tag.new(opts)
     if @tag.save
-      render :text => @tag.id, :status => 200 #OK
+      if params[:redirect] && ['true','1'].include?(params[:redirect].to_s) 
+        redirect_to(@tag), :status => 302 #Temporary Redirect
+      else
+        render :text => @tag.id, :status => 200 #OK
+      end
     else
       logger.error "Could not create tag from API: #{@tag.errors.inspect}"
       render :text => "ERROR: #{@tag.errors.inspect}", :status => 422 #Unprocessable Entity
