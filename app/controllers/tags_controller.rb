@@ -44,7 +44,7 @@ class TagsController < ApplicationController
     set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
     
     respond_to do |wants|
-      wants.html { render }      
+      wants.html { render 'index' }      
       wants.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
       wants.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
       # wants.rss  { render :rss => @tags.to_rss }
@@ -96,7 +96,20 @@ class TagsController < ApplicationController
     @tag = Tag.random
     redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
     show
-  end    
+  end
+  
+  # lookup by basic model fields. Nothing fancy.
+  # implementing just for location (by URL) for webmarker for now. need lat/long & keyword
+  # location is the only field we want right now -- so far just using in webmarker
+  def search
+    raise "must specify a location (?location=)" if params[:location].blank?  #only thing we do 4 now
+    # { :location => params[:location] }.each do |key,value|
+    
+    @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?",'%'+params[:location]+'%'] }
+    # @tags = Tag.paginate(:page=>@page, :per_page=>@per_page, :conditions => ["location LIKE ?",params[:location]]) #TODO eagerloads
+    # render 'index'
+    return index
+  end
   
   
   # Create/edit tags
@@ -178,7 +191,7 @@ protected
     @tag = Tag.new(opts)
     if @tag.save
       if params[:redirect] && ['true','1'].include?(params[:redirect].to_s) 
-        redirect_to(@tag), :status => 302 #Temporary Redirect
+        redirect_to(@tag, :status => 302) #Temporary Redirect
       else
         render :text => @tag.id, :status => 200 #OK
       end
