@@ -81,7 +81,12 @@ class Tag < ActiveRecord::Base
 
   
   
-  # wrap remote_imge to always add our local FFlickr... FIXME
+  # wrap remote_imge to always add our local FFlickr... 
+  # this secures tempt's tags on the site
+  def self.remote_image_prefix
+    "http://fffff.at/tempt1/photos/data/eyetags"
+  end
+  
   def remote_image
     return nil if self.attributes['remote_image'].blank?
     "http://fffff.at/tempt1/photos/data/eyetags/#{self.attributes['remote_image'].gsub('gml','png')}"
@@ -111,7 +116,7 @@ class Tag < ActiveRecord::Base
   #TODO: memoize this; can't quite with the 
   def gml(opts = {})
     return rotated_gml if opts[:iphone_rotate].to_s == '1' #handoff for backwards compt; DEPRECATEME
-    @memoized_gml ||= gml_object && gml_object.data || self.attributes['gml'] || ''
+    @memoized_gml ||= gml_object && gml_object.data || @gml_temp || self.attributes['gml'] || ''
     return @memoized_gml
   end
     
@@ -139,6 +144,7 @@ class Tag < ActiveRecord::Base
   # Hacks for GML copying...
   def gml=(fresh)  
     # gml_object && gml_object.data = fresh
+    puts "setting gml=@...#{fresh.inspect}f"
     @gml_temp = fresh
   end
   

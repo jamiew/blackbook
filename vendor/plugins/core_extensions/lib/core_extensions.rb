@@ -15,9 +15,10 @@ class Hash
   end
 
   # allows you to use { :val => 'foo' }.val #=> "foo"
-  def method_missing(key)
-    has_key?(key) || has_key?(key.to_s) ? self[key] || self[key.to_s] : super
-  end
+  # DANGEROUS. commented out for now as well...
+  # def method_missing(key)
+  #   has_key?(key) || has_key?(key.to_s) ? self[key] || self[key.to_s] : super
+  # end
 end
 
 class Array
@@ -51,8 +52,10 @@ private
    end
 end
 
-class String
-  def to_slug
-    self.gsub("'", '').gsub(/[^\w]+/, '_').gsub(/^_|_$/, '')
-  end
-end
+
+# COMMENTED OUT -- this is also in i76-has_slug and the clash causes drama
+# class String
+#   def to_slug
+#     self.gsub("'", '').gsub(/[^\w]+/, '_').gsub(/^_|_$/, '')
+#   end
+# end
