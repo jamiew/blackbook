@@ -1,10 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe UsersController do
-  fixtures :users
 
-  before do
+  before(:each) do #:all?
     activate_authlogic
+    @user = Factory.create(:user, :login => 'mmoen')
   end
 
   describe "actions requiring no current user" do
@@ -19,20 +19,21 @@ describe UsersController do
     end
 
     it "should redirect for a logged in user on :new" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(@user)
       get :new
       response.should be_redirect
     end
 
     it "should redirect for a logged in user on :create" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(@user)
       get :create
       response.should be_redirect
     end
 
     it "should redirect to account on successful :create" do
-      post :create, :user => { :login => 'bob', :email => 'bob@example.com',
+      resp = post :create, :user => { :login => 'bob', :email => 'bob@example.com',
         :password => 'bobs_pass', :password_confirmation => 'bobs_pass' }
+      STDERR.puts "RESP is #{resp.inspect}"
       response.should redirect_to(user_path(User.find('bob'))) #TODO: requires has_slug...?
     end
   end
@@ -48,32 +49,32 @@ describe UsersController do
       response.should redirect_to(login_path)
     end
 
-    it "should redirect to login on :update" do
+    it "should redirect to settings page on :update" do
       get :update
-      response.should redirect_to(login_path)
+      response.should redirect_to(settings_path)
     end
 
     it "should not redirect to login on :show" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(@user)
       get :show
       response.should_not be_redirect
     end
 
     it "should not redirect to login on :edit" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(@user)
       get :edit
       response.should_not be_redirect
     end
 
     it "should redirect to account on :update" do
-      u = users(:mmoen)
+      u = @user
       UserSession.create(u)
       post :update, :user => { :email => 'new_valid_email@example.com' }
       response.should redirect_to(user_path(u))
     end
 
     it "should not redirect to account on failed :update" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(@user)
       post :update, :user => { :email => 'not_a_valid_email' }
       response.should_not be_redirect
     end

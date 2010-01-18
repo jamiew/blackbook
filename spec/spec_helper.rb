@@ -6,6 +6,8 @@ require 'spec/autorun'
 require 'spec/rails'
 require 'authlogic/test_case'
 
+require 'factories'
+
 
 Spec::Runner.configure do |config|
   # If you're not using ActiveRecord you should remove these

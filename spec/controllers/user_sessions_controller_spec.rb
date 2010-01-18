@@ -1,7 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe UserSessionsController do
-  fixtures :users
 
   before do
     activate_authlogic
@@ -19,13 +18,13 @@ describe UserSessionsController do
     end
 
     it "should redirect for a logged in user on :new" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(Factory.create(:user))
       get :new
       response.should be_redirect
     end
 
     it "should redirect for a logged in user on :create" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(Factory.create(:user))
       get :create
       response.should be_redirect
     end
@@ -40,12 +39,14 @@ describe UserSessionsController do
 
   describe "session management" do
     it "should redirect to the account page on successful login" do
-      post :create, :user_session => { :login => 'mmoen', :password => 'password' }
-      response.should redirect_to(user_path)
+      Factory.create(:login => 'mmoen')
+      post :create, :user_session => { :login => 'mmoen', :password => 'password' }      
+      user = User.find_by_login('mmoen')
+      response.should redirect_to(user_path(user))
     end
 
     it "should redirect to the login page on session deletion" do
-      UserSession.create(users(:mmoen))
+      UserSession.create(Factory.create(:user))
       post :destroy
       response.should redirect_to(login_path)
     end
