@@ -5,6 +5,16 @@ module TagsHelper
     tag.title.blank? ? "##{tag.id}" : tag.title
   end
   
+  def tag_user_link(tag)
+    if !tag.user.nil?
+      link_to tag.user.login, user_path(tag.user), :class => 'username_link'
+    elsif !tag.secret_username.blank?
+      secret_username_link(tag.secret_username)
+    else
+      'NULL'
+    end
+  end
+  
   # ...
   def secret_username_link(secret_username)
     link_to secret_username, tags_path(:user => secret_username), :class => 'username_link anon'
@@ -12,16 +22,17 @@ module TagsHelper
   
   # ...DOCME
   def application_link(app_name, opts = {})
-    if app_name.blank?
-      "[manual]"
-    else
-      # Strip out the long-ass GA name...
-      # shortname = (opts[:short] == true ? app_name.gsub('Graffiti Analysis ','GrafAnalysis') : app_name)
-      shortname = app_name
-      link_to shortname, tags_path(:app => app_name), :class => 'application_link anon'
-    end
-  end  
+    return "[manual]" if app_name.blank?
+    # Strip out the long-ass GA name...
+    # shortname = (opts[:short] == true ? app_name.gsub('Graffiti Analysis ','GrafAnalysis') : app_name)
+    shortname = app_name
+    link_to shortname, tags_path(:app => app_name), :class => 'application_link anon'
+  end
   
+  def location_link(location, opts = {})
+    return "NULL" if location.blank?
+    link_to(location, tags_path(:location => location), :class => 'location_link')
+  end  
   
   
   # Tag flash visualizer -- allow people to customize

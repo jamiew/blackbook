@@ -89,8 +89,11 @@ class Tag < ActiveRecord::Base
   
   # if we have a remote image (for Tempt) use that...
   def thumbnail_image(size = :medium)
+
     if !remote_image.blank?
       return "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{self.attributes['remote_image'].gsub('gml','png')}"
+    # elsif RAILS_ENV == 'development' && !File.exist?(self.image_path(size)) #don't do image 404s in development
+    #   return "/images/defaults/tag_#{size.to_s}.jpg"
     else
       return self.image(size)
     end
