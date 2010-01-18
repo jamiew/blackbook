@@ -1,4 +1,7 @@
 
+-# RSS
+= auto_discovery_link_tag(:rss, {:format => :rss, :controller => 'tags', :action => 'index'}, :title => '#0000book: Latest Tags')
+
 -# Be a little more specific about what 'today' is.
 - timezone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
 - today = DateTime.now.in_time_zone(timezone).to_date
