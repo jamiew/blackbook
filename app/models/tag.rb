@@ -210,6 +210,9 @@ class Tag < ActiveRecord::Base
     attrs[:gml_username] = (client/'username').text rescue nil
     attrs[:gml_keywords] = (client/'keywords').text rescue nil
     attrs[:gml_uniquekey] = (client/'uniqueKey').text rescue nil
+    
+    # Non-gml_ prefixed fields...
+    attrs[:location] = (client/'location').text rescue nil # this could also be in <drawing>
 
     # encode the uniquekey with SHA-1 immediately
     # FIXME this slows this method down significantly -- denormalize whole hash to the model on save...?
@@ -269,11 +272,12 @@ protected
   end
 
   # Parse & assign variables from the GML header
+  # FIXME slightly convoluted saving logic and/or should be 'save_header!'
   def save_header
     # only save attributes we actually have please, but allow displaying everything we can parse
     # this could be confusing later -- document well or refactor...
     return if gml_header.blank?
-    attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k); [k,v] }.to_hash
+    attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k) && !v.blank?; [k,v] }.to_hash
     puts "Tag.save_header: #{attrs.inspect}"
   end
   
