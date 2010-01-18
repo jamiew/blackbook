@@ -32,9 +32,9 @@ class TagsController < ApplicationController
       @search_context = {:key => :application, :value => params[:app], :conditions => ["application = ? OR gml_application = ?",params[:app],params[:app]] }
     elsif !params[:user].blank?
       # Specifically customized for the secret_username using gml_uniquekey_hash trailing 5 digits! breakable coupling!
-      @search_context = {:key => :user, :value => params[:user], :conditions => ["gml_uniquekey_hash LIKE ?",'%'+params[:user].gsub('anon-','')] }
+      @search_context = {:key => :user, :value => params[:user], :conditions => ["SUBSTRING(gml_uniquekey_hash, -5, 5) = ?", params[:user].gsub('anon-','')] }
     elsif !params[:location].blank?
-      @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?", "%#{params[:location]}%"] }      
+      @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?", params[:location]] }
     elsif !params[:user_id].blank?
       @user = User.find(params[:user_id])    
       @search_context = {:key => :user, :value => @user.login, :conditions => ["user_id = ?",@user.id]}
@@ -176,7 +176,7 @@ protected
   def create_from_api
 
     # TODO: add app uuid? or Hash app uuid?
-    opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application], :remote_secret => params[:secret], :image => params[:image] }
+    opts = { :gml => params[:gml], :ip => request.remote_ip, :location => params[:location], :application => params[:application], :remote_secret => params[:secret], :gml_uniquekey => params[:uniquekey], :image => params[:image] }
     puts "TagsController.create_from_api, opts=#{opts.inspect}"
     
     # Merge opts & params to let people add whatever...
