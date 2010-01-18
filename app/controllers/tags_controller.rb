@@ -33,6 +33,8 @@ class TagsController < ApplicationController
     elsif !params[:user].blank?
       # Specifically customized for the secret_username using gml_uniquekey_hash trailing 5 digits! breakable coupling!
       @search_context = {:key => :user, :value => params[:user], :conditions => ["gml_uniquekey_hash LIKE ?",'%'+params[:user].gsub('anon-','')] }
+    elsif !params[:location].blank?
+      @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?", "%#{params[:location]}%"] }      
     elsif !params[:user_id].blank?
       @user = User.find(params[:user_id])    
       @search_context = {:key => :user, :value => @user.login, :conditions => ["user_id = ?",@user.id]}
@@ -43,11 +45,13 @@ class TagsController < ApplicationController
         
     set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
     
+    fresh_when :last_modified => @tags.first.updated_at.utc, :etag => @tags.first
+    # expires_in 5.minutes, :public => true unless logged_in? # Rack::Cache
     respond_to do |wants|
       wants.html { render 'index' }      
       wants.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
       wants.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
-      # wants.rss  { render :rss => @tags.to_rss }
+      wants.rss  { render :rss => @tags }
       #TODO: .js => Embeddable widget
     end
   end
@@ -69,9 +73,9 @@ class TagsController < ApplicationController
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
       @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
-    
-    
-    # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
+        
+    fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag
+    # expires_in 5.minutes, :public => true unless logged_in? # Rack::Cache
     respond_to do |wants|
       wants.html  { render }
       wants.gml   { render :xml => @tag.gml(:iphone_rotate => params[:iphone_rotate]) }      
@@ -96,19 +100,6 @@ class TagsController < ApplicationController
     @tag = Tag.random
     redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
     show
-  end
-  
-  # lookup by basic model fields. Nothing fancy.
-  # implementing just for location (by URL) for webmarker for now. need lat/long & keyword
-  # location is the only field we want right now -- so far just using in webmarker
-  def search
-    raise "must specify a location (?location=)" if params[:location].blank?  #only thing we do 4 now
-    # { :location => params[:location] }.each do |key,value|
-    
-    @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?",'%'+params[:location]+'%'] }
-    # @tags = Tag.paginate(:page=>@page, :per_page=>@per_page, :conditions => ["location LIKE ?",params[:location]]) #TODO eagerloads
-    # render 'index'
-    return index
   end
   
   

@@ -13,6 +13,10 @@ RAILS_GEM_VERSION = '2.3.2' unless defined? RAILS_GEM_VERSION
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
+# Requires that must be outside initializer, since they are used during the initializer
+# gem 'rack-cache'
+# require 'rack/cache'
+
 Rails::Initializer.run do |config|
 
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
@@ -28,7 +32,7 @@ Rails::Initializer.run do |config|
   config.gem "i76-has_slug", :lib => 'has_slug', :source => 'http://gems.github.com'
   config.gem "configatron", :version => ">= 2.2.2"
   config.gem "mislav-will_paginate", :lib => "will_paginate", :version => "~>2.3.6"
-  config.gem "htmlentities"
+  config.gem "htmlentities"    
   # config.gem 'giraffesoft-is_taggable', :lib => 'is_taggable', :source => 'http://gems.github.com'
 
   # Testing
@@ -61,6 +65,14 @@ Rails::Initializer.run do |config|
   # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
+  
+  
+  # Use Rack::Cache middleware
+  # config.middleware.use Rack::Cache,
+  #   :verbose => true,
+  #   :metastore   => 'memcached://localhost:11211/blackbook-rack-cache-meta',
+  #   :entitystore => 'memcached://localhost:11211/blackbook-rack-cache-body'
+    
   
 end
 
