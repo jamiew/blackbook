@@ -45,7 +45,8 @@ class TagsController < ApplicationController
         
     set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
     
-    fresh_when :last_modified => @tags.first.updated_at.utc, :etag => @tags.first
+    fresh_when :last_modified => @tags.first.updated_at.utc unless @tags.blank?
+    #, :etag => @tags.first 
     # expires_in 5.minutes, :public => true unless logged_in? # Rack::Cache
     respond_to do |wants|
       wants.html { render 'index' }      
