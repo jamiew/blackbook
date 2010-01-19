@@ -8,7 +8,7 @@ class CommentsController < ApplicationController
     # @commentable gets found in setup below
     raise "No commentable object means no comments" if @commentable.nil?
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    @comments = @commentable.comments.sorted.paginate(:page => @page, :per_page => @per_page, :include => [:user])
+    @comments = @commentable.comments.sorted.paginate(:page => @page, :per_page => @per_page, :include => [:user, :commentable])
   end
   
   def show
@@ -65,7 +65,7 @@ protected
     if params[:tag_id]
       @commentable = Tag.find(params[:tag_id])
     elsif params[:user_id]
-      @commentable = User.find_by_login(params[:user_id]) #FIXME: override user find...
+      @commentable = User.find(params[:user_id])
     end
   end
   
