@@ -5,7 +5,7 @@ describe GMLObject do
   end
 
   it "should create a new instance given valid attributes" do
-    lambda { Factory.create('GMLObject') }.should_not raise_error
+    lambda { Factory.create(:gml_object) }.should_not raise_error
   end
   
   it "should not create without a Tag"

@@ -13,7 +13,6 @@ describe Admin::BaseController do
   end
 
   it "should redirect to login for no user or non-admin user" do
-    STDERR.puts "Trying to get :index w/ allegedly no user... current_user=#{current_user.inspect}"
     get :index
     response.should redirect_to(login_path)
 

@@ -46,7 +46,7 @@ Factory.define :tempt_api_tag, :parent => :tag do |t|
 end
 
 # Datastore... todo will make binary/gzipped as needed, or just store as JSON
-Factory.define :gmlobject do |t|
+Factory.define :gml_object, :class => GMLObject do |t|
   t.tag_id 1
   t.data "<gml><header><client><name>rspec</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></gml>"
 end
