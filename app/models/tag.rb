@@ -170,7 +170,7 @@ class Tag < ActiveRecord::Base
   # Reimplementing rails to_json because we can't do :methods => {:gml_hash=>:gml}, 
   #  and end up with an attribute called 'gml_hash' which doesn't work
   def to_json(options = {})
-    logger.info "Tag.to_json(#{options.inspect})"
+    # logger.info "Tag.to_json(#{options.inspect})"
     hash = Serializer.new(self, options).serializable_record
     hash[:gml] = gml_hash
     
