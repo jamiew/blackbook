@@ -12,7 +12,7 @@ describe PasswordResetController do
       Mailer.stub!(:password_reset_instructions).and_return(nil)
       post :create, :email => 'michael@pixels-and-bits.com'
       @user.perishable_token.should_not eql('')
-      response.should redirect_to(root_url)
+      response.should redirect_to(user_path(@user))
     end
 
     it "should re-render the new template on invalid email" do

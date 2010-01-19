@@ -34,7 +34,8 @@ describe UsersController do
       resp = post :create, :user => { :login => 'bob', :email => 'bob@example.com',
         :password => 'bobs_pass', :password_confirmation => 'bobs_pass' }
       STDERR.puts "RESP is #{resp.inspect}"
-      response.should redirect_to(user_path(User.find('bob'))) #TODO: requires has_slug...?
+      found_user = User.find_by_login('bob')
+      response.should redirect_to(user_path(found_user)) #TODO: requires has_slug...?
     end
   end
 
