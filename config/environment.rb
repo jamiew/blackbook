@@ -30,8 +30,8 @@ Rails::Initializer.run do |config|
   config.gem 'thoughtbot-paperclip', :lib => 'paperclip', :source => 'http://gems.github.com'
   config.gem 'unicode' # needed for i76-has_slug
   config.gem "i76-has_slug", :lib => 'has_slug', :source => 'http://gems.github.com'
-  config.gem "configatron", :version => ">= 2.2.2"
-  config.gem "mislav-will_paginate", :lib => "will_paginate", :version => "~>2.3.6"
+  config.gem "configatron", :version => "2.2.2"
+  config.gem "will_paginate", :version => "2.3.12"
   config.gem "htmlentities"    
   # config.gem 'giraffesoft-is_taggable', :lib => 'is_taggable', :source => 'http://gems.github.com'
 
