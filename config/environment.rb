@@ -13,43 +13,34 @@ RAILS_GEM_VERSION = '2.3.2' unless defined? RAILS_GEM_VERSION
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
+# Requires that must be outside initializer, since they are used during the initializer
+# gem 'rack-cache'
+# require 'rack/cache'
+
 Rails::Initializer.run do |config|
-  # Settings in config/environments/* take precedence over those specified here.
-  # Application configuration should go into files in config/initializers
-  # -- all .rb files in that directory are automatically loaded.
 
-  # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
-
-  # Ripped from GemTools -- support libs we want; require them as gem dependencies
-  # config.gem 'capistrano'
-  # config.gem 'capistrano-ext'
 
   # Actually used by the app
   config.gem 'haml'
   config.gem 'config_reader', :version => '0.0.6'
   config.gem 'RedCloth'
-  config.gem 'expose_model'
   config.gem 'authlogic', :version => '2.0.9'
   config.gem 'nokogiri'
-  config.gem 'jackdempsey-acts_as_commentable', :lib => 'acts_as_commentable', :source => "http://gems.github.com"
   config.gem 'thoughtbot-paperclip', :lib => 'paperclip', :source => 'http://gems.github.com'
+  config.gem 'unicode' # needed for i76-has_slug
   config.gem "i76-has_slug", :lib => 'has_slug', :source => 'http://gems.github.com'
   config.gem "configatron", :version => ">= 2.2.2"
   config.gem "mislav-will_paginate", :lib => "will_paginate", :version => "~>2.3.6"
+  config.gem "htmlentities"    
   # config.gem 'giraffesoft-is_taggable', :lib => 'is_taggable', :source => 'http://gems.github.com'
-  config.gem "htmlentities"
-  # Spawn installed as a plugin -- not available as a gem
-
-  # Plugins I still need to get used to
-  # config.gem 'justinfrench-formtastic', :lib => 'formtastic', :source => 'http://gems.github.com'
-  # config.gem 'rubymood-jintastic', :lib => 'jintastic', :source => 'http://gems.github.com'
 
   # Testing
   config.gem "rspec", :lib => false, :version => ">= 1.2.0" 
   config.gem "rspec-rails", :lib => false, :version => ">= 1.2.0"   
   config.gem "thoughtbot-factory_girl", :lib => false, :source => "http://gems.github.com"
-  config.gem 'spicycode-rcov', :lib => false, :source => 'http://gems.github.com'
+  # Other testing libs we use, but which aren't necesssarily "required"
+  # config.gem 'spicycode-rcov', :lib => false, :source => 'http://gems.github.com'
   # config.gem "aslakhellesoy-cucumber", :lib => false, :source => 'http://gems.github.com'
   # config.gem "jscruggs-metric_fu", :lib => false, :source => 'http://gems.github.com'
   # config.gem 'timcharper-spork', :lib => false, :source => 'http://gems.github.com'
@@ -74,6 +65,14 @@ Rails::Initializer.run do |config|
   # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
+  
+  
+  # Use Rack::Cache middleware
+  # config.middleware.use Rack::Cache,
+  #   :verbose => true,
+  #   :metastore   => 'memcached://localhost:11211/blackbook-rack-cache-meta',
+  #   :entitystore => 'memcached://localhost:11211/blackbook-rack-cache-body'
+    
   
 end
 

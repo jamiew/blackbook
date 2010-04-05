@@ -2,7 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe "/home/index.html.haml" do
   include HomeHelper
-  fixtures :users
   setup :activate_authlogic
 
   # it "should render the blackbird files when overridden" do

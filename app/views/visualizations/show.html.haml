@@ -2,7 +2,7 @@
 %p.back= link_to '&larr; back to applications', visualizations_path
 
 .left{:style => 'margin-top: 40px;'}
-  = image_tag("/images/defaults/app_large.jpg", :width => 300)  
+  = image_tag(current_object.image(:medium))
   =# image_tag(current_object.image(:large), :width => 300)  
   
 .centered{:style => 'width: 400px; margin: 20px 0 0 330px;'}
@@ -18,11 +18,10 @@
       = link_to current_object.website, "http://#{current_object.website.gsub("http://",'')}"
   
     %hr
-
     - unless current_object.kind.blank?
       %p
         %strong Language:
-        =h current_object.kind
+        =h Visualization::KINDS.select { |k,v| v == current_object.kind }[0][0] rescue current_object.kind
     - unless current_object.download.blank?
       %p
         %strong Download:

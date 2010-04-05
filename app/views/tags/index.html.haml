@@ -1,14 +1,26 @@
 
-- if @search_context
+= auto_discovery_link_tag(:rss, params.merge({:format => :rss}), :title => page_title)
+
+-# Some ghetto custom mastheads
+- if @user
+  .left
+    = link_to "&larr; Back to user profile", user_path(@user)
+    %h3
+      .left{:style => 'margin-right: 8px; margin-top: 2px;'}= link_to image_tag(@user.photo(:tiny)), user_path(@user)
+      == #{@user.login}'s #{@favorites ? 'favorites' : 'tags'} (#{@tags.total_entries})
+    %br
+- elsif @search_context
   .left
     = link_to '&larr; Back to all data', tags_path        
     %h3
       Search:
       %span{:style => 'font-weight: normal;'}== #{@search_context[:key]} = #{@search_context[:value]}
 
+-# 'create' button! Might want to make this pop more
 %p.create_new
   = link_to '+ Upload GML', new_tag_path, :class => 'button facebox add'
 
+-# Business
 %br.clear
 = pagination
 
@@ -30,17 +42,20 @@
     -# url = user.nil? ? tag_path(tag) : user_tag_path(user,tag)
     - url = tag_path(tag)
     %tr
-      %td.thumbnail= link_to(image_tag(tag.thumbnail_image(:small)), url)
-      %td.name= link_to(tag_title(tag), url)
+      %td.thumbnail= link_to(image_tag(tag.thumbnail_image(:medium), :width => 220), url)
+      %td.name{:style => 'padding-left: 10px;'}
+        %strong= link_to(tag_title(tag), url)
       %td.application
         = application_link(tag.sexy_app_name)
       %td.who
         - if !user.nil?
-          = link_to(user.login, user_path(user))
-        - elsif tag.author
-          = link_to tag.author
+          %a{:href => user_path(user)}
+            .user_photo.left{:style => 'margin-top: -7px; padding-right: 5px;'}= image_tag(user.photo(:tiny))
+            = user.login
         - elsif tag.secret_username
           = secret_username_link(tag.secret_username)
+        - elsif false && tag.author
+          = link_to tag.author
         - else
           &mdash;
       %td.timeago.uploaded
@@ -49,9 +64,9 @@
       %td.center
         = link_to 'download GML', tag_path(tag, :format => :gml), :class => 'button smallbutton'
         - if is_admin? || is_owner?
-          .controls.right
-            = link_to 'edit', edit_tag_path(tag)          
-            &nbsp;
+          %br
+          %p.controls.right
+            = link_to 'edit', edit_tag_path(tag)
             = link_to 'delete', tag_path(tag), :method => 'delete', :class => 'delete', :confirm => 'Are you sure?'
 
 %p= pagination

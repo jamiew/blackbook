@@ -28,27 +28,30 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users,
         :member => [:change_password],
         # :has_many => [:tags, :comments]
-        :has_many => [:visualizations, :comments, :favorites] do |users| 
+        :has_many => [:tags, :visualizations, :comments, :favorites] do |users| 
     users.resources :tags, :as => 'data'
-    #FIXME remove above visualizations nested association -- not being used
   end
   map.settings '/settings', :controller => 'users', :action => 'edit'
 
-  map.resources :visualizations,
-    :as => 'apps', #TODO FIXME
-    :has_many => [:comments, :favorites],
-    :member => {:approve => :put, :unapprove => :put}
+  # intercept bad js/robot GETS to /data/:id/favorites -- TODO should have a 'are you sure you wanna favorite this?' page for GETs
+  map.backup_tag_favorites_get '/data/:tag_id/favorites', :method => 'get', :controller => 'favorites', :action => 'create'
 
+  # tags => /data
   map.resources :tags,
     :as => 'data',
     :has_many => [:comments, :favorites],
-    :collection => [:latest],
-    :trailing_slash => true
-  map.resources :tags    
-  map.vanderlin_tag '/tags/:id/tag.xml', :controller => 'tags', :action => 'show', :format => 'gml'
+    :member => [:upload_thumbnail, :flipped],
+    :collection => [:latest, :random]
+  map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
+
+  # visualizations => /apps
+  map.resources :visualizations,
+    :as => 'apps',
+    :has_many => [:comments, :favorites],
+    :member => {:approve => :put, :unapprove => :put}
 
   # TODO...
-  map.resources :favorites
+  # map.resources :favorites
   map.resources :comments
 
   map.activity '/activity', :controller => 'home', :action => 'activity'

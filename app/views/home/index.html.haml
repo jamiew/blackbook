@@ -1,36 +1,39 @@
 
+-# RSS
+= auto_discovery_link_tag(:rss, {:format => :rss, :controller => 'tags', :action => 'index'}, :title => '#0000book: Latest Tags')
+
+-# Be a little more specific about what 'today' is.
+- timezone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
+- today = DateTime.now.in_time_zone(timezone).to_date
+
 #home
 
   #intro
     .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 6px; color: #777;'}
-      == #{pluralize Tag.count(:conditions => ["created_at >= ?",Date.today]), 'tag'} uploaded 
-      == by #{pluralize Tag.count(:conditions => ["created_at >= ?",Date.today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
+      == #{pluralize Tag.count(:conditions => ["created_at >= ?", today]), 'tag'} uploaded 
+      == by #{pluralize Tag.count(:conditions => ["created_at >= ?", today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
       == &ndash; #{link_to 'view activity', activity_path, :style => 'text-decoration: underline;'}
 
-    / == Last #{pluralize @tags.length, 'tag'},
     .welcome{:style => 'width: 600px;'}
       %strong Welcome to #000000book
       == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
       == &ndash; uploading tags? #{link_to 'register an account', signup_path} 
-      == <br/> Don't forget to add your iPhone UUID in your #{link_to 'settings', settings_path} (full support coming soon)
+      == <br/> Don't forget to add your iPhone UUID in your #{link_to 'settings', settings_path} to link your uploads (<span style="color:red">*</span>now supported!)
 
-  %br.clear
-  / .right_column{:style => 'width: 280px; text-align: left; margin-top: 40px;'}
-  -# TODO: convert this to a table
   .right_column{:style => "margin-top: 40px; overflow: visible;"}
     %ul#frontpage_tags
       - @tags.each do |tag|
         %li
-          %a{:href => tag_path(tag)}= tag_title(tag)
+          %span
+            %a{:href => tag_path(tag)}= tag_title(tag)
           %small
             -# unless tag.application.blank? && tag.gml_application.blank?
             - if true
               %span.application== <em>|</em> #{application_link(tag.sexy_app_name, :short => true)}
-            - unless tag.user.nil?
+            - if !tag.user.nil?
               %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
-            - unless tag.secret_username.blank?
+            - elsif !tag.secret_username.blank?
               %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}              
-            %span.created_at.timeago== <em>|</em> #{tag.created_at.strftime('%D')}
     %p.right
       %strong= link_to '<span>View all data &raquo;</span>', tags_path, :class => 'button ghost small'
 
@@ -38,13 +41,14 @@
     %h2
       %a{:href => tag_path(@tag)}= tag_title(@tag)
       %small
-        - unless @tag.application.blank?
-          %span.application== &ndash; #{@tag.application}          
+        - if true
+          %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
         - unless @tag.location.blank?
           %span.location== &ndash; #{@tag.location}
-        - unless @tag.user.nil?
-          %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}            
-        %span.created_at.timeago== &ndash; #{@tag.created_at.strftime('%D')}
+        - if !@tag.user.nil?
+          %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
+        - elsif @tag.secret_username.blank?
+          %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}                  
       
-    = tag_player(@tag, :width => '580px')
+    = render :partial => 'tags/tag_playback', :object => @tag
     

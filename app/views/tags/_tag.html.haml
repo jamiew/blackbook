@@ -3,22 +3,30 @@
 -# link = @user ? user_tag_path(@user, tag) : tag_path(tag)
 - link = tag_path(tag)
 
-.meta.right{:style => 'position: absolute; width: 200px; margin: 10px 0 0 320px;'}
+-# TODO FIXME lots of hardcoded styles/widths in here
+.meta.right{:style => 'position: absolute; width: 200px; margin: 10px 0 0 280px;'}
   %br
   %strong.title= link_to tag_title(tag), link
   .posted_at
     == #{time_ago_in_words(tag.created_at)} ago
     %br= tag.created_at.strftime('%D %T')
-  - unless tag.application.blank?
+  - unless tag.sexy_app_name.blank?
     %p.application 
       %strong Application: <br />
-      = tag.application || '(null)'
+      = application_link(tag.sexy_app_name) || 'NULL'
 
+  - if is_owner?(tag) && is_admin?
+    .controls.left
+      %small
+        = link_to 'edit', edit_tag_path(tag)          
+        &nbsp;
+        = link_to 'delete', tag_path(tag), :method => 'delete', :class => 'delete', :confirm => 'Are you sure?'
+    
 %p
   =# link_to image_tag(tag.image.url(:medium)), link
   -# if tag.image.exists?    
   - if tag.remote_image
     .image= link_to(image_tag(tag.thumbnail_image), link)
   - else
-    .image= link_to(image_tag(tag.image(:medium)), link)
+    .image= link_to(image_tag(tag.image(:medium), :width => 260), link)
 
