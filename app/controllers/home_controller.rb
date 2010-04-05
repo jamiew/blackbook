@@ -11,6 +11,7 @@ class HomeController < ApplicationController
   def activity
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
     @notifications = Notification.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:subject])
+    set_page_title "Activity"
   end
   
   # Show a single static file
@@ -27,6 +28,6 @@ class HomeController < ApplicationController
   # Ghetto handling for "bad" URLs -- I'm mapping them here as a blackhole
   def discard
     logger.warn "Discarding request..."
-    render :nothing => true, :status => 200 #OK
+    render :nothing => true, :status => 420 #LOL
   end
 end

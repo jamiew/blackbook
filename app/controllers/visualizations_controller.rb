@@ -16,7 +16,7 @@ class VisualizationsController < ApplicationController
     end
     
     before :index do
-      set_page_title "Applications"+(@page > 1 ? " (page #{@page})" : '')
+      set_page_title "Applications"
     end
     
     before :show do
@@ -35,8 +35,13 @@ class VisualizationsController < ApplicationController
   end  
 
   def current_objects
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 20
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 20    
     which = is_admin? ? current_model : current_model.approved
+    if params[:user_id]
+      @user = User.find(params[:user_id]) rescue nil
+      which = which.by_user(@user.id)
+      #TODO: set page_title etc. Also handle all this logic less if/elsify
+    end
     @visualizations ||= which.paginate(:page => @page, :per_page => @per_page, :include => [:user], :order => 'approved_at DESC, name ASC')
   end
   

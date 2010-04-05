@@ -1,13 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Admin::BaseController do
-  fixtures :users
-  before do
+
+  before(:each) do
     activate_authlogic
   end
 
   it "should require an admin user" do
-    UserSession.create(users(:admin))
+    UserSession.create(Factory.create(:admin))
     get :index
     response.should be_success
   end
@@ -16,7 +16,7 @@ describe Admin::BaseController do
     get :index
     response.should redirect_to(login_path)
 
-    UserSession.create(users(:mmoen))
+    UserSession.create(Factory.create(:user))
     get :index
     response.should redirect_to(login_path)
   end

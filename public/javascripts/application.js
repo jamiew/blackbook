@@ -1,6 +1,8 @@
-//
-// Blackbook javascript
-// 
+/*
+* #000000book javascript
+* Jamie Wilkinson <http://jamiedubs.com>
+* (cc) Free Art & Technology Lab 
+*/ 
 
 $(document).ready(function(){
 
@@ -16,8 +18,7 @@ $(document).ready(function(){
   
   // Ghetto tabs
 	var tabContainers = $('div.tabs > div');
-	tabContainers.hide().filter(':first').show();
-	
+	tabContainers.hide().filter(':first').show();	
 	$('div.tabs ul.tab_navigation a').click(function (){
 		tabContainers.hide();
 		tabContainers.filter(this.hash).show();

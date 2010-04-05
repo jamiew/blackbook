@@ -32,14 +32,29 @@ class TagsController < ApplicationController
       @search_context = {:key => :application, :value => params[:app], :conditions => ["application = ? OR gml_application = ?",params[:app],params[:app]] }
     elsif !params[:user].blank?
       # Specifically customized for the secret_username using gml_uniquekey_hash trailing 5 digits! breakable coupling!
-      @search_context = {:key => :user, :value => params[:user], :conditions => ["gml_uniquekey_hash LIKE ?",'%'+params[:user].gsub('anon-','')] }
+      @search_context = {:key => :user, :value => params[:user], :conditions => ["SUBSTRING(gml_uniquekey_hash, -5, 5) = ?", params[:user].gsub('anon-','')] }
+    elsif !params[:location].blank?
+      @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?", params[:location]] }
+    elsif !params[:user_id].blank?
+      @user = User.find(params[:user_id])    
+      @search_context = {:key => :user, :value => @user.login, :conditions => ["user_id = ?",@user.id]}
     end
     
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 10
+    @page, @per_page = params[:page] && params[:page].to_i || 1, 15
     @tags ||= Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user], :conditions => (@search_context && @search_context[:conditions]))
+        
+    set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
     
-    
-    set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')+(@page > 1 ? " (page #{@page})" : '')
+    # fresh_when :last_modified => @tags.first.updated_at.utc unless @tags.blank?
+    #, :etag => @tags.first 
+    # expires_in 5.minutes, :public => true unless logged_in? # Rack::Cache
+    respond_to do |wants|
+      wants.html { render 'index' }      
+      wants.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
+      wants.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
+      wants.rss  { render :rss => @tags }
+      #TODO: .js => Embeddable widget
+    end
   end
   
   def show    
@@ -53,18 +68,22 @@ class TagsController < ApplicationController
       @user = User.find(params[:user_id]) if params[:user_id]
       @user ||= @tag.user # ...
 
+      @comments = @tag.comments.visible.paginate(:page => 1, :per_page => 10) # No pagination yet
+      # favorites...?
+
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
       @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
-    
-    
-    # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag    
+        
+    # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag
+    # expires_in 5.minutes, :public => true unless logged_in? # Rack::Cache
     respond_to do |wants|
       wants.html  { render }
+      wants.gml   { render :xml => @tag.gml(:iphone_rotate => params[:iphone_rotate]) }      
       wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }      
-      wants.gml   { render :xml => @tag.gml }
       wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
-      wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
+      # wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
+      #TODO: .js => Embeddable widget
     end
   end
   
@@ -72,6 +91,14 @@ class TagsController < ApplicationController
   # Hand off to :show except for HTML, which should redirect -- keep permalinks happy
   def latest
     @tag = Tag.find(:first, :order => 'created_at DESC')
+    redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
+    show
+  end
+  
+  # Just a random tag -- redirect to canonical for HTML, but otherwise don't bother (API)
+  # TODO DRY with .latest above! generic 'solo' method? wrap into show? hmm
+  def random
+    @tag = Tag.random
     redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
     show
   end
@@ -121,8 +148,15 @@ class TagsController < ApplicationController
     else
       flash[:error] = "Could not destroy tag: #{$!}"
     end
-    redirect_to(tags_path)
+    # redirect_to(tags_path)
+    redirect_to :back
   end
+  
+  # intended for canvasplayer dataURI callback
+  def upload_thumbnail
+    render :text => "YEAH BOY", :layout => false
+  end
+  
   
 protected
   
@@ -142,13 +176,17 @@ protected
   def create_from_api
 
     # TODO: add app uuid? or Hash app uuid?
-    opts = { :gml => params[:gml], :ip => request.remote_ip, :application => params[:application], :remote_secret => params[:secret], :image => params[:image] }
+    opts = { :gml => params[:gml], :ip => request.remote_ip, :location => params[:location], :application => params[:application], :remote_secret => params[:secret], :gml_uniquekey => params[:uniquekey], :image => params[:image] }
     puts "TagsController.create_from_api, opts=#{opts.inspect}"
     
     # Merge opts & params to let people add whatever...
     @tag = Tag.new(opts)
     if @tag.save
-      render :text => @tag.id, :status => 200 #OK
+      if params[:redirect] && ['true','1'].include?(params[:redirect].to_s) 
+        redirect_to(@tag, :status => 302) #Temporary Redirect
+      else
+        render :text => @tag.id, :status => 200 #OK
+      end
     else
       logger.error "Could not create tag from API: #{@tag.errors.inspect}"
       render :text => "ERROR: #{@tag.errors.inspect}", :status => 422 #Unprocessable Entity

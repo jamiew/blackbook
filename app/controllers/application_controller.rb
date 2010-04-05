@@ -30,11 +30,13 @@ class ApplicationController < ActionController::Base
       if logger && logger.info?
         logger.info("  HTTP Referer: #{request.referer}") if !request.referer.blank?
         # logger.info("  clean_params: #{clean_params.inspect}") unless clean_params.blank?
+        logger.info("  User Agent: #{request.env["HTTP_USER_AGENT"]}")
       end
-    end
+    end    
    
     # Modify the global page title -- could also use @page_title
     def set_page_title(title) #TODO change to page_title= (or just use @page_title/@title directly)
+      title += " (page #{@page})" if @page.to_i > 1
       @page_title = title
     end
 
@@ -67,8 +69,7 @@ class ApplicationController < ActionController::Base
       render_to_string :partial => file, :locals => opts
     end
     helper_method :fetch_partial
-    
-
+      
   private
   
     # User shortcuts
@@ -104,8 +105,9 @@ class ApplicationController < ActionController::Base
     # Permission requirements
     def require_user
       unless current_user
+        logger.info "require_user failed"
         store_location
-        flash[:error] = "You must be logged in to access that page"
+        flash[:notice] = "You must be logged in to access that page"
         redirect_to(login_path)
         return false
       end
@@ -113,8 +115,9 @@ class ApplicationController < ActionController::Base
 
     def require_no_user
       if current_user
+        logger.info "require_no_user failed"      
         store_location
-        flash[:error] = "You must be logged out to access that page"
+        flash[:error] = "You must not be logged-in in order to to access that page"
         # Can cause infinite redirects if on /login => /login ... FIXME
         # redirect_back_or_default(user_path(current_user))
         redirect_to(user_path(current_user))
@@ -124,8 +127,9 @@ class ApplicationController < ActionController::Base
     
     def require_admin
       unless current_user && is_admin?
+        logger.warn "require_admin failed (!!)"        
         store_location
-        flash[:error] = "You must be an admin to access that page"
+        flash[:error] = "You must be an admin to access this (Event logged)"
         # redirect_to login_url
         # raise NoPermissionError
         redirect_back_or_default(logged_in? ? root_path : login_path)
