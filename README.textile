@@ -1,37 +1,26 @@
-h1. #000000book (Blackbook)
+!http://fffff.at/fuckflickr/data/000000book/web/000000book-handshake.jpg!
 
-!http://fffff.at/fuckflickr/data/000000book/web/000000book-handshake-invert.jpg!
+h1. About
 
-bq. *#000000*, _adjective_ -- the hexadecimal representation of the color black
+#000000book ("blackbook") is an open repository for sharing and archiving motion captured graffiti tags. Tags are saved as digital text files known as GML (Graffiti Markup Language), which can be captured through freely available software such as "Graffiti Analysis":http://graffitianalysis.com (marker), "DustTag":http://graffitianalysis.com/iphone (iPhone), "EyeWriter":http://eyewriter.org (eye capture), "Laser Tag":http://graffitiresearchlab.com/?page_id=76 (laser).
 
-bq. *black book*, _noun_ -- "a graffiti artist's sketchbook. Often used to sketch out and plan potential graffiti, and to collect tags from other writers."<br> 
-  &mdash; "Wikipedia":http://en.wikipedia.org/wiki/Graffiti_terminology
-
-!http://fffff.at/fuckflickr/data/000000book/thumb/gml-file.png!
+Graffiti writers are invited to capture and share their own tags, and computer programmers are invited to create new applications and visualizations of the resulting data. The project aims to bring together two seemingly disparate communities that   share an interest hacking systems, whether found in code or in the city.
 
 &rarr; Watch: "#000000book Intro Video":http://vimeo.com/8072358
 
-#000000book is an open repository for sharing and archiving motion
-captured graffiti tags. Tags are saved as digital text files known
-as GML (Graffiti Markup Language), which can be captured through
-freely available software such as "Graffiti Analysis":http://graffitianalysis.com
-(marker), "DustTag":http://graffitianalysis.com/iphone (iPhone),
-"EyeWriter":http://eyewriter.org (eye capture), 
-"Laser Tag":http://graffitiresearchlab.com/?page_id=76 (laser).
-Graffiti writers are invited to capture and share their
-own tags, and computer programmers are invited to create new
-applications and visualizations of the resulting data. The project
-aims to bring together two seemingly disparate communities that
-share an interest hacking systems, whether found in code or in the
-city.
+h2. API
+
+Please visit the "API documentation":http://jamiedubs.com/wikis/blackbook/.
+
+h2. Team
 
 The GML and #000000book development team consists of "Jamie Wilkinson":http://jamiedubs.com, "Evan Roth":http://evan-roth.com, "Theodore Watson":http://www.theowatson.com, "Chris Sugrue":http://csugrue.com/ and "Todd Vanderlin":http://toddvanderlin.com/, all members of the copyleft "F.A.T. Lab":http://fffff.at. Additional Flash development assistance from "Manolis Perrakis":http://art.manorius.com/ 
 
 Contact us: *info[at]000000book.com*
 
-h2. API
-
-For more technical information on 000000book please visit the <a href="http://jamiedubs.com/wikis/blackbook/">API/docs page</a>.
+Code available under an MIT License
+Copyfree 2009-2010 F.A.T.
+"Release early, often & w/ rap music"
  
-!http://fffff.at/fuckflickr/data/000000book/grl-2-browser-diagram.png!
+!http://fffff.at/fuckflickr/data/000000book/thumb/gml-file.png!
 
