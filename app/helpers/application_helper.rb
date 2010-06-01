@@ -18,8 +18,8 @@ module ApplicationHelper
     end
     return messages
   end
-  
-  
+
+
   # Javascript includes, used across multiple layouts
   # 'Remote' files are only remote in prod, since we might be offline in dev
   def remote_javascript_includes
@@ -44,18 +44,18 @@ module ApplicationHelper
       'application'
     )
   end
-  
+
   # Pagination helper; collection optional as will_paginate will guess based on controller name
   def pagination(collection = nil)
     collection.nil? ? will_paginate : will_paginate(collection)
   end
-  
+
   # Time wrappers; TODO add jquery.timeago and stop using time_ago_in_words...
   def timeago(timestamp)
     time_ago_in_words(timestamp)
   end
-  
-  
+
+
 
   # Enabled and disabled modes for blackbird javascript console()
   def blackbird_tags
@@ -111,13 +111,13 @@ module ApplicationHelper
       })
     EOC
   end
-  
-  
+
+
   # Some common elements
   def redstar
     '<span style="color: #f55">*</span>'
   end
 
-  
-  
+
+
 end

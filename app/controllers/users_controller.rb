@@ -7,27 +7,27 @@ class UsersController < ApplicationController
   def index
     @page, @per_page = params[:page] && params[:page].to_i || 1, 28
     @users = User.paginate(:page => @page, :per_page => @per_page)
-    set_page_title "Users"    
+    set_page_title "Users"
     # default_respond_to(@users, :layout => true, :exclude => [:email,:password,:crypted_password,:persistence_token])
   end
-  
+
   # Show one user
   def show
     @user = User.find(params[:id])
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10
-    
+
     @tags = @user.tags.paginate(:page => @page, :per_page => @per_page, :include => [:user])
     @wall_posts = @user.wall_posts.paginate(:page => 1, :per_page => 10, :order => 'created_at DESC', :include => [:user])
     @notifications = @user.notifications.paginate(:page => 1, :per_page => 15, :order => 'created_at DESC', :include => [:subject, :user])
 
-    set_page_title @user.name || @user.login    
+    set_page_title @user.name || @user.login
   end
 
   # Setup a new user
   def new
     @user = User.new
   end
-  
+
   def create
     params[:user][:password_confirmation] = params[:user][:password] if params[:user]
     @user = User.new(params[:user])
@@ -41,14 +41,14 @@ class UsersController < ApplicationController
 
   # Change information about ourselves
   def edit
-    set_page_title "Your Settings"    
+    set_page_title "Your Settings"
   end
 
   def change_password
-    #TODO? ack    
+    #TODO? ack
   end
 
-  def update    
+  def update
     @user.attributes = params[:user]
 
     if @user.update_attributes(params[:user])
@@ -59,12 +59,12 @@ class UsersController < ApplicationController
       render :action => :edit
     end
   end
-  
-  
+
+
 protected
-  
+
   def set_user_from_current_user
     @user = @current_user  # makes our views "cleaner" and more consistent
-  end  
-  
+  end
+
 end
