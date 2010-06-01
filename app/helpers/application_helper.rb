@@ -55,24 +55,7 @@ module ApplicationHelper
     time_ago_in_words(timestamp)
   end
 
-
-
-  # Enabled and disabled modes for blackbird javascript console()
-  def blackbird_tags
-    if SiteConfig.blackbird || true == session[:blackbird]
-      '<script type="text/javascript" charset="utf-8" src="/blackbird/blackbird.js"></script>
-<link href="/blackbird/blackbird.css" media="screen" rel="stylesheet" type="text/css" />'
-    else
-      no_blackbird
-    end rescue no_blackbird
-  end
-
-  def no_blackbird
-    '<script type="text/javascript" charset="utf-8">var log = {toggle: function() {}, move: function() {}, resize: function() {}, clear: function() {}, debug: function() {}, info: function() {}, warn: function() {}, error: function() {}, profile: function() {} };</script>'
-  end
-
-
-  # ...
+  # DOCME
   def delete_img(obj, path)
     link_to_remote(image_tag('delete.png',
         :title => "Delete this #{obj.class}",
@@ -85,7 +68,7 @@ module ApplicationHelper
     ) unless obj.id.blank?
   end
 
-  # ...
+  # DOCME
   def edit_img(obj, path)
     link_to(image_tag('pencil.png',
         :title => "Edit this #{obj.class}",

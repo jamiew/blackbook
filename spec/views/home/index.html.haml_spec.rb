@@ -4,12 +4,6 @@ describe "/home/index.html.haml" do
   include HomeHelper
   setup :activate_authlogic
 
-  # it "should render the blackbird files when overridden" do
-  #   UserSession.create(users(:mmoen))
-  #   session[:blackbird] = true
-  #   render "/home/index.html.haml", :layout => 'application'
-  # end
-
   # it "should NOT use the google apis for production" do
   #   # yes I know that setting this here throws a warning, but it needs to be
   #   # run in a production context, open to suggestions
