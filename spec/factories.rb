@@ -19,7 +19,7 @@ Factory.define :admin, :parent => :user do |t|
   t.login 'adminner'
   t.name 'Admin Yep'
   t.admin true
-end  
+end
 
 # - UserSession?
 # - PasswordReset?
@@ -56,7 +56,7 @@ Factory.define :visualization do |t|
   t.name "Jdubs testtag"
   t.website "http://jamiedubs.com/yep"
   t.kind 'javascript'
-  #...  
+  #...
 end
 
 Factory.define :favorite do |t|

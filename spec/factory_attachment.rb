@@ -9,7 +9,7 @@ Factory.class_eval do
                     else
                       ActionController::TestUploadedFile.new(path_with_rails_root)
                     end
- 
+
     add_attribute name, uploaded_file
   end
 end

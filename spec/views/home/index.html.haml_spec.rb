@@ -20,7 +20,7 @@ describe "/home/index.html.haml" do
   #   response.should_not have_tag("script[src=?]",
   #     'http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/jquery-ui.min.js')
   # end
-  
+
   # it "should use the google apis for production" do
   #   # yes I know that setting this here throws a warning, but it needs to be
   #   # run in a production context, open to suggestions

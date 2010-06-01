@@ -5,14 +5,14 @@ ActionController::Routing::Routes.draw do |map|
   map.discard_temp_png '/temp.png', :controller => 'home', :action => 'discard'
   map.discard_data_temp_png '/data/temp.png', :controller => 'home', :action => 'discard'
   map.discard_tags_temp_png '/tags/temp.png', :controller => 'home', :action => 'discard'
-  
+
   # Forum (TODO)
   # map.resources :forums do |forum|
   #   forum.resources :forum_threads do |threads|
   #     threads.resources :forum_posts
   #   end
   # end
-  
+
   map.admin '/admin', :controller => 'admin/base'
 
   map.signup '/signup', :controller => 'users', :action => 'new'
@@ -26,9 +26,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :account, :controller => "users" #FIXME DEPRECATEME
   map.resources :users,
-        :member => [:change_password],
+        :member => [:change_password, :latest],
         # :has_many => [:tags, :comments]
-        :has_many => [:tags, :visualizations, :comments, :favorites] do |users| 
+        :has_many => [:tags, :visualizations, :comments, :favorites] do |users|
     users.resources :tags, :as => 'data'
   end
   map.settings '/settings', :controller => 'users', :action => 'edit'
@@ -55,13 +55,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :comments
 
   map.activity '/activity', :controller => 'home', :action => 'activity'
-  
+
   # # Install the default routes
   # map.connect ':controller/:action/:id'
   # map.connect ':controller/:action/:id.:format'
-  
+
   # Home, & lastly serve up static pages when available
-  map.root :controller => 'home', :action => 'index'  
+  map.root :controller => 'home', :action => 'index'
   map.connect '/:id.:format', :controller => 'home', :action => 'static'
 
 end

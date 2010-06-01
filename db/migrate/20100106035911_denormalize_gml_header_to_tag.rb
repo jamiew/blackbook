@@ -16,7 +16,7 @@ class DenormalizeGmlHeaderToTag < ActiveRecord::Migration
     remove_column :tags, :gml_version, :string
     remove_column :tags, :gml_username, :string
     remove_column :tags, :gml_uniquekey, :string
-    remove_column :tags, :gml_uniquekey_hash, :string    
+    remove_column :tags, :gml_uniquekey_hash, :string
     remove_column :tags, :gml_keywords
   end
 end

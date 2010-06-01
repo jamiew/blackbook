@@ -47,13 +47,13 @@ describe User do
     user = Factory.build(:user)
     user.save!
   end
-  
+
   it "should not create w/o login" do; lambda { Factory.create(:user, :login => '') }.should raise_error; end
   it "should not create w/o email" do; lambda { Factory.create(:user, :email => '') }.should raise_error; end
-  
+
   #TODO: more field validations...
   # test any related hooks
   # user state transitions for shizzle
   # Permissions...
-  
+
 end
