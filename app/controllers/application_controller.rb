@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   # Global filters
-  before_filter :activate_authlogic, :set_format, :blackbird_override
+  before_filter :activate_authlogic, :set_format
 
   # Global exceptions to catch
   rescue_from NoPermissionError, :with => :permission_denied
@@ -59,13 +59,6 @@ class ApplicationController < ActionController::Base
     render_to_string :partial => file, :locals => opts
   end
   helper_method :fetch_partial
-
-  # Enable blackbird if ?force_blackbird=true
-  def blackbird_override
-    if params[:force_blackbird] == 'true'
-      session[:blackbird] = true
-    end
-  end
 
   private
 
