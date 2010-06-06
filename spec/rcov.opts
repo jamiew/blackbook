@@ -1,3 +1,2 @@
---exclude "spec/*,gems/*" 
+--exclude "spec/*,gems/*"
 --rails
---text-summary

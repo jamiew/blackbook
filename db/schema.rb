@@ -11,21 +11,14 @@
 
 ActiveRecord::Schema.define(:version => 20100113002753) do
 
-  create_table "apps", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "comments", :force => true do |t|
-    t.string   "title",             :limit => 50, :default => ""
+    t.string   "title",            :limit => 50, :default => ""
     t.text     "text"
     t.integer  "commentable_id"
     t.string   "commentable_type"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "cached_user_login"
-    t.string   "cached_user_url"
     t.string   "ip_address"
     t.datetime "hidden_at"
   end
@@ -42,23 +35,6 @@ ActiveRecord::Schema.define(:version => 20100113002753) do
     t.datetime "updated_at"
   end
 
-  create_table "forum_posts", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "forum_threads", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "forums", :force => true do |t|
-    t.string   "name"
-    t.string   "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "gml_objects", :force => true do |t|
     t.integer  "tag_id"
     t.text     "data",       :limit => 2147483647
@@ -67,14 +43,6 @@ ActiveRecord::Schema.define(:version => 20100113002753) do
   end
 
   add_index "gml_objects", ["tag_id"], :name => "index_gml_objects_on_tag_id"
-
-  create_table "likes", :force => true do |t|
-    t.integer  "object_id"
-    t.string   "object_type"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "notifications", :force => true do |t|
     t.string   "subject_id"
@@ -160,12 +128,12 @@ ActiveRecord::Schema.define(:version => 20100113002753) do
     t.string   "version"
     t.text     "description"
     t.string   "authors"
-    t.string   "kind",                                     :default => ""
-    t.boolean  "is_embeddable",                            :default => false
+    t.string   "kind",                                   :default => ""
+    t.boolean  "is_embeddable",                          :default => false
     t.string   "embed_url"
     t.string   "embed_callback"
     t.string   "embed_params"
-    t.text     "embed_code",         :limit => 2147483647
+    t.text     "embed_code",         :limit => 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "approved_at"
