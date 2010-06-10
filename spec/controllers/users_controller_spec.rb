@@ -2,9 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe UsersController do
 
-  before(:each) do #:all?
+  before do
     activate_authlogic
-    @user = Factory.create(:user, :login => 'mmoen')
+    @user = Factory(:user)
   end
 
   describe "actions requiring no current user" do
@@ -33,7 +33,6 @@ describe UsersController do
     it "should redirect to account on successful :create" do
       resp = post :create, :user => { :login => 'bob', :email => 'bob@example.com',
         :password => 'bobs_pass', :password_confirmation => 'bobs_pass' }
-      STDERR.puts "RESP is #{resp.inspect}"
       found_user = User.find_by_login('bob')
       response.should redirect_to(user_path(found_user)) #TODO: requires has_slug...?
     end
