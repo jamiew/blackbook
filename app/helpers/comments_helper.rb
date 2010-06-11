@@ -1,5 +1,5 @@
 module CommentsHelper
-  
+
   # make a sexy name for the object we're referencing
   # TODO -- this could be merged with activity-style stuff
   #       we need sexy names for almost everything!

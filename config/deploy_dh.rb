@@ -60,7 +60,7 @@ namespace :deploy do
     run "ln -nfs #{shared_path}/config/settings.yml #{current_path}/config/settings.yml"
 
     run "mkdir -p #{release_path}/public/"
-    run "ln -nfs #{shared_path}/public/system #{current_path}/public/system"    
+    run "ln -nfs #{shared_path}/public/system #{current_path}/public/system"
 
     # metric_fu -- creating dirs just to make sure
     # run "mkdir -p #{shared_path}/metric_fu"
