@@ -104,7 +104,7 @@ class ApplicationController < ActionController::Base
     def require_user
       if current_user.nil?
         store_location
-        logger.info "require_user failed"
+        logger.info "require_user test failed"
         flash[:notice] = "You must be logged in to access that page"
         redirect_to(login_path)
         return false
@@ -114,7 +114,7 @@ class ApplicationController < ActionController::Base
     def require_no_user
       if !current_user.nil?
         store_location
-        logger.info "require_no_user failed -- current_user=#{current_user.login.inspect}"
+        logger.info "require_no_user test failed -- current_user=#{current_user.login.inspect}"
         flash[:error] = "You must not be logged-in in order to to access that page"
         # Can cause infinite redirects if on /login => /login ... FIXME
         # redirect_back_or_default(user_path(current_user))
@@ -125,11 +125,9 @@ class ApplicationController < ActionController::Base
 
     def require_admin
       unless current_user && is_admin?
-        logger.warn "require_admin failed (!!)"
-        store_location
+        logger.warn "require_admin test failed"
+        # store_location
         flash[:error] = "You must be an admin to access this (Event logged)"
-        # redirect_to login_url
-        # raise NoPermissionError
         redirect_back_or_default(logged_in? ? root_path : login_path)
       end
     end
@@ -137,19 +135,21 @@ class ApplicationController < ActionController::Base
     # Stash the current page for use in redirection, e.g. login
     # using :back doesn't work inside a POST (and isn't reliable either way, or testable)
     def store_location
+      logger.info "store_location: return_to = #{request.request_uri}"
       session[:return_to] = request.request_uri
     end
 
     # Allow for using all 3 of: a specific redirect_to, a general :back, OR the specified default
     # Update: skipping out on using :back -- it causes a lot of goofiness. If you want that kind of functionality,
-    #  use :store_location explicitly on the callin page
+    #  use :store_location explicitly on the calling page
     def redirect_back_or_default(default)
       if session[:return_to].blank?
-        # puts "Redirecting to :back ..."
+        # logger.info "Redirecting to :back ..."
+        logger.warn "REDIRECTING TO DEFAULT..."
         # redirect_to(:back)
         redirect_to(default)
       else
-        puts "Redirecting to #{session[:return_to]}"
+        logger.info "Redirecting to #{session[:return_to]}"
         redirect_to(session[:return_to])
         session[:return_to] = nil
       end
