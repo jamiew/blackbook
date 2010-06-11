@@ -24,9 +24,6 @@ Factory.define :tag do |t|
   t.user { |a| a.association(:user) }
   t.application 'TestApp'
   t.author 'JDUBS'
-  t.keywords 'testapp,police,car'
-  #TODO: should read GML header somehow...?
-  #TODO: how to store/cache the GML? HRMZ.
 end
 
 # A tag sent via the API is different than through the site
@@ -39,11 +36,11 @@ end
 # A sample tag from Tempt1's EyeWriter.
 # He can't upgrade, we must maintain backwards-compat
 Factory.define :tempt_api_tag, :parent => :tag do |t|
-  t.remote_secret '123456789' # FIXME use his real key
+  t.remote_secret '123456789' # FIXME use tempt's real key
   t.gml "<gml>yo i am some sample tempt graffiti... TODO could use a fixture to store this</gml>"
 end
 
-# Datastore... todo will make binary/gzipped as needed, or just store as JSON
+# Stores the actual GML
 Factory.define :gml_object, :class => GMLObject do |t|
   t.tag_id 1
   t.data "<gml><header><client><name>rspec</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></gml>"

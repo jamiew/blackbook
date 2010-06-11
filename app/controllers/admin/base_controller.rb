@@ -1,9 +1,6 @@
 class Admin::BaseController < ApplicationController
   layout 'admin'
-  # before_filter :admin_required, :set_title
-  before_filter :require_admin #Applies to all methods
-
-  # ...
+  before_filter :require_admin
 
   private
 

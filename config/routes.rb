@@ -1,18 +1,11 @@
 ActionController::Routing::Routes.draw do |map|
 
-  # Requests I'd like to blackhole -- ideally these wouldn't flood my logs either O_o
-  #FIXME; what's a better way to handle this idom?
+  # Requests to blackhole -- ideally these wouldn't flood my logs either O_o
+  # TODO handle inside nginx instead
   map.discard_temp_png '/temp.png', :controller => 'home', :action => 'discard'
   map.discard_data_temp_png '/data/temp.png', :controller => 'home', :action => 'discard'
   map.discard_tags_temp_png '/tags/temp.png', :controller => 'home', :action => 'discard'
-  
-  # Forum (TODO)
-  # map.resources :forums do |forum|
-  #   forum.resources :forum_threads do |threads|
-  #     threads.resources :forum_posts
-  #   end
-  # end
-  
+
   map.admin '/admin', :controller => 'admin/base'
 
   map.signup '/signup', :controller => 'users', :action => 'new'
@@ -28,12 +21,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users,
         :member => [:change_password],
         # :has_many => [:tags, :comments]
-        :has_many => [:tags, :visualizations, :comments, :favorites] do |users| 
+        :has_many => [:tags, :visualizations, :comments, :favorites] do |users|
     users.resources :tags, :as => 'data'
   end
   map.settings '/settings', :controller => 'users', :action => 'edit'
 
-  # intercept bad js/robot GETS to /data/:id/favorites -- TODO should have a 'are you sure you wanna favorite this?' page for GETs
+  # intercept bad js/robot GETS to /data/:id/favorites
+  # TODO should have a 'are you sure you wanna favorite this?' page for GETs
   map.backup_tag_favorites_get '/data/:tag_id/favorites', :method => 'get', :controller => 'favorites', :action => 'create'
 
   # tags => /data
@@ -55,13 +49,20 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :comments
 
   map.activity '/activity', :controller => 'home', :action => 'activity'
-  
+
+  # TODO forum
+  # map.resources :forums do |forum|
+  #   forum.resources :forum_threads do |threads|
+  #     threads.resources :forum_posts
+  #   end
+  # end
+
   # # Install the default routes
   # map.connect ':controller/:action/:id'
   # map.connect ':controller/:action/:id.:format'
-  
+
   # Home, & lastly serve up static pages when available
-  map.root :controller => 'home', :action => 'index'  
+  map.root :controller => 'home', :action => 'index'
   map.connect '/:id.:format', :controller => 'home', :action => 'static'
 
 end
