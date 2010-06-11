@@ -30,14 +30,8 @@ describe TagsController do
     end
 
     describe "redirection" do
-      it "params[:redirect] = 1 should redirect to the tag page" do
+      it "params[:redirect]=1 should redirect to the tag page" do
         post :create, :gml => @gml, :redirect => 1
-        assigns[:tag].should be_valid
-        response.should redirect_to(tag_path(assigns[:tag]))
-      end
-
-      it "params[:redirect]='true' should redirect to the tag page" do
-        post :create, :gml => @gml, :redirect => 'true'
         assigns[:tag].should be_valid
         response.should redirect_to(tag_path(assigns[:tag]))
       end
@@ -47,6 +41,13 @@ describe TagsController do
         post :create, :gml => @gml, :redirect_to => url
         response.should redirect_to(url)
       end
+
+      it "params[:redirect_back]=1 should redirect to the HTTP_REFERER" do
+        request.env['HTTP_REFERER'] = "http://fffff.at"
+        post :create, :gml => @gml, :redirect_back => 1
+        response.should redirect_to("http://fffff.at")
+      end
+
     end
 
     describe "cache expiry" do
