@@ -201,7 +201,7 @@ class Tag < ActiveRecord::Base
     doc = gml_document
 
     if doc.nil? || (doc/'header').nil?
-      STDERR.puts "NIL OR NO HEADER DOC"
+      # logger.error "NIL OR NO HEADER DOC"
       return {}
     end
 
@@ -282,7 +282,7 @@ protected
     # this could be confusing later -- document well or refactor...
     return if gml_header.blank?
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k) && !v.blank?; [k,v] }.to_hash
-    puts "Tag.save_header: #{attrs.inspect}"
+    # puts "Tag.save_header: #{attrs.inspect}"
   end
 
   # assign a user if there's a paired iPhone uniquekey
@@ -305,7 +305,7 @@ protected
 
     header = (doc/'header')
     if header.blank?
-      STDERR.puts "Tag.process_gml: no header found in GML"
+      logger.error "Tag.process_gml: no header found in GML"
       return nil
     end
 
@@ -315,15 +315,13 @@ protected
     obj = (header/'client')[0] rescue nil
     attrs[:client] = (obj/'name').inner_html rescue nil
 
-    STDERR.puts "Tag.process_gml: #{attrs.inspect}"
+    # STDERR.puts "Tag.process_gml: #{attrs.inspect}"
     # self.application = attrs[:client] unless attrs[:client].blank?
     self.remote_image = attrs[:filename] unless attrs[:filename].blank?
 
     return attrs
   rescue
-    msg = "Tag.process_gml error: #{$!}"
-    STDERR.puts msg
-    logger.error msg #TODO standardize this dev-friendly idiom
+    logger.error "Tag.process_gml error: #{$!}"
   end
 
 
