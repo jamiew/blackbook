@@ -183,6 +183,8 @@ protected
     if @tag.save
       if params[:redirect] && ['true','1'].include?(params[:redirect].to_s)
         redirect_to(@tag, :status => 302)
+      elsif !params[:redirect_to].blank?
+        redirect_to(params[:redirect_to])
       else
         render :text => @tag.id, :status => 200 #OK
       end
