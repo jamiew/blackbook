@@ -33,6 +33,7 @@ Rails::Initializer.run do |config|
   config.gem 'configatron', :version => "2.2.2"
   config.gem 'will_paginate', :version => "2.3.12"
   config.gem 'htmlentities'
+  config.gem 'system_timer'
   # config.gem 'giraffesoft-is_taggable', :lib => 'is_taggable', :source => 'http://gems.github.com'
 
   # Testing
