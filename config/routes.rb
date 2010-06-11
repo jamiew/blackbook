@@ -19,7 +19,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :account, :controller => "users" #FIXME DEPRECATEME
   map.resources :users,
-        :member => [:change_password],
+        :member => [:change_password, :latest],
         # :has_many => [:tags, :comments]
         :has_many => [:tags, :visualizations, :comments, :favorites] do |users|
     users.resources :tags, :as => 'data'

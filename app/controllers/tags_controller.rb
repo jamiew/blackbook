@@ -170,21 +170,20 @@ protected
     raise NoPermissionError unless current_user && @tag && (@tag.user == current_user || is_admin?)
   end
 
+
   # Create a tag uploaded w/o a user or authentication, via the ghetto-API
   # this is currently used for tempt from the Eyewriter, but will be expanded...
   def create_from_api
 
     # TODO: add app uuid? or Hash app uuid?
     opts = { :gml => params[:gml], :ip => request.remote_ip, :location => params[:location], :application => params[:application], :remote_secret => params[:secret], :gml_uniquekey => params[:uniquekey], :image => params[:image] }
-    # puts "TagsController.create_from_api, opts=#{opts.inspect}"
+    puts "TagsController.create_from_api, opts=#{opts.inspect}"
 
     # Merge opts & params to let people add whatever...
     @tag = Tag.new(opts)
     if @tag.save
       if params[:redirect] && ['true','1'].include?(params[:redirect].to_s)
-        redirect_to(@tag, :status => 302)
-      elsif !params[:redirect_to].blank?
-        redirect_to(params[:redirect_to])
+        redirect_to(@tag, :status => 302) and return
       else
         render :text => @tag.id, :status => 200 #OK
       end
@@ -228,7 +227,7 @@ protected
   end
 
   # For converting from the pre-existing 'Application' params into a string in create/update
-  # GHETTO. FIXME ... Undescriptive method name.
+  # GHETTO. FIXME... Undescriptive method name.
   def convert_app_id_to_app_name
     # Sub in an existing application if specified...
     return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
@@ -237,5 +236,9 @@ protected
     app = Visualization.find(params[:tag][:existing_application_id]) rescue nil
     params[:tag][:application] = app.name unless app.blank?
   end
+
+
+
+
 
 end

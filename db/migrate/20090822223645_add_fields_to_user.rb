@@ -5,7 +5,7 @@ class AddFieldsToUser < ActiveRecord::Migration
     #  about              :text
     #  location           :string(255)
     #  slug               :string(255)
-    
+
     add_column :users, :website, :string
     add_column :users, :tagline, :string
     add_column :users, :about, :text

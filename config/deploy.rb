@@ -53,7 +53,7 @@ namespace :deploy do
     run "ln -nfs #{shared_path}/config/newrelic.yml #{release_path}/config/newrelic.yml"
 
     run "mkdir -p #{release_path}/public/"
-    run "ln -nfs #{shared_path}/public/system #{release_path}/public/system"    
+    run "ln -nfs #{shared_path}/public/system #{release_path}/public/system"
 
     # metric_fu -- creating dirs just to make sure
     # run "mkdir -p #{shared_path}/metric_fu"
@@ -114,7 +114,7 @@ end
 #     run "cd #{deploy_to}/#{current_dir} && " +
 #       "rake RAILS_ENV=#{rails_env} db:database_dump --trace"
 #   end
-# 
+#
 #   desc 'Downloads db/production_data.sql from the remote production environment to your local machine'
 #   task :remote_db_download, :roles => :db, :only => { :primary => true } do
 #     execute_on_servers(options) do |servers|
@@ -123,7 +123,7 @@ end
 #       end
 #     end
 #   end
-# 
+#
 #   desc 'Cleans up data dump file'
 #   task :remote_db_cleanup, :roles => :db, :only => { :primary => true } do
 #     execute_on_servers(options) do |servers|
@@ -132,7 +132,7 @@ end
 #       end
 #     end
 #   end
-# 
+#
 #   desc 'Dumps, downloads and then cleans up the production data dump'
 #   task :remote_db_runner do
 #     remote_db_dump

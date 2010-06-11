@@ -5,4 +5,4 @@ class ActiveRecord::Base
     self.find(:first, :offset => ( self.count * rand ).to_i)
   end
 end
-  
+

@@ -2,7 +2,7 @@ class AddLocationToTag < ActiveRecord::Migration
   def self.up
     add_column :tags, :location, :string
     add_column :tags, :application, :string
-    add_column :tags, :set, :string    
+    add_column :tags, :set, :string
     add_column :tags, :cached_tag_list, :string
   end
 

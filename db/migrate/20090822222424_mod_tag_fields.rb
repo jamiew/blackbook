@@ -1,6 +1,6 @@
 class ModTagFields < ActiveRecord::Migration
   def self.up
-    add_column :tags, :uuid, :string    
+    add_column :tags, :uuid, :string
     add_column :tags, :ip, :string
     rename_column :tags, :description, :gml
   end

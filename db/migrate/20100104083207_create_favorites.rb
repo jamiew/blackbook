@@ -6,7 +6,7 @@ class CreateFavorites < ActiveRecord::Migration
       t.integer :object_id
 
 
-      t.timestamps 
+      t.timestamps
     end
   end
 
