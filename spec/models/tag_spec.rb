@@ -63,7 +63,6 @@ describe Tag do
   describe 'saving GML header fields' do
     it 'location => location' do
       tag = create_tag_with_gml_header(:location => 'mylocale')
-      puts tag.inspect
       tag.location.should == 'mylocale'
     end
 
@@ -91,7 +90,6 @@ protected
 
   def create_tag_with_gml_header(attrs)
     merged = base_gml.merge({:header => {:client => attrs}})
-    puts "merged=#{merged.inspect}"
     return Factory.create(:tag, :gml => merged.to_xml)
   end
 

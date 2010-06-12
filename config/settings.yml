@@ -12,8 +12,8 @@ production:
   google_tracker_id:
 
 test:
-  site_url: http://fake.web
-  host_name: localhost
+  site_url: http://test.host
+  host_name: test.host
 
 development:
   site_url: http://localhost:3000

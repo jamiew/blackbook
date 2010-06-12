@@ -1,9 +1,8 @@
 require 'rubygems'
 require 'factory_girl'
 
-# Players
 Factory.define :user do |t|
-  t.login 'test1'
+  t.login 'jamiew'
   t.name 'Test User'
   t.email 'test@000000book.com'
   t.password 'topsecret123'
@@ -11,41 +10,37 @@ Factory.define :user do |t|
   t.website 'http://fffff.at'
   t.tagline 'I did it for the famo'
   t.about 'Blah blah blah, http://jamiedubs.com, even a <b>BOLD TEXT</b> or <h1>HEADER</h1>'
-  t.iphone_uniquekey 'ff00ff' #bunk (for now)
+  # t.iphone_uniquekey 'ff00ff' # FIXME
 end
 
-# Bosses
 Factory.define :admin, :parent => :user do |t|
   t.login 'adminner'
   t.name 'Admin Yep'
   t.admin true
 end
 
-# - UserSession?
-# - PasswordReset?
-
-# A tag entry
+# A typical tag
 Factory.define :tag do |t|
   t.user { |a| a.association(:user) }
-  t.application 'DemoTag' #ghetto
+  t.application 'TestApp'
   t.author 'JDUBS'
-  #TODO: should read GML header somehow...?
-  #TODO: how to store/cache the GML? HRMZ.
 end
 
-# One sent via the API is typically differnet than through the site (e.g. no thumbnail required, application *is* required, etc)
+# A tag sent via the API is different than through the site
+# e.g. no thumbnail required, application *is* required, etc
 Factory.define :api_tag, :parent => :tag do |t|
-  # anonymous and with some bunk fields, including client or secret maybe
   t.remote_image 'http://fffff.at/fuckflickr/...'
   t.remote_secret '' # none at all
 end
 
+# A sample tag from Tempt1's EyeWriter.
+# He can't upgrade, we must maintain backwards-compat
 Factory.define :tempt_api_tag, :parent => :tag do |t|
-  t.remote_secret '123456789' #or some shiz -- I forget what theo kept it as, fixme...
+  t.remote_secret '123456789' # FIXME use tempt's real key
   t.gml "<gml>yo i am some sample tempt graffiti... TODO could use a fixture to store this</gml>"
 end
 
-# Datastore... todo will make binary/gzipped as needed, or just store as JSON
+# Stores the actual GML
 Factory.define :gml_object, :class => GMLObject do |t|
   t.tag_id 1
   t.data "<gml><header><client><name>rspec</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></gml>"
