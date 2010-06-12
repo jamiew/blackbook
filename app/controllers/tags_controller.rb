@@ -184,6 +184,10 @@ protected
     if @tag.save
       if params[:redirect] && ['true','1'].include?(params[:redirect].to_s)
         redirect_to(@tag, :status => 302) and return
+      elsif !params[:redirect_back].blank? && !request.referer.blank?
+        redirect_to(request.referer)
+      elsif !params[:redirect_to].blank?
+        redirect_to(params[:redirect_to])
       else
         render :text => @tag.id, :status => 200 #OK
       end
@@ -192,7 +196,6 @@ protected
       render :text => "ERROR: #{@tag.errors.inspect}", :status => 422 #Unprocessable Entity
     end
   end
-
 
   # construct & save a tag submitted manually, through the website
   # We do some strange field expansion right now that could be moved into filters or model accessors

@@ -17,15 +17,13 @@ ActiveRecord::Schema.define(:version => 20100113002753) do
   end
 
   create_table "comments", :force => true do |t|
-    t.string   "title",             :limit => 50, :default => ""
+    t.string   "title",            :limit => 50, :default => ""
     t.text     "text"
     t.integer  "commentable_id"
     t.string   "commentable_type"
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "cached_user_login"
-    t.string   "cached_user_url"
     t.string   "ip_address"
     t.datetime "hidden_at"
   end

@@ -28,12 +28,9 @@
 
 class Tag < ActiveRecord::Base
 
-  #Blacklisted attributes not to show in the API
-  #TODO: convert to a whitelisted approach...
+  # Blacklisted attributes, do not show in the API
+  # TODO convert to a whitelisted approach...
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
-
-  # is_taggable :tags
-  #TODO: cache_money indexes
 
   belongs_to :user
   has_one :gml_object, :class_name => 'GMLObject' #used to store the actual data, nice & gzipped
@@ -42,22 +39,20 @@ class Tag < ActiveRecord::Base
 
   # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
-  #TODO: *seriously* need better validation on this mother... but can't cuz of API
+  # TODO need better validation on this mother, but hard cuz API is less restrictive
 
   # before_save :process_gml
   # before_save :save_header #Done inside build_gml_object now; HACK FIXME
   before_create :validate_tempt
   # before_save :process_app_id
-  #Hackish; need a "filler" obj while we're building... don't have an ID before create.
-  before_save :copy_gml_temp_to_gml_object
+  before_save   :copy_gml_temp_to_gml_object
   before_create :build_gml_object
-  after_create :save_gml_object
-
-  after_create :create_notification
+  after_create  :save_gml_object
+  after_create  :create_notification
 
   # Caching related
   # after_save    :expire_gml_hash_cache #<-- handling in the Controller
-  # after_destroy :delete_gml_hash_cache #TODO; do we need this?
+  # after_destroy :delete_gml_hash_cache
 
   # Security: protect from mass assignment
   attr_protected :user_id
@@ -68,17 +63,15 @@ class Tag < ActiveRecord::Base
   named_scope :unclaimed, {:conditions => 'gml_uniquekey IS NOT NULL AND user_id IS NULL' }
   named_scope :by_uniquekey, lambda { |key| {:conditions => ['gml_uniquekey = ?',key]} }
 
-
+  # validates_attachment_presence :image
   has_attached_file :image,
     :default_style => :medium,
     :default_url => "/images/defaults/tag_:style.jpg",
     # :path => ":rails_root/public/system/:class/:attachment/:id_partition/:basename_:style.:extension"
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
-  # validates_attachment_presence :image
 
   # Placeholders for assigning data from forms
   attr_accessor :gml_file, :existing_application_id
-
 
 
   # wrap remote_imge to always add our local FFlickr...
@@ -94,7 +87,6 @@ class Tag < ActiveRecord::Base
 
   # if we have a remote image (for Tempt) use that...
   def thumbnail_image(size = :medium)
-
     if !remote_image.blank?
       return "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{self.attributes['remote_image'].gsub('gml','png')}"
     # elsif RAILS_ENV == 'development' && !File.exist?(self.image_path(size)) #don't do image 404s in development
@@ -104,7 +96,7 @@ class Tag < ActiveRecord::Base
     end
   end
 
-  # a quick hard-code check to see if we're from iPhone, which means we'll need to rotate
+  # Check to see if this data is from an iPhone, which means we'll need to rotate
   def from_iphone?
     app_matcher = /(DustTag|Dust Tag|Fat Tag|Katsu)/
     test = !(self.gml_application =~ app_matcher || self.application =~ app_matcher).blank?
@@ -113,7 +105,6 @@ class Tag < ActiveRecord::Base
   end
 
   # Wrapper accessors for the GML data, now stored in another object
-  #TODO: memoize this; can't quite with the
   def gml(opts = {})
     return rotated_gml if opts[:iphone_rotate].to_s == '1' #handoff for backwards compt; DEPRECATEME
     @memoized_gml ||= gml_object && gml_object.data || @gml_temp || self.attributes['gml'] || ''
@@ -121,9 +112,15 @@ class Tag < ActiveRecord::Base
   end
 
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
-  # FIXME protectme etc.
-  def rotated_gml; Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml }; end
-  def rotated_gml_cache_key; "tag/#{id}/rotated_gml"; end
+  # TODO protectme -- almost none of this needs be public
+  def rotated_gml
+    Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml }
+  end
+
+  def rotated_gml_cache_key
+    "tag/#{id}/rotated_gml"
+  end
+
   def rotate_gml
     doc = gml_document
     strokes = (doc/'drawing'/'stroke')
@@ -134,15 +131,15 @@ class Tag < ActiveRecord::Base
         (pt/'y')[0].content = (1.0 - _x.to_f).to_s
       }
     }
-    return doc.to_s #gets cached so convert to string right away... w/e
+    # response gets cached so convert to string right away
+    return doc.to_s
   rescue
     logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
     return nil
   end
 
-  # Hacks for GML copying...
+  # Proxy accessor; will be processed on save
   def gml=(fresh)
-    # gml_object && gml_object.data = fresh
     @gml_temp = fresh
   end
 
@@ -151,7 +148,10 @@ class Tag < ActiveRecord::Base
   def gml_hash
     Rails.cache.fetch(gml_hash_cache_key) { convert_gml_to_hash }
   end
-  def gml_hash_cache_key; "tag/#{id}/gml_hash"; end
+
+  def gml_hash_cache_key
+    "tag/#{id}/gml_hash"
+  end
 
   #TODO make these all below protected
   # possibly use Nokogiri to do string->XML->JSON? Potentially faster?
@@ -163,7 +163,6 @@ class Tag < ActiveRecord::Base
     logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
     return {}
   end
-
 
   # Wrap to_json so the .gml string gets converted to a hash, then to json
   # Reimplementing rails to_json because we can't do :methods => {:gml_hash=>:gml},
@@ -202,7 +201,7 @@ class Tag < ActiveRecord::Base
     doc = gml_document
 
     if doc.nil? || (doc/'header').nil?
-      STDERR.puts "gml_header: NIL OR NO HEADER DOC"
+      # logger.error "NIL OR NO HEADER DOC"
       return {}
     end
 
@@ -283,7 +282,7 @@ protected
     # this could be confusing later -- document well or refactor...
     return if gml_header.blank?
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k) && !v.blank?; [k,v] }.to_hash
-    puts "Tag.save_header: #{attrs.inspect}"
+    # puts "Tag.save_header: #{attrs.inspect}"
   end
 
   # assign a user if there's a paired iPhone uniquekey
@@ -306,7 +305,7 @@ protected
 
     header = (doc/'header')
     if header.blank?
-      STDERR.puts "Tag.process_gml: no header found in GML"
+      logger.error "Tag.process_gml: no header found in GML"
       return nil
     end
 
@@ -316,15 +315,13 @@ protected
     obj = (header/'client')[0] rescue nil
     attrs[:client] = (obj/'name').inner_html rescue nil
 
-    STDERR.puts "Tag.process_gml: #{attrs.inspect}"
+    # STDERR.puts "Tag.process_gml: #{attrs.inspect}"
     # self.application = attrs[:client] unless attrs[:client].blank?
     self.remote_image = attrs[:filename] unless attrs[:filename].blank?
 
     return attrs
   rescue
-    msg = "Tag.process_gml error: #{$!}"
-    STDERR.puts msg
-    logger.error msg #TODO standardize this dev-friendly idiom
+    logger.error "Tag.process_gml error: #{$!}"
   end
 
 

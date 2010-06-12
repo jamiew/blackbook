@@ -7,17 +7,19 @@ describe Admin::BaseController do
   end
 
   it "should require an admin user" do
-    UserSession.create(Factory.create(:admin))
+    UserSession.create(Factory(:admin))
     get :index
     response.should be_success
   end
 
-  it "should redirect to login for no user or non-admin user" do
+  it "should redirect to login for no user" do
     get :index
-    response.should redirect_to(login_path)
+    response.should redirect_to(login_url)
+  end
 
-    UserSession.create(Factory.create(:user))
+  it "should redirect to the root for a non-admin user" do
+    UserSession.create(Factory(:user))
     get :index
-    response.should redirect_to(login_path)
+    response.should redirect_to(root_url)
   end
 end

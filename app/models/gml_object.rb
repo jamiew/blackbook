@@ -18,7 +18,6 @@ class GMLObject < ActiveRecord::Base
   # end
   #
   # def _data=(fresh)
-  #   puts "fresh=#{fresh.inspect}"
   #   # self.attributes['data'] = Zlib::Deflate.new.deflate(fresh)
   #   encoded = Zlib::Deflate.new.deflate(fresh)
   #   # self.attributes['data'] = encoded

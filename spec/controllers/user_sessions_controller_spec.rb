@@ -39,9 +39,9 @@ describe UserSessionsController do
 
   describe "session management" do
     it "should redirect to the account page on successful login" do
-      Factory.create(:user, :login => 'mmoen', :password => 'password', :password_confirmation => 'password') #Create the user first (not created yet?)
-      post :create, :user_session => { :login => 'mmoen', :password => 'password' }
-      user = User.find_by_login('mmoen')
+      Factory.create(:user, :login => 'jamiew', :password => 'password', :password_confirmation => 'password') #Create the user first (not created yet?)
+      post :create, :user_session => { :login => 'jamiew', :password => 'password' }
+      user = User.find_by_login('jamiew')
       response.should redirect_to(user_path(user))
     end
 
