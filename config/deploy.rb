@@ -9,32 +9,24 @@ require 'cap_recipes/tasks/passenger'
 # require 'cap_recipes/tasks/memcache'
 # require 'cap_recipes/tasks/thinking_sphinx'
 
-
-# Application
 set :stages, %w(staging production)
 set :default_stage, "production"
 set :application, "blackbook"
-# set :deploy_to "/home/#{user}/#{application}"
-
-# Settings
-default_run_options[:pty] = true
-ssh_options[:forward_agent] = true
 
 # Server-specific information is stored in /config/deploy/#{stage}.rb
 
-#	Git
 set :scm, :git
 set :branch, ENV['BRANCH'] || 'master'
 set :repository, "git@github.com:jamiew/#{application}.git"
 set :deploy_via, :remote_cache
 set :scm_verbose, true
 #set :git_enable_submodules, 1
-
+default_run_options[:pty] = true
+ssh_options[:forward_agent] = true
 
 # Hooks
-# before "deploy", "gems:install"
-# after 'deploy:update_code', 'deploy:gemtools'
-after 'deploy:update_code', 'deploy:create_symlinks'
+before "deploy:restart", "gems:install"
+after "deploy:update_code", "deploy:create_symlinks"
 
 #	Recipes
 namespace :deploy do
