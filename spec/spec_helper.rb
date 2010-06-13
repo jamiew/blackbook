@@ -3,7 +3,7 @@ ENV["RAILS_ENV"] = 'test'
 require File.expand_path(File.join(File.dirname(__FILE__),'..','config','environment'))
 require 'spec/autorun'
 require 'spec/rails'
-#require 'webrat/integrations/rspec-rails'
+require 'webrat/integrations/rspec-rails'
 
 require 'authlogic/test_case'
 require RAILS_ROOT+'/spec/factories'
