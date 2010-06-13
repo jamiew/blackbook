@@ -6,12 +6,12 @@ class GMLObject < ActiveRecord::Base
   validates_uniqueness_of :tag_id, :on => :create, :message => "must be unique; currently a Tag can only have one (1) GML object"
   validates_associated :tag, :on => :create
 
-  # temporarily allowing blank data...
+  # FIXME temporarily allowing blank data...
   # Need to make the process a little more clear; FIXME. Also some magic in TagsController to link into this
   # validates_presence_of :data, :on => :create, :message => "can't be blank"
 
-  #TODO: Wrappers to inflate/deflate our data attribute
-  #TODO: we should also attr_protected :data to prevent getting around this...
+  # TODO Wrappers to inflate/deflate our data attribute
+  # TODO we should also attr_protected :data to prevent getting around this...
   # def data
   #   return self.attributes['data'] if self.attributes['data'].blank?
   #   @uncompressed_data ||= Zlib::Inflate.new.inflate(self.attributes['data'])
@@ -24,8 +24,7 @@ class GMLObject < ActiveRecord::Base
   #   self.data = encoded
   # end
 
-
-  #TODO: validate GML here instead of Tag
+  # TODO validate GML here instead of Tag
   # can also do header extraction and such
   # as well as to_json? not sure.
 

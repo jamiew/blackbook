@@ -25,8 +25,8 @@ class Mailer < ActionMailer::Base
   #   body          :comment => comment, :user => user
   # end
 
-  # - New tag posted?
-  # - Wall posts?
-  # - Favorites..?
+  # TODO New tag posted
+  # TODO Wall posts
+  # TODO Favorited one of your tags
 
 end
