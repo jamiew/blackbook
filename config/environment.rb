@@ -29,6 +29,10 @@ Rails::Initializer.run do |config|
   config.gem 'htmlentities'
   config.gem 'system_timer'
 
+  # Deployment
+  config.gem "cap-recipes", :lib => false
+  config.gem "capistrano-ext", :lib => false
+
   # Testing
   config.gem "rspec", :lib => false, :version => ">= 1.2.0"
   config.gem "rspec-rails", :lib => false, :version => ">= 1.2.0"
