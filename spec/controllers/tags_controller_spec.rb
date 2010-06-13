@@ -25,12 +25,9 @@ describe TagsController do
       pending 'TODO'
     end
 
-    it "should fail given an incorrect secret" do
-      pending 'TODO'
-    end
-
     describe "redirection" do
       it "params[:redirect]=1 should redirect to the tag page" do
+        Tag.destroy_all # FIXME not sure why we're ending up w/ dupe objs
         post :create, :gml => @gml, :redirect => 1
         assigns[:tag].should be_valid
         response.should redirect_to(tag_path(assigns[:tag]))

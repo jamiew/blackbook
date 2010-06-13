@@ -1,4 +1,5 @@
 .DS_Store
+*.sql
 blackbook.tmproj
 log/*.log
 tmp/**/*

@@ -2,21 +2,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe GMLObject do
   before(:each) do
+    @gml = Factory(:gml_object)
   end
 
-  it "should create a new instance given valid attributes" do
-    lambda { Factory.create(:gml_object) }.should_not raise_error
+  it "should not create without a Tag" do
+    expect { Factory.create(:gml_object, :tag => nil) }.to raise_error
   end
 
-  it "should not create without a Tag"
-  it 'should not create without any data'
-  it 'should validate GML'
-  it 'should not save if GML is invalid'
-
-  it 'should read a valid GML header'
-  it 'should gracefully handle invalid headers'
-
-  it 'should to_json'
-  # Accessors? client, name, uniquekey, etc?
-
+  it 'should not create without any data' do
+    expect { Factory.create(:gml_object, :gml => nil) }.to raise_error
+  end
 end

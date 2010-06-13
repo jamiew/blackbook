@@ -53,23 +53,23 @@ class TagsController < ApplicationController
       wants.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
       wants.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
       wants.rss  { render :rss => @tags }
-      #TODO: .js => Embeddable widget
+      # TODO: .js => Embeddable widget
     end
   end
 
   def show
     set_page_title "Tag ##{@tag.id}"
 
-    # Only need these instance variables when rendering full HTML display (aka ghetto interlok)
+    # We only need these instance variables when rendering HTML (aka ghetto interlok)
      if params[:format] == 'html' || params[:format] == nil
       @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
       @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
 
       @user = User.find(params[:user_id]) if params[:user_id]
-      @user ||= @tag.user # ...
+      @user ||= @tag.user
 
-      @comments = @tag.comments.visible.paginate(:page => 1, :per_page => 10) # No pagination yet
-      # favorites...?
+      # No real comment pagination yet
+      @comments = @tag.comments.visible.paginate(:page => params[:comments_page] || 1, :per_page => 10)
 
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
       @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
@@ -176,18 +176,25 @@ protected
   def create_from_api
 
     # TODO: add app uuid? or Hash app uuid?
-    opts = { :gml => params[:gml], :ip => request.remote_ip, :location => params[:location], :application => params[:application], :remote_secret => params[:secret], :gml_uniquekey => params[:uniquekey], :image => params[:image] }
-    puts "TagsController.create_from_api, opts=#{opts.inspect}"
+    opts = {
+      :gml => params[:gml],
+      :ip => request.remote_ip,
+      :location => params[:location],
+      :application => params[:application],
+      :remote_secret => params[:secret],
+      :gml_uniquekey => params[:uniquekey],
+      :image => params[:image]
+    }
 
-    # Merge opts & params to let people add whatever...
+    # Merge opts & params to let people attempt to add whatever...
     @tag = Tag.new(opts)
     if @tag.save
       if params[:redirect] && ['true','1'].include?(params[:redirect].to_s)
         redirect_to(@tag, :status => 302) and return
       elsif !params[:redirect_back].blank? && !request.referer.blank?
-        redirect_to(request.referer)
+        redirect_to(request.referer) and return
       elsif !params[:redirect_to].blank?
-        redirect_to(params[:redirect_to])
+        redirect_to(params[:redirect_to]) and return
       else
         render :text => @tag.id, :status => 200 #OK
       end

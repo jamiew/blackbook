@@ -2,6 +2,9 @@ class Admin::BaseController < ApplicationController
   layout 'admin'
   before_filter :require_admin
 
+  def index
+  end
+
   private
 
   def set_title

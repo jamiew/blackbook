@@ -1,31 +1,3 @@
-# == Schema Information
-#
-# Table name: tags
-#
-#  id                 :integer(4)      not null, primary key
-#  user_id            :integer(4)
-#  title              :string(255)
-#  slug               :string(255)
-#  gml                :text
-#  comment_count      :integer(4)
-#  likes_count        :integer(4)
-#  created_at         :datetime
-#  updated_at         :datetime
-#  location           :string(255)
-#  application        :string(255)
-#  set                :string(255)
-#  cached_tag_list    :string(255)
-#  image_file_name    :string(255)
-#  image_content_type :string(255)
-#  image_file_size    :integer(4)
-#  image_updated_at   :datetime
-#  uuid               :string(255)
-#  ip                 :string(255)
-#  description        :text
-#  remote_image       :string(255)
-#  remote_secret      :string(255)
-#
-
 class Tag < ActiveRecord::Base
 
   # Blacklisted attributes, do not show in the API
@@ -39,12 +11,10 @@ class Tag < ActiveRecord::Base
 
   # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
-  # TODO need better validation on this mother, but hard cuz API is less restrictive
 
   # before_save :process_gml
-  # before_save :save_header #Done inside build_gml_object now; HACK FIXME
-  before_create :validate_tempt
   # before_save :process_app_id
+  before_create :validate_tempt
   before_save   :copy_gml_temp_to_gml_object
   before_create :build_gml_object
   after_create  :save_gml_object
@@ -230,7 +200,7 @@ class Tag < ActiveRecord::Base
   #   doc = Nokogiri::XML(self.gml)
   # end
 
-  #TODO: inject 000000book infos into this GML...
+  # TODO inject 000000book infos into this GML...
 
   # Dump some chars from the uniquekey as a Secret User Codename
   def secret_username
@@ -251,8 +221,7 @@ class Tag < ActiveRecord::Base
   end
 
 
-
-protected
+  protected
 
   def create_notification
     Notification.create(:subject => self, :verb => 'created', :user => self.user)
@@ -276,13 +245,12 @@ protected
   end
 
   # Parse & assign variables from the GML header
-  # FIXME slightly convoluted saving logic and/or should be 'save_header!'
+  # only save attributes we actually have please, but allow displaying everything we can parse
   def save_header
-    # only save attributes we actually have please, but allow displaying everything we can parse
-    # this could be confusing later -- document well or refactor...
     return if gml_header.blank?
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k) && !v.blank?; [k,v] }.to_hash
     # puts "Tag.save_header: #{attrs.inspect}"
+    return attrs
   end
 
   # assign a user if there's a paired iPhone uniquekey
@@ -298,7 +266,7 @@ protected
 
   # extract some information from the GML
   # and insert our server signature
-  #FIXME: duplicating some stuff from save_header
+  # FIXME duplicating some stuff from save_header
   def process_gml
     doc = gml_document
     return if doc.nil?
@@ -328,8 +296,7 @@ protected
   # simpe hack to check secret/appname for if this is tempt...
   # if so, save it to his User for him
   def validate_tempt
-    # if secret
-    if self.application =~ /eyeSaver/ #WEAK as hell son.
+    if self.application =~ /eyeSaver/ # weak
       user = User.find_by_login('tempt1')
       self.user_id = user.id
     end
@@ -340,7 +307,5 @@ protected
     gml_object.data = @gml_temp
     gml_object.save! if gml_object.data_changed? #we might be double-saving...
   end
-
-
 
 end
