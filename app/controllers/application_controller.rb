@@ -115,7 +115,7 @@ class ApplicationController < ActionController::Base
   def require_admin
     unless current_user && is_admin?
       logger.warn "require_admin failed (!!)"
-      store_location
+      # store_location
       flash[:error] = "You must be an admin to access this (Event logged)"
       # redirect_to login_url
       # raise NoPermissionError
