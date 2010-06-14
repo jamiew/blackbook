@@ -13,12 +13,6 @@ class Hash
       !keys.include? k.to_sym
     }
   end
-
-  # allows you to use { :val => 'foo' }.val #=> "foo"
-  # DANGEROUS. commented out for now as well...
-  # def method_missing(key)
-  #   has_key?(key) || has_key?(key.to_s) ? self[key] || self[key.to_s] : super
-  # end
 end
 
 class Array
@@ -51,11 +45,3 @@ private
      caller[0] =~ /`([^']*)'/ and $1
    end
 end
-
-
-# COMMENTED OUT -- this is also in i76-has_slug and the clash causes drama
-# class String
-#   def to_slug
-#     self.gsub("'", '').gsub(/[^\w]+/, '_').gsub(/^_|_$/, '')
-#   end
-# end
