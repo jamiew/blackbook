@@ -30,14 +30,8 @@ after "deploy:update_code", "deploy:create_symlinks"
 
 #	Recipes
 namespace :deploy do
-  desc "Things to do once we get the code up: install gems, generate Sass, etc."
-  task :gemtools, :roles => :app, :except => { :no_release => true } do
-    # run "cd #{release_path} && sudo gemtools install"
-    # run "cd #{release_path} && RAILS_ENV=#{stage} ./script/runner Sass::Plugin.update_stylesheets"
-    # run "cd #{release_path} && RAILS_ENV=#{stage} rake db:migrate"
-  end
 
-  desc "Link database.yml & other shared settings after 'symlink' (what links /releases/YYYYMMDDMMSS to /current)"
+  desc "Link database.yml & other shared settings"
   task :create_symlinks do
     run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
     run "ln -nfs #{shared_path}/config/settings.yml #{release_path}/config/settings.yml"
