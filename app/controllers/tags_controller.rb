@@ -2,8 +2,8 @@ class TagsController < ApplicationController
 
   # We allow access to :create for the ghetto-API, which doesn't require real authentication
   #TODO: change it to something like 'require_api_key' for if it doesn't have a user, or requires http basic...
-  before_filter :get_tag, :only => [:show, :edit, :update, :destroy]
-  before_filter :require_user, :only => [:new, :edit, :update, :destroy] # <-- but not create
+  before_filter :get_tag, :only => [:show, :edit, :update, :destroy, :upload_thumbnail, :nominate]
+  before_filter :require_user, :only => [:new, :edit, :update, :destroy, :nominate] # <-- but not create
   protect_from_forgery :except => [:create] # for the "API"
   before_filter :require_owner, :only => [:edit, :update, :destroy]
   before_filter :convert_app_id_to_app_name, :only => [:update, :create]
@@ -142,6 +142,18 @@ class TagsController < ApplicationController
   def upload_thumbnail
     render :text => "YEAH BOY", :layout => false
   end
+
+  # add the 'mfcc' keyword for the Media Facades contest
+  def nominate
+    @tag.gml_keywords = (@tag.gml_keywords.blank? ? "mfcc" : "#{@tag.gml_keywords},mfcc")
+    if @tag.save
+      flash[:notice] = "Tag #{@tag.id} nominated"
+    else
+      flash[:error] = "Error: #{$!}"
+    end
+    redirect_to(:back)
+  end
+
 
 
 protected
