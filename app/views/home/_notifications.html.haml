@@ -1,4 +1,4 @@
-- notifications ||= @notifications 
+- notifications ||= @notifications
 - if notifications.blank?
   = "None yet."
 - else
@@ -9,10 +9,9 @@
         %td.timeago
           = time_ago_in_words(notif.created_at).gsub('about ','')
           ago
-          
+
         - begin
           - case notif.subject
-
           - when Tag
             - tag = notif.subject
             - user = tag.user
@@ -25,13 +24,11 @@
                 == uploaded via API #{tag.application.blank? ? '' : "from #{application_link(tag.application)}"}
               - else
                 == uploaded by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
-        
           - when User
             - user = notif.subject
             %td{:colspan => 3}
               = link_to user.login, user_path(user)
               signed up
-
           - when Visualization
             %td{:colspan => 3}
               - app = notif.subject
@@ -39,7 +36,6 @@
               submitted application
               = link_to app.name, visualization_path(app.name)
               == (#{app.kind})
-              
           - when Favorite
             - fave = notif.subject
             - obj = fave.object
@@ -52,7 +48,6 @@
               = obj.class.to_s.downcase
               -#FIXME use tag_title -- make that part of Tag proper perhaps? hmm
               == #{link_to obj.title || "##{obj.id}", url_for(obj)}
-          
           - when Comment
             - comment = notif.subject
             - commentable = comment.commentable
@@ -62,10 +57,8 @@
               commented on
               == #{link_to commentable_name(commentable), url_for(commentable)}:
               .text.graytext{:style => 'margin-top: 3px; margin-left: 1px; padding: 4px 0 4px 8px; border-left: 4px solid #333;'}= comment.text
-
           - else
             %td{:colspan => 3}
               %em== No support for #{notif.subject.class.to_s} notification yet.
-
         - rescue
           == ERROR: #{$!}
