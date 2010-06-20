@@ -14,8 +14,8 @@ class HomeController < ApplicationController
     set_page_title "Activity"
   end
 
-  # Show a single static file
-  # FIXME -- hardcoded references to haml & erb
+  # Show a single static page
+  # FIXME using hardcoded references to .haml or .erb... where is template_exists?()
   def static
     if (File.exist?("#{RAILS_ROOT}/app/views/pages/#{params[:id]}.html.haml") || File.exist?("#{RAILS_ROOT}/app/views/pages/#{params[:id]}.html.erb"))
       set_page_title params[:id].capitalize
@@ -25,9 +25,9 @@ class HomeController < ApplicationController
     end
   end
 
-  # Ghetto handling for "bad" URLs -- I'm mapping them here as a blackhole
+  # Ghetto handling for "bad" URLs -- mapping them here as a blackhole
   def discard
     logger.warn "Discarding request..."
-    render :nothing => true, :status => 420 #LOL
+    render :nothing => true, :status => 420 # lol
   end
 end

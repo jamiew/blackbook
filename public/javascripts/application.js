@@ -33,6 +33,7 @@ $(document).ready(function(){
 	$('div.tabs ul.tab_navigation li a').each(function(){ 
 	  var pattern = $(this).attr('href'); 
 	  if(window.location.href.match(pattern)) { $(this).click(); }
+	  scroll(0,0); // Re-center the page
 	});  
   
 });
