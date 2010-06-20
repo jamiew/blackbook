@@ -16,7 +16,7 @@ Rails::Initializer.run do |config|
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
   # Actually used by the app
-  config.gem 'rack', :version => '1.2.1'
+  config.gem 'rack', :version => '1.0.0'
   config.gem 'haml'
   config.gem 'config_reader', :version => '0.0.6'
   config.gem 'RedCloth'
