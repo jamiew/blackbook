@@ -5,7 +5,7 @@ class Tag < ActiveRecord::Base
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   belongs_to :user
-  has_one :gml_object, :class_name => 'GMLObject' #used to store the actual data, nice & gzipped
+  has_one :gml_object, :class_name => 'GMLObject' # used to store the actual data, nice & gzipped
   has_many :comments, :as => :commentable, :order => 'created_at DESC'
   has_many :likes
 
@@ -14,7 +14,7 @@ class Tag < ActiveRecord::Base
 
   # before_save :process_gml
   # before_save :process_app_id
-  before_create :validate_tempt
+  before_create :detect_tempt_one
   before_save   :copy_gml_temp_to_gml_object
   before_create :build_gml_object
   after_create  :save_gml_object
@@ -82,71 +82,34 @@ class Tag < ActiveRecord::Base
   end
 
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
-  # TODO protectme -- almost none of this needs be public
   def rotated_gml
     Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml }
   end
 
-  def rotated_gml_cache_key
-    "tag/#{id}/rotated_gml"
-  end
-
-  def rotate_gml
-    doc = gml_document
-    strokes = (doc/'drawing'/'stroke')
-    strokes.each { |stroke|
-      (stroke/'pt').each { |pt|
-        _x = (pt/'x')[0].content
-        (pt/'x')[0].content = (pt/'y')[0].content
-        (pt/'y')[0].content = (1.0 - _x.to_f).to_s
-      }
-    }
-    # response gets cached so convert to string right away
-    return doc.to_s
-  rescue
-    logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
-    return nil
-  end
-
-  # Proxy accessor; will be processed on save
+  # Proxy; will be processed on save
   def gml=(fresh)
     @gml_temp = fresh
   end
 
-  # the GML data (String) as a Hash
-  # w/ caching, it's an expensive operation
+  # the GML data (String) as a Hash (w/ caching, conversion is an expensive operation)
   def gml_hash
-    Rails.cache.fetch(gml_hash_cache_key) { convert_gml_to_hash }
-  end
-
-  def gml_hash_cache_key
-    "tag/#{id}/gml_hash"
-  end
-
-  #TODO make these all below protected
-  # possibly use Nokogiri to do string->XML->JSON? Potentially faster?
-  def convert_gml_to_hash
-    return {} if self.gml.blank? || self.gml['gml'].blank? # FIXME really should reject blank GML...
-    #TODO: possibly use Nokogiri to do string->XML->JSON? Potentially faster?
-    Hash.from_xml(self.gml)['gml']
-  rescue
-    logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
-    return {}
+    data = Rails.cache.read(gml_hash_cache_key)
+    if data.blank?
+      data = convert_gml_to_hash
+      puts Rails.cache.write(gml_hash_cache_key, data)
+    end
+    return data
   end
 
   # Wrap to_json so the .gml string gets converted to a hash, then to json
-  # Reimplementing rails to_json because we can't do :methods => {:gml_hash=>:gml},
-  #  and end up with an attribute called 'gml_hash' which doesn't work
+  # We're reimplementing Rails' to_json because we can't do :methods => {:gml_hash=>:gml},
+  # and end up with an attribute called 'gml_hash' which doesn't work
   def to_json(options = {})
-    # logger.info "Tag.to_json(#{options.inspect})"
+    logger.info "Tag.to_json(#{options.inspect})"
     hash = Serializer.new(self, options).serializable_record
-    hash[:gml] = gml_hash
-
-    # Strip empty records -- it's mostly 'planning' stuff at this point...
+    hash[:gml] = self.gml_hash
     hash.reject! { |k,v| v.blank? }
-
     ActiveSupport::JSON.encode(hash)
-    # super(options.merge(:methods => :gml))
   end
 
   # Also hide what we'd like, and strip empty records (for now)
@@ -220,22 +183,31 @@ class Tag < ActiveRecord::Base
     Favorite.count(:conditions => ['object_id = ? AND object_type = ? AND user_id = ?', self.id, self.class.to_s, user.id]) > 0
   end
 
+  # Caching
+  def gml_hash_cache_key
+    "tag/#{id}/gml_hash"
+  end
 
-  protected
+  def rotated_gml_cache_key
+    "tag/#{id}/rotated_gml"
+  end
+
+
+protected
 
   def create_notification
     Notification.create(:subject => self, :verb => 'created', :user => self.user)
   end
 
-  # before_create hook to build, copy over our temp data & then read our GML
+  # before_create hook to copy over our temp data & then read our GML
   def build_gml_object
     # STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
     obj = GMLObject.new
     obj.data = @gml_temp || self.attributes['gml'] #attr_protected
-    self.gml_object = obj # Is this automatically assigned to us without reloading? Making sure...
+    self.gml_object = obj
     process_gml
     save_header
-    find_paired_user #...
+    find_paired_user
   end
 
   # after_create hook to finalize the GMLObject
@@ -244,8 +216,14 @@ class Tag < ActiveRecord::Base
     self.gml_object.save!
   end
 
+  def copy_gml_temp_to_gml_object
+    return if @gml_temp.blank? || gml_object.nil?
+    gml_object.data = @gml_temp
+    gml_object.save! if gml_object.data_changed?
+  end
+
   # Parse & assign variables from the GML header
-  # only save attributes we actually have please, but allow displaying everything we can parse
+  # only save attributes we actually have, but allow displaying everything we can parse
   def save_header
     return if gml_header.blank?
     attrs = gml_header.select { |k,v| self.send("#{k}=", v) if self.respond_to?(k) && !v.blank?; [k,v] }.to_hash
@@ -262,7 +240,6 @@ class Tag < ActiveRecord::Base
     logger.info "Pairing with user=#{user.login.inspect}"
     self.user = user
   end
-
 
   # extract some information from the GML
   # and insert our server signature
@@ -292,20 +269,40 @@ class Tag < ActiveRecord::Base
     logger.error "Tag.process_gml error: #{$!}"
   end
 
+  # Transforms
+  def convert_gml_to_hash
+    logger.info "hiiiiiiiiiiiii"
+    return {} if self.gml.blank?
+    Hash.from_xml(gml_document.to_xml)
+  rescue
+    logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
+    return {}
+  end
+
+  def rotate_gml
+    doc = gml_document
+    strokes = (doc/'drawing'/'stroke')
+    strokes.each { |stroke|
+      (stroke/'pt').each { |pt|
+        _x = (pt/'x')[0].content
+        (pt/'x')[0].content = (pt/'y')[0].content
+        (pt/'y')[0].content = (1.0 - _x.to_f).to_s
+      }
+    }
+    # response gets cached so convert to string right away
+    return doc.to_s
+  rescue
+    logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
+    return nil
+  end
 
   # simpe hack to check secret/appname for if this is tempt...
   # if so, save it to his User for him
-  def validate_tempt
+  def detect_tempt_one
     if self.application =~ /eyeSaver/ # weak
       user = User.find_by_login('tempt1')
       self.user_id = user.id
     end
-  end
-
-  def copy_gml_temp_to_gml_object
-    return if @gml_temp.blank? || gml_object.nil?
-    gml_object.data = @gml_temp
-    gml_object.save! if gml_object.data_changed? #we might be double-saving...
   end
 
 end

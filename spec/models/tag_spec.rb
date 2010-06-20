@@ -32,7 +32,41 @@ describe Tag do
     end
   end
 
-  protected
+  # Alternate formats
+  describe "to_json" do
+    it "should be valid" do
+      pending
+    end
+
+    it "should include GML data" do
+      pending
+    end
+  end
+
+  describe "to_xml" do
+    it "should be valid" do
+      pending
+    end
+  end
+
+  describe "to_hash" do
+    it "should be valid" do
+      pending
+    end
+  end
+
+  # Transforms
+  describe "rotate_gml" do
+    it "should rotate GML data 90 degrees" do
+      pending
+    end
+
+    it "should only rotate data from iPhone apps (DustTag, FatTag)" do
+      pending
+    end
+  end
+
+protected
 
   def base_gml
     {
