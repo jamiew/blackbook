@@ -5,7 +5,7 @@ class Admin::BaseController < ApplicationController
   def index
   end
 
-  private
+private
 
   def set_title
     set_page_title('Admin')

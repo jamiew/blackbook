@@ -13,11 +13,8 @@
     %td= h favorite.object_type
     %td= h favorite.object_id
 
-  
     %td= link_to 'Show', favorite_path(favorite)
     %td= link_to 'Edit', edit_favorite_path(favorite)
     %td= link_to 'Destroy', favorite_path(favorite), :confirm => 'Are you sure?', :method => :delete
 
-
-
-= link_to 'New favorite', new_favorite_path 
+= link_to 'New favorite', new_favorite_path
