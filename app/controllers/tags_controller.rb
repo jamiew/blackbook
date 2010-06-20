@@ -13,21 +13,9 @@ class TagsController < ApplicationController
   caches_action :index, :expires_in => 30.minutes, :if => :cache_request?
   caches_action :show,  :expires_in => 30.minutes, :if => :cache_request?
 
-  #TODO: this should be a Sweeper. but it doesn't *have* to be...
-  def expire_caches
-    if @tag && !@tag.new_record?
-      [nil,'json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
-      Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash) #Model caching, but handling all in the controller
-    end
-    expire_fragment(:controller => 'tags', :action => 'index')
-    # expire_fragment(:controller => 'home', :action => 'index')
-    expire_fragment('home/index')
-  end
-
-  # Display
   def index
 
-    # Setup a 'search' context -- user or app currently, for finding things not really 'in' the database... more TODO
+    # Setup a search context for this tag: currently user or app
     if !params[:app].blank?
       @search_context = {:key => :application, :value => params[:app], :conditions => ["application = ? OR gml_application = ?",params[:app],params[:app]] }
     elsif !params[:user].blank?
@@ -76,14 +64,12 @@ class TagsController < ApplicationController
     end
 
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag
-    # expires_in 5.minutes, :public => true unless logged_in? # Rack::Cache
     respond_to do |wants|
       wants.html  { render }
       wants.gml   { render :xml => @tag.gml(:iphone_rotate => params[:iphone_rotate]) }
       wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }
       wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
-      # wants.rss   { render :rss => @tag.to_rss(:except => Tag::HIDDEN_ATTRIBUTES) }
-      #TODO: .js => Embeddable widget
+      # TODO .js => Embeddable widget
     end
   end
 
@@ -170,12 +156,10 @@ protected
     raise NoPermissionError unless current_user && @tag && (@tag.user == current_user || is_admin?)
   end
 
-
   # Create a tag uploaded w/o a user or authentication, via the ghetto-API
   # this is currently used for tempt from the Eyewriter, but will be expanded...
   def create_from_api
-
-    # TODO: add app uuid? or Hash app uuid?
+    # TODO add app uuid? or Hash app uuid?
     opts = {
       :gml => params[:gml],
       :ip => request.remote_ip,
@@ -207,7 +191,6 @@ protected
   # construct & save a tag submitted manually, through the website
   # We do some strange field expansion right now that could be moved into filters or model accessors
   def create_from_form
-
     # Translate/expand some params
     params[:tag][:user] = current_user
 
@@ -238,7 +221,6 @@ protected
   end
 
   # For converting from the pre-existing 'Application' params into a string in create/update
-  # GHETTO. FIXME... Undescriptive method name.
   def convert_app_id_to_app_name
     # Sub in an existing application if specified...
     return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
@@ -246,6 +228,17 @@ protected
     # FIXME use internal ids if available? string matching all the time is ghetto
     app = Visualization.find(params[:tag][:existing_application_id]) rescue nil
     params[:tag][:application] = app.name unless app.blank?
+  end
+
+  # TODO this should be a Sweeper
+  def expire_caches
+    if @tag && !@tag.new_record?
+      [nil,'json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
+      Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash) # Write-through object caching, but handling in the controller
+    end
+    expire_fragment(:controller => 'tags', :action => 'index')
+    # expire_fragment(:controller => 'home', :action => 'index')
+    expire_fragment('home/index')
   end
 
 

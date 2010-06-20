@@ -105,7 +105,6 @@ class Tag < ActiveRecord::Base
   # We're reimplementing Rails' to_json because we can't do :methods => {:gml_hash=>:gml},
   # and end up with an attribute called 'gml_hash' which doesn't work
   def to_json(options = {})
-    logger.info "Tag.to_json(#{options.inspect})"
     hash = Serializer.new(self, options).serializable_record
     hash[:gml] = self.gml_hash
     hash.reject! { |k,v| v.blank? }
@@ -183,13 +182,38 @@ class Tag < ActiveRecord::Base
     Favorite.count(:conditions => ['object_id = ? AND object_type = ? AND user_id = ?', self.id, self.class.to_s, user.id]) > 0
   end
 
-  # Caching
+  # Transforms (cached)
   def gml_hash_cache_key
     "tag/#{id}/gml_hash"
   end
 
+  def convert_gml_to_hash
+    return {} if self.gml.blank?
+    Hash.from_xml(gml_document.to_xml)
+  rescue
+    logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
+    return {}
+  end
+
   def rotated_gml_cache_key
     "tag/#{id}/rotated_gml"
+  end
+
+  def rotate_gml
+    doc = gml_document
+    strokes = (doc/'drawing'/'stroke')
+    strokes.each { |stroke|
+      (stroke/'pt').each { |pt|
+        _x = (pt/'x')[0].content
+        (pt/'x')[0].content = (pt/'y')[0].content
+        (pt/'y')[0].content = (1.0 - _x.to_f).to_s
+      }
+    }
+    # response gets cached so convert to string right away
+    return doc.to_s
+  rescue
+    logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
+    return nil
   end
 
 
@@ -267,33 +291,6 @@ protected
     return attrs
   rescue
     logger.error "Tag.process_gml error: #{$!}"
-  end
-
-  # Transforms
-  def convert_gml_to_hash
-    logger.info "hiiiiiiiiiiiii"
-    return {} if self.gml.blank?
-    Hash.from_xml(gml_document.to_xml)
-  rescue
-    logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
-    return {}
-  end
-
-  def rotate_gml
-    doc = gml_document
-    strokes = (doc/'drawing'/'stroke')
-    strokes.each { |stroke|
-      (stroke/'pt').each { |pt|
-        _x = (pt/'x')[0].content
-        (pt/'x')[0].content = (pt/'y')[0].content
-        (pt/'y')[0].content = (1.0 - _x.to_f).to_s
-      }
-    }
-    # response gets cached so convert to string right away
-    return doc.to_s
-  rescue
-    logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
-    return nil
   end
 
   # simpe hack to check secret/appname for if this is tempt...
