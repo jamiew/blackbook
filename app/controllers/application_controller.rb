@@ -1,15 +1,16 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
-# Some globally used exceptions we catch from
+# Common exceptions
 class NoPermissionError < RuntimeError; end
+class InvalidGMLError < RuntimeError; end
 
 class ApplicationController < ActionController::Base
 
   helper :all
   helper_method :current_user_session, :current_user, :page_title, :set_page_title
 
-  #Don't show raw GML in the logs
+  # Don't show raw GML in the logs
   filter_parameter_logging :password, :password_confirmation, :gml, :data
   protect_from_forgery
 
@@ -164,18 +165,15 @@ class ApplicationController < ActionController::Base
     super
   end
 
-  # shell for a future a Merb-esque displays/provides syntax
-  # TODO: handle arrays better
-  # TODO: also handle text...
+  # Generic responses, Merb-esque displays/provides
+  # TODO handle arrays better
   def default_respond_to(object, opts={})
 
     opts = { :exclude => [:id, :created_at, :cached_tag_list] }.merge(opts)
     which_layout = opts[:layout] || false
-    # TODO: strip out excluded attributes...
+    # TODO strip out excluded attributes
 
     respond_to do |format|
-
-      # format.html { render :html => object.to_html }
       format.html {
         if request.xhr? && !opts[:html_partial].blank?
           render :partial => opts[:html_partial], :object => object
@@ -187,13 +185,9 @@ class ApplicationController < ActionController::Base
       format.xml  { render :text => object.to_xml }
       format.json { render :text => object.to_json }
       format.yaml { render :text => object.to_yaml }
-      # - JS
-      # - text
-      # - RSS
-      # - atom
+      # TODO: js, txt, rss, atom
     end and return
   end
-
 
   # Should we cache this request? A good question!
   def cache_request?
@@ -222,12 +216,8 @@ class ApplicationController < ActionController::Base
   end
   helper_method :url_escape
 
-  def dev?
-    RAILS_ENV == 'development'
-  end
-  def production?
-    RAILS_ENV == 'production'
-  end
+  def dev?; RAILS_ENV == 'development'; end
+  def production?; RAILS_ENV == 'production'; end
   helper_method :dev?, :production?
 
 end

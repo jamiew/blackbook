@@ -15,14 +15,12 @@ module TagsHelper
     end
   end
 
-  # ...
   def secret_username_link(secret_username)
     link_to secret_username, tags_path(:user => secret_username), :class => 'username_link anon'
   end
 
-  # ...DOCME
   def application_link(app_name, opts = {})
-    return "[manual]" if app_name.blank?
+    return "[upload]" if app_name.blank?
     # Strip out the long-ass GA name...
     # shortname = (opts[:short] == true ? app_name.gsub('Graffiti Analysis ','GrafAnalysis') : app_name)
     shortname = app_name
@@ -34,12 +32,15 @@ module TagsHelper
     link_to(location, tags_path(:location => location), :class => 'location_link')
   end
 
-
-  # Tag flash visualizer -- allow people to customize
-  # If no tag specified try to do "slideshow" mode (??)
+  # Builtin tag playback modes
   def tag_player(tag = nil, args = {})
+    flash_tag_player(tag, args)
+  end
 
-    # return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
+  # Todd's flash player
+  def flash_tag_player(tag = nil, args = {})
+
+    return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
 
     # No longer specifying a specific height, just width
     opts = { :width => '100%', :src => 'http://toddvanderlin.com/content/000000book/BlackBook.swf', :bgcolor => '#000000' }.merge(args)
@@ -78,6 +79,5 @@ module TagsHelper
       </object>
     }
   end
-  alias :tag_vis :tag_player
 
 end

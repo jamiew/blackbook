@@ -16,7 +16,8 @@ class CommentsController < ApplicationController
     render :partial => 'comments/comment', :object => @comment, :layout => true
   end
 
-  def new # Not used directly
+  def new 
+    # Not used directly
     @comment = Comment.new
     render :text => "No juju here man.", :layout => true, :status => 420
   end

@@ -20,8 +20,7 @@ class FavoritesController < ApplicationController
   end
 
   # Double-duty favorite/unfavorite -- seems better than individual controller favorite/unfavorites
-  # Double-duty create cuz DELETE requires specifying a specific object -- we just want something generic.
-  # TODO: allow DELETE to .index as 'unfavorite'?
+  # DELETE requires specifying a specific object -- we just want something generic.
   def create
 
     #FIXME: hardcoded to Tag currently. Should support more -- extract from nested route

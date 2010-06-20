@@ -126,7 +126,7 @@ class Tag < ActiveRecord::Base
   #TODO make these all below protected
   # possibly use Nokogiri to do string->XML->JSON? Potentially faster?
   def convert_gml_to_hash
-    return {} if self.gml.blank? || self.gml['gml'].blank? #FIXME; really should never have blank GML...
+    return {} if self.gml.blank? || self.gml['gml'].blank? # FIXME really should reject blank GML...
     #TODO: possibly use Nokogiri to do string->XML->JSON? Potentially faster?
     Hash.from_xml(self.gml)['gml']
   rescue
