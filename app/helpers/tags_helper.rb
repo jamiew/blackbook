@@ -40,7 +40,7 @@ module TagsHelper
   # Todd's flash player
   def flash_tag_player(tag = nil, args = {})
 
-    return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
+    # return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
 
     # No longer specifying a specific height, just width
     opts = { :width => '100%', :src => 'http://toddvanderlin.com/content/000000book/BlackBook.swf', :bgcolor => '#000000' }.merge(args)
