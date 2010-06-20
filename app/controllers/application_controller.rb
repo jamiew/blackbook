@@ -95,7 +95,7 @@ class ApplicationController < ActionController::Base
     unless current_user
       logger.info "require_user failed"
       store_location
-      flash[:notice] = "You must be logged in to access that page"
+      flash[:notice] = "You must be logged in to do that"
       redirect_to(login_path)
       return false
     end
