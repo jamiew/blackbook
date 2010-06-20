@@ -93,12 +93,12 @@ class Tag < ActiveRecord::Base
 
   # the GML data (String) as a Hash (w/ caching, conversion is an expensive operation)
   def gml_hash
-    data = Rails.cache.read(gml_hash_cache_key)
-    if data.blank?
-      data = convert_gml_to_hash
-      puts Rails.cache.write(gml_hash_cache_key, data)
+    @gml_hash ||= Rails.cache.read(gml_hash_cache_key)
+    if @gml_hash.blank?
+      @gml_hash = convert_gml_to_hash
+      Rails.cache.write(gml_hash_cache_key, @gml_hash)
     end
-    return data
+    return @gml_hash
   end
 
   # Wrap to_json so the .gml string gets converted to a hash, then to json
@@ -106,7 +106,7 @@ class Tag < ActiveRecord::Base
   # and end up with an attribute called 'gml_hash' which doesn't work
   def to_json(options = {})
     hash = Serializer.new(self, options).serializable_record
-    hash[:gml] = self.gml_hash
+    hash[:gml] = self.gml_hash && self.gml_hash['gml'] || []
     hash.reject! { |k,v| v.blank? }
     ActiveSupport::JSON.encode(hash)
   end
