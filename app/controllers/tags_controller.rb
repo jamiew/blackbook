@@ -23,6 +23,8 @@ class TagsController < ApplicationController
       @search_context = {:key => :user, :value => params[:user], :conditions => ["SUBSTRING(gml_uniquekey_hash, -5, 5) = ?", params[:user].gsub('anon-','')] }
     elsif !params[:location].blank?
       @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?", params[:location]] }
+    elsif !params[:keywords].blank?
+      @search_context = {:key => :keywords, :value => params[:keywords], :conditions => ["gml_keywords LIKE ?", params[:keywords]] }
     elsif !params[:user_id].blank?
       @user = User.find(params[:user_id])
       @search_context = {:key => :user, :value => @user.login, :conditions => ["user_id = ?",@user.id]}

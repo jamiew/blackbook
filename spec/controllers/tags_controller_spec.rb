@@ -53,4 +53,12 @@ describe TagsController do
       end
     end
   end
+
+  describe "GET #index" do
+    it "should filter on keywords"
+    it "should filter on location"
+    it "should filter on application"
+    it "should filter on user"
+  end
+
 end
