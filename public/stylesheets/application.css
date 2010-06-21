@@ -124,7 +124,7 @@ form br { clear:left; }
 form .left_column { width: 440px; }
 form .right_column { width: 470px; }
 
-.buttons input, .buttons button { font-size: 1.5em; } 
+.buttons input, .buttons button { font-size: 1.5em; }
 .buttons.small input, .buttons.small button { font-size: 0.9em; }
 
 
@@ -199,7 +199,7 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 #header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; min-width: 820px; } /* min-width doesn't work with all the floating... */
 #header a.root_link, #header a.root_link img { text-decoration: none; border: 0; }
 #header a.root_link:hover, #header a.root_link:hover img { background-color: transparent; border: 0; padding: 0; text-decoration: none; }
-#header a.root_link img { margin-top: -40px; height: 100px; } 
+#header a.root_link img { margin-top: -40px; height: 100px; }
 /* beta logo */
 #header .masthead { width: 450px; white-space:nowrap; }
 #header h1.title { font-family: "Times", serif; font-size: 3em; font-weight: bold; margin: 0; padding: 0; line-height: 1em; letter-spacing: 1px; }
@@ -226,12 +226,12 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 
 
 /* Flash */
-#flash-notice, #flash-warning, #flash-error {  
+#flash-notice, #flash-warning, #flash-error {
   display: none; /* FIXME: should be obtrusive O_o */
   position: absolute;
-  margin-top: -20px;    
+  margin-top: -20px;
   font-size: 1em;
-  font-weight: bold;  
+  font-weight: bold;
   background: #667;
   color: #fff;
   padding: 6px 12px 4px;
@@ -252,7 +252,7 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 
 
 /* Form Errors */
-#errorExplanation { background-color: #faa; border: 1px solid #faa; color: #333; padding: 0 10px 15px; } 
+#errorExplanation { background-color: #faa; border: 1px solid #faa; color: #333; padding: 0 10px 15px; }
 #errorExplanation ul li { list-style-type: square; margin-left: 15px; }
 
 /* Login form... */
@@ -310,14 +310,17 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 a.username_link, a.application_link { }
 a.username_link.anon, a.application_link.anon { text-decoration: none; border-bottom: 1px dotted #888; }
 
-/* Players */
-#vanderplayer object, #vanderplayer embed { min-height: 460px; } /* hack */
+/* Tag players, flash & canvas */
 #home #vis { margin-top: 15px; }
-input.embed { font-size: 8pt; color: #999; background-color: #2f2f2f; border: 1px solid #555; padding: 4px 5px 3px 2px; width: 350px; }
-input.embed:hover { border-color: #ff0; }
+
+.tag #flash object, .tag #flash embed { min-height: 460px; border: 1px solid #666; }
+.tag #html canvas { height: 460px; width: 580px; background-color: #000; border: 1px solid #666; }
+
+.tag input.embed { font-size: 8pt; color: #999; background-color: #2f2f2f; border: 1px solid #555; padding: 4px 5px 3px 2px; width: 350px; }
+.tag input.embed:hover { border-color: #ff0; }
 
 
-/* Add new application/visualization... */
+/* Add new application */
 .embed_toggle { margin-top: 40px; }
 .embed_details.disabled { color: #555; }
 
@@ -333,11 +336,9 @@ input.embed:hover { border-color: #ff0; }
 .comment .info .author_photo { float: left; margin-right: 8px; border: 1px solid #333; }
 .comment .info .author, .comment .timeago { }
 .comment .info .timeago { margin-left: 5px; }
-/*.comment .controls { margin-left: 2px; margin-bottom: 5px; }*/
 .comment p.text { color: #bbb; margin: 3px 0 0 43px; }
 
 .commentable { float: left; text-align: center; width: 100px; margin-right: 20px; padding-top: 10px; }
-
 
 /* User.index */
 ul.users li { float: left; text-align: center; margin: 0 15px 15px 0; width: 110px; height: 150px; overflow: hidden; }

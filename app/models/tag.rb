@@ -106,7 +106,7 @@ class Tag < ActiveRecord::Base
   # and end up with an attribute called 'gml_hash' which doesn't work
   def to_json(options = {})
     hash = Serializer.new(self, options).serializable_record
-    hash[:gml] = self.gml_hash && self.gml_hash['gml'] || []
+    hash[:gml] = self.gml_hash && self.gml_hash['gml'] || {}
     hash.reject! { |k,v| v.blank? }
     ActiveSupport::JSON.encode(hash)
   end
