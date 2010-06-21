@@ -2,19 +2,19 @@
 
 #main.tag.tabs
   %ul.tab_navigation
-    %li= link_to 'HTML5', '#html', :class => 'selected'
-    %li= link_to 'flash', '#flash'
+    %li= link_to 'flash', '#flash', :class => 'selected'
+    %li= link_to 'HTML5', '#html'
     %li= link_to 'image', '#image'
 
-  #html
-    %p= render :partial => 'tags/canvas_player', :object => @tag
-
-  #flash{:style => 'display: none;'}
+  #flash
     - html = tag_player(@tag, :width => '580px')
     %p= html
     - encoded_embed = HTMLEntities.new.encode(html).gsub("\n",'').squeeze(" ").chomp
     %label{:for => 'player_embed'} Embed Code
     %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}
+
+  #html{:style => 'display: none;'}
+    %p= render :partial => 'tags/canvas_player', :object => @tag
 
   #image{:style => 'display: none;'}
     - imgopts = {:width => 600}
