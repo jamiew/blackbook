@@ -30,8 +30,8 @@ function hex2rgb2(hexcolor)
 // ********************************************
 function load_gml(data) 
 {
-  // TODO handle either arrays OR single items
-  // e.g. /data.json?location=... and /data/145.json
+  // TODO handle both arrays and individual items...
+  // e.g. both /data.json?location=... and /data/145.json
   
 	if(typeof(data) != 'undefined')	
 	{
@@ -61,7 +61,7 @@ function load_gml(data)
 		/* 
 		 * concatenate pointlists of one tag and set them as global variables, so the processing.js draw function can acces them.
 		 * This is kind of a workarround because one can't give parameters to the setup or drawing functions.
-		 * Working with the iteration variable here because Objects can't be serialized and attached to the created sketch scripts, but numbers/strings can.
+  		 * Working with the iteration variable here because Objects can't be serialized and attached to the created sketch scripts, but numbers/strings can.
 		 */
 		pts = []; 
 		pts_opts = []; 
@@ -69,7 +69,7 @@ function load_gml(data)
 		for(j in strokes){ 
 			pts 		= pts.concat(strokes[j].pt); 
 			pts_opts 	= pts_opts.concat({
-			  stroke: (strokes[j].stroke_size || 5), 
+			  stroke: (strokes[j].stroke_size || 8), 
 			  color: (strokes[j].color ? hex2rgb2(strokes[j].color) : '255,255,255'), 
 			  drips: (strokes[j].dripping || false)
 			}); 			
@@ -77,9 +77,9 @@ function load_gml(data)
 		}
 
 		// create global vars on demand
-		eval("pts" + i + " = pts");
-	    eval("pts_opts" + i + " = pts_opts");
-		eval("strokeCount" + i + " = 0");
+    // eval("pts" + i + " = pts");
+    // eval("pts_opts" + i + " = pts_opts");
+    // eval("strokeCount" + i + " = 0");
 
 		// appending sketch script for current tag to its script tag
 		// TODO FIXME the size should be set from the canvas...
@@ -96,19 +96,17 @@ function load_gml(data)
 			  rotation = 0; \
 			  translation = [0, 0]; \
 			  console.log('Unknown appplication source: '+app_name); \
-			} console.log('rotation='+rotation+' translation='+translation); \
+			} \
+			console.log('rotation='+rotation+' translation='+translation); \
+      pts" + i + " = pts; \
+      pts_opts" + i + " = pts_opts; \
+      strokeCount"+i+" = 0; \
 		}; \
 		function draw() { \
-		  if(frameCount >= pts"+i+".length){ \
-  			return; \
-		  } \
 		  i = frameCount % pts"+i+".length; \
 		  prev = pts"+i+"[i-1]; \
 		  pt = pts"+i+"[i]; \
-		  if(i == 0) { \
-  			var b_canvas = document.getElementById('canvas'); \
-  			b_canvas.width = b_canvas.width; \
-		  } \
+      if(i == 0){ background(0); } \
 		  if(pt == undefined || pt == []){ \
   			strokeCount"+i+"++; \
   			return; \
@@ -118,10 +116,12 @@ function load_gml(data)
 		  } \
 		  dimx = (prev.x -pt.x)*width; \
 		  dimy = (prev.y -pt.y)*height; \
+  		hyp = 1/(sqrt(pow(dimx,2),pow(dimy,2)) + 20); \
 		  translate(translation[0], translation[1]); \
 		  rotate(rotation); \
-		  strokeWeight(pts_opts"+i+"[strokeCount"+i+"]['stroke']); \
-		  var colors = pts_opts"+i+"[strokeCount"+i+"]['color'].split(','); \
+		  num = (pow(hyp,0.5)*90); \
+  		strokeWeight(num); \
+      var colors = ['255','255','255']; \
 		  stroke(colors[0],colors[1],colors[2]); \
 		  line(prev.x*width, prev.y*height, pt.x*width, pt.y*height); \
 		}";
