@@ -272,7 +272,7 @@ ul#frontpage_tags li { line-height: 1.3em; }
 ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* span is occupied */
 
 /* User/Entry.show sidebar */
-#main { width: 600px; padding: 0; }
+#main { width: 590px; padding: 0; }
 #sidebar { width: 260px; float: right; border-left: 1px solid #222; padding: 10px 0 0 25px; font-size: 92%; }
 #sidebar.tag_sidebar { margin-top: 30px; padding: 0; border: 0; }
 #sidebar textarea { border: 1px solid #444; background-color: #222; color: #ccc; padding: 8px 8px 5px; margin-top: 10px; width: 95%; }

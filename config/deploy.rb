@@ -25,7 +25,7 @@ default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
 
 # Hooks
-before "deploy:restart", "gems:install"
+#before "deploy:restart", "gems:install"
 after "deploy:update_code", "deploy:create_symlinks"
 
 #	Recipes
