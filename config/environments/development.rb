@@ -19,23 +19,26 @@ config.cache_store = :mem_cache_store
 config.action_mailer.raise_delivery_errors = false
 config.action_mailer.delivery_method = :test
 
-# in dev use Bullet to auto-analyze easy DB optimizations
+# Use bullet to auto-analyze easy DB optimizations
 # http://github.com/flyerhzm/bullet
-config.gem 'bullet', :source => 'http://gemcutter.org' #only used in dev mode
 config.after_initialize do
-  Bullet.enable = true
+  Bullet.enable = false
   Bullet.alert = false # intense alert() notification action
   Bullet.bullet_logger = true # log/bullet.log
-  Bullet.console = true #javascript console()
-  Bullet.rails_logger = false # log/#{environment}.log
+  Bullet.console = false #javascript console()
+  Bullet.rails_logger = true # log/#{environment}.log
   Bullet.disable_browser_cache = true #...DOCME
 
   # Display growl notifications on Mac
-  # begin
-  #   require 'ruby-growl'
-  #   Bullet.growl = false
-  # rescue MissingSourceFile
-  #   STDERR.puts "$$ Bullet: could not initialize Growl; skipping..."
-  # end
-
+  begin
+    require 'ruby-growl'
+    Bullet.growl = false
+  rescue MissingSourceFile
+    STDERR.puts "$$ Bullet: could not initialize Growl; skipping..."
+  end
 end
+
+# To use Oink log parsing we need to use hodel3000-style logging
+# http://github.com/noahd1/oink
+#require RAILS_ROOT+'/lib/hodel_3000_logger'
+#config.logger = Hodel3000CompliantLogger.new(RAILS_ROOT+'/log/hodel_3000.log')

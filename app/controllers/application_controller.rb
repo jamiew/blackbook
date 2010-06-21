@@ -20,6 +20,11 @@ class ApplicationController < ActionController::Base
   # Global exceptions to catch
   rescue_from NoPermissionError, :with => :permission_denied
 
+  # Oink object debugging in dev
+  if RAILS_ENV == 'development'
+    include Oink::MemoryUsageLogger
+    include Oink::InstanceTypeCounter
+  end
 
   protected
 
