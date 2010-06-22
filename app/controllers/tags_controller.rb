@@ -145,9 +145,10 @@ class TagsController < ApplicationController
     render :text => "YEAH BOY", :layout => false
   end
 
-  # add the 'mfcc' keyword for the Media Facades contest
+  # add the 'mff2010' keyword for the Media Facades contest
   def nominate
-    @tag.gml_keywords = (@tag.gml_keywords.blank? ? "mfcc" : "#{@tag.gml_keywords},mfcc")
+    key = "mff2010"
+    @tag.gml_keywords = (@tag.gml_keywords.blank? ? key : "#{@tag.gml_keywords},#{key}")
     if @tag.save
       flash[:notice] = "Tag #{@tag.id} nominated"
     else
