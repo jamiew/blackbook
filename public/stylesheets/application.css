@@ -308,7 +308,7 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 
 /* Some metaclasses for quasi-searches */
 a.username_link, a.application_link { }
-a.username_link.anon, a.application_link.anon { text-decoration: none; border-bottom: 1px dotted #888; }
+a.username_link.anon, a.application_link.anon, .keywords a { text-decoration: none; border-bottom: 1px dotted #888; }
 
 /* Tag players, flash & canvas */
 #home #vis { margin-top: 15px; }
