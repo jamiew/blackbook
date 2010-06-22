@@ -26,6 +26,7 @@
     %ul
       - app = !@tag.gml_application.blank? && @tag.gml_application || @tag.application
       %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(@tag.sexy_app_name)}
+      %li== <strong>Keywords:</strong> #{@tag.gml_keywords.blank? ? 'NULL' : @tag.gml_keywords}
     %hr
     %ul
       - if !@tag.author.blank?
