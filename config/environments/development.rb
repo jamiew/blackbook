@@ -21,6 +21,7 @@ config.action_mailer.delivery_method = :test
 
 # Use bullet to auto-analyze easy DB optimizations
 # http://github.com/flyerhzm/bullet
+config.gem 'bullet'
 config.after_initialize do
   Bullet.enable = false
   Bullet.alert = false # intense alert() notification action
@@ -34,7 +35,7 @@ config.after_initialize do
     require 'ruby-growl'
     Bullet.growl = false
   rescue MissingSourceFile
-    STDERR.puts "$$ Bullet: could not initialize Growl; skipping..."
+    # STDERR.puts "$$ Bullet: could not initialize Growl; skipping..."
   end
 end
 
