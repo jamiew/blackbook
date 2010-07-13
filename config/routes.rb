@@ -34,8 +34,9 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :tags,
     :as => 'data',
     :has_many => [:comments, :favorites],
-    :member => [:upload_thumbnail, :flipped, :nominate],
+    :member => {:flipped => :get, :nominate => :post, :thumbnail => :post},
     :collection => [:latest, :random]
+  # map.upload_tag_thumbnail "/data/:id/thumbnail", :controller => 'tags', :action => 'thumbnail'
   map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
 
   # visualizations => /apps
