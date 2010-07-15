@@ -14,3 +14,4 @@ config/newrelic.yml
 public/javascripts/cache
 public/stylesheets/cache
 public/system/
+sync_db.sh
