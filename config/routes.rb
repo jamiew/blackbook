@@ -39,6 +39,9 @@ ActionController::Routing::Routes.draw do |map|
   # map.upload_tag_thumbnail "/data/:id/thumbnail", :controller => 'tags', :action => 'thumbnail'
   map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
 
+  map.latest_tag '/latest.:format', :controller => 'tags', :action => 'latest'
+  map.random_tag '/random.:format', :controller => 'tags', :action => 'random'
+
   # visualizations => /apps
   map.resources :visualizations,
     :as => 'apps',
