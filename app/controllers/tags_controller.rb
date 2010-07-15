@@ -142,7 +142,15 @@ class TagsController < ApplicationController
 
   # intended for canvasplayer dataURI callback
   def thumbnail
-    render :text => params.inspect, :layout => false
+    if @tag.image.exists?
+      render :text => 'thumbnail already exists', :status => 409 and return
+    end
+    @tag.image = params[:image]
+    @tag.save!
+    render :text => "OK", :status => 200, :layout => false
+  rescue
+    logger.error $!
+    render :text => "Error: #{$!}", :status => 500
   end
 
   # add the 'mff2010' keyword for the Media Facades contest
