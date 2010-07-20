@@ -310,9 +310,10 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 a.username_link, a.application_link { }
 a.username_link.anon, a.application_link.anon, .keywords a { text-decoration: none; border-bottom: 1px dotted #888; }
 
-/* Tag players, flash & canvas */
+/* Tag.show playback: flash, canvas, image */
 #home #vis { margin-top: 15px; }
 
+.tag #image img { width: 590px; }
 .tag #flash object, .tag #flash embed { min-height: 460px; border: 1px solid #666; }
 .tag #html canvas { height: 460px; width: 580px; background-color: #000; border: 1px solid #666; }
 
