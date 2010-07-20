@@ -19,7 +19,7 @@
       %p= render :partial => 'tags/canvas_player', :object => @tag
 
   #image{:style => 'display: none;'}
-    - imgopts = {:width => 600}
+    - imgopts = {}
     - if @tag.image.exists?
       .image= image_tag @tag.image(:large), imgopts
     - elsif @tag.remote_image
