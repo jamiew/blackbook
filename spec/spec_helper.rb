@@ -6,7 +6,7 @@ require 'spec/rails'
 require 'webrat/integrations/rspec-rails'
 
 require 'authlogic/test_case'
-require RAILS_ROOT+'/spec/factories'
+#require RAILS_ROOT+'/spec/factories'
 
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
