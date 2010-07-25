@@ -44,8 +44,12 @@ class ApplicationController < ActionController::Base
     @page_title = title
   end
 
-  def page_title
-    @page_title ? "#{@page_title} - #{SiteConfig.site_name}" : SiteConfig.site_name
+  def page_title(suffix = true)
+    if @page_title
+      @page_title + (suffix ? " - #{SiteConfig.site_name}" : '')
+    else
+      SiteConfig.site_name
+    end
   end
 
   # Catch-all render for no-permission errors

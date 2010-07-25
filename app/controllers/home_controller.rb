@@ -6,7 +6,7 @@ class HomeController < ApplicationController
     # @users = User.find(:all, :order => 'created_at DESC', :limit => 10)
     @tags = Tag.find(:all, :order => 'created_at DESC', :limit => 30, :include => [:user])
     @tag = @tags.shift
-    set_page_title "the Graffiti Markup Language (GML) database"
+    set_page_title("#000000book - an open database for Graffiti Markup Language (GML) files", false)
   end
 
   def activity
