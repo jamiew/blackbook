@@ -43,12 +43,6 @@ Rails::Initializer.run do |config|
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
 
-  # Middleware
-  # config.middleware.use Rack::Cache,
-  #   :verbose => true,
-  #   :metastore   => 'memcached://localhost:11211/blackbook-rack-cache-meta',
-  #   :entitystore => 'memcached://localhost:11211/blackbook-rack-cache-body'
-
 end
 
 # require everything in /lib
