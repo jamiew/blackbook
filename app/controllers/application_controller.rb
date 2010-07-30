@@ -39,14 +39,15 @@ class ApplicationController < ActionController::Base
 
   # Modify the global page title -- could also use @page_title
   # TODO change to page_title= (or just use @page_title/@title directly)
-  def set_page_title(title)
+  def set_page_title(title, suffix = true)
+    title += (suffix ? " - #{SiteConfig.site_name}" : '')
     title += " (page #{@page})" if @page.to_i > 1
     @page_title = title
   end
 
-  def page_title(suffix = true)
+  def page_title
     if @page_title
-      @page_title + (suffix ? " - #{SiteConfig.site_name}" : '')
+      @page_title
     else
       SiteConfig.site_name
     end
