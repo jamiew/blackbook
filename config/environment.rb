@@ -17,7 +17,7 @@ Rails::Initializer.run do |config|
   config.gem 'config_reader', :version => '0.0.6'
   config.gem 'RedCloth', :version => '4.2.3'
   config.gem 'authlogic', :version => '2.0.9'
-  config.gem 'nokogiri', :version => '1.4.2'
+  config.gem 'nokogiri'
   config.gem 'paperclip', :version => '2.3.3'
   config.gem 'unicode', :version => '0.3.1' # required by has_slug
   config.gem 'has_slug', :version => '0.2.7'
@@ -31,8 +31,8 @@ Rails::Initializer.run do |config|
   config.gem "capistrano-ext", :lib => false
 
   # Testing
-  config.gem "rspec", :lib => false, :version => ">= 1.2.0"
-  config.gem "rspec-rails", :lib => false, :version => ">= 1.2.0"
+  config.gem "rspec", :lib => false, :version => "1.3.0"
+  config.gem "rspec-rails", :lib => false, :version => "1.3.2"
   config.gem "factory_girl", :lib => false
   config.gem "webrat", :lib => false
 
