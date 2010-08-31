@@ -169,9 +169,6 @@ class TagsController < ApplicationController
   # interactive GML Syntax Validator
   # Actual processing -- accept /data/:id/validate but also accept raw data via POST
   def validate
-    set_page_title "GML Syntax Validator"
-    @noindex = true # Don't abuse this, Google
-
     if params[:id]
       @tag = Tag.find(params[:id])
     else
@@ -180,6 +177,8 @@ class TagsController < ApplicationController
     end
     @tag.validate_gml
 
+    set_page_title "GML Syntax Validator"
+    @noindex = true unless @tag.gml.blank? # No data = splash page
 
     respond_to do |wants|
       wants.html {
