@@ -14,7 +14,7 @@ __          __   _                          _
 			Note: This file is a fork of Jamie Wilkinson's canvasplayer http://github.com/jamiew/canvasplayer
 */
 
-console.log("canvasplayer.js loading...");
+// console.log("canvasplayer.js loading...");
 
 function cutHex(h){ return (h.charAt(0)=="#") ? h.substring(1,7) : h; }
 
@@ -91,13 +91,10 @@ function load_gml(data)
 		  if(app_name == 'Graffiti Analysis 2.0: DustTag' || app_name == 'DustTag: Graffiti Analysis 2.0' || app_name == 'Fat Tag - Katsu Edition'){ \
   			rotation = 80; \
   			translation = [0, 500]; \
-  			console.log('GML is known iPhone app, scaling...'); \
 		  } else { \
 			  rotation = 0; \
 			  translation = [0, 0]; \
-			  console.log('Unknown appplication source: '+app_name); \
 			} \
-			console.log('rotation='+rotation+' translation='+translation); \
       pts" + i + " = pts; \
       pts_opts" + i + " = pts_opts; \
       strokeCount"+i+" = 0; \
@@ -135,6 +132,6 @@ function load_gml(data)
 	}
 	else
 	{
-		console.log('error reading gml. gml undefined');
+    // console.log('error reading gml. gml undefined');
 	}
 }
