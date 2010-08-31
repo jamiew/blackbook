@@ -7,11 +7,11 @@
 
 <!-- load our GML via JSONp callback -->
 <script type="text/javascript" charset="utf-8">
-  var s=document.createElement('script');
+  var s = document.createElement('script');
   //s.setAttribute('src','http://000000book.com/data/'+tag_id+'.json?callback=load_gml');
   // var url = 'http://000000book.com/data/'+tag_id+'.json?callback=load_gml';
   var url = "<%= tag_path(@tag, :format => 'json', :callback => 'load_gml') %>";
-  console.log("Loading GSON data from url: "+url);
+  // console.log("Loading GSON data from url: "+url);
   s.setAttribute('src', url);
   s.setAttribute('id','drawing_stuff');
   document.getElementsByTagName('body')[0].appendChild(s);
