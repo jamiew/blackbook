@@ -90,7 +90,7 @@ ol.square li, ul.square li {
   margin-left: 15px;
   margin-bottom: 3px;
 }
-ul.circle li { list-style-type: circle; margin-left: 15px; }
+ul.circle li { list-style-type: disc; margin-left: 15px; }
 
 caption, th {
   text-align: left;
@@ -355,6 +355,6 @@ ul.users li img { display: block; margin-bottom: 5px; }
 #validator #results .recommendations { background-color: #070;  }
 #validator #results dt { font-size: 15pt; font-weight: bold; padding: 15px 10px 10px 20px; overflow: hidden; }
 #validator #results dd { margin-left: 15px; }
-#validator #results dd li { line-height: 1.5em; list-style: disc;margin-left: 25px; margin-bottom: 4px; }
+#validator #results dd li { line-height: 1.5em; list-style: disc; margin-left: 25px; margin-bottom: 4px; }
 #validator .congratulations { margin-top: 50px; font-size: 20pt; font-weight: normal; }
 #validator .congratulations img { margin-top: 30px; }

@@ -172,6 +172,7 @@ class TagsController < ApplicationController
       @tag = Tag.find(params[:id])
     else
       @tag = Tag.new(params[:tag])
+      @tag.gml = params[:gml] if @tag.gml.blank? && params[:gml]
     end
     @tag.validate_gml
 
@@ -186,6 +187,7 @@ class TagsController < ApplicationController
       # TODO FIXME to_xml does the fuckin' <hash> thing :(
       wants.xml   { render :xml => @tag.validation_results.to_xml(:dasherize => false, :skip_types => true) }
       wants.json  { render :json => @tag.validation_results.to_json(:callback => params[:callback]) }
+      wants.json  { render :text => @tag.validation_results.inspect }
     end
   end
 
