@@ -268,15 +268,13 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 ul#frontpage_tags li { line-height: 1.3em; }
 ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* span is occupied */
 
-/* User/Entry.show sidebar */
+/* General sidebar (tag/user) */
 #main { width: 590px; padding: 0; }
 #sidebar { width: 260px; float: right; border-left: 1px solid #222; padding: 10px 0 0 25px; font-size: 92%; }
 #sidebar.tag_sidebar { margin-top: 30px; padding: 0; border: 0; }
 #sidebar textarea { border: 1px solid #444; background-color: #222; color: #ccc; padding: 8px 8px 5px; margin-top: 10px; width: 95%; }
 
 #sidebar .infobox { background-color: #151515; padding: 5px 16px; margin-bottom: 30px; } /* just used in entry.show for now */
-/*#sidebar .modbox { margin-top: 30px; }*/
-/*#sidebar .infobox.comments { margin-top: 40px; }*/
 #sidebar .infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
 
 #sidebar span.download { margin-left: 5px; font-size: 120%; }
@@ -284,7 +282,7 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 #sidebar textarea.gml { border: 1px solid #ff0; }
 
 
-/* User.show-specific */
+/* User.show */
 #profile { width: 980px; margin: 0 auto; margin-left: -50px; }
 #profile #main { width: 425px; overflow: hidden; font-size: .9em; }
 #profile #main .image img { width: 260px; }
@@ -306,6 +304,8 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 /* Some metaclasses for quasi-searches */
 a.username_link, a.application_link { }
 a.username_link.anon, a.application_link.anon, .keywords a { text-decoration: none; border-bottom: 1px dotted #888; }
+
+#app_nav { clear: both; margin-top: -40px; font-size: 11px; color: #999; }
 
 /* Tag.show playback: flash, canvas, image */
 #home #vis { margin-top: 15px; }
