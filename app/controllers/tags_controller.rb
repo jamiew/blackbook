@@ -33,7 +33,7 @@ class TagsController < ApplicationController
     @page, @per_page = params[:page] && params[:page].to_i || 1, 15
     @tags ||= Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user], :conditions => (@search_context && @search_context[:conditions]))
 
-    set_page_title "Tag Data"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
+    set_page_title "GML Tags"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
 
     # fresh_when :last_modified => @tags.first.updated_at.utc unless @tags.blank?
     #, :etag => @tags.first
@@ -165,6 +165,11 @@ class TagsController < ApplicationController
     redirect_to(:back)
   end
 
+  # interactive GML Syntax Validator
+  def validate
+
+  end
+
 
 
 protected
@@ -263,9 +268,6 @@ protected
     # expire_fragment(:controller => 'home', :action => 'index')
     expire_fragment('home/index')
   end
-
-
-
 
 
 end

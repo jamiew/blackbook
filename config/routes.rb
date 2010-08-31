@@ -41,6 +41,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.latest_tag '/latest.:format', :controller => 'tags', :action => 'latest'
   map.random_tag '/random.:format', :controller => 'tags', :action => 'random'
+  map.validate_tag '/validate.:format', :controller => 'tags', :action => 'validate'
 
   # visualizations => /apps
   map.resources :visualizations,
