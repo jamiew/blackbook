@@ -32,57 +32,89 @@ describe Tag do
     end
   end
 
-  # Alternate formats
-  describe "to_json" do
-    it "should be valid" do
-      pending
+  describe "validating GML" do
+    before do
+      @tag = Factory.create(:tag_from_api)
     end
 
-    it "should include GML data" do
-      pending
-    end
+    # it "should error on no strokes"
+    # it "should error on no points"
+    # it "should error on no time data"
+    # it "should error on no environment"
+    # it "should error on no screenBounds"
+    #
+    # it "should warn on no header"
+    # it "should warn on no environment"
+    # it "should warn on no screenBounds"
+    # it "should warn on no application"
+    # it "should warn on no uniqueKey"
+    #
+    # it "should recommend using newlines"
+    # it "should recommend using tabs"
   end
 
-  describe "to_xml" do
-    it "should be valid" do
-      pending
-    end
-  end
-
-  describe "to_hash" do
-    it "should be valid" do
-      pending
-    end
-  end
-
-  # Transforms
-  describe "rotate_gml" do
-    it "should rotate GML data 90 degrees" do
-      pending
-    end
-
-    it "should only rotate data from iPhone apps (DustTag, FatTag)" do
-      pending
-    end
-  end
-
-  describe "validate_gml" do
-    before
+  describe "format conversion" do
+    before do
       @tag = Factory.create(:tag)
     end
 
-    it "should error on no strokes"
-    it "should error on no points"
-    it "should error on no time data"
-    it "should error on no environment"
-    it "should error on no screenBounds"
+    describe "to_json" do
+      before do
+        @string = @tag.to_json
+        @json = ActiveSupport::JSON.decode(@string)
+      end
 
-    it "should warn on no header"
-    it "should warn on no environment"
-    it "should warn on no screenBounds"
-    it "should warn on no application"
-    it "should warn on no uniqueKey"
+      # I feel like this should actually return a hash >:|
+      it "should return a string" do
+        @string.class.should == String
+        @string.should_not be_blank
+      end
+
+      it "should be valid JSON" do
+        @json.class == Hash
+        @json.length.should > 0
+        # Check for some fields?
+      end
+
+      it "should contain GML data (GSON)" do
+        @tag.gml_hash.should_not be_blank # Or else there won't be @json['gml']
+        @json['gml'].should_not be_blank
+      end
+    end
+
+    it "to_xml" do
+      xml = @tag.to_xml
+      xml.should_not be_blank
+      xml.to_s.should match(/id/)
+    end
+
+    it "gml_document should be a valid Nokogiri document" do
+      tag = Factory(:tag)
+      doc = tag.gml_document
+      tag.gml.should_not be_blank
+      doc.class.should == Nokogiri::XML::Document
+      (doc/'header').should_not be_blank
+    end
+
+    it "gml_hash should output a valid Hash" do
+      tag = Factory(:tag)
+      tag.gml.should_not be_blank
+      tag.gml_hash.class.should == Hash
+      tag.gml_hash.should_not be_blank
+    end
   end
+
+  # Manipulation & transformation
+  describe "rotate_gml transformation" do
+    # it "should rotate GML data 90 degrees" do
+    #   pending
+    # end
+    #
+    # it "should only rotate data from iPhone apps (DustTag, FatTag)" do
+    #   pending
+    # end
+  end
+
 
   protected
 
