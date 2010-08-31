@@ -31,7 +31,7 @@ class TagsController < ApplicationController
     end
 
     @page, @per_page = params[:page] && params[:page].to_i || 1, 15
-    @tags ||= Tag.paginate(:page => @page, :per_page => @per_page, :order => 'created_at DESC', :include => [:user], :conditions => (@search_context && @search_context[:conditions]))
+    @tags ||= Tag.paginate(:page => @page, :per_page => @per_page, :order => 'tags.created_at DESC', :include => [:user], :conditions => (@search_context && @search_context[:conditions]))
     @applications ||= Visualization.find_by_sql("SELECT DISTINCT application AS name FROM tags ORDER BY name")
     @applications.reject! { |app| app.name.blank? }
 
