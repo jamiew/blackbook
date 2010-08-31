@@ -200,7 +200,6 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 #header a.root_link, #header a.root_link img { text-decoration: none; border: 0; }
 #header a.root_link:hover, #header a.root_link:hover img { background-color: transparent; border: 0; padding: 0; text-decoration: none; }
 #header a.root_link img { margin-top: -40px; height: 100px; }
-/* beta logo */
 #header .masthead { width: 450px; white-space:nowrap; }
 #header h1.title { font-family: "Times", serif; font-size: 3em; font-weight: bold; margin: 0; padding: 0; line-height: 1em; letter-spacing: 1px; }
 #header h2.byline { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; margin-top: -0.5em; }
@@ -241,7 +240,6 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 .left_column { width: 580px; }
 .right_column { float: right; width: 330px; }
 
-
 #flash-notice   { color: #fff; background-color: #9c9; }
 #flash-warning  { color: #cc9; }
 #flash-error    { color: #fff; background-color: #c99; }
@@ -263,9 +261,8 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 .signup_or_login .help { font-size: 0.9em; margin-top: 2em; }
 
 
-
 /* Main page layout biz */
-#home #intro { line-height: 1.2em; font-size: 90%; color: #aaa; margin: 5px 0 5px 0; padding: 5px 5px 7px 5px; background-color: #0f0f0f; border-bottom: 1px solid #222; }
+#home #intro { line-height: 1.3em; font-size: 90%; color: #aaa; margin: 5px 0 5px 0; padding: 5px 5px 7px 5px; border-bottom: 1px solid #222; }
 #tags a img { margin-right: 5px; }
 
 ul#frontpage_tags li { line-height: 1.3em; }
@@ -344,3 +341,17 @@ a.username_link.anon, a.application_link.anon, .keywords a { text-decoration: no
 /* User.index */
 ul.users li { float: left; text-align: center; margin: 0 15px 15px 0; width: 110px; height: 150px; overflow: hidden; }
 ul.users li img { display: block; margin-bottom: 5px; }
+
+
+/* Validator */
+#validator #form  { width: 400px; float: left; margin-right: 40px; }
+#validator #results { font-size: 13pt; margin-left: 440px; }
+#validator #results dd, #validator #results dt { padding: 6px 10px 20px; }
+#validator #results .errors { background-color: #700;  }
+#validator #results .warnings { background-color: #770;  }
+#validator #results .recommendations { background-color: #070;  }
+#validator #results dt { font-size: 15pt; font-weight: bold; padding: 15px 10px 10px 20px; overflow: hidden; }
+#validator #results dd { margin-left: 15px; }
+#validator #results dd li { line-height: 1.5em; list-style: disc;margin-left: 25px; margin-bottom: 4px; }
+#validator .congratulations { margin-top: 50px; font-size: 20pt; font-weight: normal; }
+#validator .congratulations img { margin-top: 30px; }

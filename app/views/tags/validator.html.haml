@@ -1,0 +1,40 @@
+- required = redstar
+
+#validator.full.centered
+  %p= link_to '&larr; back to all tags', tags_path
+  - if @tag.new_record?
+    %h1= @tag.gml.blank? ? 'GML Syntax Validator' : 'Validating Your GML...'
+  - else
+    %h1== Validating Tag ##{@tag.id}...
+
+  == Test your Graffiti Markup...
+  == for more info check out the #{link_to 'reference GML specification', 'http://fffff.at/gml'}
+  %hr
+
+  #form
+    - form_for(@tag, :url => validate_path) do |form|
+      = form.label :gml_file, 'Upload <abbr>GML</abbr> file'+required
+      = form.file_field :gml_file, :size => 10
+
+      .spacer{:style => 'display: block; margin: 20px 50px; font-style: italic;'}
+        or
+
+      = form.label :gml, 'paste raw GML'+required
+      = form.text_area :gml, :label => 'paste raw GML'+required, :rows => 10
+      %p= form.submit 'Validate'
+
+  - unless @tag.gml.blank?
+    #results
+      / %h3 Validation Results
+      - if @tag.validation_results.values.flatten.blank?
+        .congratulations
+          Congrats! Your GML is totally valid!
+          = image_tag('applause.gif')
+      - else
+        %dl
+          - @tag.validation_results.each do |key,values|
+            %dt{:class => key}== #{pluralize values.length, key.to_s.singularize}
+            %dd{:class => key}
+              %ul
+                - values.each do |value|
+                  %li=h value
