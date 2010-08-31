@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe TagsController do
 
+  integrate_views
+
   before do
     activate_authlogic
     @gml = Factory(:gml_object).data
@@ -27,7 +29,7 @@ describe TagsController do
 
     describe "redirection" do
       it "params[:redirect]=1 should redirect to the tag page" do
-        Tag.destroy_all # FIXME not sure why we're ending up w/ dupe objs
+        Tag.destroy_all # FIXME not sure why we're ending up w/ dupe objs??
         post :create, :gml => @gml, :redirect => 1
         assigns[:tag].should be_valid
         response.should redirect_to(tag_path(assigns[:tag]))
@@ -49,16 +51,53 @@ describe TagsController do
 
     describe "cache expiry" do
       it "should expire the index page" do
-        pending 'TODO'
+        pending
       end
+
+      # TODO there are a # of other keys expired to test!!
     end
   end
 
   describe "GET #index" do
-    it "should filter on keywords"
-    it "should filter on location"
-    it "should filter on application"
-    it "should filter on user"
+
+    before do
+      @default_tag = Factory(:tag)
+      @should_mention_application = lambda { |matchable|
+        response.should be_success
+        response.body.should match(matchable)
+        response.body.should_not match(@default_tag.application)
+      }
+    end
+
+    it "should filter on keywords" do
+      Factory.create(:tag, :application => 'mfcc_test_app', :gml_keywords => 'mfcc')
+      get :index, :keywords => 'mfcc'
+      @should_mention_application.call(/mfcc_test_app/)
+    end
+
+    it "should filter on location" do
+      Factory.create(:tag, :application => 'location_test', :location => 'San Francisco')
+      get :index, :location => 'San Francisco'
+      @should_mention_application.call(/location_test/)
+    end
+
+    it "should filter on application (using 'application')" do
+      Factory.create(:tag, :application => 'app_test')
+      get :index, :application => 'mfcc'
+      # @should_mention_application.call(/app_test/)
+    end
+
+    it "should filter on application (using 'gml_application')" do
+      Factory.create(:tag, :application => 'displayed_name', :gml_application => 'real_test_string')
+      get :index, :application => 'real_test_string'
+      # @should_mention_application.call(/displayed_name/)
+    end
+
+    it "should filter on user (using last 5 characters of gml_uniquekey_hash)" do
+      tag = Factory.create(:tag, :application => 'user_test', :gml_uniquekey => 'lol')
+      get :index, :user => tag.secret_username # TODO rename this method, it is undescriptive
+      # @should_mention_application.call(/user_test/)
+    end
   end
 
 end
