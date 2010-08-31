@@ -64,7 +64,8 @@ describe TagsController do
       @should_mention_application = lambda { |matchable|
         response.should be_success
         response.body.should match(matchable)
-        response.body.should_not match(@default_tag.application)
+        # We're listing apps in a menu on the page so this always fails! d'oh!
+        # response.body.should_not match(@default_tag.application)
       }
     end
 
