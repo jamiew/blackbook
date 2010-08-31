@@ -16,7 +16,7 @@ class VisualizationsController < ApplicationController
     end
 
     before :index do
-      set_page_title "Applications"
+      set_page_title "GML Applications"
     end
 
     before :show do

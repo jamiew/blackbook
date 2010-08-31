@@ -126,21 +126,20 @@ class Tag < ActiveRecord::Base
   end
   alias :document :gml_document # Can't decide on the name; how much gml_ prefixing do we want?
 
-  # Read the important bits of the GML -- this is also used
-  # by the before_save processing method to add
+  # Read the important bits of the GML -- also called by the save_header :before_save hook
   def gml_header
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
 
     if doc.nil? || (doc/'header').nil?
-      # logger.error "NIL OR NO HEADER DOC"
+      logger.error "NIL OR NO HEADER DOC"
       return {}
     end
 
     attrs = {}
     attrs[:filename] = (doc/'header'/'filename')[0].text rescue nil
 
-    # whitelist approach, explicitly name things
+    # whitelist approach -- explicitly name things
     client = (doc/'header'/'client')[0] rescue nil
     attrs[:gml_application] = (client/'name').text rescue nil
     attrs[:gml_username] = (client/'username').text rescue nil
@@ -152,7 +151,7 @@ class Tag < ActiveRecord::Base
 
     # encode the uniquekey with SHA-1 immediately
     # FIXME this slows this method down significantly -- denormalize whole hash to the model on save...?
-    attrs[:gml_uniquekey_hash] = Digest::SHA1.hexdigest(attrs[:gml_uniquekey]) unless attrs[:gml_uniquekey].blank?
+    attrs[:gml_uniquekey_hash] = self.class.hash_uniquekey(attrs[:gml_uniquekey]) unless attrs[:gml_uniquekey].blank?
 
     return attrs
   end
@@ -275,6 +274,7 @@ protected
     header = (doc/'header')
     if header.blank?
       logger.error "Tag.process_gml: no header found in GML"
+      # TODO raise exception
       return nil
     end
 
@@ -299,6 +299,45 @@ protected
     if self.application =~ /eyeSaver/ # weak
       user = User.find_by_login('tempt1')
       self.user_id = user.id
+    end
+  end
+
+  def self.hash_uniquekey(string)
+    Digest::SHA1.hexdigest(string)
+  end
+
+  # Parse and build errors & warnings
+  # Not actually used as a validation, but
+  def validate_gml
+    doc = gml_document
+    errors, warnings, recommendations = [], []
+
+    errors << check_for_tag('stroke', "No <stroke> tags - at least 1 stroke required")
+    errors << check_for_tag('pt', "No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
+
+    # TODO use nested tags -- e.g. stroke/pt/t rather than just t
+    warnings << check_for_tag('t', "No <t> tags in your points! Time data makes things much more interesting")
+    warnings << check_for_tag('environment', "No <environment> tag")
+    warnings << check_for_tag('up', "No <up> tag in your <environment> - is this horizontal or landscape?!")
+    warnings << check_for_tag('screenBounds', "No <screenBounds> tag in your <environment> - otherwise apps might draw it in the wrong aspect ratio")
+
+    # Suggest newlines & indenting!
+    recommendations << "You don't have any newlines - proper formatting makes your GML nice & readable!" unless doc.to_s =~ "\n"
+    recommendations << "You don't have any tabs - indenting is the bomb yo" unless doc.to_s =~ "\t" || doc.to_s =~ "  " # 2 spaces = 1 tab
+
+    return {:errors => errors.compact, :warnings => warnings.compact, :recommendations => recommendations.compact}
+  rescue
+    errors ||= []
+    errors << "Error parsing GML: #{$!} -- most likely malformed XML"
+    return {:errors => errors, :warnings => warnings}
+  end
+
+  def check_for_tag(tag, message)
+    @tag_doc ||= gml_document
+    if (@tag_doc/tag).blank?
+      return message
+    else
+      return nil
     end
   end
 
