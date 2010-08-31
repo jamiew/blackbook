@@ -281,12 +281,20 @@ protected
 
   # TODO this should be a Sweeper
   def expire_caches
+
+    formats = [nil,'json','gml','xml','rss']
+
+    # Tags#show
     if @tag && !@tag.new_record?
-      [nil,'json','gml','xml','rss'].each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
+      formats.each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
       Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash) # Write-through object caching, but handling in the controller
     end
-    expire_fragment(:controller => 'tags', :action => 'index')
-    # expire_fragment(:controller => 'home', :action => 'index')
+
+    # Tags#index
+    formats.each { |format| expire_fragment(:controller => 'tags', :action => 'index', :format => format) }
+
+    # Home#index -- FIXME which of these is correct?!
+    expire_fragment(:controller => 'home', :action => 'index')
     expire_fragment('home/index')
   end
 
