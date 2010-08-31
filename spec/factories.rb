@@ -31,7 +31,7 @@ Factory.define :admin, :parent => :user do |t|
   t.admin true
 end
 
-# A normal tag
+# A minimum GML tag
 Factory.define :tag do |t|
   t.user { |a| a.association(:user) }
   t.application 'TestApp'
@@ -55,7 +55,7 @@ end
 # Stores the actual GML
 Factory.define :gml_object, :class => GMLObject do |t|
   t.tag_id 1
-  t.data "<gml><header><client><name>rspec</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></gml>"
+  t.data "<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
 end
 
 # A GML application

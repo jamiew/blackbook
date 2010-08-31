@@ -66,7 +66,25 @@ describe Tag do
     end
   end
 
-protected
+  describe "validate_gml" do
+    before
+      @tag = Factory.create(:tag)
+    end
+
+    it "should error on no strokes"
+    it "should error on no points"
+    it "should error on no time data"
+    it "should error on no environment"
+    it "should error on no screenBounds"
+
+    it "should warn on no header"
+    it "should warn on no environment"
+    it "should warn on no screenBounds"
+    it "should warn on no application"
+    it "should warn on no uniqueKey"
+  end
+
+  protected
 
   def base_gml
     {
