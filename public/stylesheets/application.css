@@ -279,7 +279,7 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 /*#sidebar .infobox.comments { margin-top: 40px; }*/
 #sidebar .infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
 
-#sidebar span.download { margin-left: 5px; }
+#sidebar span.download { margin-left: 5px; font-size: 120%; }
 #sidebar span.what-is-gml { margin-left: 2px; }
 #sidebar textarea.gml { border: 1px solid #ff0; }
 
@@ -312,10 +312,13 @@ a.username_link.anon, a.application_link.anon, .keywords a { text-decoration: no
 
 .tag #image img { width: 590px; }
 .tag #flash object, .tag #flash embed { min-height: 460px; border: 1px solid #666; }
-.tag #html canvas { height: 460px; width: 580px; background-color: #000; border: 1px solid #666; }
+.tag #html5 canvas { height: 460px; width: 580px; background-color: #000; border: 1px solid #666; }
 
 .tag input.embed { font-size: 8pt; color: #999; background-color: #2f2f2f; border: 1px solid #555; padding: 4px 5px 3px 2px; width: 350px; }
 .tag input.embed:hover { border-color: #ff0; }
+
+.tag #html5 .beta { color: #666; }
+.tag #html5 .beta a { color: #999; }
 
 
 /* Add new application */
