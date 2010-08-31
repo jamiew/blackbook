@@ -32,7 +32,7 @@
           = image_tag('applause.gif')
       - else
         %dl
-          - @tag.validation_results.each do |key,values|
+          - @tag.validation_results.reverse.each do |key,values|
             %dt{:class => key}== #{pluralize values.length, key.to_s.singularize}
             %dd{:class => key}
               %ul
