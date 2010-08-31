@@ -43,7 +43,6 @@ class TagsController < ApplicationController
       wants.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
       wants.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
       wants.rss  { render :rss => @tags }
-      # TODO: .js => Embeddable widget
     end
   end
 
@@ -71,7 +70,6 @@ class TagsController < ApplicationController
       wants.gml   { render :xml => @tag.gml(:iphone_rotate => params[:iphone_rotate]) }
       wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }
       wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
-      # TODO .js => Embeddable widget
     end
   end
 
@@ -166,8 +164,27 @@ class TagsController < ApplicationController
   end
 
   # interactive GML Syntax Validator
+  # Actual processing -- accept /data/:id/validate but also accept raw data via POST
   def validate
+    if params[:id]
+      @tag = Tag.find(params[:id])
+    else
+      @tag = Tag.new(params[:tag])
+    end
+    @tag.validate_gml
 
+    respond_to do |wants|
+      wants.html {
+        if request.xhr?
+          render :text => @tag..validation_results.inspect
+        else
+          render 'validator'
+        end
+      }
+      # TODO FIXME to_xml does the fuckin' <hash> thing :(
+      wants.xml   { render :xml => @tag.validation_results.to_xml(:dasherize => false, :skip_types => true) }
+      wants.json  { render :json => @tag.validation_results.to_json(:callback => params[:callback]) }
+    end
   end
 
 

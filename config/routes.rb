@@ -34,14 +34,15 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :tags,
     :as => 'data',
     :has_many => [:comments, :favorites],
-    :member => {:flipped => :get, :nominate => :post, :thumbnail => [:post,:put]},
+    :member => {:flipped => :get, :nominate => :post, :thumbnail => [:post,:put], :validate => :get},
     :collection => [:latest, :random]
-  # map.upload_tag_thumbnail "/data/:id/thumbnail", :controller => 'tags', :action => 'thumbnail'
   map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
 
   map.latest_tag '/latest.:format', :controller => 'tags', :action => 'latest'
   map.random_tag '/random.:format', :controller => 'tags', :action => 'random'
-  map.validate_tag '/validate.:format', :controller => 'tags', :action => 'validate'
+
+  map.validator '/validator.:format', :controller => 'tags', :action => 'validate', :method => :get
+  map.validate  '/validate.:format',  :controller => 'tags', :action => 'validate', :method => :post
 
   # visualizations => /apps
   map.resources :visualizations,
@@ -49,18 +50,9 @@ ActionController::Routing::Routes.draw do |map|
     :has_many => [:comments, :favorites],
     :member => {:approve => :put, :unapprove => :put}
 
-  # TODO...
-  # map.resources :favorites
   map.resources :comments
 
   map.activity '/activity', :controller => 'home', :action => 'activity'
-
-  # TODO forum
-  # map.resources :forums do |forum|
-  #   forum.resources :forum_threads do |threads|
-  #     threads.resources :forum_posts
-  #   end
-  # end
 
   # # Install the default routes
   # map.connect ':controller/:action/:id'

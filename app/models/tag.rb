@@ -41,7 +41,9 @@ class Tag < ActiveRecord::Base
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
 
   # Placeholders for assigning data from forms
-  attr_accessor :gml_file, :existing_application_id
+  attr_accessor :gml_file
+  attr_accessor :existing_application_id
+  attr_accessor :validation_results
 
 
   # wrap remote_imge to always add our local FFlickr...
@@ -117,7 +119,6 @@ class Tag < ActiveRecord::Base
     options[:except] += self.attributes.select { |key,value| value.blank? }
     super(options)
   end
-
 
   # GML as a Nokogiri object...
   def gml_document
@@ -215,6 +216,35 @@ class Tag < ActiveRecord::Base
     return nil
   end
 
+  # Parse and build errors & warnings
+  # Not actually used as a validation, but
+  def validate_gml
+    doc = gml_document
+    errors, warnings, recommendations = [], [], []
+
+    # TODO use nested tags -- e.g. stroke/pt/t rather than just t
+    errors << check_for_tag('stroke', "No <stroke> tags - at least 1 stroke required")
+    errors << check_for_tag('pt', "No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
+
+    warnings << check_for_tag('time', "No <time> tags in your points! Time data makes things so much more interesting")
+    warnings << check_for_tag('environment', "No <environment> tag")
+    warnings << check_for_tag('up', "No <up> tag in your <environment> - is this horizontal or landscape?!")
+    warnings << check_for_tag('screenBounds', "No <screenBounds> tag in your <environment> - otherwise apps might draw it in the wrong aspect ratio")
+
+    # Suggest newlines & indenting!
+    recommendations << "You don't have any newlines. Proper formatting makes your GML nice & human-readable" unless doc.to_s =~ /\n/
+    recommendations << "You don't have any tabs. Indenting is the bomb yo" unless doc.to_s =~ /\t/ || doc.to_s =~ /  / # assume 2 spaces = 1 tab
+
+  rescue
+    errors << "Error parsing GML (malformed XML?): #{$!.class} - #{$!}"
+  ensure
+    self.validation_results = {:errors => errors.compact, :warnings => warnings.compact, :recommendations => recommendations.compact}
+    self.validation_results.reject! { |key,value| value.blank? }
+    logger.info "GML Validation Results..."
+    logger.info self.validation_results.inspect
+    return validation_results
+  end
+
 
 protected
 
@@ -306,34 +336,9 @@ protected
     Digest::SHA1.hexdigest(string)
   end
 
-  # Parse and build errors & warnings
-  # Not actually used as a validation, but
-  def validate_gml
-    doc = gml_document
-    errors, warnings, recommendations = [], []
-
-    errors << check_for_tag('stroke', "No <stroke> tags - at least 1 stroke required")
-    errors << check_for_tag('pt', "No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
-
-    # TODO use nested tags -- e.g. stroke/pt/t rather than just t
-    warnings << check_for_tag('t', "No <t> tags in your points! Time data makes things much more interesting")
-    warnings << check_for_tag('environment', "No <environment> tag")
-    warnings << check_for_tag('up', "No <up> tag in your <environment> - is this horizontal or landscape?!")
-    warnings << check_for_tag('screenBounds', "No <screenBounds> tag in your <environment> - otherwise apps might draw it in the wrong aspect ratio")
-
-    # Suggest newlines & indenting!
-    recommendations << "You don't have any newlines - proper formatting makes your GML nice & readable!" unless doc.to_s =~ "\n"
-    recommendations << "You don't have any tabs - indenting is the bomb yo" unless doc.to_s =~ "\t" || doc.to_s =~ "  " # 2 spaces = 1 tab
-
-    return {:errors => errors.compact, :warnings => warnings.compact, :recommendations => recommendations.compact}
-  rescue
-    errors ||= []
-    errors << "Error parsing GML: #{$!} -- most likely malformed XML"
-    return {:errors => errors, :warnings => warnings}
-  end
-
   def check_for_tag(tag, message)
     @tag_doc ||= gml_document
+    logger.info "check_for_tag(#{tag.inspect}, #{message.inspect})"
     if (@tag_doc/tag).blank?
       return message
     else

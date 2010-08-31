@@ -59,7 +59,6 @@ describe TagsController do
   end
 
   describe "GET #index" do
-
     before do
       @default_tag = Factory(:tag)
       @should_mention_application = lambda { |matchable|
@@ -100,4 +99,57 @@ describe TagsController do
     end
   end
 
+  describe "GET #validate" do
+    it "should work with an existing tag_id" do
+      @tag = Factory(:tag)
+      get :validate, :id => @tag.id
+      response.should be_success
+      response.body.should match(/Validating Tag ##{@tag.id}/)
+    end
+
+    it "should 404 with a bad tag_id" do
+      Tag.destroy_all
+      lambda { get :validate, :id => 666 }.should raise_error
+      # TODO make sure it's a *404*
+    end
+  end
+
+  describe "POST #validate" do
+    it "should present form for submitting GML if no tag data" do
+      pending 'route broken?'
+      post :validate
+      response.should be_success
+      response.body.should match(/GML Syntax Validator/)
+    end
+
+    it "should work with raw :tag data" do
+      pending 'route broken?'
+      post :validate, :tag => {:gml => "<gml>...</gml>"}
+      response.should be_success
+      response.body.should match(/Validating Your GML.../)
+    end
+
+    it "should return XML" do
+      pending 'route broken'
+      @tag = Factory(:tag)
+      post :validate, :id => @tag.id, :format => 'xml'
+      response.should be_success
+      # TODO test syntax
+    end
+
+    it "should return JSON" do
+      @tag = Factory(:tag)
+      post :validate, :id => @tag.id, :format => 'json'
+      response.should be_success
+      # TODO test syntax
+    end
+
+    it "should return text via XmlHttpRequest" do
+      pending 'broken too :('
+      @tag = Factory(:tag)
+      xhr :validate, :id => @tag.id, :format => 'json'
+      response.should be_success
+      # TODO test syntax
+    end
+  end
 end
