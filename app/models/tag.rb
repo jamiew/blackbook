@@ -225,21 +225,32 @@ class Tag < ActiveRecord::Base
     # TODO use nested tags -- e.g. stroke/pt/t rather than just t
     errors << check_for_tag('stroke', "No <stroke> tags - at least 1 stroke required")
     errors << check_for_tag('pt', "No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
+    errors << check_for_tag('x', "Missing <x> tags inside your <pt>'s") # FIXME really verify each point...
+    errors << check_for_tag('y', "Missing <y> tags inside your <pt>'s")
 
-    warnings << check_for_tag('time', "No <time> tags in your points! Time data makes things so much more interesting")
+    warnings << check_for_tag('time', "No <time> tags in your <pt> tags! Capturing time data makes things much more interesting.")
+    warnings << check_for_tag('client', "No <client> tag - provide some info about your app!")
     warnings << check_for_tag('environment', "No <environment> tag")
     warnings << check_for_tag('up', "No <up> tag in your <environment> - is this horizontal or landscape?!")
     warnings << check_for_tag('screenBounds', "No <screenBounds> tag in your <environment> - otherwise apps might draw it in the wrong aspect ratio")
+    # Offset? Rotation? z coords? could be a 'protips' section...
+    # Time? Maybe just recommendation?
 
-    # Suggest newlines & indenting!
+    recommendations << check_for_tag('uniqueKey', "No <uniqueKey> tag - includign a unique device ID of some kind lets users pair their 000000book accounts with your app, e.g. iPhone uuid, MAC address, etc")
     recommendations << "You don't have any newlines. Proper formatting makes your GML nice & human-readable" unless doc.to_s =~ /\n/
     recommendations << "You don't have any tabs. Indenting is the bomb yo" unless doc.to_s =~ /\t/ || doc.to_s =~ /  / # assume 2 spaces = 1 tab
+    # Geo information?
+    # Brushes? Layers? Styles?
+    # Pressure, skew, yaw etc?
 
   rescue
     errors << "Error parsing GML (malformed XML?): #{$!.class} - #{$!}"
   ensure
-    self.validation_results = {:errors => errors.compact, :warnings => warnings.compact, :recommendations => recommendations.compact}
-    self.validation_results.reject! { |key,value| value.blank? }
+    self.validation_results = ActiveSupport::OrderedHash.new
+    self.validation_results[:errors] = errors.compact unless errors.blank?
+    self.validation_results[:warnings] = warnings.compact unless warnings.blank?
+    self.validation_results[:recommendations] = recommendations.compact unless recommendations.blank?
+
     logger.info "GML Validation Results..."
     logger.info self.validation_results.inspect
     return validation_results
@@ -338,7 +349,6 @@ protected
 
   def check_for_tag(tag, message)
     @tag_doc ||= gml_document
-    logger.info "check_for_tag(#{tag.inspect}, #{message.inspect})"
     if (@tag_doc/tag).blank?
       return message
     else

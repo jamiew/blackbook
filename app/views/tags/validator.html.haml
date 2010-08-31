@@ -7,8 +7,6 @@
   - else
     %h1== Validating Tag ##{@tag.id}...
 
-  == Test your Graffiti Markup...
-  == for more info check out the #{link_to 'reference GML specification', 'http://fffff.at/gml'}
   %hr
 
   #form
@@ -23,16 +21,34 @@
       = form.text_area :gml, :label => 'paste raw GML'+required, :rows => 10
       %p= form.submit 'Validate'
 
-  - unless @tag.gml.blank?
+  - if @tag.gml.blank?
+    %p Upload or paste in your Graffiti Markup Language to test it out.
+    %p== Read more about the #{link_to 'reference GML spec', 'http://graffitimarkuplanguage.com/spec'}
+
+    %h3 GML Validator
+    %ul.square
+      %li Will check for syntax errors
+      %li Are you missing any important tags?
+      %li Make sure other GML players will be able to scale & orient correctly
+      %li Ensure general awesomeness
+
+    %p== #{redstar} every GML tag page on 000000book now has a "#{link_to 'Validate GML', validate_tag_path(Tag.last)}" link to jump here quickly.
+    %p== #{redstar} API-enabled: POST data to this page in the "gml" or "tag[gml]" field, or fetch URLs like:
+    %ul.formats.square
+      - reference_tag = 161 # A personal favorite
+      %li= link_to validate_tag_url(:id => reference_tag, :format => "xml"), validate_tag_url(:id => reference_tag, :format => "xml")
+      %li= link_to validate_tag_url(:id => reference_tag, :format => "json"), validate_tag_url(:id => reference_tag, :format => "json")
+      %li= link_to validate_tag_url(:id => reference_tag, :format => "txt"), validate_tag_url(:id => reference_tag, :format => "txt")
+  - else
     #results
       / %h3 Validation Results
       - if @tag.validation_results.values.flatten.blank?
         .congratulations
-          Congrats! Your GML is totally valid!
+          Congratulations! Your GML is valid!
           = image_tag('applause.gif')
       - else
         %dl
-          - @tag.validation_results.reverse.each do |key,values|
+          - @tag.validation_results.each do |key,values|
             %dt{:class => key}== #{pluralize values.length, key.to_s.singularize}
             %dd{:class => key}
               %ul
