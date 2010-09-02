@@ -1,47 +1,57 @@
 - required = redstar
 
 #validator.full.centered
-  %p= link_to '&larr; back to all tags', tags_path
-  - if @tag.new_record?
-    %h1= @tag.gml.blank? ? 'GML Syntax Validator' : 'Validating Your GML...'
-  - else
-    %h1== Validating Tag ##{@tag.id}...
-
-  %hr
-
+  - if false
+    %p= link_to '&larr; back to all tags', tags_path
+  %p &nbsp;
   #form
     - form_for(@tag, :url => validate_path) do |form|
-      = form.label :gml_file, 'Upload <abbr>GML</abbr> file'+required
+      .floatLeft= form.label :id, '000000book Tag ID:'
+      &nbsp;&nbsp;
+      = form.text_field :id, :size => 5
+      = form.submit 'Validate'
+
+      .spacer{:style => 'display: block; margin: 10px 50px 20px; font-style: italic;'} or
+
+      = form.label :gml_file, 'Upload <abbr>GML</abbr> file:'
       = form.file_field :gml_file, :size => 10
+      = form.submit 'Validate'
 
-      .spacer{:style => 'display: block; margin: 20px 50px; font-style: italic;'}
-        or
+      .spacer{:style => 'display: block; margin: 10px 50px 20px; font-style: italic;'} or
 
-      = form.label :gml, 'paste raw GML'+required
-      = form.text_area :gml, :label => 'paste raw GML'+required, :rows => 10
+      = form.label :gml, 'Raw GML:'
+      = form.text_area :gml, :label => 'paste raw GML'+required, :rows => 14
       %p= form.submit 'Validate'
 
   - if @tag.gml.blank?
-    %p Upload or paste in your Graffiti Markup Language to test it out.
-    %p== Read more about the #{link_to 'reference GML spec', 'http://graffitimarkuplanguage.com/spec'}
+    %h1 GML Syntax Validator
 
-    %h3 GML Validator
+    == Upload or paste in your Graffiti Markup Language to test it out.
+    %p== Check out the #{link_to 'reference GML spec', 'http://graffitimarkuplanguage.com/spec'}
+
+    %h3 What does this do?
     %ul.square
-      %li Will check for syntax errors
+      %li Check for syntax errors
       %li Are you missing any important tags?
       %li Make sure other GML players will be able to scale & orient correctly
-      %li Ensure general awesomeness
+      %li Ensure maximum awesome
 
-    %p== #{redstar} every GML tag page on 000000book now has a "#{link_to 'Validate GML', validate_tag_path(Tag.last)}" link to jump here quickly.
-    %p== #{redstar} API-enabled: POST data to this page in the "gml" or "tag[gml]" field, or fetch URLs like:
+    %br
+    %h3 Protips
+    == #{redstar} every GML tag page on 000000book now has a "#{link_to 'Validate GML', validate_tag_path(Tag.last)}" link to jump here quickly.
+    %p== #{redstar} API-enabled: POST to this page with your data in the "gml" or "tag[gml]" field, or after uploading try fetching URLs like:
     %ul.formats.square
       - reference_tag = 161 # A personal favorite
       %li= link_to validate_tag_url(:id => reference_tag, :format => "xml"), validate_tag_url(:id => reference_tag, :format => "xml")
       %li= link_to validate_tag_url(:id => reference_tag, :format => "json"), validate_tag_url(:id => reference_tag, :format => "json")
-      %li= link_to validate_tag_url(:id => reference_tag, :format => "txt"), validate_tag_url(:id => reference_tag, :format => "txt")
+      / %li= link_to validate_tag_url(:id => reference_tag, :format => "txt"), validate_tag_url(:id => reference_tag, :format => "txt")
   - else
     #results
-      / %h3 Validation Results
+      - if @tag.new_record?
+        %h1= 'Validating Your Uploaded GML...'
+      - else
+        %h1== Validating Tag ##{@tag.id}...
+
       - if @tag.validation_results.values.flatten.blank?
         .congratulations
           Congratulations! Your GML is valid!
