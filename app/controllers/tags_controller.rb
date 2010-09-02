@@ -171,6 +171,8 @@ class TagsController < ApplicationController
   def validate
     if params[:id]
       @tag = Tag.find(params[:id])
+    elsif params[:tag] && params[:tag][:id]
+      @tag = Tag.find(params[:tag][:id])
     else
       @tag = Tag.new(params[:tag])
       @tag.gml = params[:gml] if @tag.gml.blank? && params[:gml]
