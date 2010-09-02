@@ -1,10 +1,9 @@
 class TagsController < ApplicationController
 
-  # We allow access to :create for the ghetto-API, which doesn't require real authentication
-  #TODO: change it to something like 'require_api_key' for if it doesn't have a user, or requires http basic...
+  # We allow open access to API #create -- no authentication or forgery protection
   before_filter :get_tag, :only => [:show, :edit, :update, :destroy, :thumbnail, :nominate]
-  before_filter :require_user, :only => [:new, :edit, :update, :destroy, :nominate] # <-- but not create
-  protect_from_forgery :except => [:create, :thumbnail] # for the "API"
+  before_filter :require_user, :only => [:new, :edit, :update, :destroy, :nominate]
+  protect_from_forgery :except => [:create, :thumbnail]
   before_filter :require_owner, :only => [:edit, :update, :destroy]
   before_filter :convert_app_id_to_app_name, :only => [:update, :create]
 
@@ -90,7 +89,6 @@ class TagsController < ApplicationController
     show
   end
 
-
   # Create/edit tags
   def new
     set_page_title 'Upload a Graffiti Markup Language (GML) file'
@@ -102,7 +100,7 @@ class TagsController < ApplicationController
     render :action => 'new'
   end
 
-  # branches into create_from_form (on-site, more strict) vs. create_from_api (less strict)
+  # Calls either create_from_form (on-site, more strict) or create_from_api (less strict)
   def create
     raise "No params!" if params.blank?
     render :nothing => true, :status => 200 and return if params[:check] == 'connected' #DustTag weirdness?
@@ -141,7 +139,7 @@ class TagsController < ApplicationController
     redirect_to :back
   end
 
-  # intended for canvasplayer dataURI callback
+  # Upload an image for a tag if one doesn't already exist (for GMLImageRenderer)
   def thumbnail
     if @tag.image.exists?
       render :text => 'thumbnail already exists', :status => 409 and return
@@ -154,7 +152,7 @@ class TagsController < ApplicationController
     render :text => "Error: #{$!}", :status => 500
   end
 
-  # add the 'mff2010' keyword for the Media Facades contest
+  # Quick method for adding the 'mff2010' keyword to a tag for submission to Media Facades
   def nominate
     key = "mff2010"
     @tag.gml_keywords = (@tag.gml_keywords.blank? ? key : "#{@tag.gml_keywords},#{key}")
@@ -167,7 +165,6 @@ class TagsController < ApplicationController
   end
 
   # interactive GML Syntax Validator
-  # Actual processing -- accept /data/:id/validate but also accept raw data via POST
   def validate
     if params[:id]
       @tag = Tag.find(params[:id])
@@ -180,7 +177,7 @@ class TagsController < ApplicationController
     @tag.validate_gml
 
     set_page_title "GML Syntax Validator"
-    @noindex = true unless @tag.gml.blank? # No data = splash page
+    @noindex = true unless @tag.gml.blank? # Don't index every /data/:id/validate page, Google
 
     respond_to do |wants|
       wants.html {
@@ -303,6 +300,5 @@ protected
     expire_fragment(:controller => 'home', :action => 'index')
     expire_fragment('home/index')
   end
-
 
 end
