@@ -38,7 +38,7 @@
 
     %br
     %h3 Protips
-    == #{redstar} every GML tag page on 000000book now has a "#{link_to 'Validate GML', validate_tag_path(Tag.last)}" link to jump here quickly.
+    == #{redstar} every GML tag page on 000000book now has a "#{link_to('Validate GML', validate_tag_path(Tag.last)) rescue 'Validate GML'}" link to jump here quickly.
     %p== #{redstar} API-enabled: POST to this page with your data in the "gml" or "tag[gml]" field, or after uploading try fetching URLs like:
     %ul.formats.square
       - reference_tag = 161 # A personal favorite
