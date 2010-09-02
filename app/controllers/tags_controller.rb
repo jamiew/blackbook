@@ -188,7 +188,8 @@ class TagsController < ApplicationController
         end
       }
       # TODO FIXME to_xml does the fuckin' <hash> thing :(
-      wants.xml   { render :xml => @tag.validation_results.to_xml(:dasherize => false, :skip_types => true) }
+      joined_hash = Hash[@tag.validation_results.map { |k,v| [k, v.join(";\n")] }]
+      wants.xml   { render :xml => joined_hash.to_xml(:dasherize => false, :skip_types => true) }
       wants.json  { render :json => @tag.validation_results.to_json(:callback => params[:callback]) }
       wants.json  { render :text => @tag.validation_results.inspect }
     end

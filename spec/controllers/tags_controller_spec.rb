@@ -116,39 +116,44 @@ describe TagsController do
   end
 
   describe "POST #validate" do
+    it "should work given an existing tag_id (via tag[id])" do
+      @tag = Factory(:tag)
+      # FIXME why do we need to do "post :validate, :method => :post"? Cuz of the duplicate :get route?
+      post :validate, :method => :post, :tag => {:id => @tag.id}
+      response.should be_success
+      response.body.should match(/Validating Tag ##{@tag.id}/)
+    end
+
     it "should present form for submitting GML if no tag data" do
-      pending 'route broken?'
-      post :validate
+      post :validate, :method => :post
       response.should be_success
       response.body.should match(/GML Syntax Validator/)
     end
 
     it "should work with raw :tag data" do
-      pending 'route broken?'
-      post :validate, :tag => {:gml => "<gml>...</gml>"}
+      post :validate, :method => :post, :tag => {:gml => "<gml>...</gml>"}
       response.should be_success
-      response.body.should match(/Validating Your GML.../)
+      response.body.should match(/Validating Your Uploaded GML.../)
     end
 
     it "should return XML" do
-      pending 'route broken'
       @tag = Factory(:tag)
-      post :validate, :id => @tag.id, :format => 'xml'
+      post :validate, :method => :post, :id => @tag.id, :format => 'xml'
       response.should be_success
       # TODO test syntax
     end
 
     it "should return JSON" do
       @tag = Factory(:tag)
-      post :validate, :id => @tag.id, :format => 'json'
+      post :validate, :method => :post, :id => @tag.id, :format => 'json'
       response.should be_success
       # TODO test syntax
     end
 
     it "should return text via XmlHttpRequest" do
-      pending 'broken too :('
+      pending "Dont think I'm doing this right"
       @tag = Factory(:tag)
-      xhr :validate, :id => @tag.id, :format => 'json'
+      xhr :validate, :method => :post, :format => 'js', :id => @tag.id
       response.should be_success
       # TODO test syntax
     end
