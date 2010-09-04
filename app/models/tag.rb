@@ -244,7 +244,8 @@ class Tag < ActiveRecord::Base
     # Pressure, skew, yaw etc?
 
   rescue
-    errors << "Error parsing GML (malformed XML?): #{$!.class} - #{$!}"
+
+    errors << "Error parsing GML (malformed XML?)"+(RAILS_ENV == 'development' ? ": #{$!.class} - #{$!}" : '')
   ensure
     self.validation_results = ActiveSupport::OrderedHash.new
     self.validation_results[:errors] = errors.compact unless errors.blank?
