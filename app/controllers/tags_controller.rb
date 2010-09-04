@@ -3,7 +3,7 @@ class TagsController < ApplicationController
   # We allow open access to API #create -- no authentication or forgery protection
   before_filter :get_tag, :only => [:show, :edit, :update, :destroy, :thumbnail, :nominate]
   before_filter :require_user, :only => [:new, :edit, :update, :destroy, :nominate]
-  protect_from_forgery :except => [:create, :thumbnail]
+  protect_from_forgery :except => [:create, :thumbnail, :validate]
   before_filter :require_owner, :only => [:edit, :update, :destroy]
   before_filter :convert_app_id_to_app_name, :only => [:update, :create]
 
@@ -168,8 +168,8 @@ class TagsController < ApplicationController
   def validate
     if params[:id]
       @tag = Tag.find(params[:id])
-    elsif params[:tag] && params[:tag][:id]
-      @tag = Tag.find(params[:tag][:id])
+    # elsif params[:tag] && params[:tag][:id]
+    #   @tag = Tag.find(params[:tag][:id])
     else
       @tag = Tag.new(params[:tag])
       @tag.gml = params[:gml] if @tag.gml.blank? && params[:gml]
