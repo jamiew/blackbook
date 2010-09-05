@@ -19,13 +19,14 @@
 %p.create_new
   = link_to '+ Upload GML', new_tag_path, :class => 'button facebox add'
 
-#app_nav
-  %form{:method => 'get', :action => tags_path}
-    %span filter by app:
-    -# FIXME don't use params[] directly... dynamically use @search_context
-    - param = CGI.unescape(params[:app]) rescue ''
-    = select_tag :app, "<option></option>"+options_from_collection_for_select(@applications, "name", "name", param)
-    = submit_tag 'search'
+- if @applications
+  #app_nav
+    %form{:method => 'get', :action => tags_path}
+      %span filter by app:
+      -# FIXME don't use params[] directly... dynamically use @search_context
+      - param = CGI.unescape(params[:app]) rescue ''
+      = select_tag :app, "<option></option>"+options_from_collection_for_select(@applications, "name", "name", param)
+      = submit_tag 'search'
 
 %p= pagination
 
