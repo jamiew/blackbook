@@ -10,6 +10,7 @@ require RAILS_ROOT+'/spec/factories'
 
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
+
 Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
@@ -21,7 +22,8 @@ Spec::Runner.configure do |config|
   end
 end
 
-# Helper methods
+
+# Authentication-related spec helpers
 def login_as_user(user = nil)
   user ||= Factory(:user)
   UserSession.create(user)
@@ -30,4 +32,18 @@ end
 def login_as_admin(admin = nil)
   admin ||= Factory(:admin)
   UserSession.create(admin)
+end
+
+def logout
+  current_user_session.destroy
+end
+
+# FIXME these are copied from ApplicationController
+# what are the typical procedures for AuthLogic...?
+def current_user
+  @current_user ||= current_user_session && current_user_session.record
+end
+
+def current_user_session
+  @current_user_session ||=UserSession.find
 end
