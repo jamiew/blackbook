@@ -26,6 +26,7 @@ class ApplicationController < ActionController::Base
     include Oink::InstanceTypeCounter
   end
 
+
   protected
 
   # Log extra info we like
@@ -91,7 +92,8 @@ class ApplicationController < ActionController::Base
   alias :admin? :is_admin?
   helper_method :is_admin?, :admin?
 
-  # TODO: smarter evaluation of object and "owner" (e.g. use more than just .user; current_object is also unreliable)
+  # TODO need smarter evaluation of object and "owner"
+  # e.g. use more than just .user -- current_object is also unreliable
   def is_owner?(object = nil)
     object = @current_object if object.nil? && !@current_object.nil? #Hijack into
     !current_user.nil? && !object.nil? && object.respond_to?(:user) && object.user == current_user
@@ -104,7 +106,7 @@ class ApplicationController < ActionController::Base
     unless current_user
       logger.info "require_user failed"
       store_location
-      flash[:notice] = "You must be logged in to do that"
+      flash[:error] = "You must be logged in to do that"
       redirect_to(login_path)
       return false
     end
@@ -153,7 +155,8 @@ class ApplicationController < ActionController::Base
     redirect_to(default, opts)
   end
 
-  # Set XHR as a totally differnet response format than HTML (don't override .js, we use that)
+  # Set XHR as a totally differnet response format than HTML
+  # We don't want to override .js, we use that for actual javascript
   def set_format
     @template.template_format = 'html'
     request.format = :xhr if request.xhr?
@@ -202,7 +205,7 @@ class ApplicationController < ActionController::Base
     return true if request.session['user_credentials_id'].blank? # Never cache if logged in
   end
 
-  # params, stripped of internal route info
+  # Request params stripped of internal route info
   def clean_params
     excludes = [:controller, :action, :id, :format]
     return params.reject { |k,v| excludes.include?(k.to_sym) }
