@@ -10,14 +10,14 @@
 
   #intro
     .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 6px; color: #777;'}
-      == #{pluralize Tag.count(:conditions => ["created_at >= ?", today]), 'tag'} uploaded 
+      == #{pluralize Tag.count(:conditions => ["created_at >= ?", today]), 'tag'} uploaded
       == by #{pluralize Tag.count(:conditions => ["created_at >= ?", today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
       == &ndash; #{link_to 'view activity', activity_path, :style => 'text-decoration: underline;'}
 
     .welcome{:style => 'width: 600px;'}
       %strong Welcome to #000000book
       == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
-      == &ndash; uploading tags? #{link_to 'register an account', signup_path} 
+      == &ndash; uploading tags? #{link_to 'register an account', signup_path}
       == <br/> Don't forget to add your iPhone UUID in your #{link_to 'settings', settings_path} to link your uploads (<span style="color:red">*</span>now supported!)
 
   .right_column{:style => "margin-top: 40px; overflow: visible;"}
@@ -33,22 +33,21 @@
             - if !tag.user.nil?
               %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
             - elsif !tag.secret_username.blank?
-              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}              
+              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
     %p.right
       %strong= link_to '<span>View all data &raquo;</span>', tags_path, :class => 'button ghost small'
 
   #vanderplayer.left_column
-    %h2
-      %a{:href => tag_path(@tag)}= tag_title(@tag)
-      %small
-        - if true
-          %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
-        - unless @tag.location.blank?
-          %span.location== &ndash; #{@tag.location}
-        - if !@tag.user.nil?
-          %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
-        - elsif @tag.secret_username.blank?
-          %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}                  
-      
-    = render :partial => 'tags/tag_playback', :object => @tag
-    
+    -  unless @tag.blank?
+      %h2
+        %a{:href => tag_path(@tag)}= tag_title(@tag)
+        %small
+          - if true
+            %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
+          - unless @tag.location.blank?
+            %span.location== &ndash; #{@tag.location}
+          - if !@tag.user.nil?
+            %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
+          - elsif @tag.secret_username.blank?
+            %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}
+      = render :partial => 'tags/tag_playback', :object => @tag
