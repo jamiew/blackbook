@@ -19,5 +19,15 @@ Spec::Runner.configure do |config|
   config.before(:each) do
     $memcache.flush_all unless $memcache.nil?
   end
+end
 
+# Helper methods
+def login_as_user(user = nil)
+  user ||= Factory(:user)
+  UserSession.create(user)
+end
+
+def login_as_admin(admin = nil)
+  admin ||= Factory(:admin)
+  UserSession.create(admin)
 end
