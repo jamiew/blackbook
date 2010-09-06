@@ -4,40 +4,35 @@ class CommentsController < ApplicationController
   before_filter :setup
 
   def index
-    # Show all comments for given object
-    # @commentable gets found in setup below
-    raise "No commentable object means no comments" if @commentable.nil?
+    # Show all comments for given @commentable (fetched in :setup)
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
     @comments = @commentable.comments.sorted.paginate(:page => @page, :per_page => @per_page, :include => [:user, :commentable])
   end
 
   def show
-    # Show a specific comment (via permalink?)
     render :partial => 'comments/comment', :object => @comment, :layout => true
   end
 
-  def new 
-    # Not used directly
+  def new
+    # Not Implemented
     @comment = Comment.new
-    render :text => "No juju here man.", :layout => true, :status => 420
+    render :text => "Not used directly", :layout => true, :status => 420
   end
 
   def create
-
-    #TODO: add some rudimentary rate limiting & IP banning
-
     @comment = Comment.new(params[:comment])
-    @comment.user = current_user # Hard-assign (attr_protected)
+    @comment.user = current_user
     @comment.commentable = @commentable
     @comment.ip_address = request.remote_addr
 
-    # redirect_back_or_default(url_for(@commentable))
     if @comment.save
       flash[:notice] = "Succesfully posted."
     else
       flash[:error] = "Failed to save your comment: #{@comment.errors.map(&:to_s)}"
+      # TODO should render the 'new' template
     end
-    redirect_to(url_for(@commentable)) #TODO: should behave differently for failure vs. success
+    # redirect_back_or_default(url_for(@commentable))
+    redirect_to(url_for(@commentable))
   end
 
   def edit
@@ -49,15 +44,18 @@ class CommentsController < ApplicationController
   end
 
   def destroy
+    raise NoPermissionError unless is_admin? || @comment.user == current_user
     @comment.hidden_at = Time.now
     @comment.save!
     flash[:notice] = "Comment deleted"
+    redirect_back_or_default(comments_path(@commentable))
   end
 
-protected
+
+  protected
 
   def setup
-    # Find any specific Comment objects
+    # Find a specific Comment objects
     if params[:id]
       @comment = Comment.find(params[:id])
     end
@@ -67,6 +65,8 @@ protected
       @commentable = Tag.find(params[:tag_id])
     elsif params[:user_id]
       @commentable = User.find(params[:user_id])
+    else
+      raise ActiveRecord::RecordNotFound, "A commentable (parent) object is required"
     end
   end
 

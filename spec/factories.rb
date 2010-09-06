@@ -28,8 +28,8 @@ Factory.define :user do |t|
 end
 
 Factory.define :admin, :parent => :user do |t|
-  t.login 'adminner'
-  t.name 'Admin Yep'
+  t.login 'admin'
+  t.name 'Admin User'
   t.admin true
 end
 
@@ -79,6 +79,7 @@ end
 Factory.define :comment do |t|
   t.user {|a| a.association(:user) }
   t.commentable {|a| a.association(:tag) }
+  t.text 'Default comment yo'
 end
 
 

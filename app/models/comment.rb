@@ -23,6 +23,9 @@ class Comment < ActiveRecord::Base
   after_create :create_notification
   after_create :send_email
 
+  def hidden?
+    !hidden_at.blank?
+  end
 
   # Helper class method to lookup all comments assigned to all commentable types for a given user.
   def self.find_comments_by_user(user)
