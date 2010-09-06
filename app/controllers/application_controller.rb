@@ -55,9 +55,8 @@ class ApplicationController < ActionController::Base
 
   # Catch-all render for no-permission errors
   def permission_denied
-    logger.error "Permission denied to user #{current_user.login} (##{current_user.id})"
     flash[:error] = "You don't have permission to do that"
-    redirect_back_or_default(logged_in? ? root_path : login_path) #, :status => 403
+    render :text => flash[:error], :status => 403
   end
 
   # Automatically respond with 404 for ActiveRecord::RecordNotFound
@@ -115,27 +114,24 @@ class ApplicationController < ActionController::Base
     if current_user
       logger.info "require_no_user failed"
       store_location
-      flash[:error] = "You must not be logged-in in order to to access that page"
-      # Can cause infinite redirects if on /login => /login ... FIXME
+      flash[:error] = "You must *not* be logged-in to access that."
       # redirect_back_or_default(user_path(current_user))
       redirect_to(user_path(current_user))
-      return false
     end
   end
 
   def require_admin
     unless current_user && is_admin?
       logger.warn "require_admin failed (!!)"
-      # store_location
-      flash[:error] = "You must be an admin to access this (Event logged)"
-      # redirect_to login_url
-      # raise NoPermissionError
-      redirect_back_or_default(logged_in? ? root_path : login_path)
+      store_location
+      flash[:error] = "You don't have permission to access this page. Your IP #{request.remote_addr} has been logged & reported."
+      # redirect_back_or_default(logged_in? ? root_path : login_path)
+      redirect_to(logged_in? ? root_path : login_path)
     end
   end
 
   # Stash the current page for use in redirection, e.g. login
-  # using :back doesn't work inside a POST (and isn't reliable either way, or testable)
+  # using :back doesn't work inside a POST
   def store_location
     session[:return_to] = request.request_uri
   end
@@ -143,18 +139,18 @@ class ApplicationController < ActionController::Base
   # Allow for using all 3 of: a specific redirect_to, a general :back, OR the specified default
   # Update: skipping out on using :back -- it causes a lot of goofiness. If you want that kind of functionality,
   #  use :store_location explicitly on the callin page
-  def redirect_back_or_default(default)
+  def redirect_back_or_default(default, opts = {})
     if session[:return_to].blank?
       # puts "Redirecting to :back ..."
       # redirect_to(:back)
-      redirect_to(default)
+      redirect_to(default, opts)
     else
       puts "Redirecting to #{session[:return_to]}"
-      redirect_to(session[:return_to])
+      redirect_to(session[:return_to], opts)
       session[:return_to] = nil
     end
   rescue ActionController::RedirectBackError
-    redirect_to(default)
+    redirect_to(default, opts)
   end
 
   # Set XHR as a totally differnet response format than HTML (don't override .js, we use that)

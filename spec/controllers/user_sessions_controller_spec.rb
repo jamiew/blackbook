@@ -46,7 +46,6 @@ describe UserSessionsController do
     end
 
     it "should redirect to the login page on session deletion" do
-      pending 'bizarre Time::RFC2822_DAY_NAME error?!'
       UserSession.create(Factory.create(:user))
       post :destroy
       response.should redirect_to(login_path)
