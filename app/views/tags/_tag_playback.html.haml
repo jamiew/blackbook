@@ -7,11 +7,15 @@
     %li= link_to 'image', '#image'
 
   #flash
-    - html = tag_player(@tag, :width => '580px')
-    %p= html
-    - encoded_embed = HTMLEntities.new.encode(html).gsub("\n",'').squeeze(" ").chomp
-    %label{:for => 'player_embed'} Embed Code
-    %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}
+    - if RAILS_ENV == 'development'
+      %p
+        %span.beta *Flashplayer disabled in development
+    - else
+      - html = tag_player(@tag, :width => '580px')
+      %p= html
+      - encoded_embed = HTMLEntities.new.encode(html).gsub("\n",'').squeeze(" ").chomp
+      %label{:for => 'player_embed'} Embed Code
+      %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}
 
   #html5
     %p= render :partial => 'tags/canvas_player', :object => @tag
