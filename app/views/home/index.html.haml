@@ -9,18 +9,25 @@
 #home
 
   #intro
-    .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 6px; color: #777;'}
+    .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 0px; color: #777;'}
       == #{pluralize Tag.count(:conditions => ["created_at >= ?", today]), 'tag'} uploaded
-      == by #{pluralize Tag.count(:conditions => ["created_at >= ?", today], :select => 'DISTINCT gml_uniquekey'), 'person'} today
-      == &ndash; #{link_to 'view activity', activity_path, :style => 'text-decoration: underline;'}
+      == by #{pluralize Tag.count(:conditions => ["created_at >= ?", today], :select => 'DISTINCT gml_uniquekey'), 'person'} today (last #{time_ago_in_words(today).gsub('about ','')})
+      %br
+      == &rarr; #{link_to 'view all activity', activity_path, :style => 'text-decoration: underline;'}
 
     .welcome{:style => 'width: 600px;'}
       %strong Welcome to #000000book
       == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
-      == &ndash; uploading tags? #{link_to 'register an account', signup_path}
+      == &ndash; uploading tags? #{link_to 'Register an account', signup_path}
       == <br/> Don't forget to add your iPhone UUID in your #{link_to 'settings', settings_path} to link your uploads (<span style="color:red">*</span>now supported!)
 
-  .right_column{:style => "margin-top: 40px; overflow: visible;"}
+  .right_column{:style => "overflow: visible;"}
+    .prevnext
+      - @prev ||= @tags.first
+      %li= @next.nil? ? '&larr; newer' : link_to('&larr; newer', tag_path(@next), :class => 'button')
+      %li &nbsp;::&nbsp;
+      %li= @prev.nil? ? 'older &rarr;' : link_to('older &rarr;', tag_path(@prev), :class => 'button')
+    %br
     %ul#frontpage_tags
       - @tags.each do |tag|
         %li
@@ -50,4 +57,5 @@
             %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
           - elsif @tag.secret_username.blank?
             %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}
+          == &ndash; uploaded #{time_ago_in_words(@tag.created_at)} ago
       = render :partial => 'tags/tag_playback', :object => @tag
