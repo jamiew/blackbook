@@ -20,8 +20,8 @@ class Tag < ActiveRecord::Base
   after_create  :save_gml_object
   after_create  :create_notification
 
-  # Caching related
-  # after_save    :expire_gml_hash_cache #<-- handling in the Controller
+  # Caching related -- currently handled in the Controller
+  # after_save    :expire_gml_hash_cache
   # after_destroy :delete_gml_hash_cache
 
   # Security: protect from mass assignment
@@ -225,8 +225,11 @@ class Tag < ActiveRecord::Base
     # TODO use nested tags -- e.g. stroke/pt/t rather than just t
     errors << check_for_tag('stroke', "No <stroke> tags - at least 1 stroke required")
     errors << check_for_tag('pt', "No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
-    errors << check_for_tag('x', "Missing <x> tags inside your <pt>'s") # FIXME really verify each point...
+    # TODO iterate through each pt to ensure each has x/y's -- not just any x/y
+    errors << check_for_tag('x', "Missing <x> tags inside your <pt>'s")
     errors << check_for_tag('y', "Missing <y> tags inside your <pt>'s")
+
+    # TODO parse & verify all pt values are between 0 and 1.0
 
     warnings << check_for_tag('time', "No <time> tags in your <pt> tags! Capturing time data makes things much more interesting.")
     warnings << check_for_tag('client', "No <client> tag - provide some info about your app!")
@@ -240,12 +243,10 @@ class Tag < ActiveRecord::Base
     recommendations << "You don't have any newlines. Proper formatting makes your GML nice & human-readable" unless doc.to_s =~ /\n/
     recommendations << "You don't have any tabs. Indenting is the bomb yo" unless doc.to_s =~ /\t/ || doc.to_s =~ /  / # assume 2 spaces = 1 tab
     # Geo information?
-    # Brushes? Layers? Styles?
-    # Pressure, skew, yaw etc?
 
   rescue
-
     errors << "Error parsing GML (malformed XML?)"+(RAILS_ENV == 'development' ? ": #{$!.class} - #{$!}" : '')
+
   ensure
     self.validation_results = ActiveSupport::OrderedHash.new
     self.validation_results[:errors] = errors.compact unless errors.blank?
@@ -268,7 +269,7 @@ protected
   def build_gml_object
     # STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
     obj = GMLObject.new
-    obj.data = @gml_temp || self.attributes['gml'] #attr_protected
+    obj.data = @gml_temp || self.attributes['gml']
     self.gml_object = obj
     process_gml
     save_header

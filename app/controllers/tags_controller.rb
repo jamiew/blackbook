@@ -1,9 +1,9 @@
 class TagsController < ApplicationController
 
   # We allow open access to API #create -- no authentication or forgery protection
+  protect_from_forgery :except => [:create, :thumbnail, :validate]
   before_filter :get_tag, :only => [:show, :edit, :update, :destroy, :thumbnail, :nominate]
   before_filter :require_user, :only => [:new, :edit, :update, :destroy, :nominate]
-  protect_from_forgery :except => [:create, :thumbnail, :validate]
   before_filter :require_owner, :only => [:edit, :update, :destroy]
   before_filter :convert_app_id_to_app_name, :only => [:update, :create]
 
@@ -164,7 +164,7 @@ class TagsController < ApplicationController
     redirect_to(:back)
   end
 
-  # interactive GML Syntax Validator
+  # Interactive GML Syntax Validator
   def validate
     if params[:id]
       @tag = Tag.find(params[:id])
@@ -177,7 +177,7 @@ class TagsController < ApplicationController
     @tag.validate_gml
 
     set_page_title "GML Syntax Validator"
-    @noindex = true unless @tag.gml.blank? # Don't index every /data/:id/validate page, Google
+    @noindex = true unless @tag.gml.blank?
 
     respond_to do |wants|
       wants.html {
@@ -187,11 +187,12 @@ class TagsController < ApplicationController
           render 'validator'
         end
       }
-      # TODO FIXME to_xml does the fuckin' <hash> thing :(
+      # FIXME to_xml does the fuckin' <hash> thing :(
       joined_hash = Hash[@tag.validation_results.map { |k,v| [k, v.join(";\n")] }]
       wants.xml   { render :xml => joined_hash.to_xml(:dasherize => false, :skip_types => true) }
       wants.json  { render :json => @tag.validation_results.to_json(:callback => params[:callback]) }
-      wants.json  { render :text => @tag.validation_results.inspect }
+      wants.xhr   { render :text => @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
+      wants.text  { render :text => @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
     end
   end
 
@@ -283,15 +284,15 @@ protected
     params[:tag][:application] = app.name unless app.blank?
   end
 
-  # TODO this should be a Sweeper
+  # TODO this should be a Sweeper...
   def expire_caches
-
-    formats = [nil,'json','gml','xml','rss']
+    formats = [nil,'json','gml','xml','rss','txt']
 
     # Tags#show
     if @tag && !@tag.new_record?
       formats.each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
-      Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash) # Write-through object caching, but handling in the controller
+      # Write-through(ish) object caching of the raw GML
+      Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash)
     end
 
     # Tags#index

@@ -317,8 +317,8 @@ a.username_link.anon, a.application_link.anon, .keywords a { text-decoration: no
 .tag input.embed { font-size: 8pt; color: #999; background-color: #2f2f2f; border: 1px solid #555; padding: 4px 5px 3px 2px; width: 350px; }
 .tag input.embed:hover { border-color: #ff0; }
 
-.tag #html5 .beta { color: #666; }
-.tag #html5 .beta a { color: #999; }
+.tag .beta { color: #666; }
+.tag .beta a { color: #999; }
 
 
 /* Add new application */
