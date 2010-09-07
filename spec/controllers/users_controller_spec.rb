@@ -18,17 +18,19 @@ describe UsersController do
     end
 
     it "should redirect for a logged in user on :new" do
-      pending 'FIXME, broken by redirect_back logic'
+      activate_authlogic
       UserSession.create(@user)
       get :new
       response.should be_redirect
+      flash[:error].should_not be_blank
     end
 
     it "should redirect for a logged in user on :create" do
-      pending 'FIXME, broken by redirect_back logic'
+      activate_authlogic
       UserSession.create(@user)
       get :create
       response.should be_redirect
+      flash[:error].should_not be_blank
     end
 
     it "should redirect to account on successful :create" do
