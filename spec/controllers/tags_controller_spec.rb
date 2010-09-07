@@ -25,6 +25,8 @@ describe TagsController do
 
     it "should create and assign to tempt1 given the correct secret" do
       pending 'TODO'
+      @tag = Factory(:tag_from_tempt1)
+      # ...
     end
 
     describe "redirection" do
@@ -50,11 +52,19 @@ describe TagsController do
     end
 
     describe "cache expiry" do
-      it "should expire the index page" do
+      it "should expire Home#index.html" do
+        pending
+        route = {:controller => 'home', :method => 'index'}
+        # lambda { post :create, :gml => @gml }.should expire_fragment(route)
+      end
+
+      it "should expire Tags#index, all formats" do
         pending
       end
 
-      # TODO there are a # of other keys expired to test!!
+      it "should expire Tags#show, all formats" do
+        pending
+      end
     end
   end
 
@@ -140,22 +150,29 @@ describe TagsController do
       @tag = Factory(:tag)
       post :validate, :method => :post, :id => @tag.id, :format => 'xml'
       response.should be_success
-      # TODO test syntax
+      response.body.should match('<warnings>')
     end
 
     it "should return JSON" do
       @tag = Factory(:tag)
       post :validate, :method => :post, :id => @tag.id, :format => 'json'
       response.should be_success
-      # TODO test syntax
+      response.body.should match('"warnings":')
     end
 
-    it "should return text via XmlHttpRequest" do
-      pending "Dont think I'm doing this right"
+    it "should return text" do
       @tag = Factory(:tag)
-      xhr :validate, :method => :post, :format => 'js', :id => @tag.id
+      post :validate, :method => :post, :id => @tag.id, :format => 'text'
       response.should be_success
-      # TODO test syntax
+      response.body.should match('warnings=')
+    end
+
+    it "should return text via XMLHttpRequest" do
+      @tag = Factory(:tag)
+      request.env['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+      post :validate, :id => @tag.id
+      response.should be_success
+      response.body.should match('warnings=')
     end
   end
 end
