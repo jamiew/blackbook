@@ -30,21 +30,17 @@ after "deploy:update_code", "deploy:create_symlinks"
 
 #	Recipes
 namespace :deploy do
-
   desc "Link database.yml & other shared settings"
   task :create_symlinks do
-    run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
-    run "ln -nfs #{shared_path}/config/settings.yml #{release_path}/config/settings.yml"
-    run "ln -nfs #{shared_path}/config/memcached.yml #{release_path}/config/memcached.yml"
-    run "ln -nfs #{shared_path}/config/newrelic.yml #{release_path}/config/newrelic.yml"
+    run <<-CMD
+      ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml &&
+      ln -nfs #{shared_path}/config/settings.yml #{release_path}/config/settings.yml &&
+      ln -nfs #{shared_path}/config/memcached.yml #{release_path}/config/memcached.yml &&
+      ln -nfs #{shared_path}/config/newrelic.yml #{release_path}/config/newrelic.yml &&
 
-    run "mkdir -p #{release_path}/public/"
-    run "ln -nfs #{shared_path}/public/system #{release_path}/public/system"
-
-    # metric_fu -- creating dirs just to make sure
-    # run "mkdir -p #{shared_path}/metric_fu"
-    # run "rm -rf #{release_path}/tmp/metric_fu" # ln can't force-overwrite directories
-    # run "ln -nfs #{shared_path}/metric_fu #{current_path}/tmp/metric_fu"
+      mkdir -p #{release_path}/public/ &&
+      ln -nfs #{shared_path}/public/system #{release_path}/public/system
+    CMD
   end
 
 end
