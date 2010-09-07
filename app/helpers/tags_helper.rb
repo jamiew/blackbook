@@ -60,8 +60,6 @@ module TagsHelper
 
     %{
       <object width="#{opts[:width]}">
-
-        <!-- typical flash noise; note allowScriptAccess (for js), allowFullScreen=true, loop=true, bgcolor=BLACK -->
         <param name="allowScriptAccess" value="always" />
         <param name="allowFullScreen" value="true" />
         <param name="quality" value="high" />
@@ -70,12 +68,8 @@ module TagsHelper
         <param name="loop" value="true" />
         <param name="movie" value="#{opts[:src]}" />
         <param name="bgcolor" value="#{opts[:bgcolor]}" />
-
-        <!-- blackbook data, also passed as flashvars -->
-        #{flashvars.map { |key, value| "<param name=\"#{key}\" value=\"#{value}\" />\n        " } }
-
+        #{flashvars.map { |key, value| "<param name=\"#{key}\" value=\"#{value}\" />\n\t\t\t\t" } }
         #{embed}
-
       </object>
     }
   end
