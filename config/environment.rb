@@ -50,3 +50,8 @@ end
 # require everything in /lib
 Dir.glob(RAILS_ROOT+"/lib/*.rb").each { |file| require file }
 
+# We <3 Exceptions
+ExceptionNotification::Notifier.exception_recipients = %w(jamie+blackbook@jamiedubs.com)
+ExceptionNotification::Notifier.sender_address =%("000000book App Error" <noreply@000000book.com>)
+ExceptionNotification::Notifier.email_prefix = "[000book] "
+
