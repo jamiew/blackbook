@@ -19,6 +19,7 @@ describe HomeController do
   it "/about should work" do
     get :static, :id => 'about'
     response.should be_success
+    response.body.should match(/About/)
     response.should render_template('pages/about')
   end
 
