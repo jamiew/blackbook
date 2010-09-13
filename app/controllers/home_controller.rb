@@ -17,17 +17,27 @@ class HomeController < ApplicationController
   # Show a single static page
   # FIXME using hardcoded references to .haml or .erb... we need template_exists?()
   def static
-    if (File.exist?("#{RAILS_ROOT}/app/views/pages/#{params[:id]}.html.haml") || File.exist?("#{RAILS_ROOT}/app/views/pages/#{params[:id]}.html.erb"))
+    template = "pages/#{params[:id]}"
+    if template_exists?(template)
       set_page_title params[:id].capitalize
-      render :template => "pages/#{params[:id]}"
+      render :template => template
     else
-      render :file => "public/404.html", :status => 404
+      render :file => "#{RAILS_ROOT}/public/404.html", :status => 404
     end
   end
 
   # Ghetto handling for known-bad URLs -- mapping them here as a blackhole
   def discard
     logger.warn "Discarding request..."
-    render :nothing => true, :status => 420 # lol
+    render :nothing => true, :status => 304 # Not Modified
+  end
+
+
+  private
+
+  def template_exists?(path)
+    self.view_paths.find_template(path, response.template.template_format)
+  rescue ActionView::MissingTemplate
+    false
   end
 end
