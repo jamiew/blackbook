@@ -43,7 +43,7 @@ module TagsHelper
     # return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
 
     # No longer specifying a specific height, just width
-    opts = { :width => '100%', :src => 'http://toddvanderlin.com/content/000000book/BlackBook.swf', :bgcolor => '#000000' }.merge(args)
+    opts = { :width => '100%', :src => 'http://000000book.com/system/BlackBook.swf', :bgcolor => '#000000' }.merge(args)
 
     # image_urls = tag.image.styles.keys.map { |s| ["image_#{s}", "http://#{request.host}:#{request.port}"+tag.image.url(s)] }.to_hash
     image_urls = {:image_large => tag.image.url(:large)}
