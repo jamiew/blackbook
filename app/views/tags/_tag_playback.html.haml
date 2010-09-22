@@ -10,6 +10,9 @@
     - if RAILS_ENV == 'development'
       %p
         %span.beta *Flashplayer disabled in development
+    - elsif true # Player hosted on Todd's site is busted and I have old code :-(
+      %p 
+        %span.beta (Flashplayer temporarily unavailable)
     - else
       - html = tag_player(@tag, :width => '580px')
       %p= html
