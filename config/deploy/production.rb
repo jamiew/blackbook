@@ -2,7 +2,7 @@
 set :rails_env, "production"
 
 set :domain, '000000book.com' # FIXME; how can we get the hostname of the current server inside a cap task?
-set :user, 'blackbook'
+set :user, 'jamie'
 set :use_sudo, false
 set :deploy_to, "/home/blackbook/blackbook"
 
