@@ -1,6 +1,7 @@
 source :rubygems
 
-gem 'rails', '2.3.9'
+gem 'rails', '2.3.8'
+gem 'rack', '1.1.0'
 gem 'mysql', '2.8.1'
 gem 'haml', '3.0.12'
 gem 'config_reader', '0.0.7'
