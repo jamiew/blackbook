@@ -6,14 +6,14 @@
 #                                                            #
  ############################################################
 
-RAILS_GEM_VERSION = '2.3.8' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.9' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
 Rails::Initializer.run do |config|
 
-  config.gem 'rack', :version => '1.1.0' # 1.2.1 causing major issues... TODO upgrade Rails!!
+  # config.gem 'rack', :version => '1.1.0'
 
   config.gem 'haml', :version => '3.0.12'
   config.gem 'config_reader', :version => '0.0.6'
