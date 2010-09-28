@@ -2,8 +2,10 @@
 # Blackbook deployment
 #
 
+
 # Stand on the shoulders of giants
 # `sudo gem install capistrano-extensions cap-recipes`
+require 'bundler/capistrano'
 require 'capistrano/ext/multistage'
 require 'cap_recipes/tasks/passenger'
 # require 'cap_recipes/tasks/memcache'
