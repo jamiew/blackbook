@@ -27,6 +27,7 @@ ssh_options[:forward_agent] = true
 # Hooks
 #before "deploy:restart", "gems:install"
 after "deploy:update_code", "deploy:create_symlinks"
+after "deploy", "deploy:cleanup"
 
 #	Recipes
 namespace :deploy do
