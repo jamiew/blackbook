@@ -13,7 +13,7 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 Rails::Initializer.run do |config|
 
-  # config.gem 'rack', :version => '1.1.0'
+  config.gem 'rack', :version => '1.2.1'
 
   config.gem 'haml', :version => '3.0.12'
   config.gem 'config_reader', :version => '0.0.6'
