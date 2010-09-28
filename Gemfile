@@ -18,14 +18,13 @@ gem 'system_timer', '1.0'
 
 group :development do
   gem 'bullet', '1.7.6'
+  gem 'cap-recipes'
+  gem 'capistrano-ext'
+end
 
-  # Deployment
-  gem 'cap-recipes', :require => false
-  gem 'capistrano-ext', :require => false
-
-  # Testing
-  gem 'factory_girl', :require => false
-  gem 'rspec', '1.3.0', :require => false
-  gem 'rspec-rails', '1.3.2', :require => false
-  gem 'webrat', '0.7.1', :require => false
+group :test do
+  gem 'rspec', '1.3.0'
+  gem 'rspec-rails', '1.3.2'
+  gem 'factory_girl'
+  gem 'webrat'
 end
