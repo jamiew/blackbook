@@ -26,16 +26,6 @@ Rails::Initializer.run do |config|
   config.gem 'htmlentities', :version => '4.2.1'
   config.gem 'system_timer', :version => '1.0'
 
-  # Deployment
-  config.gem "cap-recipes", :lib => false
-  config.gem "capistrano-ext", :lib => false
-
-  # Testing
-  config.gem "rspec", :lib => false, :version => "1.3.0"
-  config.gem "rspec-rails", :lib => false, :version => "1.3.2"
-  config.gem "factory_girl", :lib => false
-  config.gem "webrat", :lib => false
-
   # Rails configuration
   config.time_zone = 'UTC'
   config.frameworks -= [ :active_resource ]
