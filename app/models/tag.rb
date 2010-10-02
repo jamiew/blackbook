@@ -110,8 +110,9 @@ class Tag < ActiveRecord::Base
   def to_json(options = {})
     hash = Serializer.new(self, options).serializable_record
     hash.reject! { |k,v| v.blank? }
-    hash[:gml] = self.gml_hash && self.gml_hash['gml'] || {}
-    hash[:gml] ||= self.gml_hash && self.gml_hash['GML'] || {}
+    hash[:gml] = self.gml_hash && self.gml_hash['gml']
+    hash[:gml] ||= self.gml_hash && self.gml_hash['GML']
+    hash[:gml] ||= {}
     ActiveSupport::JSON.encode(hash)
   end
 
