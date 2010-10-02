@@ -110,6 +110,43 @@ describe TagsController do
     end
   end
 
+  describe "GET #show" do
+    before do
+      @tag = Factory(:tag)
+    end
+
+    it "HTML" do
+      get :show, :id => @tag.to_param
+      response.should be_success
+      response.body.should match(/Tag ##{@tag.id}/)
+    end
+
+    it "GML" do
+      get :show, :id => @tag.to_param, :format => 'gml'
+      response.should be_success
+      response.body.should match("<gml><tag><header>")
+    end
+
+    it "XML" do
+      get :show, :id => @tag.to_param, :format => 'xml'
+      response.should be_success
+      response.body.should match("<id>")
+    end
+
+    describe "JSON" do
+      it "should work" do
+        get :show, :id => @tag.to_param, :format => 'json'
+        response.should be_success
+        response.body.should match("\"id\":#{@tag.id}")
+      end
+
+      it "should include GML data (GSON)" do
+        get :show, :id => @tag.to_param, :format => 'json'
+        response.body.should match("\"gml\":")
+      end
+    end
+  end
+
   describe "GET #validate" do
     it "should work with an existing tag_id" do
       @tag = Factory(:tag)
