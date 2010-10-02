@@ -106,10 +106,12 @@ class Tag < ActiveRecord::Base
   # Wrap to_json so the .gml string gets converted to a hash, then to json
   # We're reimplementing Rails' to_json because we can't do :methods => {:gml_hash=>:gml},
   # and end up with an attribute called 'gml_hash' which doesn't work
+  # Note: Rails 2.3.9 added case sensitivity to this?
   def to_json(options = {})
     hash = Serializer.new(self, options).serializable_record
-    hash[:gml] = self.gml_hash && self.gml_hash['gml'] || {}
     hash.reject! { |k,v| v.blank? }
+    hash[:gml] = self.gml_hash && self.gml_hash['gml'] || {}
+    hash[:gml] ||= self.gml_hash && self.gml_hash['GML'] || {}
     ActiveSupport::JSON.encode(hash)
   end
 
