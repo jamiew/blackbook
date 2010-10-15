@@ -112,7 +112,11 @@ describe TagsController do
 
   describe "GET #show" do
     before do
-      @tag = Factory(:tag)
+      @tag = Factory(:tag,
+        :description => "An <b>html</b> description which might contain XSS!",
+        :location => "http://locationURL.com",
+        :gml_application => "Some Application name",
+        :gml_keywords => "some,gml,keywords")
     end
 
     it "HTML" do
