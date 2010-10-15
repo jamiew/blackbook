@@ -25,16 +25,16 @@
     %hr
     %ul
       - app = !@tag.gml_application.blank? && @tag.gml_application || @tag.application
-      %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(@tag.sexy_app_name)}
-      %li== <strong>Keywords:</strong> #{@tag.gml_keywords.blank? ? 'NULL' : @tag.gml_keywords}
+      %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(h(@tag.sexy_app_name))}
+      %li== <strong>Keywords:</strong> #{@tag.gml_keywords.blank? ? 'NULL' : h(@tag.gml_keywords)}
     %hr
     %ul
       - if !@tag.author.blank?
         %li== <strong>Author:</strong> #{@tag.author}
       %li== <strong>Uploader:</strong> #{@user.blank? ? (@tag.secret_username.blank? ? 'NULL' : secret_username_link(@tag.secret_username)) : link_to(@user.login, user_path(@user)) }
-      %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : @tag.location}
+      %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : h(@tag.location)}
       - unless @tag.description.blank?
-        %li== <strong>Description:</strong> #{@tag.description}
+        %li== <strong>Description:</strong> #{h(@tag.description)}
       - if @tag.image.exists? || @tag.remote_image
         - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
         - #Quick little gsub to remove the queryvars... not ideal
