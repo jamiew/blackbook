@@ -130,12 +130,13 @@ end
 namespace :memcached do
   desc "Flush memcached"
   task :flush, :roles => [:app] do
-    run("cd #{current_release} && RAILS_ENV=#{rails_env} /usr/bin/rake memcached:flush")
+    run("cd #{current_release} && RAILS_ENV=#{rails_env} rake memcached:flush")
   end
 
   desc "Flush memcached if there are any pending migrations (installs hook, run before db:migrate)"
+  # Depends on a local 'rake:pending_migrations' task... see lib/tasks/pending_migrations.rake
   task :flush_if_pending_migrations, :roles => [:app] do
-    output = capture("cd #{current_release} && RAILS_ENV=#{rails_env} /usr/bin/rake db:pending_migration_count")
+    output = capture("cd #{current_release} && RAILS_ENV=#{rails_env} rake db:pending_migration_count")
     count = /(\d+) pending migrations/.match(output)
     if count[0] && count[0].to_i > 0
       puts "#{count[0].to_i} migrations will be run! Installing memcached:flush hook"
