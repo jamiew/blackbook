@@ -2,14 +2,13 @@
 # Blackbook deployment
 #
 
-
 # Stand on the shoulders of giants
-# `sudo gem install capistrano-extensions cap-recipes`
+# `gem install capistrano-extensions cap-recipes`
 require 'bundler/capistrano'
 require 'capistrano/ext/multistage'
 require 'cap_recipes/tasks/passenger'
-# require 'cap_recipes/tasks/memcache'
-# require 'cap_recipes/tasks/thinking_sphinx'
+#require 'cap_recipes/tasks/memcache'
+#require 'cap_recipes/tasks/thinking_sphinx'
 
 set :stages, %w(staging production)
 set :default_stage, "production"
@@ -27,9 +26,11 @@ default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
 
 # Hooks
-#before "deploy:restart", "gems:install"
 after "deploy:update_code", "deploy:create_symlinks"
 after "deploy", "deploy:cleanup"
+#after "bundle:install", "deploy:migrate"
+before "deploy:migrate", "memcached:flush_if_pending_migrations"
+
 
 #	Recipes
 namespace :deploy do
@@ -125,3 +126,20 @@ end
 #     remote_db_cleanup
 #   end
 # end
+
+namespace :memcached do
+  desc "Flush memcached"
+  task :flush, :roles => [:app] do
+    run("cd #{current_release} && RAILS_ENV=#{rails_env} /usr/bin/rake memcached:flush")
+  end
+
+  desc "Flush memcached if there are any pending migrations (installs hook, run before db:migrate)"
+  task :flush_if_pending_migrations, :roles => [:app] do
+    output = capture("cd #{current_release} && RAILS_ENV=#{rails_env} /usr/bin/rake db:pending_migration_count")
+    count = /(\d+) pending migrations/.match(output)
+    if count[0] && count[0].to_i > 0
+      puts "#{count[0].to_i} migrations will be run! Installing memcached:flush hook"
+      after "deploy:migrate", "memcached:flush"
+    end
+  end
+end
