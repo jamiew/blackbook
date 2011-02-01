@@ -1,11 +1,7 @@
 development:
-  adapter: mysql
-  database: blackbook_dev
-  username: root
-  password: 
+  adapter: sqlite3
+  database: db/development.sqlite3
 
-# Tests working ok with sqlite3 still,
-# but will eventually move to MySQL for consistentcy
 test:
   adapter: sqlite3
   database: db/test.sqlite3
