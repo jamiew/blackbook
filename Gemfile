@@ -13,9 +13,10 @@ gem 'paperclip', '2.3.3'
 gem 'unicode', '0.3.1' # required by has_slug
 gem 'has_slug', '0.2.7'
 
-gem 'will_paginate', '2.3.12'
+gem 'exception_notification', :branch => '2-3-stable'
 gem 'htmlentities', '4.2.1'
 gem 'system_timer', '1.0'
+gem 'will_paginate', '2.3.12'
 
 group :development do
   gem 'bullet', '1.7.6'
