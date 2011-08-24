@@ -10,7 +10,7 @@
 
 
 Paperclip.interpolates(:id_smart) do |attachment, style|
-  limit = 33600
+  limit = 33520
   if attachment.instance.id > limit
     id_partition(attachment, style)
   else
