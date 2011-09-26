@@ -18,6 +18,10 @@ gem 'htmlentities', '4.2.1'
 gem 'system_timer', '1.0'
 gem 'will_paginate', '2.3.12'
 
+group :development, :test do
+  gem 'sqlite3', :require => 'sqlite3'
+end
+
 group :development do
   gem 'bullet', '1.7.6'
   gem 'cap-recipes'
