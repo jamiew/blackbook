@@ -39,8 +39,7 @@ namespace :deploy do
     run <<-CMD
       ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml &&
       ln -nfs #{shared_path}/config/settings.yml #{release_path}/config/settings.yml &&
-      ln -nfs #{shared_path}/config/memcached.yml #{release_path}/config/memcached.yml
-
+      ln -nfs #{shared_path}/config/memcached.yml #{release_path}/config/memcached.yml &&
       mkdir -p #{release_path}/public/ &&
       ln -nfs #{shared_path}/public/system #{release_path}/public/system
     CMD
