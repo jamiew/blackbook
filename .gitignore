@@ -1,6 +1,7 @@
 .bundle
 .DS_Store
 .gems
+.powenv
 *.sql
 blackbook.tmproj
 log/*.log
@@ -12,6 +13,7 @@ db/*.sqlite3
 config/database.yml
 config/memcached.yml
 config/newrelic.yml
+tmp/
 public/javascripts/cache
 public/stylesheets/cache
 public/system/
