@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'rails', '2.3.17'
+gem 'rails', '2.3.18'
 # gem 'rack', '1.0.1'
 gem 'mysql', '2.8.1'
 gem 'haml', '3.0.12'
