@@ -152,18 +152,6 @@ class TagsController < ApplicationController
     render :text => "Error: #{$!}", :status => 500
   end
 
-  # Quick method for adding the 'mff2010' keyword to a tag for submission to Media Facades
-  def nominate
-    key = "mff2010"
-    @tag.gml_keywords = (@tag.gml_keywords.blank? ? key : "#{@tag.gml_keywords},#{key}")
-    if @tag.save
-      flash[:notice] = "Tag #{@tag.id} nominated"
-    else
-      flash[:error] = "Error: #{$!}"
-    end
-    redirect_to(:back)
-  end
-
   # Interactive GML Syntax Validator
   def validate
     if params[:id]
