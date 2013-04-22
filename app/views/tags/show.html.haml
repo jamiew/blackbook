@@ -41,7 +41,6 @@
         %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, :target => '_blank') }
     %hr
     %br
-    = link_to '<small>Submit to Media Facades</small>', nominate_tag_path(@tag), :class => 'button', :rel => 'nofollow'
     = link_to '<small>Validate GML</small>', validate_tag_path(@tag), :class => 'button', :rel => 'nofollow'
     %p
     %br
