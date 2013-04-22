@@ -28,9 +28,12 @@ group :development do
   gem 'capistrano-ext'
 end
 
-group :test do
+group :development, :test do
   gem 'rspec', '1.3.0'
   gem 'rspec-rails', '1.3.2'
+end
+
+group :test do
   gem 'factory_girl'
   gem 'webrat'
 end
