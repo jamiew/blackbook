@@ -16,12 +16,29 @@ describe Tag do
   # Map some GML headers to database columns
   # Clashing field names are saved into a gml_* namespace
   describe 'reading GML header' do
-    it 'should read header/client/name => gml_application' do; create_tag_with_gml_header(:name => 'jdubsatron').gml_application.should == 'jdubsatron'; end
-    it 'should read header/client/username => gml_username' do; create_tag_with_gml_header(:username => 'jamiew').gml_username.should == 'jamiew'; end
-    it 'should read header/client/keywords => gml_keywords' do; create_tag_with_gml_header(:keywords => 'tag,phat,fffffat').gml_keywords.should == 'tag,phat,fffffat'; end
-    it 'should read header/client/uniqueKey => gml_uniquekey' do; create_tag_with_gml_header(:uniqueKey => '#ff00ff').gml_uniquekey.should == '#ff00ff'; end
-    it 'should read header/client/filename => remote_image' do; create_tag_with_gml_header(:filename => 'image007.jpg').remote_image.should == Tag.remote_image_prefix+'/image007.jpg'; end
-    it 'should read header/client/location => location' do; create_tag_with_gml_header(:location => 'http://google.com').location.should == 'http://google.com'; end
+    it 'should read header/client/name => gml_application' do
+      create_tag_with_gml_header(:name => 'jdubsatron').gml_application.should == 'jdubsatron'
+    end
+
+    it 'should read header/client/username => gml_username' do
+      create_tag_with_gml_header(:username => 'jamiew').gml_username.should == 'jamiew'
+    end
+
+    it 'should read header/client/keywords => gml_keywords' do
+      create_tag_with_gml_header(:keywords => 'tag,phat,fffffat').gml_keywords.should == 'tag,phat,fffffat'
+    end
+
+    it 'should read header/client/uniqueKey => gml_uniquekey' do
+      create_tag_with_gml_header(:uniqueKey => '#ff00ff').gml_uniquekey.should == '#ff00ff'
+    end
+
+    it 'should read header/client/filename => remote_image' do
+      create_tag_with_gml_header(:filename => 'image007.jpg').remote_image.should == Tag.remote_image_prefix+'/image007.jpg'
+    end
+
+    it 'should read header/client/location => location' do
+      create_tag_with_gml_header(:location => 'http://google.com').location.should == 'http://google.com'
+    end
   end
 
   # various GML headers are saved back onto the model each time
