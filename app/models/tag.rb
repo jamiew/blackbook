@@ -37,9 +37,8 @@ class Tag < ActiveRecord::Base
   has_attached_file :image,
     :default_style => :medium,
     :default_url => "/images/defaults/tag_:style.jpg",
-    :url => "/system/:attachment/:id_smart/:style/:basename.:extension",
-    :path => ":rails_root/public/system/:attachment/:id_smart/:style/:basename_:style.:extension",
-    # :path => ":rails_root/public/system/:class/:attachment/:id_partition/:basename_:style.:extension"
+    :url => "/system/:attachment/:id_partition/:style/:basename.:extension",
+    :path => ":rails_root/public/system/:attachment/:id_partition/:style/:basename_:style.:extension",
     :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
 
   # Placeholders for assigning data from forms
