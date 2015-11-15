@@ -12,12 +12,9 @@ gem 'turbolinks'
 # gem 'jbuilder', '~> 2.0'
 # gem 'sdoc', '~> 0.4.0', group: :doc
 
-group :test do
-  gem 'rspec-rails'
-end
-
 group :development, :test do
   gem 'byebug'
+  gem 'rspec-rails', '~> 3.0'
 end
 
 group :development do
