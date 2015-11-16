@@ -69,7 +69,6 @@ GEM
       activesupport (>= 4.1.0)
     haml (4.0.7)
       tilt
-    has_slug (0.2.7)
     htmlentities (4.3.4)
     i18n (0.7.0)
     jquery-rails (4.0.5)
@@ -167,7 +166,6 @@ GEM
     uglifier (2.7.2)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
-    unicode_utils (1.4.0)
     web-console (2.2.1)
       activemodel (>= 4.0)
       binding_of_caller (>= 0.7.2)
@@ -183,7 +181,6 @@ DEPENDENCIES
   byebug
   coffee-rails (~> 4.1.0)
   haml
-  has_slug
   htmlentities
   jquery-rails
   mysql2 (>= 0.3.13, < 0.5)
@@ -195,7 +192,6 @@ DEPENDENCIES
   spring
   turbolinks
   uglifier (>= 1.3.0)
-  unicode_utils
   web-console (~> 2.0)
   will_paginate
 

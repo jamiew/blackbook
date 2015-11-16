@@ -134,7 +134,7 @@ class ApplicationController < ActionController::Base
   # Stash the current page for use in redirection, e.g. login
   # using :back doesn't work inside a POST
   def store_location
-    session[:return_to] = request.request_uri
+    session[:return_to] = request.url
   end
 
   # Allow for using all 3 of: a specific redirect_to, a general :back, OR the specified default
