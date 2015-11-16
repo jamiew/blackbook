@@ -1,0 +1,85 @@
+
+/ Top level navigation
+- all_link = @user ? user_tags_path(@user) : tags_path
+/ .floatLeft= link_to '&larr; back', all_link
+.prevnext
+  %li= @next.nil? ? '&larr; newer' : link_to('&larr; newer', tag_path(@next), :class => 'button')
+  %li &nbsp;::&nbsp;
+  %li= @prev.nil? ? 'older &rarr;' : link_to('older &rarr;', tag_path(@prev), :class => 'button')
+  %br.clear
+
+
+#sidebar.tag_sidebar
+  / Information about the tag
+  .metadata.infobox
+    - if true # show for logged-out users as well, to encourage logging in
+      .right.favorite
+        - on = current_user && @tag.favorited_by?(current_user) || false
+        = link_to 'Favorite', tag_favorites_path(@tag), :method => 'post', :class => "favorite button #{on ? 'on' : 'off'}"
+    %h2= tag_title(@tag)
+    %hr
+    %ul
+      %li
+        == Uploaded #{@tag.created_at.strftime("%D %T")}
+        %br== (#{time_ago_in_words(@tag.created_at)} ago)
+    %hr
+    %ul
+      - app = !@tag.gml_application.blank? && @tag.gml_application || @tag.application
+      %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(h(@tag.sexy_app_name))}
+      %li== <strong>Keywords:</strong> #{@tag.gml_keywords.blank? ? 'NULL' : h(@tag.gml_keywords)}
+    %hr
+    %ul
+      - if !@tag.author.blank?
+        %li== <strong>Author:</strong> #{@tag.author}
+      %li== <strong>Uploader:</strong> #{@user.blank? ? (@tag.secret_username.blank? ? 'NULL' : secret_username_link(@tag.secret_username)) : link_to(@user.login, user_path(@user)) }
+      %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : h(@tag.location)}
+      - unless @tag.description.blank?
+        %li== <strong>Description:</strong> #{h(@tag.description)}
+      - if @tag.image.exists? || @tag.remote_image
+        - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
+        - #Quick little gsub to remove the queryvars... not ideal
+        %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, :target => '_blank') }
+    %hr
+    %br
+    = link_to '<small>Validate GML</small>', validate_tag_path(@tag), :class => 'button', :rel => 'nofollow'
+    %p
+    %br
+
+    .gml
+      %span.download= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
+      %span.what-is-gml= link_to('?', 'http://fffff.at/gml-week-graffiti-markup-language/', :target => '_blank')
+      %textarea.gml{:cols => 24, :rows => 12, :onclick => '$(this).select();'}= @tag.gml
+
+  -# Comments display
+  .comments.infobox
+    %h3== #{@comments.total_entries} Comments
+    = render :partial => 'comments/comments', :object => @comments, :locals => {:commentable => @tag}
+
+  -# Faves display...
+  -# TODO!!
+
+  -# Tag modbox -- edit/delete/debugging etc.
+  - if is_owner?(@tag) || is_admin?
+    .modbox.infobox
+      %h2{:style => 'color: #f0f'} MODBOX
+      %ol#controls
+        %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
+        %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
+      %p
+        %strong{:style => 'color: #f0f'} Secret Fields
+        - ['gml_uniquekey', 'gml_uniquekey_hash'].each do |field|
+          %p{:style => 'overflow: hidden;'}
+            %strong= field
+            %br
+            %input{:type => 'text', :readonly => 'readonly', :value => @tag.attributes[field], :onclick => '$(this).select();'}
+      %p
+        %strong{:style => 'color: #f0f'} Parsed GML Header
+        - @tag.gml_header.each do |k,v|
+          %p{:style => 'overflow: hidden;'}
+            %strong= k
+            %br
+            %span=h !v.blank? && v || 'NULL'
+
+/ The actual tag awwwwwww yeah
+= render :partial => "tags/tag_playback", :object => @tag
+

@@ -1,0 +1,9 @@
+
+%h2 Recent Database Activity
+%p
+  &larr;
+  = link_to "back to home", root_path
+
+= pagination(@notifications)
+= render :partial => 'notifications', :object => @notifications #not :collection
+%p= pagination(@notifications)

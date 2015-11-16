@@ -1,0 +1,20 @@
+-# Common code we're using on every page (for the time being)
+#header
+  %ul.navigation.user_navigation
+    = yield :header_nav
+  %ul.navigation.buttons
+    -#TODO: select the currently active link
+    %li= link_to 'data', tags_path
+    %li= link_to 'applications', visualizations_path
+    %li= link_to 'API/docs', "https://github.com/jamiew/blackbook/wiki/", :target => '_blank'
+    %li= link_to 'about', "/about"
+    - if false
+      %li= link_to 'activity', activity_path
+  .masthead
+    - if false
+      %h1.title= link_to SiteConfig.site_name, root_path, :class => 'root_link'
+      %h2.byline= link_to SiteConfig.site_byline, root_path, :class => 'root_link'
+    - alt = "#{SiteConfig.site_name}: #{SiteConfig.site_byline}"
+    %h1
+      %a.root_link{:href => root_path}
+        = image_tag("/images/000000book-logo-beta.png", :alt => alt, :title => alt)

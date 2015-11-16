@@ -1,0 +1,40 @@
+
+- required = redstar
+
+%fieldset
+
+  = form.error_messages
+
+  .right== #{required} = required field
+
+  %legend
+  .left{:style => 'width: 250px;'}
+    %br
+    = form.file_field :gml_file, :size => 10, :label => '<strong>Upload <abbr>GML</abbr> file</strong>'+required
+  .left{:style => 'margin-top: 50px; margin-right: 30px;'}
+    %em or
+  = form.text_area :gml, :label => 'paste raw GML'+required, :rows => 10
+
+  %hr
+  .row
+    .left= form.select :existing_application_id, Visualization.approved.find(:all, :select => 'id, name', :order => 'name ASC').map { |v| [v.name, v.id] }, :label => 'Application'+required, :include_blank => true
+    .left{:style => 'margin-left: 30px; font-size: 90%;'}= form.text_field :application, :label => 'or other'
+    %br
+  %hr
+  = form.file_field :image, :size => 10, :label => 'Screenshot (jpg/gif/png, up to 2MB)'
+  %hr.clear
+  = form.text_field :author, :label => 'Who (writer/artist/author)' #title/authors ... desync FIXME
+  = form.text_field :location, :label => 'Where <span>(e.g. NYC, SF)</span>'
+
+  -# Not using these anymore
+  - if false && admin?
+    .admin{:style => 'background-color: #411; padding: 10px 0; margin: 10px 0;'}
+      = form.text_field :remote_image, :label => 'Filename'
+      = form.text_field :remote_secret, :label => 'Secret'
+  =# form.text_field :description
+  =# form.text_field :cached_tag_list, :label => 'Tags (comma-separated)'
+
+  - unless @tag.new_record?
+    = form.hidden_field :id
+
+
