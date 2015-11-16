@@ -13,7 +13,7 @@ class Favorite < ActiveRecord::Base
 
   after_create :create_notification
 
-  named_scope :tags, {:conditions => 'object_type = "Tag"'}
+  scope :tags, -> { where('object_type = "Tag"') }
 
 protected
 

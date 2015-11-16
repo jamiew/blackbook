@@ -14,10 +14,9 @@ class Comment < ActiveRecord::Base
 
   # attr_protected :user_id, :commentable_type, :commentable_type, :ip_address
 
-  named_scope :sorted, {:order => "created_at DESC"}
-  named_scope :limit, lambda { |limit| {:limit => limit} }
-  named_scope :visible, {:conditions => ['hidden_at IS NULL OR hidden_at > ?', Time.now]} #Future hidden at? Lulz.
-  named_scope :hidden, {:conditions => ['hidden_at < ?', Time.now]}
+  scope :sorted, -> { order("created_at DESC") }
+  scope :visible, -> { where('hidden_at IS NULL OR hidden_at > ?', Time.now) }
+  scope :hidden, -> { where('hidden_at < ?', Time.now) }
 
   # before_save :denormalize_user_fields
   after_create :create_notification

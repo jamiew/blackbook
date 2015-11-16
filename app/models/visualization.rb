@@ -31,9 +31,8 @@ class Visualization < ActiveRecord::Base
   # Protect from mass assignment
   # attr_protected :user_id, :slug
 
-  named_scope :approved, { :conditions => ['approved_at < ?', Time.now] }
-  named_scope :pending, { :conditions => ['approved_at IS NULL OR approved_at > ?', Time.now] }
-  named_scope :by_user, lambda { |user_id| {:conditions => ['user_id = ?', user_id]} }
+  scope :approved, -> { where('approved_at < ?', Time.now) }
+  scope :pending, -> { where('approved_at IS NULL OR approved_at > ?', Time.now) }
 
   after_create :create_notification
 
