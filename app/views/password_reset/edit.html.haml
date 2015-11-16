@@ -1,0 +1,6 @@
+- uberform_for @user, :url => password_reset_path, :method => :put do |f|
+  %h2 Change My Password
+  = f.error_messages
+  = f.password_field :password
+  = f.password_field :password_confirmation
+  = f.submit "Update"

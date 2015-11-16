@@ -1,0 +1,66 @@
+- required = redstar
+
+#validator.full.centered
+  - if false
+    %p= link_to '&larr; back to all tags', tags_path
+  %p &nbsp;
+  #form
+    - form_for(@tag, :url => validate_path) do |form|
+      .floatLeft= form.label :id, '000000book Tag ID:'
+      &nbsp;&nbsp;
+      = form.text_field :id, :size => 5
+      = form.submit 'Validate'
+
+      .spacer{:style => 'display: block; margin: 10px 50px 20px; font-style: italic;'} or
+
+      = form.label :gml_file, 'Upload <abbr>GML</abbr> file:'
+      = form.file_field :gml_file, :size => 10
+      = form.submit 'Validate'
+
+      .spacer{:style => 'display: block; margin: 10px 50px 20px; font-style: italic;'} or
+
+      = form.label :gml, 'Raw GML:'
+      = form.text_area :gml, :label => 'paste raw GML'+required, :rows => 14
+      %p= form.submit 'Validate'
+
+  - if @tag.gml.blank?
+    %h1 GML Syntax Validator
+
+    == Upload or paste in your Graffiti Markup Language to test it out.
+    %p== Check out the #{link_to 'reference GML spec', 'http://graffitimarkuplanguage.com/spec'}
+
+    %h3 What does this do?
+    %ul.square
+      %li Check for syntax errors
+      %li Are you missing any important tags?
+      %li Make sure other GML players will be able to scale & orient correctly
+      %li Ensure maximum awesome
+
+    %br
+    %h3 Protips
+    == #{redstar} every GML tag page on 000000book now has a "#{(link_to('Validate GML', validate_tag_path(Tag.last)) rescue 'Validate GML')}" link to jump here quickly.
+    %p== #{redstar} API-enabled: POST to this page with your data in the "gml" or "tag[gml]" field, or after uploading try fetching URLs like:
+    %ul.formats.square
+      - reference_tag = 161 # A personal favorite
+      %li= link_to validate_tag_url(:id => reference_tag, :format => "xml"), validate_tag_url(:id => reference_tag, :format => "xml")
+      %li= link_to validate_tag_url(:id => reference_tag, :format => "json"), validate_tag_url(:id => reference_tag, :format => "json")
+      / %li= link_to validate_tag_url(:id => reference_tag, :format => "txt"), validate_tag_url(:id => reference_tag, :format => "txt")
+  - else
+    #results
+      - if @tag.new_record?
+        %h1= 'Validating Your Uploaded GML...'
+      - else
+        %h1== Validating Tag ##{@tag.id}...
+
+      - if @tag.validation_results.values.flatten.blank?
+        .congratulations
+          Congratulations! Your GML is valid!
+          = image_tag('applause.gif')
+      - else
+        %dl
+          - @tag.validation_results.each do |key,values|
+            %dt{:class => key}== #{pluralize values.length, key.to_s.singularize}
+            %dd{:class => key}
+              %ul
+                - values.each do |value|
+                  %li=h value
