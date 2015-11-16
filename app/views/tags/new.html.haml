@@ -4,7 +4,7 @@
   %h2= (@tag.new_record? ? 'Adding new tag' : "Editing Tag ##{@tag.id}")
   = link_to '&larr; back to all tags', tags_path
 
-  - uberform_for @tag, :url => (@tag.new_record? ? tags_path : tag_path(@tag)), :method => (@tag.new_record? ? :post : :put), :html => { :multipart => true } do |form|
+  - form_for @tag, :url => (@tag.new_record? ? tags_path : tag_path(@tag)), :method => (@tag.new_record? ? :post : :put), :html => { :multipart => true } do |form|
     = render :partial => "form", :object => form
     %p.buttons
       = form.submit @tag.new_record? ? "Create" : 'Save'

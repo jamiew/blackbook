@@ -78,9 +78,9 @@ Rails.application.routes.draw do
   get '/settings', :controller => 'users', :action => 'edit', as: 'settings'
 
   # tags => /data
-  get '/data' => 'tags#index'
+  # get '/data' => 'tags#index'
   resources :tags,
-    :as => 'data',
+    :path => 'data',
     :has_many => [:comments, :favorites],
     :member => {:flipped => :get, :nominate => :post, :thumbnail => [:post,:put], :validate => :get},
     :collection => [:latest, :random]
@@ -94,7 +94,7 @@ Rails.application.routes.draw do
 
   # visualizations => /apps
   resources :visualizations,
-    :as => 'apps',
+    :path => 'apps',
     :has_many => [:comments, :favorites],
     :member => {:approve => :put, :unapprove => :put}
 

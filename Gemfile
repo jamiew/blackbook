@@ -15,8 +15,6 @@ gem 'haml'
 gem 'authlogic'
 gem 'nokogiri'
 gem 'paperclip'
-gem 'unicode_utils' # required by has_slug
-gem 'has_slug'
 gem 'htmlentities'
 gem 'will_paginate'
 

@@ -2,12 +2,12 @@ class User < ActiveRecord::Base
 
   acts_as_authentic
 
-  has_slug :login
+  # has_slug :login
 
   has_many :comments # Owns/has made
   has_many :wall_posts, :class_name => 'Comment', :as => :commentable # Comments *on* this user
   has_many :favorites
-  has_many :tags, :order => 'created_at DESC'
+  has_many :tags
   has_many :visualizations
   has_many :notifications
 

@@ -1,6 +1,6 @@
 
 %p.create_new
-  = link_to '+ Register New Application', new_object_path, :class => 'button add facebox'
+  = link_to '+ Register New Application', new_visualization_path, :class => 'button add facebox'
 
 = pagination(@visualizations)
 
@@ -8,29 +8,29 @@
   %tr
     / %th{:style => 'width: 110px;'}
     %th{:style => 'width: 100px;'} application
-    %th{:style => 'width: 200px;'} 
-    %th{:style => 'width: 220px; padding: 0px 0px 0 25px;'} authors    
+    %th{:style => 'width: 200px;'}
+    %th{:style => 'width: 220px; padding: 0px 0px 0 25px;'} authors
     %th
     %th
     - if false
       %th{:style => 'width: 40px;'} embeddable
-      %th{:style => 'width: 150px;'} submitted    
+      %th{:style => 'width: 150px;'} submitted
     %th.controls
     - if is_admin? || is_owner?
       %th.admin{:style => 'width: 40px;'}
       %th.admin{:style => 'width: 80px;'}
-    
-  - current_objects.each do |app|
+
+  - @visualizations.each do |app|
     %tr.fat
       %td= link_to(image_tag(app.image(:small), :width => 100), visualization_path(app))
       %td.name
         %strong= link_to app.name, visualization_path(app)
-      %td.authors{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'        
+      %td.authors{:style => 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'
       %td.language= app.kind.blank? ? '&mdash;' : app.kind
       %td.website{:style => 'padding: 0px 5px 0 15px;'}= link_to app.website.gsub('http://','') || '&mdash;', app.website
       - if false
         %td= app.is_embeddable? ? 'y' : 'n'
-        %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"      
+        %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"
         %td{:style => 'width: 150px;'}= app.created_at.strftime('%D')
       %td.controls= link_to "more&nbsp;&raquo;", visualization_path(app), :class => 'ghost button'
 
@@ -45,10 +45,10 @@
           %br
           = link_to 'edit', edit_visualization_path(app)
           = link_to 'delete', visualization_path(app), :method => :delete, :confirm => "Are you sure?", :class => 'delete'
-      
-%p= pagination(current_objects)
 
-=# render :partial => 'visualization', :collection => current_objects
+%p= pagination(@visualizations)
 
-- if current_objects.blank?
+=# render :partial => 'visualization', :collection => @visualizations
+
+- if @visualizations.blank?
   %em None yet!

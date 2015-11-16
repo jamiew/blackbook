@@ -5,33 +5,30 @@ class VisualizationsController < ApplicationController
   before_filter :require_owner, :only => [:edit, :update, :destroy]
   before_filter :require_user, :only => [:new, :create]
 
-  make_resourceful do
-    actions :all
-    belongs_to :user
-
-    response_for :show do |format|
+  def show
+    @visualization = Visualization.find(params[:id])
+    set_page_title @visualization.name
+    respond_with(@visualization) do |format|
       format.html
       format.js
       format.xml
     end
+  end
 
-    before :index do
-      set_page_title "GML Applications"
+  def index
+    set_page_title "GML Applications"
+    @visualizations = Visualization.paginate(page: @page, per_page: 20).order('created_at ASC')
+  end
+
+  def create
+    raise 'TODO'
+    respond_with @visualization do |format|
+      format.html { flash[:notice] = "Application submitted"; redirect_to visualization_path(@visualization) }
     end
+  end
 
-    before :show do
-      set_page_title @visualization.name
-    end
-
-    response_for :create do |format| # Don't use nested route
-      format.html { flash[:notice] = "Application submitted"; redirect_to visualization_path(current_object) }
-    end
-
-    # response_for :update_fails do |format|
-    #   format.html { render :action => 'edit' }
-    #   format.json { render :json => false.to_json, :status => 422 }
-    # end
-
+  def update
+    raise 'TODO'
   end
 
   def current_objects
