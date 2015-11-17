@@ -247,7 +247,7 @@ protected
     # Build object
     @tag = Tag.new(params[:tag])
 
-    # GML data of some kind is required -- catching this ourselves due to GMLObject complexity...
+    # GML data of some kind is required -- catching this ourselves due to GmlObject complexity...
     # Allowing screenshot-only's for now... delete later.
     # if params[:tag].blank? || params[:tag][:gml].blank?
     #   @tag.errors.add("You must provide valid GML data to upload (no screenshots only, sorry)")

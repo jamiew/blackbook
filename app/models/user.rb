@@ -40,7 +40,7 @@ class User < ActiveRecord::Base
 
   # Tags matching our uniqueKey (not necessarily owned by us?)
   def matching_device_tags
-    @matching_device_tags ||= Tag.unclaimed.by_uniquekey(self.iphone_uniquekey)
+    @matching_device_tags ||= Tag.unclaimed.where('gml_uniquekey = ?', self.iphone_uniquekey)
   end
 
 protected
@@ -58,7 +58,7 @@ protected
     new_tags.update_all(:user_id => self.id)
 
     # Disassociate old tags (only 1 at a time!)
-    old_tags = Tag.claimed.by_uniquekey(self.iphone_uniquekey_was) #manual; TODO methodize
+    old_tags = Tag.claimed.where('gml_uniquekey = ?', self.iphone_uniquekey_was)
     old_tags.update_all(:user_id => nil)
 
     logger.info "Associated #{new_tags.length} new tags from #{self.iphone_uniquekey.inspect}; disassociated #{old_tags.length} old tags from previous key #{self.iphone_uniquekey_was.inspect}"

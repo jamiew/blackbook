@@ -5,7 +5,7 @@ class Tag < ActiveRecord::Base
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   belongs_to :user
-  has_one :gml_object, :class_name => 'GMLObject' # used to store the actual data, nice & gzipped
+  has_one :gml_object, :class_name => 'GmlObject' # used to store the actual data, nice & gzipped
   # has_many :comments, :as => :commentable, :order => 'created_at DESC'
   has_many :comments, :as => :commentable
   has_many :likes
@@ -32,7 +32,6 @@ class Tag < ActiveRecord::Base
   scope :from_device, -> { where('gml_uniquekey IS NOT NULL') }
   scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
   scope :unclaimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NULL') }
-  # scope :by_uniquekey, -> {|key| where(['gml_uniquekey = ?',key]) }
 
   # validates_attachment_presence :image
   # TODO FIXME
@@ -110,14 +109,15 @@ class Tag < ActiveRecord::Base
   # We're reimplementing Rails' to_json because we can't do :methods => {:gml_hash=>:gml},
   # and end up with an attribute called 'gml_hash' which doesn't work
   # Note: Rails 2.3.9 added case sensitivity to this?
-  def to_json(options = {})
-    hash = Serializer.new(self, options).serializable_record
-    hash.reject! { |k,v| v.blank? }
-    hash[:gml] = self.gml_hash && self.gml_hash['gml']
-    hash[:gml] ||= self.gml_hash && self.gml_hash['GML']
-    hash[:gml] ||= {}
-    ActiveSupport::JSON.encode(hash)
-  end
+  # TODO FIXME need to re-monkeypatch for Rails 4.3
+  # def to_json(options = {})
+  #   hash = Serializer.new(self, options).serializable_record
+  #   hash.reject! { |k,v| v.blank? }
+  #   hash[:gml] = self.gml_hash && self.gml_hash['gml']
+  #   hash[:gml] ||= self.gml_hash && self.gml_hash['GML']
+  #   hash[:gml] ||= {}
+  #   ActiveSupport::JSON.encode(hash)
+  # end
 
   # Also hide what we'd like, and strip empty records (for now)
   def to_xml(options = {})
@@ -274,7 +274,7 @@ protected
   # before_create hook to copy over our temp data & then read our GML
   def build_gml_object
     # STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
-    obj = GMLObject.new
+    obj = GmlObject.new
     obj.data = @gml_temp || self.attributes['gml']
     self.gml_object = obj
     process_gml
@@ -282,7 +282,7 @@ protected
     find_paired_user
   end
 
-  # after_create hook to finalize the GMLObject
+  # after_create hook to finalize the GmlObject
   def save_gml_object
     self.gml_object.tag = self
     self.gml_object.save!
