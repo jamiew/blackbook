@@ -2,13 +2,11 @@ require 'rails_helper'
 
 
 describe TagsController do
-
-  require 'rails_helper'
-
+  render_views
 
   before do
     activate_authlogic
-    @gml = Factory(:gml_object).data
+    @gml = FactoryGirl.create(:gml_object).data
   end
 
   describe "POST #create" do
@@ -27,7 +25,7 @@ describe TagsController do
 
     it "should create and assign to tempt1 given the correct secret" do
       pending 'TODO'
-      @tag = Factory(:tag_from_tempt1)
+      @tag = FactoryGirl.create(:tag_from_tempt1)
       # ...
     end
 
@@ -72,7 +70,7 @@ describe TagsController do
 
   describe "GET #index" do
     before do
-      @default_tag = Factory(:tag)
+      @default_tag = FactoryGirl.create(:tag)
       @should_mention_application = lambda { |matchable|
         response.should be_success
         response.body.should match(matchable)
@@ -114,7 +112,7 @@ describe TagsController do
 
   describe "GET #show" do
     before do
-      @tag = Factory(:tag,
+      @tag = FactoryGirl.create(:tag,
         :description => "An <b>html</b> description which might contain XSS!",
         :location => "http://locationURL.com",
         :gml_application => "Some Application name",
@@ -155,7 +153,7 @@ describe TagsController do
 
   describe "GET #validate" do
     it "should work with an existing tag_id" do
-      @tag = Factory(:tag)
+      @tag = FactoryGirl.create(:tag)
       get :validate, :id => @tag.id
       response.should be_success
       response.body.should match(/Validating Tag ##{@tag.id}/)
@@ -170,7 +168,7 @@ describe TagsController do
 
   describe "POST #validate" do
     it "should work given an existing tag_id (via tag[id])" do
-      @tag = Factory(:tag)
+      @tag = FactoryGirl.create(:tag)
       # FIXME why do we need to do "post :validate, :method => :post"? Cuz of the duplicate :get route?
       post :validate, :method => :post, :tag => {:id => @tag.id}
       response.should be_success
@@ -190,28 +188,28 @@ describe TagsController do
     end
 
     it "should return XML" do
-      @tag = Factory(:tag)
+      @tag = FactoryGirl.create(:tag)
       post :validate, :method => :post, :id => @tag.id, :format => 'xml'
       response.should be_success
       response.body.should match('<warnings>')
     end
 
     it "should return JSON" do
-      @tag = Factory(:tag)
+      @tag = FactoryGirl.create(:tag)
       post :validate, :method => :post, :id => @tag.id, :format => 'json'
       response.should be_success
       response.body.should match('"warnings":')
     end
 
     it "should return text" do
-      @tag = Factory(:tag)
+      @tag = FactoryGirl.create(:tag)
       post :validate, :method => :post, :id => @tag.id, :format => 'text'
       response.should be_success
       response.body.should match('warnings=')
     end
 
     it "should return text via XMLHttpRequest" do
-      @tag = Factory(:tag)
+      @tag = FactoryGirl.create(:tag)
       request.env['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
       post :validate, :id => @tag.id
       response.should be_success
