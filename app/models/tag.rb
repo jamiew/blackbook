@@ -81,7 +81,7 @@ class Tag < ActiveRecord::Base
   # Wrapper accessors for the GML data, now stored in another object
   def gml(opts = {})
     return rotated_gml if opts[:iphone_rotate].to_s == '1' #handoff for backwards compt; DEPRECATEME
-    @memoized_gml ||= gml_object && gml_object.data || @gml_temp || self.attributes['gml'] || ''
+    @memoized_gml ||= gml_object && gml_object.data || @gml_temp
     return @memoized_gml
   end
 
@@ -105,24 +105,21 @@ class Tag < ActiveRecord::Base
     return @gml_hash
   end
 
-  # Wrap to_json so the .gml string gets converted to a hash, then to json
-  # We're reimplementing Rails' to_json because we can't do :methods => {:gml_hash=>:gml},
-  # and end up with an attribute called 'gml_hash' which doesn't work
-  # Note: Rails 2.3.9 added case sensitivity to this?
-  # TODO FIXME need to re-monkeypatch for Rails 4.3
-  # def to_json(options = {})
-  #   hash = Serializer.new(self, options).serializable_record
-  #   hash.reject! { |k,v| v.blank? }
-  #   hash[:gml] = self.gml_hash && self.gml_hash['gml']
-  #   hash[:gml] ||= self.gml_hash && self.gml_hash['GML']
-  #   hash[:gml] ||= {}
-  #   ActiveSupport::JSON.encode(hash)
-  # end
+  # Override so we can add :gml => :gml_hash
+  # Arguably could just be using :methods but we always want this
+  def as_json(_opts = {})
+    hash = super(_opts)
+    hash.reject! {|k,v| v.blank? }
+    hash[:gml] = self.gml_hash && self.gml_hash['gml']
+    hash[:gml] ||= self.gml_hash && self.gml_hash['GML']
+    hash[:gml] ||= {}
+    hash
+  end
 
   # Also hide what we'd like, and strip empty records (for now)
   def to_xml(options = {})
     options[:except] ||= []
-    options[:except] += self.attributes.select { |key,value| value.blank? }
+    options[:except] += self.attributes.map{|k,v| k if v.blank? }.compact
     super(options)
   end
 
