@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'rails_helper'
 
-describe Tag do
+RSpec.describe Tag, type: :model do
 
   describe 'create' do
     it 'should succeed w/ valid GML' do

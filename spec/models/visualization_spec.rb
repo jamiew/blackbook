@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe Visualization do
+RSpec.describe Visualization, type: :model do
 
   it "should create" do
     user = Factory.build(:user)
