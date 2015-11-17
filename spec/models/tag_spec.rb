@@ -4,7 +4,7 @@ RSpec.describe Tag, type: :model do
 
   describe 'create' do
     it 'should succeed w/ valid GML' do
-      expect { Factory.create(:tag, :gml => base_gml.to_s) }.to_not raise_error
+      expect { FactoryGirl.create(:tag, :gml => base_gml.to_s) }.to_not raise_error
     end
   end
 
@@ -51,7 +51,7 @@ RSpec.describe Tag, type: :model do
 
   describe "validating GML" do
     before do
-      @tag = Factory.create(:tag_from_api)
+      @tag = FactoryGirl.create(:tag_from_api)
     end
 
     # it "should error on no strokes"
@@ -72,7 +72,7 @@ RSpec.describe Tag, type: :model do
 
   describe "format conversion" do
     before do
-      @tag = Factory.create(:tag)
+      @tag = FactoryGirl.create(:tag)
     end
 
     describe "to_json" do
@@ -144,7 +144,7 @@ RSpec.describe Tag, type: :model do
 
   def create_tag_with_gml_header(attrs)
     merged = base_gml.merge({:header => {:client => attrs}})
-    return Factory.create(:tag, :gml => merged.to_xml)
+    return FactoryGirl.create(:tag, :gml => merged.to_xml)
   end
 
 end

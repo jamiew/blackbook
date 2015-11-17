@@ -82,31 +82,31 @@ describe TagsController do
     end
 
     it "should filter on keywords" do
-      Factory.create(:tag, :application => 'mfcc_test_app', :gml_keywords => 'mfcc')
+      FactoryGirl.create(:tag, :application => 'mfcc_test_app', :gml_keywords => 'mfcc')
       get :index, :keywords => 'mfcc'
       @should_mention_application.call(/mfcc_test_app/)
     end
 
     it "should filter on location" do
-      Factory.create(:tag, :application => 'location_test', :location => 'San Francisco')
+      FactoryGirl.create(:tag, :application => 'location_test', :location => 'San Francisco')
       get :index, :location => 'San Francisco'
       @should_mention_application.call(/location_test/)
     end
 
     it "should filter on application (using 'application')" do
-      Factory.create(:tag, :application => 'app_test')
+      FactoryGirl.create(:tag, :application => 'app_test')
       get :index, :application => 'mfcc'
       # @should_mention_application.call(/app_test/)
     end
 
     it "should filter on application (using 'gml_application')" do
-      Factory.create(:tag, :application => 'displayed_name', :gml_application => 'real_test_string')
+      FactoryGirl.create(:tag, :application => 'displayed_name', :gml_application => 'real_test_string')
       get :index, :application => 'real_test_string'
       # @should_mention_application.call(/displayed_name/)
     end
 
     it "should filter on user (using last 5 characters of gml_uniquekey_hash)" do
-      tag = Factory.create(:tag, :application => 'user_test', :gml_uniquekey => 'lol')
+      tag = FactoryGirl.create(:tag, :application => 'user_test', :gml_uniquekey => 'lol')
       get :index, :user => tag.secret_username # TODO rename this method, it is undescriptive
       # @should_mention_application.call(/user_test/)
     end

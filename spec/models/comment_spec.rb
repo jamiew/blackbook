@@ -3,8 +3,7 @@ require 'rails_helper'
 RSpec.describe Comment, type: :model do
 
   before do
-    @comment = Factory.build(:comment)
-
+    @comment = FactoryGirl.build(:comment)
   end
 
   it "factory should be valid" do
@@ -13,10 +12,10 @@ RSpec.describe Comment, type: :model do
   end
 
   it "should fail without a commentable object" do
-    Factory.build(:comment, :commentable => nil).should_not be_valid
+    FactoryGirl.build(:comment, :commentable => nil).should_not be_valid
   end
 
   it "should be invalid with blank text" do
-    Factory.build(:comment, :text => '').should_not be_valid
+    FactoryGirl.build(:comment, :text => '').should_not be_valid
   end
 end
