@@ -21,6 +21,7 @@ gem 'will_paginate'
 group :development, :test do
   gem 'byebug'
   gem 'rspec-rails', '~> 3.0'
+  gem 'factory_girl'
 end
 
 group :development do
