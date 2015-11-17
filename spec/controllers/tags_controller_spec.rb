@@ -3,7 +3,8 @@ require 'rails_helper'
 
 describe TagsController do
 
-  integrate_views
+  require 'rails_helper'
+
 
   before do
     activate_authlogic
