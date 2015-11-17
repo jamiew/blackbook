@@ -91,6 +91,8 @@ Rails.application.routes.draw do
 
   get '/validator', :controller => 'tags', :action => 'validate', as: 'validator'
   post  '/validate',  :controller => 'tags', :action => 'validate', as: 'validate'
+  post  '/validate',  :controller => 'tags', :action => 'validate', as: 'validate_tag'
+  # ^ FIXME what is validate vs. validate_path? both seemed to be used...
 
   # visualizations => /apps
   resources :visualizations,
