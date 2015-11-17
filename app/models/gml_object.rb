@@ -1,4 +1,4 @@
-class GMLObject < ActiveRecord::Base
+class GmlObject < ActiveRecord::Base
 
   belongs_to :tag
 
