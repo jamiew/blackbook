@@ -1,15 +1,363 @@
 /*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
- * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any styles
- * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
- * file per style scope.
- *
- *= require_tree .
- *= require_self
- */
+* #000000book stylesheet
+* Jamie Wilkinson <http://jamiedubs.com>
+* (cc) Free Art & Technology Lab
+*
+*= require_tree .
+*= require_self
+*/
+
+
+/* Reset */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, /*p, */blockquote, th, td {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* Main */
+html, body { width: 100%; height: 100%; }
+html { color: #fff; background: #000; font-size: 100%; }
+body {
+  font-size: .92em;
+  font-family: helvetica, arial, sans-serif;
+  line-height: 1.25em;
+}
+body.ie6 { font-size: 16px; }
+
+/* Links */
+a { color: #fff; text-decoration: underline; }
+a:hover { background-color: #ff0; color: #000; text-decoration: none; }
+
+/* Image links somewhat differently */
+a img { border: 1px solid #333; background: transparent; }
+a img.noborder { border: 1px solid transparent; } /* default is bordered */
+a:hover img { border: 1px solid #ff0; background-color: transparent; }
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Century Gothic", sans-serif;
+  line-height: 2.125em;
+  font-size: 150%;
+}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { text-decoration: none; }
+
+h1 { font-size: 1.6em; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.2em; }
+h4 { font-size: 1.1em; }
+h5 { font-size: 1em; }
+
+
+/* General */
+hr {
+  border: 0;
+  height: 1px;
+  border-top: 1px solid #333;
+  width: 80%;
+  margin: 15px auto 10px auto;
+}
+
+table { border-collapse: collapse; border-spacing: 0; }
+table tr { }
+table th { font-family: serif; font-size: 1.2em; background-color: #333; padding: 5px; font-weight: bold; }
+table td { padding: 5px 5px; font-size: 0.9em; }
+
+/*table tr.fat { line-height: 3em; }*/
+table tr.fat td { padding: 20px 0; }
+table tr.fat td.name { padding-left: 10px; }
+
+table th.admin { background-color: #422; text-align: center; }
+table tr.fat td.admin { background-color: #200; text-align: center; }
+table tr.fat td.controls { text-align: right; padding-right: 10px; }
+
+fieldset, img {
+  border: 0;
+}
+
+address, caption, cite, code, dfn, th, var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+li {
+  list-style: none;
+}
+ol li {
+  list-style: upper-roman;
+  margin-left: 2em;
+  margin-bottom: 0.3em;
+}
+ol.square li, ul.square li {
+  list-style-type: square;
+  margin-left: 15px;
+  margin-bottom: 3px;
+}
+ul.circle li { list-style-type: disc; margin-left: 15px; }
+
+caption, th {
+  text-align: left;
+}
+
+q:before, q:after { content: ''; }
+
+abbr, acronym { border: 0; font-variant: normal; border-bottom: 1px dashed #444; }
+
+sup { vertical-align: text-top; }
+sub { vertical-align: text-bottom; }
+
+/*em { background-color: #eea; color: #000; padding: 2px 3px; }*/
+em { font-style: italic; }
+
+/* Form styles */
+input, textarea, select { font-family: inherit; font-size: inherit; font-weight: inherit; }
+input, textarea, select { font-size: 100%; }
+legend { color: #fff; }
+input[disabled], button[disabled] { color: #777; background-color: #bbb; border-color: #999; }
+
+form label { display: block; text-align: left; padding: 0px 0px 5px 0px; margin-top: 5px; }
+
+form {   font:100% verdana,arial,sans-serif; margin: 0; padding: 0; }
+form fieldset { clear: both; padding: 10px; margin: 0; }
+form fieldset legend { font-size: 1.1em; }
+form fieldset label:first-letter { text-decoration:underline; } /* Denote accesskey */
+form br { clear:left; }
+
+/* two-column form styling -- more 50/50 than 70/30 */
+form .left_column { width: 440px; }
+form .right_column { width: 470px; }
+
+.buttons input, .buttons button { font-size: 1.5em; }
+.buttons.small input, .buttons.small button { font-size: 0.9em; }
+
+
+/* Custom classes & misc helpers */
+.row, .clear { display: block; clear: both; }
+.left, .floatLeft { float: left; }
+.right, .floatRight { float: right; }
+.center { text-align: center; }
+.centered { margin-left: auto; margin-right: auto; }
+
+.full { width: 100%; }
+.half { width: 50%; }
+.third { width: 33%; }
+.quarter { width: 25%; }
+
+/* Fonts & button misc */
+.bigtext { font-size: 1.4em; line-height: 1.6em; }
+
+a.button { background: #fff; border: 1px solid #bbb; padding: 3px 5px; color: #000; text-decoration: none; }
+a.button:hover { background-color: #ff0; } /* Hmm. a:hover getting overriden by a.button */
+a.button.small { /*font-size: 0.9em;*/ padding: 1px 2px 0; margin: 0 1px; }
+a.smallbutton { padding: 3px 4px; border: 0; margin-right: 2px; }
+
+a.delete { color: #fbb; }
+
+.create_new { margin: 25px 0 25px; text-align: right; font-size: 11pt;  }
+.create_new a { /*color: #fff; background-color: #e00*/ background-color: #ff0; border: none; font-weight: normal; } /* don't actaully want to emphasize */
+
+
+
+/* Pagination */
+.pagination { text-align: left; padding: .3em 0 1em 0; }
+/*.pagination a, .pagination span { padding: .2em .5em; }*/
+.pagination a { padding: .2em .5em; }
+.pagination span.current, .pagination span.disabled { color: #AAA; border: 1px solid #444; padding: 3px 6px; }
+/*.pagination span.current { font-weight: bold; color: #dF5084; }*/
+.pagination span.current { }
+.pagination a { background-color: #fff; color: #000; text-decoration: none; }
+.pagination a:hover, .pagination a:focus { background-color: #ff0; color: #000; }
+.pagination .page_info { color: #aaa; padding-top: .8em; }
+.pagination .prev_page, .pagination .next_page { border-width: 2px; }
+.pagination .prev_page { margin-right: 0.5em; }
+.pagination .next_page { margin-left: 0.5em; }
+
+
+/* Ghetto tabs */
+div.tabs ul.tab_navigation { padding-bottom: 30px; }
+div.tabs ul.tab_navigation li a { float: left; margin-right: 5px; padding: 10px 5px; background-color: #333; text-decoration: none; }
+div.tabs ul.tab_navigation li a:hover { background-color: #555; color: #eee; }
+div.tabs ul.tab_navigation li a.selected { background-color: #ff0; color: #000; }
+div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: #333; text-shadow: 3px; }
+/*div.tabs div { clear: both; }*/
+
+
+/* Prev/next on show pages */
+.prevnext { display: block; /*width: 200px;*/ text-align: right; margin: 25px 100px 0px 0; font-size: 1.3em; }
+.prevnext li { display: inline; }
+
+
+/* Main layout */
+#container {
+  padding: 0 0;
+  margin: 0 auto;
+  width: 920px;
+  min-width: 820px;
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -3em;
+}
+
+#header { height: 54px; padding: 16px 0 16px 8px; border-bottom: 2px solid #333; min-width: 820px; } /* min-width doesn't work with all the floating... */
+#header a.root_link, #header a.root_link img { text-decoration: none; border: 0; }
+#header a.root_link:hover, #header a.root_link:hover img { background-color: transparent; border: 0; padding: 0; text-decoration: none; }
+#header a.root_link img { margin-top: -40px; height: 100px; }
+#header .masthead { width: 450px; white-space:nowrap; }
+#header h1.title { font-family: "Times", serif; font-size: 3em; font-weight: bold; margin: 0; padding: 0; line-height: 1em; letter-spacing: 1px; }
+#header h2.byline { font-size: 10pt; font-weight: normal; padding: 0; margin: 0; margin-top: -0.5em; }
+
+#header ul.navigation { float: right; margin: 20px 10px 0 0; font-size: 1.5em;  }
+#header ul.navigation li { font-family: "Times", serif; display: block; float: left; }
+#header ul.navigation li { padding-left: 12px; }
+#header ul.navigation.buttons li a { padding: 5px 6px 3px; font-size: 0.9em; text-decoration: none; border: 0; background: #fff; color: #000; -moz-border-radius: 1px; -webkit-border-radius: 1px; }
+#header ul.navigation.buttons li a:hover { background-color: #ff0; border-color: #ff0; color: #111; }
+#header ul.navigation.user_navigation { font-size: 1em; }
+
+/* User navigation: settings, logout, etc. */
+#header ul.user_navigation .user_photo img { margin-top: -10px; }
+
+#header h1 {
+  display: block;
+  font-family: "Georgia", serif;
+  font-size: 30pt;
+  font-style: italic;
+}
+
+#footer { clear: both; padding: 0 16px; margin: 8em 2em 1em 2em; height: 3em; text-align: right; color: #777; font-size: 90%; }
+
+
+/* Flash */
+#flash-notice, #flash-warning, #flash-error {
+  display: none; /* FIXME: should be obtrusive O_o */
+  position: absolute;
+  margin-top: -20px;
+  font-size: 1em;
+  font-weight: bold;
+  background: #667;
+  color: #fff;
+  padding: 6px 12px 4px;
+}
+
+/* Standardish layouts, dependent on the container size */
+.left_column { width: 580px; }
+.right_column { float: right; width: 330px; }
+
+#flash-notice   { color: #fff; background-color: #9c9; }
+#flash-warning  { color: #cc9; }
+#flash-error    { color: #fff; background-color: #c99; }
+
+.graytext { color: #aaa; }
+.redtext  { color: #e33; }
+.timeago { color: #666; font-size: 9pt; }
+
+
+/* Form Errors */
+#errorExplanation { background-color: #faa; border: 1px solid #faa; color: #333; padding: 0 10px 15px; }
+#errorExplanation ul li { list-style-type: square; margin-left: 15px; }
+
+/* Login form... */
+#login .remember_me { margin-left: 100px; font-size: 0.8em; margin-top: 10px; }
+#login .remember_me input { float: left; margin-right: 10px; }
+#login .remember_me label { text-align: left; margin-left: 3px; }
+.signup_or_login .buttons, .signup_or_login .help { margin-left: 6em; }
+.signup_or_login .help { font-size: 0.9em; margin-top: 2em; }
+
+
+/* Main page layout biz */
+#home #intro { line-height: 1.4em; font-size: 90%; color: #aaa; margin: 5px 0 5px 0; padding: 5px 5px 7px 5px; border-bottom: 1px solid #222; }
+#tags a img { margin-right: 5px; }
+
+ul#frontpage_tags li { line-height: 1.3em; }
+ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* span is occupied */
+
+/* General sidebar (tag/user) */
+#main { width: 590px; padding: 0; }
+#sidebar { width: 260px; float: right; border-left: 1px solid #222; padding: 10px 0 0 25px; font-size: 92%; }
+#sidebar.tag_sidebar { margin-top: 30px; padding: 0; border: 0; }
+#sidebar textarea { border: 1px solid #444; background-color: #222; color: #ccc; padding: 8px 8px 5px; margin-top: 10px; width: 95%; }
+
+#sidebar .infobox { background-color: #151515; padding: 5px 16px; margin-bottom: 30px; } /* just used in entry.show for now */
+#sidebar .infobox h2 { margin: 0; padding: 5px 0 0 0; line-height: 1.2em; }
+
+#sidebar span.download { margin-left: 5px; font-size: 120%; }
+#sidebar span.what-is-gml { margin-left: 2px; }
+#sidebar textarea.gml { border: 1px solid #ff0; }
+
+
+/* User.show */
+#profile { width: 980px; margin: 0 auto; margin-left: -50px; }
+#profile #main { width: 425px; overflow: hidden; font-size: .9em; }
+#profile #main .image img { width: 260px; }
+
+#profile #activity { float: right; width: 340px; min-height: 250px; padding: 10px 0 0 15px; }
+#profile #activity td.timeago { border-left: 1px solid #222; text-align: right; padding-right: 8px; width: 84px; overflow: visible; }
+#profile #activity .notifications .thumbnail { width: 50px; }
+
+#profile #sidebar { float: right; width: 190px; margin-right: -20px; }
+#profile #sidebar .roles { float: right; margin-top: 50px; }
+#profile #sidebar .role.admin { font-size: 0.9em; text-transform: uppercase; color: #444; }
+#profile #sidebar .ownerbox { margin: 15px 0 0px 0; }
+#profile #sidebar .tagline { color: #aaa; font-style: italic; }
+#profile #sidebar .website a { color: #aaa; }
+#profile #sidebar h4 { color: #666; text-transform: uppercase; margin: 10px 0 0 0; padding: 0; }
+#profile #sidebar .about { color: #ccc; font-size: 0.9em; }
+#profile #sidebar .stats { font-size: 1.4em; line-height: 1.6em; }
+
+/* Some metaclasses for quasi-searches */
+a.username_link, a.application_link { }
+a.username_link.anon, a.application_link.anon, .keywords a { text-decoration: none; border-bottom: 1px dotted #888; }
+
+#app_nav { clear: both; margin-top: -40px; font-size: 11px; color: #999; }
+
+/* Tag.show playback: flash, canvas, image */
+#home #vis { margin-top: 15px; }
+
+.tag #image img { width: 590px; }
+.tag #flash object, .tag #flash embed { min-height: 460px; border: 1px solid #666; }
+.tag #html5 canvas { height: 460px; width: 580px; background-color: #000; border: 1px solid #666; }
+
+.tag input.embed { font-size: 8pt; color: #999; background-color: #2f2f2f; border: 1px solid #555; padding: 4px 5px 3px 2px; width: 350px; }
+.tag input.embed:hover { border-color: #ff0; }
+
+.tag .beta { color: #666; }
+.tag .beta a { color: #999; }
+
+
+/* Add new application */
+.embed_toggle { margin-top: 40px; }
+.embed_details.disabled { color: #555; }
+
+/* Favorites */
+.favorite { margin-top: 4px; }
+.favorite a { background: #fff url(/images/heart.png) 2px 0 no-repeat; padding: 4px 4px 2px 24px; display: inline-block; line-height: 10px; font-weight: bold; color: #808080; border: 2px solid #aaa; }
+.favorite a:hover { background-position: 2px -32px; color: #B33d33; text-decoration: none; }
+.favorite a.on, .favorite a.on:hover { background-position: 2px -16px; color: #c80000; }
+
+/* Comments... */
+.comment { border-bottom: 1px solid #222; padding-bottom: 10px; margin-top: 5px; margin-bottom: 10px; font-size: 0.9em; }
+.comment .info { line-height: 1.1em; }
+.comment .info .author_photo { float: left; margin-right: 8px; border: 1px solid #333; }
+.comment .info .author, .comment .timeago { }
+.comment .info .timeago { margin-left: 5px; }
+.comment p.text { color: #bbb; margin: 3px 0 0 43px; }
+
+.commentable { float: left; text-align: center; width: 100px; margin-right: 20px; padding-top: 10px; }
+
+/* User.index */
+ul.users li { float: left; text-align: center; margin: 0 15px 15px 0; width: 110px; height: 150px; overflow: hidden; }
+ul.users li img { display: block; margin-bottom: 5px; }
+
+
+/* Validator */
+#validator #form  { width: 400px; float: left; margin-right: 40px; }
+#validator #results { font-size: 13pt; margin-left: 440px; }
+#validator #results dd, #validator #results dt { padding: 6px 10px 20px; }
+#validator #results .errors { background-color: #700;  }
+#validator #results .warnings { background-color: #770;  }
+#validator #results .recommendations { background-color: #070;  }
+#validator #results dt { font-size: 15pt; font-weight: bold; padding: 15px 10px 10px 20px; overflow: hidden; }
+#validator #results dd { margin-left: 15px; }
+#validator #results dd li { line-height: 1.5em; list-style: disc; margin-left: 25px; margin-bottom: 4px; }
+#validator .congratulations { margin-top: 50px; font-size: 20pt; font-weight: normal; }
+#validator .congratulations img { margin-top: 30px; }
