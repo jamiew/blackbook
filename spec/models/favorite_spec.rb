@@ -1,7 +1,7 @@
 require 'rails_helper'
 
+RSpec.describe Favorite, type: :model do
 
-describe Favorite do
   before(:each) do
     @favorite = Factory(:favorite)
   end

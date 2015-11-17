@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'rails_helper'
 
-describe Comment do
+RSpec.describe Comment, type: :model do
 
   before do
     @comment = Factory.build(:comment)

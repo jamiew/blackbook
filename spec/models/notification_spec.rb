@@ -1,7 +1,7 @@
 require 'rails_helper'
 
+RSpec.describe Notification, type: :model do
 
-describe Notification do
   before(:each) do
     @valid_attributes = {
       :subject_id => 1,

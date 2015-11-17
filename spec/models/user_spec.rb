@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'rails_helper'
 
-describe User do
+RSpec.describe User, type: :model do
 
   it "should create" do
     user = Factory.build(:user)

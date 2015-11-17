@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 
-describe GMLObject do
+RSpec.describe GMLObject, type: :model do
+
   before(:each) do
     @gml = Factory(:gml_object)
   end
