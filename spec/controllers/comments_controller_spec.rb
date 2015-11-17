@@ -2,7 +2,6 @@ require 'rails_helper'
 
 
 describe CommentsController do
-  integrate_views
 
   before do
     activate_authlogic

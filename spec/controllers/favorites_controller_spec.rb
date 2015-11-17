@@ -2,7 +2,8 @@ require 'rails_helper'
 
 
 describe FavoritesController do
-  integrate_views
+  require 'rails_helper'
+
 
   before do
     activate_authlogic
