@@ -2,6 +2,7 @@ require 'rails_helper'
 
 
 describe UserSessionsController do
+  render_views
 
   before do
     activate_authlogic

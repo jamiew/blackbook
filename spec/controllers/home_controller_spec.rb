@@ -2,12 +2,11 @@ require 'rails_helper'
 
 
 describe HomeController do
-  require 'rails_helper'
-
+  render_views
 
   before do
     activate_authlogic
-    @tag = Factory(:tag) # Act like we've got at least 1 tag
+    @tag = FactoryGirl.create(:tag) # Act like we've got at least 1 tag
   end
 
   it "/ (homepage) should work" do

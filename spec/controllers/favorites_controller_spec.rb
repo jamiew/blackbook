@@ -2,13 +2,12 @@ require 'rails_helper'
 
 
 describe FavoritesController do
-  require 'rails_helper'
-
+  render_views
 
   before do
     activate_authlogic
-    @user = Factory(:user)
-    @tag = Factory(:tag)
+    @user = FactoryGirl.create(:user)
+    @tag = FactoryGirl.create(:tag)
   end
 
   describe "GET#index" do
@@ -24,7 +23,7 @@ describe FavoritesController do
 
   describe "POST #create" do
     before do
-      @user = Factory(:user)
+      @user = FactoryGirl.create(:user)
       request.env["HTTP_REFERER"] = tag_path(@tag)
       # FIXME we're relying on redirect_to(:back) inside FavoritesController...
     end

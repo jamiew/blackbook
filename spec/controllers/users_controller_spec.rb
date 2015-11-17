@@ -2,9 +2,10 @@ require 'rails_helper'
 
 
 describe UsersController do
+  render_views
 
   before do
-    @user = Factory(:user)
+    @user = FactoryGirl.create(:user)
   end
 
   describe "actions requiring no current user" do

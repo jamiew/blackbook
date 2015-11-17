@@ -2,10 +2,11 @@ require 'rails_helper'
 
 
 describe PasswordResetController do
+  render_views
 
   before do
     # activate_authlogic
-    @user = Factory(:user)
+    @user = FactoryGirl.create(:user)
   end
 
   describe "requesting a password reset" do

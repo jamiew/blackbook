@@ -2,10 +2,11 @@ require 'rails_helper'
 
 
 describe CommentsController do
+  render_views
 
   before do
     activate_authlogic
-    @tag = Factory(:tag)
+    @tag = FactoryGirl.create(:tag)
   end
 
   describe "GET#index" do
@@ -19,7 +20,7 @@ describe CommentsController do
     end
 
     it "should work with a parent User" do
-      @user = Factory(:user)
+      @user = FactoryGirl.create(:user)
       get :index, :user_id => @user.id
       response.should be_success
     end
@@ -32,7 +33,7 @@ describe CommentsController do
 
   describe "DELETE#destroy" do
     before do
-      @comment = Factory(:comment)
+      @comment = FactoryGirl.create(:comment)
     end
 
     it "should work for admins" do
