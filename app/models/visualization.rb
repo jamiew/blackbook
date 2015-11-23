@@ -26,10 +26,8 @@ class Visualization < ActiveRecord::Base
   validates_presence_of :authors, :on => :create, :message => "can't be blank, put your username if nothing else"
   # validates_presence_of :website, :on => :create, :message => "can't be blank"
   validates_presence_of :embed_url, :on => :create, :message => "can't be blank", :if => :is_embeddable
-  # Optional: version, website, download (?), license (?)
 
-  # Protect from mass assignment
-  # attr_protected :user_id, :slug
+  attr_protected :user_id, :slug
 
   scope :approved, -> { where('approved_at < ?', Time.now) }
   scope :pending, -> { where('approved_at IS NULL OR approved_at > ?', Time.now) }

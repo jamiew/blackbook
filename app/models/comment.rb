@@ -10,7 +10,7 @@ class Comment < ActiveRecord::Base
   validates_associated  :user, :on => :create
   validates_presence_of :text, :on => :create, :message => "can't be blank"
 
-  # attr_protected :user_id, :commentable_type, :commentable_type, :ip_address
+  attr_protected :user_id, :commentable_type, :commentable_type, :ip_address
 
   scope :sorted, -> { order("created_at DESC") }
   scope :visible, -> { where('hidden_at IS NULL OR hidden_at > ?', Time.now) }

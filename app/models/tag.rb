@@ -5,8 +5,7 @@ class Tag < ActiveRecord::Base
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   belongs_to :user
-  has_one :gml_object, :class_name => 'GmlObject' # used to store the actual data, nice & gzipped
-  # has_many :comments, :as => :commentable, :order => 'created_at DESC'
+  has_one :gml_object, :class_name => 'GmlObject'
   has_many :comments, :as => :commentable
   has_many :likes
 
@@ -21,14 +20,8 @@ class Tag < ActiveRecord::Base
   after_create  :save_gml_object
   after_create  :create_notification
 
-  # Caching related -- currently handled in the Controller
-  # after_save    :expire_gml_hash_cache
-  # after_destroy :delete_gml_hash_cache
+  attr_protected :user_id
 
-  # Security: protect from mass assignment
-  # attr_protected :user_id
-
-  # Scopes -- mostly related to presence of uniquekeys
   scope :from_device, -> { where('gml_uniquekey IS NOT NULL') }
   scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
   scope :unclaimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NULL') }
