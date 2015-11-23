@@ -17,6 +17,7 @@ gem 'nokogiri'
 gem 'paperclip'
 gem 'htmlentities'
 gem 'will_paginate'
+gem 'protected_attributes'
 
 group :development, :test do
   gem 'byebug'

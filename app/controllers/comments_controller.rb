@@ -4,9 +4,8 @@ class CommentsController < ApplicationController
   before_filter :setup
 
   def index
-    # Show all comments for given @commentable (fetched in :setup)
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    @comments = @commentable.comments.sorted.paginate(:page => @page, :per_page => @per_page, :include => [:user, :commentable])
+    @comments = @commentable.comments.sorted.includes(:user, :commentable).paginate(page: @page, per_page: @per_page)
   end
 
   def show

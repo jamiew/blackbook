@@ -53,12 +53,12 @@ describe CommentsController do
     it "should fail for non-owner users" do
       login_as_user
       delete :destroy, :tag_id => @tag.id, :id => @comment.id
-      response.status.should == "403 Forbidden"
+      response.status.should == 403 # Forbidden
     end
 
     it "should fail for logged-out users" do
       delete :destroy, :tag_id => @tag.id, :id => @comment.id
-      response.status.should == "403 Forbidden"
+      response.status.should == 403 # Forbidden
     end
   end
 
