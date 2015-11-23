@@ -5,11 +5,12 @@
   %meta{ :name => 'robots', :content => @noindex ? 'noindex,follow' : 'all' }
   %meta{ :name => 'resource-type', :content => 'document' }
   %meta{ :name => 'MSSmartTagsPreventParsing', :content => 'true' }
-  = stylesheet_link_tag 'application'
-  = stylesheet_link_tag 'print', :media => 'print'
+
+  = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true
+  = javascript_include_tag 'application', 'data-turbolinks-track' => true
+  = csrf_meta_tags
+
   = yield :head
+
   %title= page_title
 
-= remote_javascript_includes
-- bundle do
-  = local_javascript_includes
