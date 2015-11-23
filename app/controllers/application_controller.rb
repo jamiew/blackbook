@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
   rescue_from NoPermissionError, :with => :permission_denied
 
   # Oink object debugging in dev
-  # if RAILS_ENV == 'development'
+  # if Rails.env == 'development'
   #   include Oink::MemoryUsageLogger
   #   include Oink::InstanceTypeCounter
   # end
@@ -225,8 +225,8 @@ class ApplicationController < ActionController::Base
   end
   helper_method :url_escape
 
-  def dev?; RAILS_ENV == 'development'; end
-  def production?; RAILS_ENV == 'production'; end
+  def dev?; Rails.env == 'development'; end
+  def production?; Rails.env == 'production'; end
   helper_method :dev?, :production?
 
 end

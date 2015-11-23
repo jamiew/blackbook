@@ -55,7 +55,7 @@ class Tag < ActiveRecord::Base
   def thumbnail_image(size = :medium)
     if !remote_image.blank?
       return "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{self.attributes['remote_image'].gsub('gml','png')}"
-    # elsif RAILS_ENV == 'development' && !File.exist?(self.image_path(size)) #don't do image 404s in development
+    # elsif Rails.env == 'development' && !File.exist?(self.image_path(size)) #don't do image 404s in development
     #   return "/images/defaults/tag_#{size.to_s}.jpg"
     else
       return self.image(size)
@@ -240,7 +240,7 @@ class Tag < ActiveRecord::Base
     # Geo information?
 
   rescue
-    errors << "Error parsing GML (malformed XML?)"+(RAILS_ENV == 'development' ? ": #{$!.class} - #{$!}" : '')
+    errors << "Error parsing GML (malformed XML?)"+(Rails.env == 'development' ? ": #{$!.class} - #{$!}" : '')
 
   ensure
     self.validation_results = ActiveSupport::OrderedHash.new

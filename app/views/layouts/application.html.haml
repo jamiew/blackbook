@@ -25,7 +25,7 @@
         = yield :layout unless dev? && params[:noyield] == '1'
     = render :partial => 'layouts/footer'
 
-    - if RAILS_ENV == 'production'
+    - if Rails.env == 'production'
       = render :partial => 'layouts/stats'
 
 
