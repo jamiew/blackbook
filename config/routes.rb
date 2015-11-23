@@ -70,8 +70,7 @@ Rails.application.routes.draw do
 
   get '/activity' => 'home#activity', as: 'activity'
 
-  root :controller => 'home', :action => 'index'
+  get '/about' => 'home#about', as: 'about'
 
-  # Lastly serve up static pages when available
-  get '/:id' => 'home#static'
+  root :controller => 'home', :action => 'index'
 end
