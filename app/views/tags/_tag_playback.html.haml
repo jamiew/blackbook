@@ -7,11 +7,11 @@
     %li= link_to 'image', '#image'
 
   #flash
-    - if RAILS_ENV == 'development'
+    - if Rails.env == 'development'
       %p
         %span.beta *Flashplayer disabled in development
     - elsif true # Player hosted on Todd's site is busted and I have old code :-(
-      %p 
+      %p
         %span.beta (Flashplayer temporarily unavailable)
     - else
       - html = tag_player(@tag, :width => '580px')

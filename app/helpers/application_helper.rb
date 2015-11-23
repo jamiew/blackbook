@@ -23,7 +23,7 @@ module ApplicationHelper
   # Javascript includes, used across multiple layouts
   # 'Remote' files are only remote in prod, since we might be offline in dev
   def remote_javascript_includes
-    if 'production' == RAILS_ENV
+    if 'production' == Rails.env
       javascript_include_tag(
         'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js',
         'http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/jquery-ui.min.js'
