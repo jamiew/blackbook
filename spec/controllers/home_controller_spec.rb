@@ -6,26 +6,19 @@ describe HomeController do
 
   before do
     activate_authlogic
-    @tag = FactoryGirl.create(:tag) # Act like we've got at least 1 tag
+    @tag = FactoryGirl.create(:tag)
   end
 
-  it "/ (homepage) should work" do
+  it "/ works" do
     get :index
     response.should be_success
     response.body.should match(/an open database for Graffiti Markup Language/)
   end
 
-  # TODO test that "/about" routes to Home#static
-
-  it "/about should work" do
-    get :static, :id => 'about'
+  it "/about works" do
+    get :about
     response.should be_success
     response.body.should match(/About/)
-    response.should render_template('pages/about')
-  end
-
-  it "should 404 on a bad page ID" do
-    get :static, :id => 'fake_bad_page'
-    response.status == "404 Not Found"
+    response.should render_template('home/about')
   end
 end

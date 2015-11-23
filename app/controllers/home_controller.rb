@@ -14,16 +14,8 @@ class HomeController < ApplicationController
     set_page_title "Activity"
   end
 
-  # Show a single static page
-  # FIXME using hardcoded references to .haml or .erb... we need template_exists?()
-  def static
-    template = "pages/#{params[:id]}"
-    if template_exists?(template)
-      set_page_title params[:id].capitalize
-      render :template => template
-    else
-      render :file => "#{RAILS_ROOT}/public/404.html", :status => 404
-    end
+  def about
+    set_page_title 'About'
   end
 
   # Ghetto handling for known-bad URLs -- mapping them here as a blackhole
@@ -32,12 +24,4 @@ class HomeController < ApplicationController
     render :nothing => true, :status => 304 # Not Modified
   end
 
-
-  private
-
-  def template_exists?(path)
-    self.view_paths.find_template(path, response.template.template_format)
-  rescue ActionView::MissingTemplate
-    false
-  end
 end
