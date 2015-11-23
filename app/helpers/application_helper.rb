@@ -19,32 +19,6 @@ module ApplicationHelper
     return messages
   end
 
-
-  # Javascript includes, used across multiple layouts
-  # 'Remote' files are only remote in prod, since we might be offline in dev
-  def remote_javascript_includes
-    if 'production' == Rails.env
-      javascript_include_tag(
-        'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js',
-        'http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/jquery-ui.min.js'
-      )
-    else
-      javascript_include_tag(
-        'jquery.js',
-        'jquery-ui.js'
-      )
-    end
-  end
-
-  # Local files are the same in both prod & dev
-  def local_javascript_includes
-    javascript_include_tag(
-      # 'jquery.rater.js',
-      'jrails',
-      'application'
-    )
-  end
-
   # Pagination helper; collection optional as will_paginate will guess based on controller name
   def pagination(collection = nil)
     collection.nil? ? will_paginate : will_paginate(collection)
