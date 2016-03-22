@@ -71,6 +71,7 @@ class TagsController < ApplicationController
       wants.gml   { render :xml => @tag.gml(:iphone_rotate => params[:iphone_rotate]) }
       wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }
       wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
+      wants.jpg   { redirect_to(@tag.image(:large)) }
     end
   end
 

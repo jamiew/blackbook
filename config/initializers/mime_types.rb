@@ -10,3 +10,8 @@ Mime::Type.register_alias "text/html", :xhr
 # GML
 Mime::Type.register "application/xml", :gml
 # Mime::Type.register_alias "application/xml", :gml
+
+# Image shortcuts
+Mime::Type.register "image/jpeg", :jpg
+Mime::Type.register "image/png", :png
+Mime::Type.register "image/gif", :gif
