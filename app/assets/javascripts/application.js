@@ -8,7 +8,6 @@
 //= require jquery_ujs
 //= require jquery.form
 
-
 $(document).ready(function(){
 
   // Flashes

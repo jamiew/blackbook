@@ -14,9 +14,17 @@ module ApplicationHelper
   def flash_messages
     messages = []
     %w(notice warning error).each do |msg|
-      messages << content_tag(:div, html_escape(flash[msg.to_sym]), :id => "flash-#{msg}") unless flash[msg.to_sym].blank?
+      if flash[msg.to_sym].present?
+        messages << content_tag(:div, html_escape(flash[msg.to_sym]), :id => "flash-#{msg}").html_safe
+      end
     end
-    return messages
+    @flash_messages ||= messages
+  end
+
+  # TODO FIXME -- I think this did generic ActiveRecord .error_messages mapping
+  # so like controller.send(object_name).map(&:error_messages)? something like that
+  def error_messages_for(object_name)
+    "TODO show errors for #{object_name}"
   end
 
   # Pagination helper; collection optional as will_paginate will guess based on controller name

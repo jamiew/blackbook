@@ -44,7 +44,7 @@
             - elsif !tag.secret_username.blank?
               %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
     %p.right
-      %strong= link_to '<span>View all data &raquo;</span>', tags_path, :class => 'button ghost small'
+      %strong= link_to '<span>View all data &raquo;</span>'.html_safe, tags_path, :class => 'button ghost small'
 
   #vanderplayer.left_column
     -  unless @tag.blank?

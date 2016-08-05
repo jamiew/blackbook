@@ -11,7 +11,7 @@
 
 - if logged_in?
   - new_comment = Comment.new
-  - form_for(new_comment, :url => polymorphic_url([commentable, :comments]), :method => :post) do |f|
+  = form_for(new_comment, :url => polymorphic_url([commentable, :comments]), :method => :post) do |f|
     %span.posting_as
     .add_comment= render :partial => 'comments/form', :locals=>{:f=>f}
     %p.buttons.small= f.submit 'Post'

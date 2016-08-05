@@ -19,8 +19,9 @@ Rails.application.routes.draw do
 
   resources :users do
     # resources :tags, :as => 'data'
-    # resources :comments
-    # resources :favorites
+    resources :tags
+    resources :comments
+    resources :favorites
 
     get :change_password, on: :member
     get :latest, on: :member
