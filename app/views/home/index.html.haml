@@ -24,9 +24,11 @@
   .right_column{:style => "overflow: visible;"}
     .prevnext
       - @prev ||= @tags.first
-      %li= @next.nil? ? '&larr; newer' : link_to('&larr; newer', tag_path(@next), :class => 'button')
+      - next_text = '&larr; newer'.html_safe
+      - prev_text = 'older &rarr;'.html_safe
+      %li= @next.nil? ? next_text : link_to(next_text, tag_path(@next), :class => 'button')
       %li &nbsp;::&nbsp;
-      %li= @prev.nil? ? 'older &rarr;' : link_to('older &rarr;', tag_path(@prev), :class => 'button')
+      %li= @prev.nil? ? prev_text : link_to(prev_text, tag_path(@prev), :class => 'button')
     %br
     %ul#frontpage_tags
       - @tags.each do |tag|
