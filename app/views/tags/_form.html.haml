@@ -3,7 +3,8 @@
 
 %fieldset
 
-  = form.error_messages
+  -# TODO FIXME show errors please
+  =# form.error_messages
 
   .right== #{required} = required field
 
@@ -17,7 +18,8 @@
 
   %hr
   .row
-    .left= form.select :existing_application_id, Visualization.approved.find(:all, :select => 'id, name', :order => 'name ASC').map { |v| [v.name, v.id] }, :label => 'Application'+required, :include_blank => true
+    - visualizations_list = Visualization.approved.select('id, name').order('name ASC').map { |v| [v.name, v.id] } || []
+    .left= form.select :existing_application_id, visualizations_list, :label => 'Application'+required, :include_blank => true
     .left{:style => 'margin-left: 30px; font-size: 90%;'}= form.text_field :application, :label => 'or other'
     %br
   %hr

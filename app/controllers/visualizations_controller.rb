@@ -20,6 +20,10 @@ class VisualizationsController < ApplicationController
     @visualizations = Visualization.paginate(page: @page, per_page: 20).order('created_at ASC')
   end
 
+  def new
+    @visualization = Visualization.new
+  end
+
   def create
     raise 'TODO'
     respond_with @visualization do |format|

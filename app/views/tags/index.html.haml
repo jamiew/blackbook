@@ -4,14 +4,14 @@
 -# Some ghetto custom mastheads
 - if @user
   .left
-    = link_to "&larr; Back to user profile", user_path(@user)
+    = link_to "&larr; Back to user profile".html_safe, user_path(@user)
     %h3
       .left{:style => 'margin-right: 8px; margin-top: 2px;'}= link_to image_tag(@user.photo(:tiny)), user_path(@user)
       == #{@user.login}'s #{@favorites ? 'favorites' : 'tags'} (#{@tags.total_entries})
     %br
 - elsif @search_context
   .left
-    = link_to '&larr; Back to all data', tags_path
+    = link_to '&larr; Back to all data'.html_safe, tags_path
     %h3
       Search:
       %span{:style => 'font-weight: normal;'}== #{@search_context[:key]} = #{@search_context[:value]}

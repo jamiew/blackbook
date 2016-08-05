@@ -21,7 +21,7 @@
     = render :partial => 'layouts/header'
     #container
       #content
-        = flash_messages
+        = flash_messages.present? && flash_messages || ''
         = yield :layout unless dev? && params[:noyield] == '1'
     = render :partial => 'layouts/footer'
 

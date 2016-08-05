@@ -1,5 +1,5 @@
 #login.signup_or_login.user_form.quarter.centered
-  - form_for @user_session, :url => user_session_path do |f|
+  = form_for @user_session, :url => user_session_path do |f|
     %h2 Login
     = f.text_field :login, :label => 'Username'
     = f.password_field :password

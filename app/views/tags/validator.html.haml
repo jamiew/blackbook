@@ -5,7 +5,7 @@
     %p= link_to '&larr; back to all tags', tags_path
   %p &nbsp;
   #form
-    - form_for(@tag, :url => validate_path) do |form|
+    = form_for(@tag, :url => validate_path) do |form|
       .floatLeft= form.label :id, '000000book Tag ID:'
       &nbsp;&nbsp;
       = form.text_field :id, :size => 5

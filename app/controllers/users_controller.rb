@@ -16,9 +16,9 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10
 
-    @tags = @user.tags.paginate(:page => @page, :per_page => @per_page, :include => [:user])
-    @wall_posts = @user.wall_posts.paginate(:page => 1, :per_page => 10, :order => 'created_at DESC', :include => [:user])
-    @notifications = @user.notifications.paginate(:page => 1, :per_page => 15, :order => 'created_at DESC', :include => [:subject, :user])
+    @tags = @user.tags.includes(:user).paginate(page: @page, per_page: @per_page)
+    @wall_posts = @user.wall_posts.includes(:user).order('created_at DESC').paginate(page: 1, per_page: 10)
+    @notifications = @user.notifications.includes(:subject, :user).order('created_at DESC').paginate(page: 1, per_page: 15)
 
     set_page_title @user.name || @user.login
   end

@@ -1,11 +1,13 @@
 
 / Top level navigation
 - all_link = @user ? user_tags_path(@user) : tags_path
-/ .floatLeft= link_to '&larr; back', all_link
+/ .floatLeft= link_to '&larr; back'.html_safe, all_link
 .prevnext
-  %li= @next.nil? ? '&larr; newer' : link_to('&larr; newer', tag_path(@next), :class => 'button')
+  - prev_text = '&larr; newer'.html_safe
+  %li= @next.nil? ? prev_text : link_to(prev_text, tag_path(@next), :class => 'button')
   %li &nbsp;::&nbsp;
-  %li= @prev.nil? ? 'older &rarr;' : link_to('older &rarr;', tag_path(@prev), :class => 'button')
+  - next_text = 'older &rarr;'.html_safe
+  %li= @prev.nil? ? next_text : link_to(next_text, tag_path(@prev), :class => 'button')
   %br.clear
 
 
