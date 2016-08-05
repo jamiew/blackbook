@@ -1,5 +1,5 @@
 #footer
-  - spacer = "&nbsp;/&nbsp;"
+  - spacer = "&nbsp;/&nbsp;".html_safe
   = link_to 'about', '/about'
   = spacer
   %script{:type => 'text/javascript'} document.write('<a href="mailto:info@000000book.com">contact</a>');
@@ -12,4 +12,4 @@
   == powered by #{link_to 'FAT Lab', 'http://fffff.at'}
   &mdash;
   == copyfree 2009-#{Date.today.year}
-  
+
