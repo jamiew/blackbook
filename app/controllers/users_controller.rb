@@ -13,7 +13,7 @@ class UsersController < ApplicationController
 
   # Show one user
   def show
-    @user = User.find(params[:id])
+    @user = User.find_from_param(params[:id])
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10
 
     @tags = @user.tags.includes(:user).paginate(page: @page, per_page: @per_page)

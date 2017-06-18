@@ -18,6 +18,7 @@ gem 'paperclip'
 gem 'htmlentities'
 gem 'will_paginate'
 gem 'protected_attributes'
+# FIXME gem 'has_slug' for slugs
 
 group :development, :test do
   gem 'byebug'
