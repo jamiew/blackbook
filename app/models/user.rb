@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
 
   acts_as_authentic
 
+  # FIXME manually reimplmenting this for now...
+  # should we just use friendly_id?
   # has_slug :login
 
   has_many :comments # Owns/has made
@@ -26,19 +28,24 @@ class User < ActiveRecord::Base
   after_create  :create_notification
   after_save    :activate_device_pairing
 
+  def to_param
+    self.login || self.id
+  end
+
+  def self.find_from_param(param)
+    find_by_login(param) || find_by_id(param)
+  end
+
+  def self.find_by_login_or_email(val)
+    find_by_login(val) || find_by_email(val)
+  end
+
   def deliver_password_reset_instructions!
     reset_perishable_token!
     Mailer.deliver_password_reset_instructions(self)
   end
 
-  #FIXME: move to lib or elsewhere
-  class << self
-    def find_by_login_or_email(val)
-      find_by_login(val) || find_by_email(val)
-    end
-  end # class << self
-
-  # Tags matching our uniqueKey (not necessarily owned by us?)
+  # Unclaimed tags matching this user's uniqueKey
   def matching_device_tags
     @matching_device_tags ||= Tag.unclaimed.where('gml_uniquekey = ?', self.iphone_uniquekey)
   end
