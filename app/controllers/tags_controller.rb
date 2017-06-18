@@ -52,8 +52,8 @@ class TagsController < ApplicationController
 
     # We only need these instance variables when rendering HTML (aka ghetto interlok)
      if params[:format] == 'html' || params[:format] == nil
-      @prev = Tag.find(:last, :conditions => "id < #{@tag.id}")
-      @next = Tag.find(:first, :conditions => "id > #{@tag.id}")
+      @prev = Tag.where("id < #{@tag.id}").last
+      @next = Tag.where("id > #{@tag.id}").first
 
       @user = User.find(params[:user_id]) if params[:user_id]
       @user ||= @tag.user
@@ -62,7 +62,8 @@ class TagsController < ApplicationController
       @comments = @tag.comments.visible.paginate(:page => params[:comments_page] || 1, :per_page => 10)
 
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
-      @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
+      # FIXME wow. just wow.
+      @tag.gml && @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
 
     # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag
