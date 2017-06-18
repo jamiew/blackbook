@@ -19,12 +19,12 @@ describe TagsController do
 
     it "should fail without params[:gml]" do
       post :create
-      response.status.should == "422 Unprocessable Entity"
+      response.status.should == 422 # Unprocessible Entity
       response.body.should match(/Error/)
     end
 
     it "should create and assign to tempt1 given the correct secret" do
-      pending 'TODO'
+      skip 'TODO'
       @tag = FactoryGirl.create(:tag_from_tempt1)
       # ...
     end
@@ -53,17 +53,20 @@ describe TagsController do
 
     describe "cache expiry" do
       it "should expire Home#index.html" do
-        pending
+        pending "TODO"
+        fail
         route = {:controller => 'home', :method => 'index'}
         # lambda { post :create, :gml => @gml }.should expire_fragment(route)
       end
 
       it "should expire Tags#index, all formats" do
-        pending
+        pending "TODO"
+        fail
       end
 
       it "should expire Tags#show, all formats" do
-        pending
+        pending "TODO"
+        fail
       end
     end
   end
