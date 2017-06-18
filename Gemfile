@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+ruby File.open('.ruby-version', 'rb') { |f| f.read.chomp }
 
 gem 'rails', '4.2.5'
 gem 'mysql2', '>= 0.3.13', '< 0.5', groups: [:development, :production]
