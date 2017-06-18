@@ -42,7 +42,8 @@ class User < ActiveRecord::Base
 
   def deliver_password_reset_instructions!
     reset_perishable_token!
-    Mailer.deliver_password_reset_instructions(self)
+    # FIXME is this correct Rails4 ActionMailer syntax? no .deliver?
+    Mailer.password_reset_instructions(self)
   end
 
   # Unclaimed tags matching this user's uniqueKey

@@ -13,7 +13,7 @@ RSpec.configure do |config|
 
     expectations.warn_about_potential_false_positives = false
 
-    expectations.syntax = :should
+    expectations.syntax = [:should, :expect]
   end
 
   # rspec-mocks config goes here. You can use an alternate test double
