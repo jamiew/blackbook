@@ -27,6 +27,8 @@ class Tag < ActiveRecord::Base
   scope :unclaimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NULL') }
 
   # validates_attachment_presence :image
+  # validates_attachment :image, content_type: { content_type: ["image/jpg", "image/jpeg", "image/png", "image/gif"] }
+  do_not_validate_attachment_file_type :image
   has_attached_file :image,
     :default_style => :medium,
     :default_url => "/images/defaults/tag_:style.jpg",
