@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
     self.login || self.id
   end
 
-  def self.find_from_param(param)
+  def self.find_by_param(param)
     find_by_login(param) || find_by_id(param)
   end
 
