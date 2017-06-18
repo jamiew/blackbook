@@ -58,7 +58,7 @@
         - if tag.gml_keywords.blank?
           &mdash;
         - else
-          = tag.gml_keywords.split(',').map { |word| link_to word, tags_path(:keywords => word) }.join(',')
+          = tag.gml_keywords.split(',').map { |word| link_to word, tags_path(:keywords => word) }.join(',').html_safe
       %td.who
         - if !user.nil?
           %a{:href => user_path(user)}
