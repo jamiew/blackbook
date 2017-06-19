@@ -1,6 +1,7 @@
-/.bundle
-/log/*
-!/log/.keep
-/tmp
+.bundle
 config/database.yml
+coverage
 db/*.sqlite3
+log/*
+!log/.keep
+tmp
