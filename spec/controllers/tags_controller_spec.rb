@@ -6,7 +6,7 @@ describe TagsController do
 
   before do
     activate_authlogic
-    @gml = FactoryGirl.create(:gml_object).data
+    @gml = FactoryGirl.build(:gml_object).data
   end
 
   describe "POST #create" do

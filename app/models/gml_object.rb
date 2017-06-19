@@ -3,7 +3,7 @@ class GmlObject < ActiveRecord::Base
   belongs_to :tag
 
   validates_presence_of :tag_id, :on => :create, :message => "must have a tag_id"
-  validates_uniqueness_of :tag_id, :on => :create, :message => "must be unique; currently a Tag can only have one (1) GML object"
+  validates_uniqueness_of :tag_id, :on => :create, :message => "must be unique"
   validates_associated :tag, :on => :create
 
   # FIXME temporarily allowing blank data...
