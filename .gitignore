@@ -5,3 +5,4 @@ db/*.sqlite3
 log/*
 !log/.keep
 tmp
+public/gml*
