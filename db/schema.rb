@@ -13,6 +13,11 @@
 
 ActiveRecord::Schema.define(version: 20100709152629) do
 
+  create_table "apps", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "comments", force: :cascade do |t|
     t.string   "title",            limit: 50,    default: ""
     t.text     "text",             limit: 65535
@@ -38,6 +43,24 @@ ActiveRecord::Schema.define(version: 20100709152629) do
   end
 
   add_index "favorites", ["object_id", "object_type"], name: "index_favorites_on_object_id_and_object_type", using: :btree
+  add_index "favorites", ["object_id", "object_type"], name: "index_on_object_id_and_object_type", using: :btree
+
+  create_table "forum_posts", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "forum_threads", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "forums", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.string   "description", limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "gml_objects", force: :cascade do |t|
     t.integer  "tag_id",     limit: 4
@@ -47,6 +70,14 @@ ActiveRecord::Schema.define(version: 20100709152629) do
   end
 
   add_index "gml_objects", ["tag_id"], name: "index_gml_objects_on_tag_id", using: :btree
+
+  create_table "likes", force: :cascade do |t|
+    t.integer  "object_id",   limit: 4
+    t.string   "object_type", limit: 255
+    t.integer  "user_id",     limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "notifications", force: :cascade do |t|
     t.string   "subject_id",      limit: 255
@@ -132,12 +163,12 @@ ActiveRecord::Schema.define(version: 20100709152629) do
     t.string   "version",            limit: 255
     t.text     "description",        limit: 65535
     t.string   "authors",            limit: 255
-    t.string   "kind",               limit: 255,      default: ""
-    t.boolean  "is_embeddable",                       default: false
+    t.string   "kind",               limit: 255,        default: ""
+    t.boolean  "is_embeddable",                         default: false
     t.string   "embed_url",          limit: 255
     t.string   "embed_callback",     limit: 255
     t.string   "embed_params",       limit: 255
-    t.text     "embed_code",         limit: 16777215
+    t.text     "embed_code",         limit: 4294967295
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "approved_at"
