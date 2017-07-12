@@ -21,6 +21,8 @@ gem 'will_paginate'
 gem 'protected_attributes'
 # FIXME gem 'has_slug' for slugs
 
+gem 'ipfs-api', '~> 0.3'
+
 group :development, :test do
   gem 'byebug'
   gem 'rspec-rails', '~> 3.0'
