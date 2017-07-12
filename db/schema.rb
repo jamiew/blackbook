@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20100709152629) do
+ActiveRecord::Schema.define(version: 20170712025926) do
 
   create_table "apps", force: :cascade do |t|
     t.datetime "created_at"
@@ -63,10 +63,14 @@ ActiveRecord::Schema.define(version: 20100709152629) do
   end
 
   create_table "gml_objects", force: :cascade do |t|
-    t.integer  "tag_id",     limit: 4
-    t.text     "data",       limit: 4294967295
+    t.integer  "tag_id",           limit: 4
+    t.text     "data",             limit: 4294967295
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "size",             limit: 4
+    t.string   "ipfs_hash",        limit: 255
+    t.datetime "ipfs_created_at"
+    t.datetime "ipfs_modified_at"
   end
 
   add_index "gml_objects", ["tag_id"], name: "index_gml_objects_on_tag_id", using: :btree
