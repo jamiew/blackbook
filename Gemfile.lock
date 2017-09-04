@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/smartinez87/exception_notification.git
+  revision: 8f590f667887dc04c7cb068f4224a680182a8f94
+  branch: master
+  specs:
+    exception_notification (4.2.2)
+      actionmailer (>= 4.0, < 6)
+      activesupport (>= 4.0, < 6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -206,6 +215,7 @@ DEPENDENCIES
   aws-sdk (~> 2)
   byebug
   coffee-rails (~> 4.1.0)
+  exception_notification!
   factory_girl
   haml
   htmlentities
