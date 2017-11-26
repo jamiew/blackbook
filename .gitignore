@@ -1,3 +1,4 @@
+*.sql
 .bundle
 config/database.yml
 coverage
