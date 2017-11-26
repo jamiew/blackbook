@@ -1,20 +1,20 @@
 default: &default
-  adapter: mysql2
+  adapter: postgresql
   encoding: utf8
   pool: 5
-  username: root
-  password:
   host: localhost
 
 development:
   <<: *default
   database: blackbook_dev
 
-test:
-  <<: *default
-  database: blackbook_test
-
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
+
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
 
