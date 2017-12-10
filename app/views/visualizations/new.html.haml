@@ -1,6 +1,6 @@
 %h1 Register New Application
 
-= error_messages_for :visualization
+= render "layouts/error_messages", target: @visualization
 
 = form_for(:visualization, :url => visualizations_url, :html => { :multipart => true }) do |f|
   = render :partial => "form", :object => @visualization, :locals => {:f => f}

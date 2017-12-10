@@ -2,12 +2,12 @@
 %h2 Your Settings
 = form_for @user, :url => user_path(@user), :html => { :multipart => true } do |form|
 
-  -# TODO FIXME
-  =# form.error_messages
+  = render "layouts/error_messages", target: @user
 
   .right_column{:style => 'margin-top: 100px;'}
     %h3 Device Pairing <em><small>[beta]</small></em>
-    = form.text_field :iphone_uniquekey, :size => 40, :label => 'iPhone key/unique ID (for claiming your uploads)'
+    = form.label :iphone_uniquekey, 'iPhone key/unique ID (for claiming your uploads)'
+    = form.text_field :iphone_uniquekey, :size => 40
     %small NOTE: changing your key will remove previously linked tags
     %p.buttons
       = form.submit "Save"

@@ -17,6 +17,16 @@ class GmlObject < ActiveRecord::Base
 
   IPFS_FOLDER_NAME = "000000book_dev"
 
+  def data
+    logger.debug "*** GmlObject read data..."
+    super
+  end
+
+  def data=(args)
+    logger.debug "*** GmlObject write data, #{args.try(:length)} bytes"
+    super(args)
+  end
+
   def self.read_all_cached_gml
     Dir.glob(Rails.root + 'public/gml-real/*.gml').each do |path|
       id = path.match(/.+\/(.+)\.gml/)[1]
@@ -35,6 +45,8 @@ class GmlObject < ActiveRecord::Base
       tag.gml_object.update_data_from_file(path)
     end
   end
+
+protected
 
   def update_data_from_file(path)
     if self.data.present?
@@ -74,5 +86,6 @@ class GmlObject < ActiveRecord::Base
       end
     end
   end
+
 
 end
