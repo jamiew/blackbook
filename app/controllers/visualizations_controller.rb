@@ -5,6 +5,8 @@ class VisualizationsController < ApplicationController
   before_filter :require_owner, :only => [:edit, :update, :destroy]
   before_filter :require_user, :only => [:new, :create]
 
+  respond_to :html, :js, :xml, :json
+
   def show
     @visualization = Visualization.find(params[:id])
     set_page_title @visualization.name
@@ -25,7 +27,6 @@ class VisualizationsController < ApplicationController
   end
 
   def create
-    raise 'TODO'
     respond_with @visualization do |format|
       format.html { flash[:notice] = "Application submitted"; redirect_to visualization_path(@visualization) }
     end

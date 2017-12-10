@@ -21,12 +21,6 @@ module ApplicationHelper
     @flash_messages ||= messages
   end
 
-  # TODO FIXME -- I think this did generic ActiveRecord .error_messages mapping
-  # so like controller.send(object_name).map(&:error_messages)? something like that
-  def error_messages_for(object_name)
-    "TODO show errors for #{object_name}"
-  end
-
   # Pagination helper; collection optional as will_paginate will guess based on controller name
   def pagination(collection = nil)
     collection.nil? ? will_paginate : will_paginate(collection)

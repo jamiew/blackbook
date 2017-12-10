@@ -1,7 +1,9 @@
 #login.signup_or_login.user_form.quarter.centered
   = form_for @user_session, :url => user_session_path do |f|
     %h2 Login
-    = f.text_field :login, :label => 'Username'
+    = f.label :login, 'Username'
+    = f.text_field :login
+
     = f.password_field :password
     .remember_me
       = f.check_box :remember_me

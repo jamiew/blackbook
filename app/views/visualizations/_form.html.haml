@@ -6,36 +6,36 @@
     %label Submitter:
     %strong{:style => 'margin-left: 3px;'}= link_to current_user.login
   %p
-    %label{:for => "visualization_authors"}== #{required}Authors:
+    %label{:for => "visualization_authors"}== #{required.html_safe}Authors:
     = f.text_area :authors, :rows => 2
   %p
     %label{:for => "visualization_website"} Website:
     = f.text_field :website
   %p
-    %label{:for => "visualization_description"}== #{required}Description:
+    %label{:for => "visualization_description"}== #{required.html_safe}Description:
     = f.text_area :description, :rows => 6
-  
+
   %p
     %label{:for => 'visualization_image'}== Image/screenshot (JPG/PNG/GIF)
-    = f.file_field :image, :size => 10  
+    = f.file_field :image, :size => 10
   %p
     = image_tag(@visualization.image(:small))
 
 .left_column
   %p
-    %label{:for => "visualization_name"}== #{required}Name:
+    %label{:for => "visualization_name"}== #{required.html_safe}Name:
     = f.text_field :name
     %label{:for => "visualization_version"} Version:
     = f.text_field :version, :size => 5
   %p
-    %label{:for => "visualization_kind"}== #{required}Kind:
+    %label{:for => "visualization_kind"}== #{required.html_safe}Kind:
     = f.select :kind, Visualization::KINDS
 
   %p.embed_toggle
     .left= f.check_box :is_embeddable, :id => 'embeddable_toggle'
-    %label{:for => 'visualization_is_embeddable', :style => 'margin-left: 1em', :onclick => "$('#embeddable_toggle').click();"}== Embeddable?  
+    %label{:for => 'visualization_is_embeddable', :style => 'margin-left: 1em', :onclick => "$('#embeddable_toggle').click();"}== Embeddable?
   .embed_details{:class => @visualization.is_embeddable ? '' : 'disabled'}
-    %label{:for => "visualization_embed_url"}== #{required} URL to .swf, .js, etc
+    %label{:for => "visualization_embed_url"}== #{required.html_safe} URL to .swf, .js, etc
     = f.text_field :embed_url
 
     %label{:for => "visualization_embed_callback"}== The name of a callback function, e.g. 'drawGML'
@@ -49,8 +49,8 @@
 
     %small
       %a{:id => 'preview_embed', :class => 'preview', :onclick => "alert('TODO!');"} Preview
-    
-    
+
+
 
 
 :javascript
@@ -59,14 +59,13 @@
       var deets = $('.embed_details');
       // $(this).is(':checked')
       deets.find(':input').attr('disabled', !$(this).is(':checked'));
-      if(deets.hasClass('disabled')){ 
+      if(deets.hasClass('disabled')){
         deets.removeClass('disabled');
         deets.find(':input').attr('disabled', false);
       }
-      else { 
+      else {
         deets.addClass('disabled');
         deets.find(':input').attr('disabled', true);
       }
     });
   });
-     

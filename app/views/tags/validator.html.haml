@@ -20,7 +20,8 @@
       .spacer{:style => 'display: block; margin: 10px 50px 20px; font-style: italic;'} or
 
       = form.label :gml, 'Raw GML:'
-      = form.text_area :gml, :label => 'paste raw GML'+required, :rows => 14
+      = form.label :gml, "paste raw GML #{required}".html_safe
+      = form.text_area :gml, :rows => 14
       %p= form.submit 'Validate'
 
   - if @tag.gml.blank?
