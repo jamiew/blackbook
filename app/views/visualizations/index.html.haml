@@ -32,7 +32,7 @@
         %td= app.is_embeddable? ? 'y' : 'n'
         %td{:style => 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"
         %td{:style => 'width: 150px;'}= app.created_at.strftime('%D')
-      %td.controls= link_to "more&nbsp;&raquo;", visualization_path(app), :class => 'ghost button'
+      %td.controls= link_to "more&nbsp;&raquo;".html_safe, visualization_path(app), :class => 'ghost button'
 
       -#Admin debuggery & controls
       - if is_admin?
