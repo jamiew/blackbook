@@ -17,6 +17,7 @@ class Visualization < ActiveRecord::Base
 
   belongs_to :user
   has_many :comments, :as => :commentable
+  belongs_to :approver, class_name: 'User', foreign_key: :approved_by
 
   validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
@@ -45,6 +46,7 @@ class Visualization < ActiveRecord::Base
   #TODO: remove :if conditionals; only needed with new version of Paperclip + Rails 2.3 (???); Weird bug.
 	validates_attachment_content_type :image, :content_type => ['image/jpeg', 'image/pjpeg', 'image/jpg', 'image/gif', 'image/png', 'image/x-png'], :message => "Your thumbnail is not a valid image filetype (we accept JPG, PNG & GIF)", :if => lambda { |e| !e.image_file_name.blank? }
   validates_attachment_size :image, :less_than => 1.megabyte, :message => 'Your thumbnail must be less than 1 megabyte (MB).', :if => lambda { |e| !e.image_file_name.blank? }
+
 
 
   def approved?

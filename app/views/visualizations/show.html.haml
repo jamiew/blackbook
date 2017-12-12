@@ -1,5 +1,5 @@
 
-%p.back= link_to '&larr; back to applications', visualizations_path
+%p.back= link_to '&larr; back to applications'.html_safe, visualizations_path
 
 .left{:style => 'margin-top: 40px;'}
   = image_tag(@visualization.image(:medium))
@@ -46,3 +46,16 @@
       = link_to 'Edit', edit_visualization_path
       |
       = link_to 'Delete', visualization_path, :confirm => 'Are you sure?', :method => :delete
+
+  - if is_admin?
+    %p
+      - if @visualization.approved?
+        Approved by
+        = link_to @visualization.approver.login, user_path(@visualization.approver)
+        @
+        = @visualization.approved_at
+        = link_to 'Unapprove', unapprove_visualization_path, confirm: 'Are you sure?', method: :put
+      - else
+        Unapproved.
+        = link_to 'Approve', approve_visualization_path, method: :put
+
