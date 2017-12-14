@@ -46,6 +46,10 @@ class GmlObject < ActiveRecord::Base
     end
   end
 
+  def upload_data!
+    store_on_s3
+  end
+
 protected
 
   def update_data_from_file(path)
@@ -72,6 +76,7 @@ protected
 
   def store_on_s3
     # Do some Amazon::SDK and stick it on S3
+
   end
 
   def store_on_ipfs

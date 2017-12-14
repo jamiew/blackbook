@@ -21,6 +21,7 @@ gem 'htmlentities'
 gem 'will_paginate'
 gem 'protected_attributes'
 # FIXME gem 'has_slug' for slugs
+gem 'aws-sdk', '~> 2'
 gem 'ipfs-api', '~> 0.3'
 
 group :development, :test do
