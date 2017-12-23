@@ -50,6 +50,12 @@ class GmlObject < ActiveRecord::Base
     store_on_s3
   end
 
+  def read_from_disk
+    # puts "GmlObject.read_from_disk id=#{id.inspect} tag_id=#{tag_id.inspect} ..."
+    return nil if filename.blank?
+    File.read(filename)
+  end
+
 protected
 
   def update_data_from_file(path)
@@ -67,8 +73,14 @@ protected
     success
   end
 
+  def filename
+    return nil if tag_id.blank?
+    "#{Rails.root}/public/gml/#{tag_id}.gml"
+  end
+
   def store_on_disk
-    filename = "#{Rails.root}/public/gml/#{tag_id}.gml"
+    raise "Cannot store on disk, invalid filename" if filename.blank?
+    logger.info "GmlObject.store_on_disk filename=#{filename} ..."
     File.open(filename, 'w+') do |file|
       file.write(data)
     end
