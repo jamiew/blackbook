@@ -53,7 +53,7 @@ class GmlObject < ActiveRecord::Base
 
     if File.exist?(filename) && overwrite == false
       # TODO maybe raise an exception instead
-      $stderr.puts "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping"
+      # $stderr.puts "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping"
       return nil
     end
 
