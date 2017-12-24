@@ -25,12 +25,12 @@ RSpec.describe GmlObject, type: :model do
     it 'fails if tag_id is blank' do
       gml = FactoryGirl.build(:gml_object, tag_id: nil)
       gml.read_from_disk.should == nil
-      expect { gml.send(:store_on_disk) }.to raise_error
+      expect { gml.store_on_disk }.to raise_error
     end
 
     it "works" do
       gml = FactoryGirl.create(:gml_object)
-      expect { gml.send(:store_on_disk) }.to_not raise_error
+      expect { gml.store_on_disk }.to_not raise_error
 
       # TODO would be nice to have method on this object to verify itself
       # maybe use a separate GmlValidator object or concern

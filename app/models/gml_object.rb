@@ -15,6 +15,8 @@ class GmlObject < ActiveRecord::Base
 
   # TODO validate GML here instead of Tag
 
+  # TODO do we want to partition IPFS folders based on id, like we do locally?
+  # e.g. id 501404 becomes approximately dir/501/404
   IPFS_FOLDER_NAME = "000000book_dev"
 
   def data
@@ -46,8 +48,20 @@ class GmlObject < ActiveRecord::Base
     end
   end
 
-  def upload_data!
-    store_on_s3
+  def store_on_disk(overwrite=false)
+    raise "Cannot store on disk, invalid filename" if filename.blank?
+
+    if File.exist?(filename) && overwrite == false
+      # TODO maybe raise an exception instead
+      $stderr.puts "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping"
+      return nil
+    end
+
+    logger.info "GmlObject.store_on_disk filename=#{filename} ..."
+    File.open(filename, 'w+') do |file|
+      file.write(data)
+    end
+    return true
   end
 
   def read_from_disk
@@ -55,6 +69,33 @@ class GmlObject < ActiveRecord::Base
     return nil if filename.blank?
     File.read(filename)
   end
+
+  def store_on_s3
+    # Do some Amazon::SDK and stick it on S3
+    raise 'Not Yet Implemented'
+  end
+
+  def read_from_s3
+    raise 'Not Yet Implemented'
+  end
+
+  def store_on_ipfs
+    # fuck yeah
+    # TODO test that daemon is running
+    # run as part of Procfile?
+    ipfs = IPFS::Connection.new
+
+    folder = IPFS::Upload.folder(IPFS_FOLDER_NAME) do |test|
+      test.add_file("#{tag_id}.gml") do |fd|
+        fd.write self.data
+      end
+    end
+  end
+
+  def read_from_ipfs
+    raise 'Not Yet Implemented'
+  end
+
 
 protected
 
@@ -76,32 +117,6 @@ protected
   def filename
     return nil if tag_id.blank?
     "#{Rails.root}/public/gml/#{tag_id}.gml"
-  end
-
-  def store_on_disk
-    raise "Cannot store on disk, invalid filename" if filename.blank?
-    logger.info "GmlObject.store_on_disk filename=#{filename} ..."
-    File.open(filename, 'w+') do |file|
-      file.write(data)
-    end
-  end
-
-  def store_on_s3
-    # Do some Amazon::SDK and stick it on S3
-
-  end
-
-  def store_on_ipfs
-    # fuck yeah
-    # TODO test that daemon is running
-    # run as part of Procfile?
-    ipfs = IPFS::Connection.new
-
-    folder = IPFS::Upload.folder(IPFS_FOLDER_NAME) do |test|
-      test.add_file("#{tag_id}.gml") do |fd|
-        fd.write self.data
-      end
-    end
   end
 
 
