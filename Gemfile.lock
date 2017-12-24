@@ -222,7 +222,7 @@ DEPENDENCIES
   ipfs-api (~> 0.3)
   jquery-rails
   mysql2 (>= 0.3.13, < 0.5)
-  nokogiri
+  nokogiri (~> 1.8.1)
   paperclip
   protected_attributes
   puma
