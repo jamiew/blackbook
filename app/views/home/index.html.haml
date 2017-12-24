@@ -10,8 +10,8 @@
 
   #intro
     .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 0px; color: #777;'}
-      == #{pluralize Tag.count(:conditions => ["created_at >= ?", today]), 'tag'} uploaded
-      == by #{pluralize Tag.count(:conditions => ["created_at >= ?", today], :select => 'DISTINCT gml_uniquekey'), 'person'} today (last #{time_ago_in_words(today).gsub('about ','')})
+      == #{pluralize Tag.where("created_at >= ?", today).count, 'tag'} uploaded
+      == by #{pluralize Tag.where("created_at >= ?", today).select('DISTINCT gml_uniquekey').count, 'person'} today (last #{time_ago_in_words(today).gsub('about ','')})
       %br
       == &rarr; #{link_to 'view all activity', activity_path, :style => 'text-decoration: underline;'}
 
