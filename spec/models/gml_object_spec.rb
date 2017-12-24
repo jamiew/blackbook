@@ -30,7 +30,7 @@ RSpec.describe GmlObject, type: :model do
 
     it "works" do
       gml = FactoryGirl.create(:gml_object)
-      expect { gml.store_on_disk }.to_not raise_error
+      expect { gml.store_on_disk(true) }.to_not raise_error
 
       # TODO would be nice to have method on this object to verify itself
       # maybe use a separate GmlValidator object or concern
@@ -51,11 +51,4 @@ RSpec.describe GmlObject, type: :model do
     it "fails if no IPFS daemon available"
   end
 
-  describe '#upload_data!' do
-    it 'calls store_on_s3' do
-      gml = FactoryGirl.build(:gml_object)
-      expect(gml).to receive(:store_on_s3)
-      gml.upload_data!
-    end
-  end
 end
