@@ -176,7 +176,7 @@ class Tag < ActiveRecord::Base
 
   # Favorites-related -- TODO this should be elsewhere/via named_scopes
   def favorited_by?(user)
-    Favorite.count(:conditions => ['object_id = ? AND object_type = ? AND user_id = ?', self.id, self.class.to_s, user.id]) > 0
+    Favorite.where('object_id = ? AND object_type = ? AND user_id = ?', self.id, self.class.to_s, user.id).count > 0
   end
 
   # Transforms (cached)
