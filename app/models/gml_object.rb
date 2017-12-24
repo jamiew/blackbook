@@ -57,6 +57,8 @@ class GmlObject < ActiveRecord::Base
       return nil
     end
 
+    FileUtils.mkdir(self.class.file_dir) if !Dir.exist?(self.class.file_dir)
+
     logger.info "GmlObject.store_on_disk filename=#{filename} ..."
     File.open(filename, 'w+') do |file|
       file.write(data)
@@ -114,9 +116,13 @@ protected
     success
   end
 
+  def self.file_dir
+    "#{Rails.root}/public/gml"
+  end
+
   def filename
     return nil if tag_id.blank?
-    "#{Rails.root}/public/gml/#{tag_id}.gml"
+    "#{self.class.file_dir}/#{tag_id}.gml"
   end
 
 
