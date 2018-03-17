@@ -30,7 +30,7 @@ class GmlObject < ActiveRecord::Base
   end
 
   def self.read_all_cached_gml
-    Dir.glob(Rails.root + 'public/gml-real/*.gml').each do |path|
+    Dir.glob("#{file_dir}/*.gml").each do |path|
       id = path.match(/.+\/(.+)\.gml/)[1]
       tag = Tag.find_by_id(id)
       if tag.nil?
@@ -44,7 +44,10 @@ class GmlObject < ActiveRecord::Base
         tag.send(:save_gml_object) # really I mean it
       end
 
-      tag.gml_object.update_data_from_file(path)
+      puts "***********"
+      puts tag.gml_object.inspect
+      tag.gml_object.send(:update_data_from_file, path) # why
+      tag.gml_object.save!
     end
   end
 
@@ -53,7 +56,7 @@ class GmlObject < ActiveRecord::Base
 
     if File.exist?(filename) && overwrite == false
       # TODO maybe raise an exception instead
-      # $stderr.puts "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping"
+      logger.info "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping"
       return nil
     end
 
@@ -67,7 +70,7 @@ class GmlObject < ActiveRecord::Base
   end
 
   def read_from_disk
-    # puts "GmlObject.read_from_disk id=#{id.inspect} tag_id=#{tag_id.inspect} ..."
+    logger.info "GmlObject.read_from_disk id=#{id.inspect} tag_id=#{tag_id.inspect} ..."
     return nil if filename.blank?
     File.read(filename)
   end
