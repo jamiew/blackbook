@@ -20,12 +20,12 @@ class GmlObject < ActiveRecord::Base
   IPFS_FOLDER_NAME = "000000book_dev"
 
   def data
-    logger.debug "*** GmlObject read data..."
+    logger.debug "*** GmlObject #data..."
     super
   end
 
   def data=(args)
-    logger.debug "*** GmlObject write data, #{args.try(:length)} bytes"
+    logger.debug "*** GmlObject #data=, #{args.try(:length)} bytes"
     super(args)
   end
 
@@ -34,20 +34,19 @@ class GmlObject < ActiveRecord::Base
       id = path.match(/.+\/(.+)\.gml/)[1]
       tag = Tag.find_by_id(id)
       if tag.nil?
-        $stderr.puts "Could not find Tag #{id} for path=#{path.inspect}, skipping"
+        logger.warn "Could not find Tag #{id} for path=#{path.inspect}, skipping"
         next
       end
 
       if tag.gml_object.blank?
-        $stderr.puts "No GmlObject for Tag #{id}, creating"
+        logger.info "No GmlObject for Tag #{id}, creating"
         tag.send(:build_gml_object) # sorry
         tag.send(:save_gml_object) # really I mean it
       end
 
-      puts "***********"
-      puts tag.gml_object.inspect
-      tag.gml_object.send(:update_data_from_file, path) # why
-      tag.gml_object.save!
+      logger.debug "***********"
+      logger.debug tag.gml_object.inspect
+      tag.gml_object.send(:update_data_from_disk_and_save) # FIXME
     end
   end
 
@@ -56,7 +55,7 @@ class GmlObject < ActiveRecord::Base
 
     if File.exist?(filename) && overwrite == false
       # TODO maybe raise an exception instead
-      logger.info "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping"
+      logger.info "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping. #{filename}"
       return nil
     end
 
@@ -70,9 +69,10 @@ class GmlObject < ActiveRecord::Base
   end
 
   def read_from_disk
-    logger.info "GmlObject.read_from_disk id=#{id.inspect} tag_id=#{tag_id.inspect} ..."
     return nil if filename.blank?
-    File.read(filename)
+    data = File.read(filename)
+    logger.info "GmlObject.read_from_disk id=#{id.inspect} tag_id=#{tag_id.inspect} filename=#{filename} => #{data.length} bytes"
+    return data
   end
 
   def store_on_s3
@@ -104,17 +104,18 @@ class GmlObject < ActiveRecord::Base
 
 protected
 
-  def update_data_from_file(path)
+  def update_data_from_disk_and_save
     if self.data.present?
-      $stderr.puts "GMLObject data exists for tag, #{self.data.size} bytes, skipping"
+      logger.warn "GMLObject data exists for tag, #{self.data.size} bytes, skipping"
       return false
     end
 
-    self.data = File.open(path).read
-    puts "GmlObject.data now #{self.data.size} bytes"
+    self.data = read_from_disk
+    logger.debug "GmlObject.data now #{self.data.size} bytes"
+
     success = self.save
     if !success
-      $stderr.puts "Error saving GMLObject: #{self.errors.to_json.inspect}"
+      logger.error "Error saving GMLObject: #{self.errors.to_json.inspect}"
     end
     success
   end
