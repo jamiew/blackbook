@@ -16,6 +16,7 @@ class Tag < ActiveRecord::Base
   # before_save :process_app_id
   before_create :detect_tempt_one
   before_save   :copy_gml_temp_to_gml_object
+  before_save   :check_for_gml_object
   before_create :build_gml_object
   after_create  :save_gml_object
   after_create  :create_notification
@@ -262,10 +263,15 @@ protected
     Notification.create(:subject => self, :verb => 'created', :user => self.user)
   end
 
-  # before_create hook to copy over our temp data & then read our GML
+  # before_create hook to copy over our temp data & then read our GML /
   def build_gml_object
-    # STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
-    obj = GmlObject.new
+    if self.gml_object.present?
+      logger.warn "Already have a GmlObject for this Tag #{self.id}, stopping. id=#{self.gml_object.id} valid?=#{self.gml_object.valid?}"
+      return nil
+    end
+
+    logger.debug "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
+    obj = GmlObject.new(tag_id: self.id) # tag_id nil if we're unsaved, but not if it's old or being fixed
     obj.data = @gml_temp || self.attributes['gml']
     self.gml_object = obj
     process_gml
@@ -352,6 +358,14 @@ protected
       return message
     else
       return nil
+    end
+  end
+
+  def check_for_gml_object
+    if self.gml_object.nil?
+      logger.error "ERROR: Missing gml_object for Tag #{self.id}"
+    elsif !self.gml_object.valid?
+      logger.warn "Warning: Invalid gml_object for Tag #{self.id}"
     end
   end
 
