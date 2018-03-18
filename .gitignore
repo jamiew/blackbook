@@ -7,4 +7,5 @@ db/*.sqlite3
 log/*
 !log/.keep
 tmp
+public/data
 public/gml*
