@@ -10,10 +10,25 @@ class GmlObject < ActiveRecord::Base
   # after_save :store_on_s3
   # after_save :store_on_ipfs
 
-  # FIXME temporarily allowing blank data... I forget why
-  # validates_presence_of :data, :on => :create, :message => "can't be blank"
-
   # TODO validate GML here instead of Tag
+
+  # validates_presence_of :data, :on => :create, :message => "can't be blank"
+  # VIRTUAL ATTRIBUTE NOW
+  attr_accessor :data
+
+
+  def self.file_dir
+    "#{Rails.root}/public/gml"
+  end
+
+  def filename
+    return nil if tag_id.blank?
+    "#{self.class.file_dir}/#{tag_id}.gml"
+  end
+
+  def s3_file_key
+    filename
+  end
 
   # TODO do we want to partition IPFS folders based on id, like we do locally?
   # e.g. id 501404 becomes approximately dir/501/404
@@ -21,12 +36,13 @@ class GmlObject < ActiveRecord::Base
 
   def data
     logger.debug "*** GmlObject #data..."
-    super
+    # FIXME how to detect disk changes and update this? Or just don't?
+    @data ||= read_from_disk
   end
 
   def data=(args)
     logger.debug "*** GmlObject #data=, #{args.try(:length)} bytes"
-    super(args)
+    @data = args
   end
 
   def self.read_all_cached_gml
@@ -50,18 +66,19 @@ class GmlObject < ActiveRecord::Base
     end
   end
 
-  def store_on_disk(overwrite=false)
-    raise "Cannot store on disk, invalid filename" if filename.blank?
-
-    if File.exist?(filename) && overwrite == false
-      # TODO maybe raise an exception instead
-      logger.info "GmlObject(id=#{id}).store_on_disk: file exists and overwrite=false, skipping. #{filename}"
-      return nil
+  def store_on_disk
+    if filename.blank?
+      logger.error "Cannot store GmlObject(id=#{self.id}) on disk, invalid filename. tag_id=#{self.tag_id.inspect} filename=#{filename.inspect}"
+      # TODO add to actievrecord errors!!!
+      return false
     end
 
-    FileUtils.mkdir(self.class.file_dir) if !Dir.exist?(self.class.file_dir)
+    unless Dir.exist?(self.class.file_dir)
+      FileUtils.mkdir(self.class.file_dir)
+    end
 
-    logger.info "GmlObject.store_on_disk filename=#{filename} ..."
+    logger.info "GmlObject(id=#{id} tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
+
     File.open(filename, 'w+') do |file|
       file.write(data)
     end
@@ -71,38 +88,60 @@ class GmlObject < ActiveRecord::Base
   def read_from_disk
     return nil if filename.blank?
     data = File.read(filename)
-    logger.info "GmlObject.read_from_disk id=#{id.inspect} tag_id=#{tag_id.inspect} filename=#{filename} => #{data.length} bytes"
+    logger.info "GmlObject(id=#{id} tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
     return data
   end
 
   def store_on_s3
     # Do some Amazon::SDK and stick it on S3
-    raise 'Not Yet Implemented'
+    s3_bucket = ENV['S3_BUCKET']
+    raise "No S3_BUCKET defined" if s3_bucket.blank?
+
+    s3 = Aws::S3::Resource.new(region:'us-west-2')
+    obj = s3.bucket(s3_bucket).object(s3_file_key)
+
+		# directly upload from disk...
+		# assumes we have stored on this local disk
+		# obj.write()
+    obj.upload_file(filename)
+
+		# # string data
+		# obj.put(body: 'Hello World!')
+
+		# # IO object
+		# File.open('source', 'rb') do |file|
+	 	#		obj.put(body: file)
+		# end
+
   end
 
   def read_from_s3
     raise 'Not Yet Implemented'
   end
 
+    # TODO test that daemon is running or use infura node as fallback ^_^
   def store_on_ipfs
-    # fuck yeah
-    # TODO test that daemon is running
-    # run as part of Procfile?
-    ipfs = IPFS::Connection.new
+    require 'ipfs/client'
 
-    folder = IPFS::Upload.folder(IPFS_FOLDER_NAME) do |test|
-      test.add_file("#{tag_id}.gml") do |fd|
-        fd.write self.data
-      end
-    end
+    ipfs = IPFS::Client.default
+
+    ret = ipfs.add File.open(filename)
+    logger.debug ret.pretty_inspect
+    added_file_hash = ret.hashcode
+    logger.info "IPFS: added tag ##{self.tag_id} (#{self.data.length} bytes) to IPFS => #{added_file_hash}"
+
+    self.update_attribute(:ipfs_hash, added_file_hash)
+
+    added_file_hash
+  end
+
+  def open_ipfs_file
+    `open http://ipfs.io/ipfs/#{self.ipfs_hash}`
   end
 
   def read_from_ipfs
     raise 'Not Yet Implemented'
   end
-
-
-protected
 
   def update_data_from_disk_and_save
     if self.data.present?
@@ -119,15 +158,5 @@ protected
     end
     success
   end
-
-  def self.file_dir
-    "#{Rails.root}/public/gml"
-  end
-
-  def filename
-    return nil if tag_id.blank?
-    "#{self.class.file_dir}/#{tag_id}.gml"
-  end
-
 
 end
