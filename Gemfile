@@ -22,7 +22,7 @@ gem 'will_paginate'
 gem 'protected_attributes'
 # FIXME gem 'has_slug' for slugs
 gem 'aws-sdk', '~> 2'
-gem 'ipfs'
+gem 'ipfs', require: 'ipfs/client'
 # gem 'exception_notification'
 gem "exception_notification", github: "smartinez87/exception_notification", branch: "master"
 
