@@ -16,4 +16,4 @@
     .add_comment= render :partial => 'comments/form', :locals=>{:f=>f}
     %p.buttons.small= f.submit 'Post'
 - else
-  %p.center.login_or_signup== #{link_to '<span>login</span>', login_path, :class => 'button small'} or #{link_to '<span>signup</span>', signup_path, :class => 'button small'} to post
+  %p.center.login_or_signup== #{link_to '<span>login</span>'.html_safe, login_path, :class => 'button small'} or #{link_to '<span>signup</span>'.html_safe, signup_path, :class => 'button small'} to post
