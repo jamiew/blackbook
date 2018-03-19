@@ -63,13 +63,11 @@ ActiveRecord::Schema.define(version: 20180319000132) do
   end
 
   create_table "gml_objects", force: :cascade do |t|
-    t.integer  "tag_id",           limit: 4
+    t.integer  "tag_id",     limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "size",             limit: 4
-    t.string   "ipfs_hash",        limit: 255
-    t.datetime "ipfs_created_at"
-    t.datetime "ipfs_modified_at"
+    t.integer  "size",       limit: 4
+    t.string   "ipfs_hash",  limit: 255
   end
 
   add_index "gml_objects", ["tag_id"], name: "index_gml_objects_on_tag_id", using: :btree
