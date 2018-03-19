@@ -1,7 +1,7 @@
 class TagsController < ApplicationController
 
   # We allow open access to API #create -- no authentication or forgery protection
-  protect_from_forgery :except => [:create, :thumbnail, :validate]
+  protect_from_forgery :except => [:show, :create, :thumbnail, :validate]
   before_filter :get_tag, :only => [:show, :edit, :update, :destroy, :thumbnail, :nominate]
   before_filter :require_user, :only => [:new, :edit, :update, :destroy, :nominate]
   before_filter :require_owner, :only => [:edit, :update, :destroy]
