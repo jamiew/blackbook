@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170712025926) do
+ActiveRecord::Schema.define(version: 20180319000132) do
 
   create_table "apps", force: :cascade do |t|
     t.datetime "created_at"
@@ -64,7 +64,6 @@ ActiveRecord::Schema.define(version: 20170712025926) do
 
   create_table "gml_objects", force: :cascade do |t|
     t.integer  "tag_id",           limit: 4
-    t.text     "data",             limit: 4294967295
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "size",             limit: 4
