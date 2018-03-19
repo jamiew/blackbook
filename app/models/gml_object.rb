@@ -6,7 +6,11 @@ class GmlObject < ActiveRecord::Base
   validates_uniqueness_of :tag_id, :on => :create, :message => "must be unique"
   validates_associated :tag, :on => :create
 
-  after_save :store_on_disk
+  # FIXME how to create without blowing away archived copy?
+  # Maybe copy over on initial create? then allow updating it...
+  # how to just NOT allow updating it once written? more like IPFS...
+  # create a new one if you want a new one
+  # after_save :store_on_disk
   # after_save :store_on_s3
   # after_save :store_on_ipfs
 
@@ -56,6 +60,10 @@ class GmlObject < ActiveRecord::Base
         tag.send(:save_gml_object) # really I mean it
       end
     end
+  end
+
+  def exists_on_disk?
+    File.exist?(filename)
   end
 
   def store_on_disk
