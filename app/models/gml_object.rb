@@ -12,13 +12,9 @@ class GmlObject < ActiveRecord::Base
 
   # TODO validate GML here instead of Tag
 
-  # validates_presence_of :data, :on => :create, :message => "can't be blank"
-  # VIRTUAL ATTRIBUTE NOW
-  attr_accessor :data
-
 
   def self.file_dir
-    "#{Rails.root}/public/gml"
+    "#{Rails.root}/public/data"
   end
 
   def filename
@@ -59,10 +55,6 @@ class GmlObject < ActiveRecord::Base
         tag.send(:build_gml_object) # sorry
         tag.send(:save_gml_object) # really I mean it
       end
-
-      logger.debug "***********"
-      logger.debug tag.gml_object.inspect
-      tag.gml_object.send(:update_data_from_disk_and_save) # FIXME
     end
   end
 
@@ -120,43 +112,32 @@ class GmlObject < ActiveRecord::Base
   end
 
     # TODO test that daemon is running or use infura node as fallback ^_^
+  def ipfs
+    @ipfs ||= IPFS::Client.default
+  end
+
   def store_on_ipfs
-    require 'ipfs/client'
-
-    ipfs = IPFS::Client.default
-
     ret = ipfs.add File.open(filename)
     logger.debug ret.pretty_inspect
     added_file_hash = ret.hashcode
-    logger.info "IPFS: added tag ##{self.tag_id} (#{self.data.length} bytes) to IPFS => #{added_file_hash}"
+    size = self.data.length
+
+    logger.info "IPFS: added tag ##{self.tag_id} (#{size} bytes) to IPFS => #{added_file_hash}"
 
     self.update_attribute(:ipfs_hash, added_file_hash)
+    self.update_attribute(:size, size) # FIXME should be setting on-create and treating as immutable
 
     added_file_hash
   end
 
   def open_ipfs_file
+    return if self.ipfs_hash.blank?
     `open http://ipfs.io/ipfs/#{self.ipfs_hash}`
   end
 
   def read_from_ipfs
-    raise 'Not Yet Implemented'
-  end
-
-  def update_data_from_disk_and_save
-    if self.data.present?
-      logger.warn "GMLObject data exists for tag, #{self.data.size} bytes, skipping"
-      return false
-    end
-
-    self.data = read_from_disk
-    logger.debug "GmlObject.data now #{self.data.size} bytes"
-
-    success = self.save
-    if !success
-      logger.error "Error saving GMLObject: #{self.errors.to_json.inspect}"
-    end
-    success
+    raise "No ipfs_hash for this Tag #{self.id}" if self.ipfs_hash.blank?
+    ipfs.cat(self.ipfs_hash)
   end
 
 end
