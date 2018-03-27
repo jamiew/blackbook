@@ -1,9 +1,0 @@
-Upgrading https://github.com/jamiew/blackbook to Rails 4
-
-Help very much welcome!
-
-Frontend needs to be made mobile-friendly too, and the
-(very large) GML objects probably shouldn't just be stuffed
-into a mysql database table.
-
-CI bump lol
