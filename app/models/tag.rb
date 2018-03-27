@@ -74,9 +74,9 @@ class Tag < ActiveRecord::Base
     return test
   end
 
-  # Wrapper accessors for the GML data, now stored in another object
+  # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
-    return rotated_gml if opts[:iphone_rotate].to_s == '1' #handoff for backwards compt; DEPRECATEME
+    return rotated_gml if opts[:iphone_rotate].to_s == '1' # handoff for backwards compt; DEPRECATEME
     @memoized_gml ||= gml_object && gml_object.data || @gml_temp
     return @memoized_gml
   end
