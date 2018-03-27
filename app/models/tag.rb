@@ -9,6 +9,8 @@ class Tag < ActiveRecord::Base
   has_many :comments, :as => :commentable
   has_many :likes
 
+  delegate :data, :ipfs_hash, to: :gml_object
+
   # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
 
