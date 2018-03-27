@@ -16,7 +16,6 @@ class Tag < ActiveRecord::Base
 
   # before_save :process_gml
   # before_save :process_app_id
-  before_create :detect_tempt_one
   before_save   :copy_gml_temp_to_gml_object
   before_save   :check_for_gml_object
   before_create :build_gml_object
@@ -339,15 +338,6 @@ protected
     return attrs
   rescue
     logger.error "Tag.process_gml error: #{$!}"
-  end
-
-  # simpe hack to check secret/appname for if this is tempt...
-  # if so, save it to his User for him
-  def detect_tempt_one
-    if self.application =~ /eyeSaver/ # weak
-      user = User.find_by_login('tempt1')
-      self.user_id = user.id
-    end
   end
 
   def self.hash_uniquekey(string)
