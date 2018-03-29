@@ -15,9 +15,9 @@ RSpec.describe GmlObject, type: :model do
     lambda { FactoryGirl.create(:gml_object, :data => nil) }.should_not raise_error
   end
 
-  it "should save to disk after saving" do
+  it "should NOT save to disk after saving" do
     gml = FactoryGirl.build(:gml_object)
-    expect(gml).to receive(:store_on_disk)
+    expect(gml).to_not receive(:store_on_disk)
     gml.save!
   end
 
@@ -30,7 +30,7 @@ RSpec.describe GmlObject, type: :model do
 
     it "works" do
       gml = FactoryGirl.create(:gml_object)
-      expect { gml.store_on_disk(true) }.to_not raise_error
+      expect { gml.store_on_disk }.to_not raise_error
 
       # TODO would be nice to have method on this object to verify itself
       # maybe use a separate GmlValidator object or concern

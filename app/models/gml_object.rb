@@ -69,8 +69,7 @@ class GmlObject < ActiveRecord::Base
   def store_on_disk
     if filename.blank?
       logger.error "Cannot store GmlObject(id=#{self.id}) on disk, invalid filename. tag_id=#{self.tag_id.inspect} filename=#{filename.inspect}"
-      # TODO add to actievrecord errors!!!
-      return false
+      raise "Filename is blank, cannot store on disk"
     end
 
     unless Dir.exist?(self.class.file_dir)
