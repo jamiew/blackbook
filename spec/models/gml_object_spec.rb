@@ -47,10 +47,8 @@ RSpec.describe GmlObject, type: :model do
 
     it "returns nothing if file is missing" do
       gml = FactoryGirl.create(:gml_object)
-      puts "filename=#{gml.filename}"
+      FileUtils.rm_f(gml.filename)
       File.exists?(gml.filename).should == false
-      # FileUtils.rm_f(gml.filename)
-      # File.exists?(gml.filename).should == false
       gml.read_from_disk.should == nil
     end
   end
