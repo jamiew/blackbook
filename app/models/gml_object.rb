@@ -86,6 +86,7 @@ class GmlObject < ActiveRecord::Base
 
   def read_from_disk
     return nil if filename.blank?
+    return nil unless File.exists?(filename)
     data = File.read(filename)
     logger.info "GmlObject(id=#{id} tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
     return data
