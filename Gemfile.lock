@@ -125,7 +125,7 @@ GEM
     mini_portile2 (2.3.0)
     minitest (5.10.3)
     mysql2 (0.4.6)
-    nokogiri (1.8.1)
+    nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
     paperclip (5.1.0)
       activemodel (>= 4.2.0)
@@ -240,7 +240,7 @@ DEPENDENCIES
   ipfs
   jquery-rails
   mysql2 (>= 0.3.13, < 0.5)
-  nokogiri (~> 1.8.1)
+  nokogiri (~> 1.8.2)
   paperclip
   protected_attributes
   puma
