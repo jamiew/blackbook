@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Favorite, type: :model do
 
   before(:each) do
-    @favorite = FactoryGirl.build(:favorite)
+    @favorite = FactoryBot.build(:favorite)
   end
 
   it "should be valid" do
@@ -19,8 +19,8 @@ RSpec.describe Favorite, type: :model do
   end
 
   it "should make a notification after create" do
-    @user = FactoryGirl.create(:user)
-    @tag = FactoryGirl.create(:tag)
+    @user = FactoryBot.create(:user)
+    @tag = FactoryBot.create(:tag)
     lambda {
       Favorite.create!(:user => @user, :object => @tag)
     }.should change(Notification, :count).by(1)

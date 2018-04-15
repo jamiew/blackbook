@@ -29,7 +29,7 @@ gem "exception_notification", github: "smartinez87/exception_notification", bran
 group :development, :test do
   gem 'byebug'
   gem 'rspec-rails', '~> 3.0'
-  gem 'factory_girl'
+  gem 'factory_bot'
   gem 'sqlite3'
 end
 

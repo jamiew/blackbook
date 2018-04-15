@@ -4,7 +4,7 @@ RSpec.describe Tag, type: :model do
 
   describe 'create' do
     it 'should succeed w/ valid GML' do
-      lambda { FactoryGirl.build(:tag, :gml => base_gml.to_s) }.should_not raise_error
+      lambda { FactoryBot.build(:tag, :gml => base_gml.to_s) }.should_not raise_error
     end
   end
 
@@ -51,7 +51,7 @@ RSpec.describe Tag, type: :model do
 
   describe "validating GML" do
     before do
-      @tag = FactoryGirl.build(:tag_from_api)
+      @tag = FactoryBot.build(:tag_from_api)
     end
 
     # it "should error on no strokes"
@@ -72,7 +72,7 @@ RSpec.describe Tag, type: :model do
 
   describe "format conversion" do
     before do
-      @tag = FactoryGirl.build(:tag)
+      @tag = FactoryBot.build(:tag)
     end
 
     describe "to_json" do
@@ -106,7 +106,7 @@ RSpec.describe Tag, type: :model do
     end
 
     it "gml_document should be a valid Nokogiri document" do
-      tag = FactoryGirl.build(:tag)
+      tag = FactoryBot.build(:tag)
       doc = tag.gml_document
       tag.gml.should_not be_blank
       doc.class.should == Nokogiri::XML::Document
@@ -114,7 +114,7 @@ RSpec.describe Tag, type: :model do
     end
 
     it "gml_hash should output a valid Hash" do
-      tag = FactoryGirl.build(:tag)
+      tag = FactoryBot.build(:tag)
       tag.gml.should_not be_blank
       tag.gml_hash.class.should == Hash
       tag.gml_hash.should_not be_blank
@@ -144,7 +144,7 @@ RSpec.describe Tag, type: :model do
 
   def create_tag_with_gml_header(attrs)
     merged = base_gml.merge({:header => {:client => attrs}})
-    return FactoryGirl.create(:tag, :gml => merged.to_xml)
+    return FactoryBot.create(:tag, :gml => merged.to_xml)
   end
 
 end

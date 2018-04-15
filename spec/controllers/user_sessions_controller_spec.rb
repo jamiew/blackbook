@@ -20,13 +20,13 @@ describe UserSessionsController do
     end
 
     it "should redirect for a logged in user on :new" do
-      UserSession.create(FactoryGirl.create(:user))
+      UserSession.create(FactoryBot.create(:user))
       get :new
       response.should be_redirect
     end
 
     it "should redirect for a logged in user on :create" do
-      UserSession.create(FactoryGirl.create(:user))
+      UserSession.create(FactoryBot.create(:user))
       get :create
       response.should be_redirect
     end
@@ -41,14 +41,14 @@ describe UserSessionsController do
 
   describe "session management" do
     it "should redirect to the account page on successful login" do
-      FactoryGirl.create(:user, :login => 'jamiew', :password => 'password', :password_confirmation => 'password')
+      FactoryBot.create(:user, :login => 'jamiew', :password => 'password', :password_confirmation => 'password')
       post :create, :user_session => { :login => 'jamiew', :password => 'password' }
       user = User.find_by_login('jamiew')
       response.should redirect_to(user_path(user))
     end
 
     it "should redirect to the login page on session deletion" do
-      UserSession.create(FactoryGirl.create(:user))
+      UserSession.create(FactoryBot.create(:user))
       post :destroy
       response.should redirect_to(login_path)
     end

@@ -6,7 +6,7 @@ describe UsersController do
   render_views
 
   describe "actions requiring no current user" do
-    let!(:user){ FactoryGirl.create(:user) }
+    let!(:user){ FactoryBot.create(:user) }
 
     it "should not redirect for a non-logged in user on :new" do
       get :new
@@ -46,7 +46,7 @@ describe UsersController do
   end
 
   describe "actions requiring a current user" do
-    let!(:user){ FactoryGirl.create(:user) }
+    let!(:user){ FactoryBot.create(:user) }
 
     before do
       activate_authlogic
@@ -74,14 +74,14 @@ describe UsersController do
 
   describe '#show' do
     it 'works with user id' do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       get :show, id: @user.id
       response.should be_success
       assigns(:user).should == @user
     end
 
     it 'works with user login' do
-      @user = FactoryGirl.create(:user, login: 'bobisok')
+      @user = FactoryBot.create(:user, login: 'bobisok')
       get :show, id: 'bobisok'
       response.should be_success
       assigns(:user).should == @user

@@ -79,12 +79,12 @@ end
 # FIXME MOVEME
 # Authentication-related spec helpers
 def login_as_user(user = nil)
-  user ||= FactoryGirl.create(:user)
+  user ||= FactoryBot.create(:user)
   UserSession.create(user)
 end
 
 def login_as_admin(admin = nil)
-  admin ||= FactoryGirl.create(:admin)
+  admin ||= FactoryBot.create(:admin)
   UserSession.create(admin)
 end
 

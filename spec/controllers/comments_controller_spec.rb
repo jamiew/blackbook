@@ -6,7 +6,7 @@ describe CommentsController do
 
   before do
     activate_authlogic
-    @tag = FactoryGirl.create(:tag)
+    @tag = FactoryBot.create(:tag)
   end
 
   describe "GET#index" do
@@ -20,7 +20,7 @@ describe CommentsController do
     end
 
     it "should work with a parent User" do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       get :index, :user_id => @user.id
       response.should be_success
     end
@@ -33,7 +33,7 @@ describe CommentsController do
 
   describe "DELETE#destroy" do
     before do
-      @comment = FactoryGirl.create(:comment)
+      @comment = FactoryBot.create(:comment)
     end
 
     it "should work for admins" do
