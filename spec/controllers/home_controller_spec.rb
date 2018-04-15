@@ -6,7 +6,7 @@ describe HomeController do
 
   before do
     activate_authlogic
-    @tag = FactoryGirl.create(:tag)
+    @tag = FactoryBot.create(:tag)
   end
 
   it "/ works" do

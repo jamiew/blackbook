@@ -1,11 +1,11 @@
-require 'factory_girl'
+require 'factory_bot'
 
 # FIXME should not be a constant
 DEFAULT_GML = "<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
 
-include FactoryGirl::Syntax::Methods
+include FactoryBot::Syntax::Methods
 
-FactoryGirl.define do
+FactoryBot.define do
   sequence :login do |i|
     "user#{i}"
   end
@@ -19,15 +19,15 @@ FactoryGirl.define do
   end
 
   factory :user do |t|
-    t.login { FactoryGirl.generate(:login) }
+    t.login { FactoryBot.generate(:login) }
     t.name 'Test User'
-    t.email  { FactoryGirl.generate(:email) }
+    t.email  { FactoryBot.generate(:email) }
     t.password 'topsecret123'
     t.password_confirmation 'topsecret123'
     t.website 'http://fffff.at'
     t.tagline 'I did it for the famo'
     t.about 'Blah blah blah, http://jamiedubs.com, even some <b>BOLD TEXT</b> or <a href="http://fffff.at">custom link</a>'
-    t.iphone_uniquekey  { FactoryGirl.generate(:device_id) }
+    t.iphone_uniquekey  { FactoryBot.generate(:device_id) }
   end
 
   factory :admin, parent: :user do |t|

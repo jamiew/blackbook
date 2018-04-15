@@ -3,16 +3,16 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
 
   it "should create" do
-    user = FactoryGirl.build(:user)
+    user = FactoryBot.build(:user)
     user.save!
   end
 
   it "should fail without a login" do
-    lambda { FactoryGirl.create(:user, :login => '') }.should raise_error
+    lambda { FactoryBot.create(:user, :login => '') }.should raise_error
   end
 
   it "should fail without an email" do
-    lambda { FactoryGirl.create(:user, :email => '') }.should raise_error
+    lambda { FactoryBot.create(:user, :email => '') }.should raise_error
   end
 
 end

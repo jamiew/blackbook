@@ -6,7 +6,7 @@ describe PasswordResetController do
 
   before do
     # activate_authlogic
-    @user = FactoryGirl.create(:user)
+    @user = FactoryBot.create(:user)
   end
 
   describe "requesting a password reset" do
