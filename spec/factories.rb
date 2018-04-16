@@ -42,7 +42,6 @@ FactoryBot.define do
     t.application 'TestApp'
     t.author 'JDUBS'
     # t.gml_object {|a| a.association(:gml_object) }
-    t.gml DEFAULT_GML
   end
 
   # A tag sent via the API is slightly different than through the site
@@ -51,7 +50,6 @@ FactoryBot.define do
     t.remote_image 'http://fffff.at/fuckflickr/...'
     t.remote_secret ''
     # t.gml_object {|a| a.association(:gml_object) }
-    t.gml DEFAULT_GML
   end
 
   # A sample tag from Tempt1's EyeWriter.

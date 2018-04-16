@@ -282,7 +282,7 @@ protected
 
   # after_create hook to finalize the GmlObject
   def save_gml_object
-    self.gml_object.tag = self
+    self.gml_object.tag = self # FIXME why is this necessary...? weird failsafe?
     self.gml_object.save!
   end
 
