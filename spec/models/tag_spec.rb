@@ -2,6 +2,11 @@ require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
 
+  before do
+    # FIXME DRY with TagsController specs...
+    # allow_any_instance_of(GmlObject).to receive(:data).and_return(DEFAULT_GML)
+  end
+
   describe 'create' do
     it 'should succeed w/ valid GML' do
       lambda { FactoryBot.build(:tag, :gml => base_gml.to_s) }.should_not raise_error
@@ -107,15 +112,17 @@ RSpec.describe Tag, type: :model do
 
     it "gml_document should be a valid Nokogiri document" do
       tag = FactoryBot.build(:tag)
+      # tag.gml.should_not be_blank
+      tag.stub(:gml).and_return(DEFAULT_GML) # FIXME use expect() syntax
       doc = tag.gml_document
-      tag.gml.should_not be_blank
       doc.class.should == Nokogiri::XML::Document
       (doc/'header').should_not be_blank
     end
 
     it "gml_hash should output a valid Hash" do
       tag = FactoryBot.build(:tag)
-      tag.gml.should_not be_blank
+      # tag.gml.should_not be_blank
+      tag.stub(:gml).and_return(DEFAULT_GML) # FIXME use expect() syntax
       tag.gml_hash.class.should == Hash
       tag.gml_hash.should_not be_blank
     end
