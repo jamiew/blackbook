@@ -7,6 +7,8 @@ describe TagsController do
   before do
     activate_authlogic
     @gml = FactoryBot.build(:gml_object).data
+    # GmlObject.any_instance.stub(:data).and_return(DEFAULT_GML)
+    allow_any_instance_of(GmlObject).to receive(:data).and_return(DEFAULT_GML)
   end
 
   describe "POST #create" do
@@ -122,25 +124,25 @@ describe TagsController do
         :gml_keywords => "some,gml,keywords")
     end
 
-    it "HTML" do
+    it ".html (default)" do
       get :show, :id => @tag.to_param
       response.should be_success
       response.body.should match(/Tag ##{@tag.id}/)
     end
 
-    it "GML" do
+    it ".gml" do
       get :show, :id => @tag.to_param, :format => 'gml'
       response.should be_success
       response.body.should match("<gml><tag><header>")
     end
 
-    it "XML" do
+    it ".xml" do
       get :show, :id => @tag.to_param, :format => 'xml'
       response.should be_success
       response.body.should match("<id>")
     end
 
-    describe "JSON" do
+    describe ".json" do
       it "should work" do
         get :show, :id => @tag.to_param, :format => 'json'
         response.should be_success
