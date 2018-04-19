@@ -121,7 +121,6 @@ GEM
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
     minitest (5.11.3)
-    mysql2 (0.4.10)
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
     paperclip (6.0.0)
@@ -130,6 +129,7 @@ GEM
       mime-types
       mimemagic (~> 0.3.0)
       terrapin (~> 0.6.0)
+    pg (1.0.0)
     protected_attributes (1.1.4)
       activemodel (>= 4.0.1, < 5.0)
     public_suffix (3.0.2)
@@ -246,9 +246,9 @@ DEPENDENCIES
   htmlentities
   ipfs
   jquery-rails
-  mysql2 (>= 0.3.13, < 0.5)
   nokogiri (~> 1.8.2)
   paperclip
+  pg
   protected_attributes
   puma
   rails (= 4.2.10)
