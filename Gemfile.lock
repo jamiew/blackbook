@@ -1,7 +1,6 @@
 GIT
-  remote: git://github.com/smartinez87/exception_notification.git
+  remote: https://github.com/smartinez87/exception_notification.git
   revision: dec18c97698035dd720e5f1078e265ef55db7ee2
-  branch: master
   specs:
     exception_notification (4.2.2)
       actionmailer (>= 4.0, < 6)
