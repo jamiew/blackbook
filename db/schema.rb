@@ -13,17 +13,20 @@
 
 ActiveRecord::Schema.define(version: 20180319000132) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "apps", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "comments", force: :cascade do |t|
-    t.string   "title",            limit: 50,    default: ""
-    t.text     "text",             limit: 65535
-    t.integer  "commentable_id",   limit: 4
+    t.string   "title",            limit: 50,  default: ""
+    t.text     "text"
+    t.integer  "commentable_id"
     t.string   "commentable_type", limit: 255
-    t.integer  "user_id",          limit: 4
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "ip_address",       limit: 255
@@ -35,9 +38,9 @@ ActiveRecord::Schema.define(version: 20180319000132) do
   add_index "comments", ["user_id"], name: "index_comments_on_user_id", using: :btree
 
   create_table "favorites", force: :cascade do |t|
-    t.integer  "user_id",     limit: 4
+    t.integer  "user_id"
     t.string   "object_type", limit: 255
-    t.integer  "object_id",   limit: 4
+    t.integer  "object_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -63,19 +66,19 @@ ActiveRecord::Schema.define(version: 20180319000132) do
   end
 
   create_table "gml_objects", force: :cascade do |t|
-    t.integer  "tag_id",     limit: 4
+    t.integer  "tag_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "size",       limit: 4
+    t.integer  "size"
     t.string   "ipfs_hash",  limit: 255
   end
 
   add_index "gml_objects", ["tag_id"], name: "index_gml_objects_on_tag_id", using: :btree
 
   create_table "likes", force: :cascade do |t|
-    t.integer  "object_id",   limit: 4
+    t.integer  "object_id"
     t.string   "object_type", limit: 255
-    t.integer  "user_id",     limit: 4
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -84,19 +87,19 @@ ActiveRecord::Schema.define(version: 20180319000132) do
     t.string   "subject_id",      limit: 255
     t.string   "subject_type",    limit: 255
     t.string   "verb",            limit: 255
-    t.integer  "user_id",         limit: 4
-    t.integer  "supplement_id",   limit: 4
+    t.integer  "user_id"
+    t.integer  "supplement_id"
     t.string   "supplement_type", limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "tags", force: :cascade do |t|
-    t.integer  "user_id",            limit: 4
+    t.integer  "user_id"
     t.string   "title",              limit: 255
     t.string   "slug",               limit: 255
-    t.integer  "comment_count",      limit: 4
-    t.integer  "likes_count",        limit: 4
+    t.integer  "comment_count"
+    t.integer  "likes_count"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "location",           limit: 255
@@ -105,11 +108,11 @@ ActiveRecord::Schema.define(version: 20180319000132) do
     t.string   "cached_tag_list",    limit: 255
     t.string   "image_file_name",    limit: 255
     t.string   "image_content_type", limit: 255
-    t.integer  "image_file_size",    limit: 4
+    t.integer  "image_file_size"
     t.datetime "image_updated_at"
     t.string   "uuid",               limit: 255
     t.string   "ip",                 limit: 255
-    t.text     "description",        limit: 65535
+    t.text     "description"
     t.string   "remote_image",       limit: 255
     t.string   "remote_secret",      limit: 255
     t.string   "gml_application",    limit: 255
@@ -123,13 +126,13 @@ ActiveRecord::Schema.define(version: 20180319000132) do
   create_table "users", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "login",              limit: 255,                null: false
-    t.string   "email",              limit: 255,   default: "", null: false
-    t.string   "crypted_password",   limit: 255,                null: false
-    t.string   "password_salt",      limit: 255,                null: false
-    t.string   "persistence_token",  limit: 255,                null: false
-    t.string   "perishable_token",   limit: 255,   default: "", null: false
-    t.integer  "login_count",        limit: 4,     default: 0,  null: false
+    t.string   "login",              limit: 255,              null: false
+    t.string   "email",              limit: 255, default: "", null: false
+    t.string   "crypted_password",   limit: 255,              null: false
+    t.string   "password_salt",      limit: 255,              null: false
+    t.string   "persistence_token",  limit: 255,              null: false
+    t.string   "perishable_token",   limit: 255, default: "", null: false
+    t.integer  "login_count",                    default: 0,  null: false
     t.datetime "last_request_at"
     t.datetime "last_login_at"
     t.datetime "current_login_at"
@@ -138,11 +141,11 @@ ActiveRecord::Schema.define(version: 20180319000132) do
     t.boolean  "admin"
     t.string   "photo_file_name",    limit: 255
     t.string   "photo_content_type", limit: 255
-    t.integer  "photo_file_size",    limit: 4
+    t.integer  "photo_file_size"
     t.datetime "photo_updated_at"
     t.string   "website",            limit: 255
     t.string   "tagline",            limit: 255
-    t.text     "about",              limit: 65535
+    t.text     "about"
     t.string   "location",           limit: 255
     t.string   "slug",               limit: 255
     t.string   "name",               limit: 255
@@ -156,27 +159,27 @@ ActiveRecord::Schema.define(version: 20180319000132) do
   add_index "users", ["persistence_token"], name: "index_users_on_persistence_token", using: :btree
 
   create_table "visualizations", force: :cascade do |t|
-    t.integer  "user_id",            limit: 4
+    t.integer  "user_id"
     t.string   "name",               limit: 255
     t.string   "slug",               limit: 255
     t.string   "website",            limit: 255
     t.string   "download",           limit: 255
     t.string   "version",            limit: 255
-    t.text     "description",        limit: 65535
+    t.text     "description"
     t.string   "authors",            limit: 255
-    t.string   "kind",               limit: 255,        default: ""
-    t.boolean  "is_embeddable",                         default: false
+    t.string   "kind",               limit: 255, default: ""
+    t.boolean  "is_embeddable",                  default: false
     t.string   "embed_url",          limit: 255
     t.string   "embed_callback",     limit: 255
     t.string   "embed_params",       limit: 255
-    t.text     "embed_code",         limit: 4294967295
+    t.text     "embed_code"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "approved_at"
-    t.integer  "approved_by",        limit: 4
+    t.integer  "approved_by"
     t.string   "image_file_name",    limit: 255
     t.string   "image_content_type", limit: 255
-    t.integer  "image_file_size",    limit: 4
+    t.integer  "image_file_size"
   end
 
 end

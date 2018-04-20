@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby File.open('.ruby-version', 'rb') { |f| f.read.chomp }
 
 gem 'rails', '4.2.10'
-gem 'pg', groups: [:development, :production]
+gem 'pg', '~> 0.15'
 gem 'puma', groups: [:development, :production]
 
 gem 'sass-rails', '~> 5.0'
