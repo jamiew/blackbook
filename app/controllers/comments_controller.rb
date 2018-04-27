@@ -63,7 +63,7 @@ class CommentsController < ApplicationController
     if params[:tag_id]
       @commentable = Tag.find(params[:tag_id])
     elsif params[:user_id]
-      @commentable = User.find(params[:user_id])
+      @commentable = User.find_by_param(params[:user_id])
     else
       raise ActiveRecord::RecordNotFound, "A commentable (parent) object is required"
     end

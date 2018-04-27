@@ -1,12 +1,12 @@
 - @user ||= current_user
 #profile
   #sidebar
-  
+
     -# Roles
     - if @user.admin?
       .roles
         %strong.role.admin Admin
-  
+
     %h2.login
       = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
       .clear= @user.login
@@ -23,16 +23,16 @@
         = @user.about
 
     -# Meta
-    %p 
+    %p
       == Joined #{timeago(@user.created_at)} ago
       - unless @user.iphone_uniquekey.blank?
         %br= redstar+"paired with device"
-      
+
     -# Simple stats
     %ul.stats.circle
-      %li= link_to(pluralize(@user.tags.count, 'tag'), user_tags_path(@user))
-      %li= link_to(pluralize(@user.comments.count, 'comment'), user_comments_path(@user))
-      %li= link_to(pluralize(@user.favorites.count, 'favorite'), user_favorites_path(@user))
+      %li= link_to pluralize(@user.tags.count, 'tag'), user_tags_path(@user)
+      %li= pluralize(@user.comments.count, 'comment')
+      %li= pluralize(@user.favorites.count, 'favorite')
 
     -# Personal editing...
     - if false && current_user == @user
@@ -53,7 +53,7 @@
           - @user.visualizations.each do |vis|
             %li= link_to vis.name, visualization_path(vis)
 
-    
+
     -# Wall posts yall
     - if true
       %br
@@ -75,11 +75,11 @@
     - if true
       - if @tags.blank?
         %p.empty
-          %strong Nothing yet! 
+          %strong Nothing yet!
       - else
         %h1== #{@tags.total_entries} Uploaded Tags
         = render :partial => 'tags/tag', :collection => @tags
 
       %br.clear
       %p= pagination(@tags)
-  
+

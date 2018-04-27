@@ -15,4 +15,5 @@
         %small= link_to 'delete', comment_path(comment), :method => 'delete', :class => 'delete'
     %span.timeago== #{timeago(comment.created_at)} ago
 
-  %p.text= sanitize(comment.text, ['b','i','a','strong','em','img'])
+  %p.text=# sanitize(comment.text, ['b','i','a','strong','em','img'])
+  %p.text= comment.text
