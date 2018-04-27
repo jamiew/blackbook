@@ -21,7 +21,6 @@ Rails.application.routes.draw do
     # resources :tags, :as => 'data'
     resources :tags
     resources :comments
-    resources :favorites
 
     get :change_password, on: :member
     get :latest, on: :member
@@ -31,7 +30,6 @@ Rails.application.routes.draw do
   # tags => /data
   resources :tags, path: 'data' do
     resources :comments
-    resources :favorites
 
     collection do
       get :latest
@@ -57,7 +55,6 @@ Rails.application.routes.draw do
 
   resources :visualizations, path: 'apps' do
     resources :comments
-    resources :favorites
 
     member do
       put :approve
