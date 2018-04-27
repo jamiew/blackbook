@@ -2,7 +2,7 @@ class FavoritesController < ApplicationController
   before_filter :require_user, :only => [:create, :update, :destroy]
 
   def index
-    @user = User.find(params[:user_id])
+    @user = current_user
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10 # FIXME align with Tags.index...
 
     # Goofy association-association loading for compat with will_paginate
@@ -12,7 +12,7 @@ class FavoritesController < ApplicationController
     @tags = Tag.order('created_at DESC').where('id in (?)', object_ids).paginate(page: @page, per_page: @per_page)
     @favorites = @tags
 
-    set_page_title "#{@user.login}'s Favorites"
+    set_page_title "Your Favorites"
     render :template => 'tags/index'
   end
 
