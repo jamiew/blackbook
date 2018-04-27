@@ -25,14 +25,16 @@
       = form.file_field :photo, :size => 9
 
       %hr
-      - if false && is_admin?
-        = form.text_field :login, :disabled => true
-        = form.text_field :slug, :disabled => true
+
+      = form.label :email
       = form.text_field :email
+
+      = form.label :location
       = form.text_field :location
 
+      = form.label :website
       = form.text_field :website
-      = form.text_field :tagline
+      = form.label :about
       = form.text_area :about, :rows => 8
 
       %p.buttons
