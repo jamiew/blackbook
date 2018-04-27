@@ -11,13 +11,21 @@ describe FavoritesController do
   end
 
   describe "GET#index" do
-    it "should 404 with no user_id" do
+    it "fails if not logged-in" do
+      current_user_session.destroy
       lambda { get :index }.should raise_error
     end
 
-    it "should work with a user_id" do
-      get :index, :user_id => @user.id
+    it "should work with no user_id" do
+      get :index
       response.should be_success
+      assigns(:user).should == current_user
+    end
+
+    it "should work with user_id but ignore it" do
+      get :index, user_id: @user.id
+      response.should be_success
+      assigns(:user).should == current_user
     end
   end
 
