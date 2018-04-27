@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   # tags => /data
   resources :tags, path: 'data' do
     resources :comments
+    resources :favorites
 
     collection do
       get :latest

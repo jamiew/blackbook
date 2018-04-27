@@ -92,12 +92,16 @@ class GmlObject < ActiveRecord::Base
     return data
   end
 
+  def s3_region
+    'us-west-2'
+  end
+
   def store_on_s3
     # Do some Amazon::SDK and stick it on S3
     s3_bucket = ENV['S3_BUCKET']
     raise "No S3_BUCKET defined" if s3_bucket.blank?
 
-    s3 = Aws::S3::Resource.new(region:'us-west-2')
+    s3 = Aws::S3::Resource.new(region: s3_region)
     obj = s3.bucket(s3_bucket).object(s3_file_key)
 
 		# directly upload from disk...
@@ -117,6 +121,7 @@ class GmlObject < ActiveRecord::Base
 
   def read_from_s3
     raise 'Not Yet Implemented'
+
   end
 
     # TODO test that daemon is running or use infura node as fallback ^_^

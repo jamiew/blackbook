@@ -8,7 +8,7 @@ class UserSessionsController < ApplicationController
 
   def create
     sess = params[:user_session]
-    session_params = { login: sess[:login], password: sess[:password], remember_me: sess[:remember_me] }
+    session_params = { login: sess.try(:login), password: sess.try(:password), remember_me: sess.try(:remember_me) }
     Rails.logger.debug session_params.inspect
     @user_session = UserSession.new(session_params)
     if @user_session.save
