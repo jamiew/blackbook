@@ -3,7 +3,7 @@
     %li.user_photo= link_to image_tag(current_user.photo.url(:tiny), :class => 'photo'), user_path(current_user)
     %li.user_name= link_to current_user.login, user_path(current_user)
     %li= link_to 'settings', settings_path
-    %li= link_to 'favorites', user_favorites_path(current_user)
+    %li= link_to 'favorites', favorites_path
     %li.logout= link_to 'logout', logout_path, :class => 'logout'
   - else
     %li= link_to 'login', login_path

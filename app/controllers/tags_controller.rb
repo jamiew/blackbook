@@ -25,7 +25,7 @@ class TagsController < ApplicationController
     elsif !params[:keywords].blank?
       @search_context = {:key => :keywords, :value => params[:keywords], :conditions => ["gml_keywords LIKE ?", params[:keywords]]}
     elsif !params[:user_id].blank?
-      @user = User.find(params[:user_id])
+      @user = User.find_by_param(params[:user_id])
       @search_context = {:key => :user, :value => @user.login, :conditions => ["user_id = ?",@user.id]}
     end
 
@@ -55,7 +55,7 @@ class TagsController < ApplicationController
       @prev = Tag.where("id < #{@tag.id}").last
       @next = Tag.where("id > #{@tag.id}").first
 
-      @user = User.find(params[:user_id]) if params[:user_id]
+      @user = User.find_by_param(params[:user_id]) if params[:user_id]
       @user ||= @tag.user
 
       # No real comment pagination yet
