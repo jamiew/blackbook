@@ -18,8 +18,6 @@ gem 'protected_attributes'
 # FIXME gem 'has_slug' for slugs
 gem 'aws-sdk', '~> 2'
 gem 'ipfs', require: 'ipfs/client'
-# gem 'exception_notification'
-gem "exception_notification", git: "https://github.com/smartinez87/exception_notification.git"
 
 group :development, :test do
   gem 'byebug'
