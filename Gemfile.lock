@@ -1,11 +1,3 @@
-GIT
-  remote: https://github.com/smartinez87/exception_notification.git
-  revision: dec18c97698035dd720e5f1078e265ef55db7ee2
-  specs:
-    exception_notification (4.2.2)
-      actionmailer (>= 4.0, < 6)
-      activesupport (>= 4.0, < 6)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -209,7 +201,6 @@ DEPENDENCIES
   authlogic
   aws-sdk (~> 2)
   byebug
-  exception_notification!
   factory_bot
   haml
   htmlentities
