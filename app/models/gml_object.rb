@@ -36,7 +36,6 @@ class GmlObject < ActiveRecord::Base
 
   def data
     logger.debug "*** GmlObject #data..."
-    # FIXME how to detect disk changes and update this? Or just don't?
     @data ||= read_from_disk
   end
 
