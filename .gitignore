@@ -1,4 +1,5 @@
 *.sql
+*.dump
 .bundle
 .env
 config/database.yml
