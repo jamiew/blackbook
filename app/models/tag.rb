@@ -123,6 +123,9 @@ class Tag < ActiveRecord::Base
   def gml_document
     return nil if self.gml.blank?
     @document ||= Nokogiri::XML(self.gml)
+  rescue ArgumentError
+    logger.error "Error parsing GML document for id=#{self.id}"
+    nil
   end
   alias :document :gml_document # Can't decide on the name; how much gml_ prefixing do we want?
 
@@ -305,7 +308,7 @@ protected
   def find_paired_user
     logger.debug "Tag.find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
     return if self.gml_uniquekey.blank?
-    user = User.find_by_iphone_uniquekey(self.gml_uniquekey) rescue nil
+    user = User.find_by_iphone_uniquekey(self.gml_uniquekey)
     return if user.nil?
     logger.info "Pairing with user=#{user.login.inspect}"
     self.user = user
@@ -338,6 +341,7 @@ protected
     return attrs
   rescue
     logger.error "Tag.process_gml error: #{$!}"
+    return nil
   end
 
   def self.hash_uniquekey(string)
