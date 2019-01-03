@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180319000132) do
+ActiveRecord::Schema.define(version: 20190103171950) do
 
   create_table "apps", force: :cascade do |t|
     t.datetime "created_at"
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20180319000132) do
   end
 
   add_index "users", ["email"], name: "index_users_on_email", using: :btree
+  add_index "users", ["iphone_uniquekey"], name: "index_users_on_iphone_uniquekey", using: :btree
   add_index "users", ["last_request_at"], name: "index_users_on_last_request_at", using: :btree
   add_index "users", ["login"], name: "index_users_on_login", using: :btree
   add_index "users", ["perishable_token"], name: "index_users_on_perishable_token", using: :btree
