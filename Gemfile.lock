@@ -107,6 +107,7 @@ GEM
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
     minitest (5.11.3)
+    mysql2 (0.4.10)
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
     paperclip (6.0.0)
@@ -216,6 +217,7 @@ DEPENDENCIES
   htmlentities
   ipfs
   jquery-rails
+  mysql2 (~> 0.4.10)
   nokogiri (~> 1.8.2)
   paperclip
   pg (~> 0.15)
