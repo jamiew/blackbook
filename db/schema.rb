@@ -170,7 +170,7 @@ ActiveRecord::Schema.define(version: 20190103171950) do
     t.string   "embed_url",          limit: 255
     t.string   "embed_callback",     limit: 255
     t.string   "embed_params",       limit: 255
-    t.text     "embed_code",         limit: 4294967295
+    t.text     "embed_code",         limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "approved_at"
