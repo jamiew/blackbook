@@ -27,7 +27,7 @@ class GmlObject < ActiveRecord::Base
   end
 
   def s3_file_key
-    filename
+    "gml/#{tag_id}.gml"
   end
 
   # TODO do we want to partition IPFS folders based on id, like we do locally?
@@ -91,22 +91,28 @@ class GmlObject < ActiveRecord::Base
     return data
   end
 
-  def s3_region
-    'us-west-2'
+  def s3_bucket_name
+    ENV['S3_BUCKET']
+  end
+
+  def s3
+    raise "No S3_BUCKET defined" if s3_bucket_name.blank?
+    @s3 ||= Aws::S3::Resource.new
+  end
+
+  def s3_object
+    puts s3_file_key
+    @s3_object ||= S3_BUCKET.object(s3_file_key)
   end
 
   def store_on_s3
-    # Do some Amazon::SDK and stick it on S3
-    s3_bucket = ENV['S3_BUCKET']
-    raise "No S3_BUCKET defined" if s3_bucket.blank?
-
-    s3 = Aws::S3::Resource.new(region: s3_region)
-    obj = s3.bucket(s3_bucket).object(s3_file_key)
+    raise "No local GML file to upload (#{filename})" if filename.blank?
+    raise "Local GML file is empty, not uploading" if read_from_disk.blank?
 
 		# directly upload from disk...
 		# assumes we have stored on this local disk
 		# obj.write()
-    obj.upload_file(filename)
+    s3_object.upload_file(filename)
 
 		# # string data
 		# obj.put(body: 'Hello World!')
@@ -115,12 +121,11 @@ class GmlObject < ActiveRecord::Base
 		# File.open('source', 'rb') do |file|
 	 	#		obj.put(body: file)
 		# end
-
   end
 
   def read_from_s3
-    raise 'Not Yet Implemented'
-
+    file = s3_object.get
+    file.body.read
   end
 
     # TODO test that daemon is running or use infura node as fallback ^_^
