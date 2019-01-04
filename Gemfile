@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby File.open('.ruby-version', 'rb') { |f| f.read.chomp }
+ruby File.open(File.dirname(__FILE__)+'/.ruby-version', 'rb') { |f| f.read.chomp }
 
 gem 'rails', '4.2.10'
 gem 'pg', '~> 0.15'
@@ -19,6 +19,7 @@ gem 'protected_attributes'
 gem 'aws-sdk', '~> 2'
 gem 'ipfs', require: 'ipfs/client'
 gem 'rails_12factor'
+gem 'dotenv-rails', groups: [:development, :test]
 
 group :development, :test do
   gem 'byebug'
