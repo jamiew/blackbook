@@ -1,29 +1,23 @@
-class GmlObject < ActiveRecord::Base
+class GmlObject
 
-  belongs_to :tag
+  attr_accessor :tag
 
-  validates_presence_of :tag_id, :on => :create, :message => "must have a tag_id"
-  validates_uniqueness_of :tag_id, :on => :create, :message => "must be unique"
-  validates_associated :tag, :on => :create
+  def initialize(**opts)
+    self.tag = opts[:tag]
+    # raise "GmObject requires :tag_id" if self.tag_id.blank?
+  end
 
-  # FIXME how to create without blowing away archived copy?
-  # Maybe copy over on initial create? then allow updating it...
-  # how to just NOT allow updating it once written? more like IPFS...
-  # create a new one if you want a new one
-  # after_save :store_on_disk
-  # after_save :store_on_s3
-  # after_save :store_on_ipfs
-
-  # TODO validate GML here instead of Tag
-
+  def tag_id
+    tag.try(:id)
+  end
 
   def self.file_dir
     "#{Rails.root}/public/data"
   end
 
   def filename
-    return nil if tag_id.blank?
-    "#{self.class.file_dir}/#{tag_id}.gml"
+    return nil if tag.try(:id).blank?
+    "#{self.class.file_dir}/#{tag.id}.gml"
   end
 
   def s3_file_key
@@ -35,13 +29,18 @@ class GmlObject < ActiveRecord::Base
   IPFS_FOLDER_NAME = "000000book_dev"
 
   def data
-    logger.debug "*** GmlObject #data..."
+    # Rails.logger.debug "*** GmlObject #data..."
     @data ||= read_from_disk
   end
 
   def data=(args)
-    logger.debug "*** GmlObject #data=, #{args.try(:length)} bytes"
+    Rails.logger.debug "*** GmlObject #data=, #{args.try(:length)} bytes"
     @data = args
+  end
+
+  def valid?
+    # FIXME
+    true
   end
 
   def self.read_all_cached_gml
@@ -49,12 +48,12 @@ class GmlObject < ActiveRecord::Base
       id = path.match(/.+\/(.+)\.gml/)[1]
       tag = Tag.find_by_id(id)
       if tag.nil?
-        logger.warn "Could not find Tag #{id} for path=#{path.inspect}, skipping"
+        Rails.logger.warn "Could not find Tag #{id} for path=#{path.inspect}, skipping"
         next
       end
 
       if tag.gml_object.blank?
-        logger.info "No GmlObject for Tag #{id}, creating"
+        Rails.logger.info "No GmlObject for Tag #{id}, creating"
         tag.send(:build_gml_object) # sorry
         tag.send(:save_gml_object) # really I mean it
       end
@@ -67,7 +66,7 @@ class GmlObject < ActiveRecord::Base
 
   def store_on_disk
     if filename.blank?
-      logger.error "Cannot store GmlObject(id=#{self.id}) on disk, invalid filename. tag_id=#{self.tag_id.inspect} filename=#{filename.inspect}"
+      Rails.logger.error "Cannot store GmlObject(tag_id=#{tag_id}) on disk, invalid filename. tag_id=#{self.tag_id.inspect} filename=#{filename.inspect}"
       raise "Filename is blank, cannot store on disk"
     end
 
@@ -75,7 +74,7 @@ class GmlObject < ActiveRecord::Base
       FileUtils.mkdir(self.class.file_dir)
     end
 
-    logger.info "GmlObject(id=#{id} tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
+    Rails.logger.info "GmlObject(id=#{id} tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
 
     File.open(filename, 'w+') do |file|
       file.write(data)
@@ -87,7 +86,7 @@ class GmlObject < ActiveRecord::Base
     return nil if filename.blank?
     return nil unless File.exists?(filename)
     data = File.read(filename)
-    logger.info "GmlObject(id=#{id} tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
+    Rails.logger.info "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
     return data
   end
 
@@ -123,18 +122,17 @@ class GmlObject < ActiveRecord::Base
 
   end
 
-    # TODO test that daemon is running or use infura node as fallback ^_^
+  # TODO test that daemon is running or use infura node as fallback ^_^
   def ipfs
     @ipfs ||= IPFS::Client.default
   end
 
   def store_on_ipfs
     ret = ipfs.add File.open(filename)
-    logger.debug ret.pretty_inspect
+    Rails.logger.debug ret.pretty_inspect
     added_file_hash = ret.hashcode
-    size = self.data.length
 
-    logger.info "IPFS: added tag ##{self.tag_id} (#{size} bytes) to IPFS => #{added_file_hash}"
+    Rails.logger.info "IPFS: added tag ##{self.tag_id} (#{size} bytes) to IPFS => #{added_file_hash}"
 
     self.update_attribute(:ipfs_hash, added_file_hash)
     self.update_attribute(:size, size) # FIXME should be setting on-create and treating as immutable
@@ -148,7 +146,7 @@ class GmlObject < ActiveRecord::Base
   end
 
   def read_from_ipfs
-    raise "No ipfs_hash for this Tag #{self.id}" if self.ipfs_hash.blank?
+    raise "No ipfs_hash for this Tag #{self.tag_id}" if self.ipfs_hash.blank?
     ipfs.cat(self.ipfs_hash)
   end
 
