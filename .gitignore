@@ -1,5 +1,6 @@
 *.sql
 *.dump
+*.sublime-*
 .bundle
 .env
 config/database.yml
