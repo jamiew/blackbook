@@ -8,7 +8,7 @@ class Tag < ActiveRecord::Base
   has_many :comments, :as => :commentable
   has_many :likes
 
-  delegate :data, to: :gml_object
+  # delegate :data, to: :gml_object
 
   # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
@@ -60,6 +60,7 @@ class Tag < ActiveRecord::Base
   end
 
   def gml_object=(obj)
+    logger.debug "Tag #{id}: gml_object="
     self._gml_object = obj
   end
 
@@ -95,23 +96,39 @@ class Tag < ActiveRecord::Base
 
   # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
+    logger.debug "Tag #{id}: gml"
     return rotated_gml if opts[:iphone_rotate].to_s == '1' # handoff for backwards compt; DEPRECATEME
     @memoized_gml ||= gml_object && gml_object.data || @gml_temp
     return @memoized_gml
   end
 
+  def data
+    logger.debug "Tag #{id}: data"
+    # rotate_gml
+    gml
+  end
+
+  def data=(arg)
+    logger.debug "Tag #{id}: data="
+    raise "why are you doing tag.data="
+    # gml_object.data = arg
+  end
+
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
   def rotated_gml
-    Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml }
+    logger.debug "Tag #{id}: rotated_gml (cached)"
+    Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml.to_s }
   end
 
   # Proxy; will be processed on save
   def gml=(fresh)
+    logger.debug "Tag #{id}: gml="
     @gml_temp = fresh
   end
 
   # the GML data (String) as a Hash (w/ caching, conversion is an expensive operation)
   def gml_hash
+    logger.debug "Tag #{id}: gml_hash"
     @gml_hash ||= Rails.cache.read(gml_hash_cache_key)
     if @gml_hash.blank?
       @gml_hash = convert_gml_to_hash
@@ -123,6 +140,7 @@ class Tag < ActiveRecord::Base
   # Override so we can add :gml => :gml_hash
   # Arguably could just be using :methods but we always want this
   def as_json(_opts = {})
+    logger.debug "Tag #{id}: as_json"
     hash = super(_opts)
     hash.reject! {|k,v| v.blank? }
     hash[:gml] = self.gml_hash && self.gml_hash['gml']
@@ -133,23 +151,25 @@ class Tag < ActiveRecord::Base
 
   # Also hide what we'd like, and strip empty records (for now)
   def to_xml(options = {})
+    logger.debug "Tag #{id}: to_xml"
     options[:except] ||= []
-    options[:except] += self.attributes.map{|k,v| k if v.blank? }.compact
+    options[:except] += self.attributes.map {|k,v| k if v.blank? }.compact
     super(options)
   end
 
   # GML as a Nokogiri object...
   def gml_document
+    logger.debug "Tag #{id}: gml_document"
     return nil if self.gml.blank?
     @document ||= Nokogiri::XML(self.gml)
   rescue ArgumentError
     logger.error "Error parsing GML document for id=#{self.id}"
     nil
   end
-  alias :document :gml_document # Can't decide on the name; how much gml_ prefixing do we want?
 
   # Read the important bits of the GML -- also called by the save_header :before_save hook
   def gml_header
+    logger.debug "Tag #{id}: gml_header"
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
 
@@ -209,6 +229,7 @@ class Tag < ActiveRecord::Base
   end
 
   def convert_gml_to_hash
+    logger.debug "Tag #{id}: convert_gml_to_hash"
     return {} if self.gml.blank?
     Hash.from_xml(gml_document.to_xml)
   rescue
@@ -221,6 +242,7 @@ class Tag < ActiveRecord::Base
   end
 
   def rotate_gml
+    logger.debug "Tag #{id}: rotate_gml"
     doc = gml_document
     strokes = (doc/'drawing'/'stroke')
     strokes.each { |stroke|
@@ -230,8 +252,7 @@ class Tag < ActiveRecord::Base
         (pt/'y')[0].content = (1.0 - _x.to_f).to_s
       }
     }
-    # response gets cached so convert to string right away
-    return doc.to_s
+    doc
   rescue
     logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
     return nil
@@ -240,6 +261,7 @@ class Tag < ActiveRecord::Base
   # Parse and build errors & warnings
   # Not actually used as a validation, but
   def validate_gml
+    logger.debug "Tag #{id}: validate_gml"
     doc = gml_document
     errors, warnings, recommendations = [], [], []
 
@@ -288,6 +310,7 @@ protected
 
   # before_create hook to copy over our temp data & then read our GML /
   def build_gml_object
+    logger.debug "Tag #{id}: build_gml_object"
     if self.gml_object.present?
       logger.warn "Already have a GmlObject for this Tag #{self.id}, stopping. id=#{self.gml_object.id} valid?=#{self.gml_object.valid?}"
       return nil
@@ -304,11 +327,13 @@ protected
 
   # after_create hook to finalize the GmlObject
   def save_gml_object
+    logger.debug "Tag #{id}: save_gml_object"
     self.gml_object.tag = self # FIXME why is this necessary...? weird failsafe?
     self.gml_object.save!
   end
 
   def copy_gml_temp_to_gml_object
+    logger.debug "Tag #{id}: copy_gml_temp_to_gml_object"
     return if @gml_temp.blank? || gml_object.nil?
     gml_object.data = @gml_temp
     # gml_object.save! if gml_object.data_changed?
@@ -338,6 +363,7 @@ protected
   # and insert our server signature
   # FIXME duplicating some stuff from save_header
   def process_gml
+    logger.debug "Tag #{id}: process_gml"
     doc = gml_document
     return if doc.nil?
 
