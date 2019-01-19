@@ -7,5 +7,15 @@ namespace :gml_objects do
       obj.store_on_disk
     end
   end
+
+  desc "Generate empty GmlObjects for all Tags that don't have them"
+  task :fix_missing => :environment do
+    Tag.find_each do |tag|
+      next unless tag.gml_object.nil?
+      tag.send(:build_gml_object)
+      tag.send(:save_gml_object)
+    end
+  end
+
 end
 

@@ -5,11 +5,10 @@ class Tag < ActiveRecord::Base
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   belongs_to :user
-  has_one :gml_object, :class_name => 'GmlObject'
   has_many :comments, :as => :commentable
   has_many :likes
 
-  delegate :data, :ipfs_hash, to: :gml_object
+  delegate :data, to: :gml_object
 
   # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
   validates_associated :user, :on => :create
@@ -40,9 +39,29 @@ class Tag < ActiveRecord::Base
 
   # Placeholders for assigning data from forms
   attr_accessor :gml_file
+  attr_accessor :_gml_object
   attr_accessor :existing_application_id
   attr_accessor :validation_results
 
+  # Some interesting test cases
+  EXAMPLES = {
+    valid_gml: 3001,
+    rotated: 3000,
+    bad_binary_data: 5198,
+    # empty: TODO
+    # invalid_gml: TODO
+    # tempt1_eyesaver: TODO
+    # TODO one from each iPhone app
+  }
+
+  def gml_object
+    self._gml_object ||= GmlObject.new(tag: self)
+    self._gml_object
+  end
+
+  def gml_object=(obj)
+    self._gml_object = obj
+  end
 
   # wrap remote_imge to always add our local FFlickr...
   # this secures tempt's tags on the site
@@ -123,6 +142,9 @@ class Tag < ActiveRecord::Base
   def gml_document
     return nil if self.gml.blank?
     @document ||= Nokogiri::XML(self.gml)
+  rescue ArgumentError
+    logger.error "Error parsing GML document for id=#{self.id}"
+    nil
   end
   alias :document :gml_document # Can't decide on the name; how much gml_ prefixing do we want?
 
@@ -289,7 +311,8 @@ protected
   def copy_gml_temp_to_gml_object
     return if @gml_temp.blank? || gml_object.nil?
     gml_object.data = @gml_temp
-    gml_object.save! if gml_object.data_changed?
+    # gml_object.save! if gml_object.data_changed?
+    gml_object.save!
   end
 
   # Parse & assign variables from the GML header
@@ -305,7 +328,7 @@ protected
   def find_paired_user
     logger.debug "Tag.find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
     return if self.gml_uniquekey.blank?
-    user = User.find_by_iphone_uniquekey(self.gml_uniquekey) rescue nil
+    user = User.find_by_iphone_uniquekey(self.gml_uniquekey)
     return if user.nil?
     logger.info "Pairing with user=#{user.login.inspect}"
     self.user = user
@@ -338,6 +361,7 @@ protected
     return attrs
   rescue
     logger.error "Tag.process_gml error: #{$!}"
+    return nil
   end
 
   def self.hash_uniquekey(string)
