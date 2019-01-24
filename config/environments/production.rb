@@ -80,4 +80,7 @@ Rails.application.configure do
   # Terse logging via lograge gem
   config.lograge.enabled = true
 
+  # Silence ActiveRecord logging in production (this isn't default?!)
+  config.active_record.logger = nil
+
 end
