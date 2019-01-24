@@ -6,7 +6,8 @@
   .left
     = link_to "&larr; Back to user profile".html_safe, user_path(@user)
     %h3
-      .left{:style => 'margin-right: 8px; margin-top: 2px;'}= link_to image_tag(@user.photo(:tiny)), user_path(@user)
+      .left{:style => 'margin-right: 8px; margin-top: 2px;'}
+        = link_to image_tag(@user.photo(:tiny)), user_path(@user)
       == #{@user.login}'s #{@favorites ? 'favorites' : 'tags'} (#{@tags.total_entries})
     %br
 - elsif @search_context
@@ -49,7 +50,11 @@
     -# url = user.nil? ? tag_path(tag) : user_tag_path(user,tag)
     - url = tag_path(tag)
     %tr
-      %td.thumbnail= link_to(image_tag(tag.thumbnail_image(:medium), :width => 190), url)
+      %td.thumbnail
+        - if Rails.env.development?
+          n/a
+        - else
+          = link_to(image_tag(tag.thumbnail_image(:medium), :width => 190), url)
       %td.name{:style => 'padding-left: 10px;'}
         %strong= link_to(tag_title(tag), url)
       %td.application
