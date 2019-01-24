@@ -60,7 +60,7 @@ class Tag < ActiveRecord::Base
   end
 
   def gml_object=(obj)
-    logger.debug "Tag #{id}: gml_object="
+    Rails.logger.debug "Tag #{id}: gml_object="
     self._gml_object = obj
   end
 
@@ -96,39 +96,39 @@ class Tag < ActiveRecord::Base
 
   # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
-    logger.debug "Tag #{id}: gml"
+    Rails.logger.debug "Tag #{id}: gml"
     return rotated_gml if opts[:iphone_rotate].to_s == '1' # handoff for backwards compt; DEPRECATEME
     @memoized_gml ||= gml_object && gml_object.data || @gml_temp
     return @memoized_gml
   end
 
   def data
-    logger.debug "Tag #{id}: data"
+    Rails.logger.debug "Tag #{id}: data"
     # rotate_gml
     gml
   end
 
   def data=(arg)
-    logger.debug "Tag #{id}: data="
+    Rails.logger.debug "Tag #{id}: data="
     raise "why are you doing tag.data="
     # gml_object.data = arg
   end
 
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
   def rotated_gml
-    logger.debug "Tag #{id}: rotated_gml (cached)"
+    Rails.logger.debug "Tag #{id}: rotated_gml (cached)"
     Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml.to_s }
   end
 
   # Proxy; will be processed on save
   def gml=(fresh)
-    logger.debug "Tag #{id}: gml="
+    Rails.logger.debug "Tag #{id}: gml="
     @gml_temp = fresh
   end
 
   # the GML data (String) as a Hash (w/ caching, conversion is an expensive operation)
   def gml_hash
-    logger.debug "Tag #{id}: gml_hash"
+    Rails.logger.debug "Tag #{id}: gml_hash"
     @gml_hash ||= Rails.cache.read(gml_hash_cache_key)
     if @gml_hash.blank?
       @gml_hash = convert_gml_to_hash
@@ -140,7 +140,7 @@ class Tag < ActiveRecord::Base
   # Override so we can add :gml => :gml_hash
   # Arguably could just be using :methods but we always want this
   def as_json(_opts = {})
-    logger.debug "Tag #{id}: as_json"
+    Rails.logger.debug "Tag #{id}: as_json"
     hash = super(_opts)
     hash.reject! {|k,v| v.blank? }
     hash[:gml] = self.gml_hash && self.gml_hash['gml']
@@ -151,7 +151,7 @@ class Tag < ActiveRecord::Base
 
   # Also hide what we'd like, and strip empty records (for now)
   def to_xml(options = {})
-    logger.debug "Tag #{id}: to_xml"
+    Rails.logger.debug "Tag #{id}: to_xml"
     options[:except] ||= []
     options[:except] += self.attributes.map {|k,v| k if v.blank? }.compact
     super(options)
@@ -159,22 +159,22 @@ class Tag < ActiveRecord::Base
 
   # GML as a Nokogiri object...
   def gml_document
-    logger.debug "Tag #{id}: gml_document"
+    Rails.logger.debug "Tag #{id}: gml_document"
     return nil if self.gml.blank?
     @document ||= Nokogiri::XML(self.gml)
   rescue ArgumentError
-    logger.error "Error parsing GML document for id=#{self.id}"
+    Rails.logger.error "Error parsing GML document for id=#{self.id}"
     nil
   end
 
   # Read the important bits of the GML -- also called by the save_header :before_save hook
   def gml_header
-    logger.debug "Tag #{id}: gml_header"
+    Rails.logger.debug "Tag #{id}: gml_header"
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
 
     if doc.nil? || (doc/'header').nil?
-      logger.error "NIL OR NO HEADER DOC"
+      Rails.logger.error "NIL OR NO HEADER DOC"
       return {}
     end
 
@@ -229,11 +229,11 @@ class Tag < ActiveRecord::Base
   end
 
   def convert_gml_to_hash
-    logger.debug "Tag #{id}: convert_gml_to_hash"
+    Rails.logger.debug "Tag #{id}: convert_gml_to_hash"
     return {} if self.gml.blank?
     Hash.from_xml(gml_document.to_xml)
   rescue
-    logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
+    Rails.logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
     return {}
   end
 
@@ -242,7 +242,7 @@ class Tag < ActiveRecord::Base
   end
 
   def rotate_gml
-    logger.debug "Tag #{id}: rotate_gml"
+    Rails.logger.debug "Tag #{id}: rotate_gml"
     doc = gml_document
     strokes = (doc/'drawing'/'stroke')
     strokes.each { |stroke|
@@ -254,14 +254,14 @@ class Tag < ActiveRecord::Base
     }
     doc
   rescue
-    logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
+    Rails.logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
     return nil
   end
 
   # Parse and build errors & warnings
   # Not actually used as a validation, but
   def validate_gml
-    logger.debug "Tag #{id}: validate_gml"
+    Rails.logger.debug "Tag #{id}: validate_gml"
     doc = gml_document
     errors, warnings, recommendations = [], [], []
 
@@ -296,8 +296,8 @@ class Tag < ActiveRecord::Base
     self.validation_results[:warnings] = warnings.compact unless warnings.blank?
     self.validation_results[:recommendations] = recommendations.compact unless recommendations.blank?
 
-    logger.info "GML Validation Results..."
-    logger.info self.validation_results.inspect
+    Rails.logger.info "GML Validation Results..."
+    Rails.logger.info self.validation_results.inspect
     return validation_results
   end
 
@@ -310,13 +310,13 @@ protected
 
   # before_create hook to copy over our temp data & then read our GML /
   def build_gml_object
-    logger.debug "Tag #{id}: build_gml_object"
+    Rails.logger.debug "Tag #{id}: build_gml_object"
     if self.gml_object.present?
-      logger.warn "Already have a GmlObject for this Tag #{self.id}, stopping. id=#{self.gml_object.id} valid?=#{self.gml_object.valid?}"
+      Rails.logger.warn "Already have a GmlObject for this Tag #{self.id}, stopping. id=#{self.gml_object.id} valid?=#{self.gml_object.valid?}"
       return nil
     end
 
-    logger.debug "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
+    Rails.logger.debug "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
     obj = GmlObject.new(tag_id: self.id) # tag_id nil if we're unsaved, but not if it's old or being fixed
     obj.data = @gml_temp || self.attributes['gml']
     self.gml_object = obj
@@ -327,13 +327,13 @@ protected
 
   # after_create hook to finalize the GmlObject
   def save_gml_object
-    logger.debug "Tag #{id}: save_gml_object"
+    Rails.logger.debug "Tag #{id}: save_gml_object"
     self.gml_object.tag = self # FIXME why is this necessary...? weird failsafe?
     self.gml_object.save!
   end
 
   def copy_gml_temp_to_gml_object
-    logger.debug "Tag #{id}: copy_gml_temp_to_gml_object"
+    Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object"
     return if @gml_temp.blank? || gml_object.nil?
     gml_object.data = @gml_temp
     # gml_object.save! if gml_object.data_changed?
@@ -351,11 +351,11 @@ protected
 
   # assign a user if there's a paired iPhone uniquekey
   def find_paired_user
-    logger.debug "Tag.find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
+    Rails.logger.debug "Tag.find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
     return if self.gml_uniquekey.blank?
     user = User.find_by_iphone_uniquekey(self.gml_uniquekey)
     return if user.nil?
-    logger.info "Pairing with user=#{user.login.inspect}"
+    Rails.logger.info "Pairing with user=#{user.login.inspect}"
     self.user = user
   end
 
@@ -363,13 +363,13 @@ protected
   # and insert our server signature
   # FIXME duplicating some stuff from save_header
   def process_gml
-    logger.debug "Tag #{id}: process_gml"
+    Rails.logger.debug "Tag #{id}: process_gml"
     doc = gml_document
     return if doc.nil?
 
     header = (doc/'header')
     if header.blank?
-      logger.error "Tag.process_gml: no header found in GML"
+      Rails.logger.error "Tag.process_gml: no header found in GML"
       # TODO raise exception
       return nil
     end
@@ -386,7 +386,7 @@ protected
 
     return attrs
   rescue
-    logger.error "Tag.process_gml error: #{$!}"
+    Rails.logger.error "Tag.process_gml error: #{$!}"
     return nil
   end
 
@@ -405,9 +405,9 @@ protected
 
   def check_for_gml_object
     if self.gml_object.nil?
-      logger.error "ERROR: Missing gml_object for Tag #{self.id}"
+      Rails.logger.error "ERROR: Missing gml_object for Tag #{self.id}"
     elsif !self.gml_object.valid?
-      logger.warn "Warning: Invalid gml_object for Tag #{self.id}"
+      Rails.logger.warn "Warning: Invalid gml_object for Tag #{self.id}"
     end
   end
 
