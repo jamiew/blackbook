@@ -60,11 +60,24 @@ class GmlObject
     end
   end
 
+  def save
+    raise "Oh no you called GmlObject#save"
+  end
+
+  def save!
+    # raise "Oh no you called GmlObject#save!"
+    store_on_disk
+    # store_on_s3
+    # store_on_ipfs
+  end
+
   def exists_on_disk?
     File.exist?(filename)
   end
 
   def store_on_disk
+    puts "GmlObject.store_on_disk data[0..100]=#{data[0..100]}"
+
     if filename.blank?
       Rails.logger.error "Cannot store GmlObject(tag_id=#{tag_id}) on disk, invalid filename. tag_id=#{self.tag_id.inspect} filename=#{filename.inspect}"
       raise "Filename is blank, cannot store on disk"
@@ -74,7 +87,7 @@ class GmlObject
       FileUtils.mkdir(self.class.file_dir)
     end
 
-    Rails.logger.info "GmlObject(id=#{id} tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
+    Rails.logger.info "GmlObject(tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
 
     File.open(filename, 'w+') do |file|
       file.write(data)

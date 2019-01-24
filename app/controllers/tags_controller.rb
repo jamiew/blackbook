@@ -112,7 +112,9 @@ class TagsController < ApplicationController
       return create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
-      render :text => "Error, could not create tag from your parameters: #{clean_params.inspect}", :status => 422 #Unprocessable Entity
+      error_text = "Error, could not create tag from your parameters: #{clean_params.inspect}"
+      Rails.logger.warn error_text
+      render text: error_text, :status => 422 #Unprocessable Entity
       return
     end
     expire_page(:index)

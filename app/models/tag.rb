@@ -96,7 +96,7 @@ class Tag < ActiveRecord::Base
 
   # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
-    Rails.logger.debug "Tag #{id}: gml"
+    # Rails.logger.debug "Tag #{id}: gml"
     return rotated_gml if opts[:iphone_rotate].to_s == '1' # handoff for backwards compt; DEPRECATEME
     @memoized_gml ||= gml_object && gml_object.data || @gml_temp
     return @memoized_gml
@@ -122,7 +122,13 @@ class Tag < ActiveRecord::Base
 
   # Proxy; will be processed on save
   def gml=(fresh)
-    Rails.logger.debug "Tag #{id}: gml="
+    # FIXME wtf is going on
+    if fresh.kind_of?(ActionDispatch::Http::UploadedFile)
+      Rails.logger.warn "Warning, reading data from ActionDispatch::Http::UploadedFile"
+      fresh = fresh.read
+    end
+
+    Rails.logger.debug "Tag #{id}: gml= (#{fresh[0..100]}"
     @gml_temp = fresh
   end
 
@@ -310,13 +316,7 @@ protected
 
   # before_create hook to copy over our temp data & then read our GML /
   def build_gml_object
-    Rails.logger.debug "Tag #{id}: build_gml_object"
-    if self.gml_object.present?
-      Rails.logger.warn "Already have a GmlObject for this Tag #{self.id}, stopping. id=#{self.gml_object.id} valid?=#{self.gml_object.valid?}"
-      return nil
-    end
-
-    Rails.logger.debug "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
+    Rails.logger.debug "Tag #{self.id}: build_gml_object ... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
     obj = GmlObject.new(tag_id: self.id) # tag_id nil if we're unsaved, but not if it's old or being fixed
     obj.data = @gml_temp || self.attributes['gml']
     self.gml_object = obj
@@ -336,8 +336,6 @@ protected
     Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object"
     return if @gml_temp.blank? || gml_object.nil?
     gml_object.data = @gml_temp
-    # gml_object.save! if gml_object.data_changed?
-    gml_object.save!
   end
 
   # Parse & assign variables from the GML header
