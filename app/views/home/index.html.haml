@@ -25,11 +25,11 @@
 
     .prevnext
       - @prev ||= @tags.first
-      - next_text = 'next &rarr;'.html_safe
-      - prev_text = '&larr; previous'.html_safe
-      %li= @prev.nil? ? prev_text : link_to(prev_text, tag_path(@prev), :class => 'button')
-      %li &nbsp;::&nbsp;
+      - next_text = '&larr; next'.html_safe
+      - prev_text = 'previous &rarr;'.html_safe
       %li= @next.nil? ? next_text : link_to(next_text, tag_path(@next), :class => 'button')
+      %li &nbsp;::&nbsp;
+      %li= @prev.nil? ? prev_text : link_to(prev_text, tag_path(@prev), :class => 'button')
     - if @tag.blank?
       %h2.warning Warning: no tag data
     - else
