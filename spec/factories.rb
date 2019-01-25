@@ -20,56 +20,54 @@ FactoryBot.define do
 
   factory :user do |t|
     t.login { FactoryBot.generate(:login) }
-    t.name 'Test User'
+    t.name { 'Test User' }
     t.email  { FactoryBot.generate(:email) }
-    t.password 'topsecret123'
-    t.password_confirmation 'topsecret123'
-    t.website 'http://fffff.at'
-    t.tagline 'I did it for the famo'
-    t.about 'Blah blah blah, http://jamiedubs.com, even some <b>BOLD TEXT</b> or <a href="http://fffff.at">custom link</a>'
+    t.password { 'topsecret123' }
+    t.password_confirmation { 'topsecret123' }
+    t.website { 'http://fffff.at' }
+    t.tagline { 'I did it for the famo' }
+    t.about { 'Blah blah blah, http://jamiedubs.com, even some <b>BOLD TEXT</b> or <a href="http://fffff.at">custom link</a>' }
     t.iphone_uniquekey  { FactoryBot.generate(:device_id) }
   end
 
   factory :admin, parent: :user do |t|
-    t.login 'admin'
-    t.name 'Admin User'
-    t.admin true
+    t.login { 'admin' }
+    t.name { 'Admin User' }
+    t.admin { true }
   end
 
   # A minimum GML tag
   factory :tag do |t|
     t.user {|a| a.association(:user) }
-    t.application 'TestApp'
-    t.author 'JDUBS'
-    # t.gml_object {|a| a.association(:gml_object) }
+    t.application { 'TestApp' }
+    t.author { 'JDUBS' }
   end
 
   # A tag sent via the API is slightly different than through the site
   # No thumbnail required & application *is* required
   factory :tag_from_api, parent: :tag do |t|
-    t.remote_image 'http://fffff.at/fuckflickr/...'
-    t.remote_secret ''
-    # t.gml_object {|a| a.association(:gml_object) }
+    t.remote_image { 'http://fffff.at/fuckflickr/...' }
+    t.remote_secret { '' }
   end
 
   # A sample tag from Tempt1's EyeWriter.
-  # He can't upgrade or diagnose issues, so we *must* maintain backwards-compat
+  # He can't upgrade or diagnose issues, so we *must* maintain backwards compatibility
   factory :tag_from_tempt1, parent: :tag do |t|
-    t.remote_secret '123456789' # FIXME use tempt's real key
-    t.gml "<gml>yo i am some sample tempt graffiti... should use a fixture to store this</gml>"
+    t.remote_secret { '123456789' }
+    t.gml { "<gml>yo i am some sample tempt graffiti... should use a fixture to store this</gml>" }
   end
 
   # Stores the actual GML
   factory :gml_object do |t|
-    t.tag_id 1
-    t.data "<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
+    t.tag_id { 1 }
+    t.data { "<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>" }
   end
 
   # A GML application
   factory :visualization do |t|
-    t.name "Jdubs TestTag"
-    t.website "http://jamiedubs.com/yep"
-    t.kind 'javascript'
+    t.name { 'Jdubs TestTag' }
+    t.website { "http://jamiedubs.com/yep" }
+    t.kind { 'javascript' }
   end
 
   factory :favorite do |t|
@@ -80,7 +78,7 @@ FactoryBot.define do
   factory :comment do |t|
     t.user {|a| a.association(:user) }
     t.commentable {|a| a.association(:tag) }
-    t.text 'Default comment yo'
+    t.text { 'Default comment yo' }
   end
 
 end
