@@ -180,7 +180,7 @@ class Tag < ActiveRecord::Base
     doc = gml_document
 
     if doc.nil? || (doc/'header').nil?
-      Rails.logger.error "NIL OR NO HEADER DOC"
+      Rails.logger.error "Tag#gml_header: NIL OR NO HEADER DOC"
       return {}
     end
 
@@ -327,13 +327,13 @@ protected
 
   # after_create hook to finalize the GmlObject
   def save_gml_object
-    Rails.logger.debug "Tag #{id}: save_gml_object"
-    self.gml_object.tag = self # FIXME why is this necessary...? weird failsafe?
+    Rails.logger.debug "Tag #{id}: save_gml_object..."
+    self.gml_object.tag_id ||= id # FIXME? fail-safe for if you build object pre-save, when tag has no id
     self.gml_object.save!
   end
 
   def copy_gml_temp_to_gml_object
-    Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object"
+    Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object..."
     return if @gml_temp.blank? || gml_object.nil?
     gml_object.data = @gml_temp
   end

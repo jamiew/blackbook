@@ -1,14 +1,19 @@
 class GmlObject
 
-  attr_accessor :tag
+  attr_accessor :tag_id
 
   def initialize(**opts)
-    self.tag = opts[:tag]
-    # raise "GmObject requires :tag_id" if self.tag_id.blank?
-  end
+    Rails.logger.debug "GmlObject.new opts=#{opts.inspect}"
+    self.tag_id = opts[:tag_id]
+    self.tag_id ||= opts[:tag] && opts[:tag].try(:id)
 
-  def tag_id
-    tag.try(:id)
+    # use data if passed explicitly; otherwise read from disk
+    # right?
+    if opts.key?(:data)
+      self.data = opts[:data]
+    else
+      self.data = read_from_disk
+    end
   end
 
   def self.file_dir
@@ -16,8 +21,8 @@ class GmlObject
   end
 
   def filename
-    return nil if tag.try(:id).blank?
-    "#{self.class.file_dir}/#{tag.id}.gml"
+    return nil if tag_id.blank?
+    "#{self.class.file_dir}/#{tag_id}.gml"
   end
 
   def s3_file_key
@@ -30,17 +35,17 @@ class GmlObject
 
   def data
     # Rails.logger.debug "*** GmlObject #data..."
-    @data ||= read_from_disk
+    @_data
   end
 
   def data=(args)
-    Rails.logger.debug "*** GmlObject #data=, #{args.try(:length)} bytes"
-    @data = args
+    Rails.logger.debug "*** GmlObject #data=, #{args.try(:length).inspect} bytes"
+    @_data = args
   end
 
   def valid?
-    # FIXME
-    true
+    Rails.logger.debug "GmlObject.valid? data?=#{data.present?} tag?=#{tag_id.present?}"
+    data.present? && tag_id.present?
   end
 
   def self.read_all_cached_gml
@@ -65,6 +70,9 @@ class GmlObject
   end
 
   def save!
+    Rails.logger.debug "GmlObject.save! here"
+    raise "invalid GmlObject, not saving" unless valid?
+
     # raise "Oh no you called GmlObject#save!"
     store_on_disk
     # store_on_s3

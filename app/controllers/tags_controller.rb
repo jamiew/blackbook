@@ -103,20 +103,31 @@ class TagsController < ApplicationController
 
   # Calls either create_from_form (on-site, more strict) or create_from_api (less strict)
   def create
-    raise "No params!" if params.blank?
-    render :nothing => true, :status => 200 and return if params[:check] == 'connected' #DustTag weirdness?
+    if params.blank?
+      logger.warn "no params"
+      raise "No params!"
+    end
+
+    if params[:check] == 'connected' #DustTag weirdness?
+      logger.debug "connected check"
+      render :nothing => true, :status => 200
+      return
+    end
 
     if !params[:tag].blank? # sent by the form
+      logger.info "sent by the form"
       return create_from_form
     elsif !params[:gml].blank? # sent from an app!
+      logger.info "sent from an app"
       return create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
       error_text = "Error, could not create tag from your parameters: #{clean_params.inspect}"
-      Rails.logger.warn error_text
+      logger.warn error_text
       render text: error_text, :status => 422 #Unprocessable Entity
       return
     end
+
     expire_page(:index)
   end
 
@@ -267,6 +278,8 @@ protected
 
   # For converting from the pre-existing 'Application' params into a string in create/update
   def convert_app_id_to_app_name
+    Rails.logger.debug "#convert_app_id_to_app_name"
+
     # Sub in an existing application if specified...
     return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
 
