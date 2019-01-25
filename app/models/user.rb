@@ -69,7 +69,7 @@ protected
     old_tags = Tag.claimed.where('gml_uniquekey = ?', self.iphone_uniquekey_was)
     old_tags.update_all(:user_id => nil)
 
-    logger.info "Associated #{new_tags.length} new tags from #{self.iphone_uniquekey.inspect}; disassociated #{old_tags.length} old tags from previous key #{self.iphone_uniquekey_was.inspect}"
+    logger.info "User#activate_device_pairing: associated #{new_tags.length} new tags from #{self.iphone_uniquekey.inspect}; disassociated #{old_tags.length} old tags from previous key #{self.iphone_uniquekey_was.inspect}"
     return true #??
   end
 end

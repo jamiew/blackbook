@@ -7,13 +7,12 @@ describe TagsController do
   before do
     activate_authlogic
     @gml = FactoryBot.build(:gml_object).data
-    # GmlObject.any_instance.stub(:data).and_return(DEFAULT_GML)
     allow_any_instance_of(GmlObject).to receive(:data).and_return(DEFAULT_GML)
   end
 
   describe "POST #create" do
     it "should create given params[:gml]" do
-      post :create, :gml => @gml
+      post :create, gml: @gml
       assigns[:tag].should be_valid
       response.should be_success
       response.body.should match(/\d+/)

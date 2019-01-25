@@ -1,0 +1,25 @@
+#!/bin/sh
+
+ssh blackbook "
+  cd ~/blackbook4/
+  git pull origin master
+  ruby --version
+  # rbenv install $(cat .ruby-version)
+  echo 'Bundle install...'
+  /home/rails/.rbenv/shims/bundle install
+  touch tmp/restart.txt
+  echo 'Restarting service...'
+  sudo systemctl restart blackbook4
+  echo 'All done'
+"
+
+# curl -I http://new.000book.com
+curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+sleep 1
+curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+sleep 1
+curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+sleep 1
+curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+sleep 1
+curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
