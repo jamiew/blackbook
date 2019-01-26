@@ -110,8 +110,9 @@ class Tag < ActiveRecord::Base
 
   def data=(arg)
     Rails.logger.debug "Tag #{id}: data="
-    raise "why are you doing tag.data="
-    # gml_object.data = arg
+    # raise "why are you doing tag.data="
+    @gml_temp = arg
+    gml_object.data = arg
   end
 
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
@@ -334,7 +335,7 @@ protected
 
   def copy_gml_temp_to_gml_object
     Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object..."
-    return if @gml_temp.blank? || gml_object.nil?
+    return if gml_object.nil? || @gml_temp.blank?
     gml_object.data = @gml_temp
   end
 

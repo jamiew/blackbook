@@ -41,6 +41,8 @@ FactoryBot.define do
     t.user {|a| a.association(:user) }
     t.application { 'TestApp' }
     t.author { 'JDUBS' }
+    # t.gml_object {|a| a.association(:gml_object) }
+    t.data { DEFAULT_GML }
   end
 
   # A tag sent via the API is slightly different than through the site
@@ -60,7 +62,7 @@ FactoryBot.define do
   # Stores the actual GML
   factory :gml_object do |t|
     t.tag_id { 1 }
-    t.data { "<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>" }
+    t.data { DEFAULT_GML }
   end
 
   # A GML application
