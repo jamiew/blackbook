@@ -43,6 +43,11 @@ class GmlObject
     @_data = args
   end
 
+  # FIXME I don't like this pseudo-ActiveRecord stuff anymore
+  def tag=(_tag)
+    self.tag_id = _tag.id
+  end
+
   def valid?
     Rails.logger.debug "GmlObject.valid? data?=#{data.present?} tag?=#{tag_id.present?}"
     data.present? && tag_id.present?
