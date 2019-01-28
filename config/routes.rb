@@ -20,7 +20,6 @@ Rails.application.routes.draw do
   resources :users do
     # resources :tags, :as => 'data'
     resources :tags
-    resources :comments
 
     get :change_password, on: :member
     get :latest, on: :member
@@ -29,7 +28,6 @@ Rails.application.routes.draw do
 
   # tags => /data
   resources :tags, path: 'data' do
-    resources :comments
     resources :favorites
 
     collection do
@@ -55,7 +53,6 @@ Rails.application.routes.draw do
   post  '/validate' => 'tags#validate', as: 'validate'
 
   resources :visualizations, path: 'apps' do
-    resources :comments
 
     member do
       put :approve
@@ -64,8 +61,6 @@ Rails.application.routes.draw do
   end
 
   resources :favorites
-
-  resources :comments
 
   get '/activity' => 'home#activity', as: 'activity'
 
