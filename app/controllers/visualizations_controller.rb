@@ -19,7 +19,7 @@ class VisualizationsController < ApplicationController
 
   def index
     set_page_title "GML Applications"
-    @visualizations = Visualization.paginate(page: @page, per_page: 20).order('created_at ASC')
+    @visualizations = Visualization.paginate(page: @page, per_page: @per_page).order('created_at ASC')
   end
 
   def new
@@ -66,7 +66,8 @@ class VisualizationsController < ApplicationController
 
     # FIXME these date back to using some magic super controller class magic
     def current_objects
-      @page, @per_page = params[:page] && params[:page].to_i || 1, 20
+      @page = params[:page] && params[:page].to_i || 1
+      @per_page = 20
       which = is_admin? ? current_model : current_model.approved
       if params[:user_id]
         @user = User.find_by_param(params[:user_id])
