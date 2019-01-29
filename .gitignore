@@ -10,3 +10,4 @@ log/*
 !log/.keep
 tmp
 public/data
+public/system
