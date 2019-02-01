@@ -33,20 +33,20 @@ describe TagsController do
     describe "redirection" do
       it "params[:redirect]=1 should redirect to the tag page" do
         Tag.destroy_all # FIXME not sure why we're ending up w/ dupe objs??
-        post :create, :gml => @gml, :redirect => 1
+        post :create, gml: @gml, redirect: 1
         assigns[:tag].should be_valid
         response.should redirect_to(tag_path(assigns[:tag]))
       end
 
       it "params[:redirect_to]='http://google.com' should redirect there" do
         url = "http://google.com"
-        post :create, :gml => @gml, :redirect_to => url
+        post :create, gml: @gml, redirect_to: url
         response.should redirect_to(url)
       end
 
       it "params[:redirect_back]=1 should redirect to the HTTP_REFERER" do
         request.env['HTTP_REFERER'] = "http://fffff.at"
-        post :create, :gml => @gml, :redirect_back => 1
+        post :create, gml: @gml, redirect_back: 1
         response.should redirect_to("http://fffff.at")
       end
 
@@ -56,8 +56,8 @@ describe TagsController do
       it "should expire Home#index.html" do
         pending "TODO"
         fail
-        route = {:controller => 'home', :method => 'index'}
-        # lambda { post :create, :gml => @gml }.should expire_fragment(route)
+        route = {controller: 'home', method: 'index'}
+        # lambda { post :create, gml: @gml }.should expire_fragment(route)
       end
 
       it "should expire Tags#index, all formats" do
@@ -84,32 +84,32 @@ describe TagsController do
     end
 
     it "should filter on keywords" do
-      FactoryBot.create(:tag, :application => 'mfcc_test_app', :gml_keywords => 'mfcc')
-      get :index, :keywords => 'mfcc'
+      FactoryBot.create(:tag, application: 'mfcc_test_app', gml_keywords: 'mfcc')
+      get :index, keywords: 'mfcc'
       @should_mention_application.call(/mfcc_test_app/)
     end
 
     it "should filter on location" do
-      FactoryBot.create(:tag, :application => 'location_test', :location => 'San Francisco')
-      get :index, :location => 'San Francisco'
+      FactoryBot.create(:tag, application: 'location_test', location: 'San Francisco')
+      get :index, location: 'San Francisco'
       @should_mention_application.call(/location_test/)
     end
 
     it "should filter on application (using 'application')" do
-      FactoryBot.create(:tag, :application => 'app_test')
-      get :index, :application => 'mfcc'
+      FactoryBot.create(:tag, application: 'app_test')
+      get :index, application: 'mfcc'
       # @should_mention_application.call(/app_test/)
     end
 
     it "should filter on application (using 'gml_application')" do
-      FactoryBot.create(:tag, :application => 'displayed_name', :gml_application => 'real_test_string')
-      get :index, :application => 'real_test_string'
+      FactoryBot.create(:tag, application: 'displayed_name', gml_application: 'real_test_string')
+      get :index, application: 'real_test_string'
       # @should_mention_application.call(/displayed_name/)
     end
 
     it "should filter on user (using last 5 characters of gml_uniquekey_hash)" do
-      tag = FactoryBot.create(:tag, :application => 'user_test', :gml_uniquekey => 'lol')
-      get :index, :user => tag.secret_username # TODO rename this method, it is undescriptive
+      tag = FactoryBot.create(:tag, application: 'user_test', gml_uniquekey: 'lol')
+      get :index, user: tag.secret_username # TODO rename this method, it is undescriptive
       # @should_mention_application.call(/user_test/)
     end
   end
@@ -117,97 +117,91 @@ describe TagsController do
   describe "GET #show" do
     before do
       @tag = FactoryBot.create(:tag,
-        :description => "An <b>html</b> description which might contain XSS!",
-        :location => "http://locationURL.com",
-        :gml_application => "Some Application name",
-        :gml_keywords => "some,gml,keywords")
+        description: "An <b>html</b> description which might contain XSS!",
+        location: "http://locationURL.com",
+        gml_application: "Some Application name",
+        gml_keywords: "some,gml,keywords")
     end
 
     it ".html (default)" do
-      get :show, :id => @tag.to_param
+      get :show, id: @tag.to_param
       response.should be_success
       response.body.should match(/Tag ##{@tag.id}/)
     end
 
     it ".gml" do
-      get :show, :id => @tag.to_param, :format => 'gml'
+      get :show, id: @tag.to_param, format: 'gml'
       response.should be_success
       response.body.should match("<gml><tag><header>")
     end
 
     it ".xml" do
-      get :show, :id => @tag.to_param, :format => 'xml'
+      get :show, id: @tag.to_param, format: 'xml'
       response.should be_success
       response.body.should match("<id>")
     end
 
     describe ".json" do
       it "should work" do
-        get :show, :id => @tag.to_param, :format => 'json'
+        get :show, id: @tag.to_param, format: 'json'
         response.should be_success
         response.body.should match("\"id\":#{@tag.id}")
       end
 
       it "should include GML data (GSON)" do
-        get :show, :id => @tag.to_param, :format => 'json'
+        get :show, id: @tag.to_param, format: 'json'
         response.body.should match("\"gml\":")
       end
     end
   end
 
   describe "GET #validate" do
-    it "should work with an existing tag_id" do
-      @tag = FactoryBot.create(:tag)
-      get :validate, :id => @tag.id
-      response.should be_success
-      response.body.should match(/Validating Tag ##{@tag.id}/)
-    end
-
-    it "should 404 with a bad tag_id" do
-      Tag.destroy_all
-      lambda { get :validate, :id => 666 }.should raise_error
-      # TODO make sure it's a *404*
+    it "should not route, we want you to use POST only now" do
+      { get: "/validate" }.should_not be_routable
     end
   end
 
   describe "POST #validate" do
+    it "should route" do
+      { post: "/validate" }.should route_to("tags#validate")
+    end
+
     it "should work given an existing tag_id (via tag[id])" do
       @tag = FactoryBot.create(:tag)
-      # FIXME why do we need to do "post :validate, :method => :post"? Cuz of the duplicate :get route?
-      post :validate, :method => :post, :tag => {:id => @tag.id}
+      post :validate, tag: {id: @tag.id}
       response.should be_success
       response.body.should match(/Validating Tag ##{@tag.id}/)
     end
 
     it "should present form for submitting GML if no tag data" do
-      post :validate, :method => :post
+      post :validate
       response.should be_success
       response.body.should match(/GML Syntax Validator/)
     end
 
     it "should work with raw :tag data" do
-      post :validate, :method => :post, :tag => {:gml => "<gml>...</gml>"}
+      post :validate, tag: {gml: "<gml>...</gml>"}
       response.should be_success
       response.body.should match(/Validating Your Uploaded GML.../)
     end
 
     it "should return XML" do
       @tag = FactoryBot.create(:tag)
-      post :validate, :method => :post, :id => @tag.id, :format => 'xml'
+      post :validate, id: @tag.id, format: 'xml'
       response.should be_success
       response.body.should match('<warnings>')
     end
 
     it "should return JSON" do
       @tag = FactoryBot.create(:tag)
-      post :validate, :method => :post, :id => @tag.id, :format => 'json'
+      post :validate, id: @tag.id, format: 'json'
       response.should be_success
       response.body.should match('"warnings":')
     end
 
     it "should return text" do
       @tag = FactoryBot.create(:tag)
-      post :validate, :method => :post, :id => @tag.id, :format => 'text'
+      post :validate, id: @tag.id, format: 'text'
       response.should be_success
       response.body.should match('warnings=')
     end
@@ -215,7 +209,7 @@ describe TagsController do
     it "should return text via XMLHttpRequest" do
       @tag = FactoryBot.create(:tag)
       request.env['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
-      post :validate, :id => @tag.id
+      post :validate, id: @tag.id
       response.should be_success
       response.body.should match('warnings=')
     end
