@@ -1,30 +1,27 @@
 Rails.application.routes.draw do
 
-  # Requests to blackhole -- ideally these wouldn't flood my logs either O_o
-  # TODO handle inside nginx instead
+  # Deprecated requests to blackhole
+  # TODO handle inside nginx or similar instead
   get '/temp.png', :controller => 'home', :action => 'discard', as: 'discard_temp_png'
   get '/data/temp.png', :controller => 'home', :action => 'discard', as: 'discard_data_temp_png'
   get '/tags/temp.png', :controller => 'home', :action => 'discard', as: 'discard_tags_temp_png'
 
-  # Users/authentication
+  # Users/authentication via authlogic
+  resource  :user_session
+  resources :password_reset
   get '/signup', :controller => 'users', :action => 'new', as: 'signup'
-  resource :user_session # For create/destroy associated with login/logout
   get '/login', :controller => 'user_sessions', :action => 'new', as: 'login'
   get '/logout', :controller => 'user_sessions', :action => 'destroy', as: 'logout'
   get '/forgot_password', :controller => 'password_reset', :action => 'new', as: 'forgot_password'
-  resources :password_reset # also not my favorite.
+
+  resources :users, only: [:show, :create] do
+    resources :tags
+  end
+  get '/settings', :controller => 'users', :action => 'edit', as: 'settings'
+  get '/account/change_password' => 'users#change_password', as: 'change_password_user'
 
   resource :account, :controller => "users" # FIXME DEPRECATEME
   # ^^^ what is this?
-
-  resources :users do
-    # resources :tags, :as => 'data'
-    resources :tags
-
-    get :change_password, on: :member
-    get :latest, on: :member
-  end
-  get '/settings', :controller => 'users', :action => 'edit', as: 'settings'
 
   # tags => /data
   resources :tags, path: 'data' do
@@ -44,16 +41,14 @@ Rails.application.routes.draw do
     end
   end
 
-  # resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
-
+  # TODO can these be inside the :tags resource declaration but maintain the /shorturls?
   get '/latest', :controller => 'tags', :action => 'latest', as: 'latest_tag'
   get '/random', :controller => 'tags', :action => 'random', as: 'random_tag'
 
-  get '/validator' => 'tags#validate', as: 'validator'
-  post  '/validate' => 'tags#validate', as: 'validate'
+  get  '/validator' => 'tags#validate', as: 'validator'
+  post '/validate' => 'tags#validate', as: 'validate'
 
   resources :visualizations, path: 'apps' do
-
     member do
       put :approve
       put :unapprove
