@@ -9,23 +9,6 @@ describe CommentsController do
     @tag = FactoryBot.create(:tag)
   end
 
-  describe "GET#index" do
-    it "should fail with no parent association" do
-      lambda { get :index }.should raise_error(ActiveRecord::RecordNotFound)
-    end
-
-    it "should work with a parent Tag" do
-      get :index, :tag_id => @tag.id
-      response.should be_success
-    end
-
-    it "should work with a parent User" do
-      @user = FactoryBot.create(:user)
-      get :index, :user_id => @user.id
-      response.should be_success
-    end
-  end
-
   it "POST #create should work" do
     login_as_user
     post :create, :tag_id => @tag.id, :comment => {:text => 'Lolcats R awesome'}

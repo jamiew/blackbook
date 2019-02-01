@@ -3,21 +3,6 @@ class CommentsController < ApplicationController
   before_filter :require_user, :only => [:new, :create, :edit, :update, :destroy]
   before_filter :setup
 
-  def index
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    @comments = @commentable.comments.sorted.includes(:user, :commentable).paginate(page: @page, per_page: @per_page)
-  end
-
-  def show
-    render :partial => 'comments/comment', :object => @comment, :layout => true
-  end
-
-  def new
-    # Not Implemented
-    @comment = Comment.new
-    render :text => "Not used directly", :layout => true, :status => 420
-  end
-
   def create
     @comment = Comment.new(params[:comment])
     @comment.user = current_user
