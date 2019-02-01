@@ -1,14 +1,14 @@
 class Comment < ActiveRecord::Base
 
-  belongs_to :commentable, :polymorphic => true
+  belongs_to :commentable, polymorphic: true
   belongs_to :user
 
-  validates_presence_of :commentable_id, :on => :create, :message => "can't be blank"
-  validates_presence_of :commentable_type, :on => :create, :message => "can't be blank"
-  validates_associated  :commentable, :on => :create
-  validates_presence_of :user_id, :on => :create, :message => "can't be blank"
-  validates_associated  :user, :on => :create
-  validates_presence_of :text, :on => :create, :message => "can't be blank"
+  validates_presence_of :commentable_id, on: :create, message: "can't be blank"
+  validates_presence_of :commentable_type, on: :create, message: "can't be blank"
+  validates_associated  :commentable, on: :create
+  validates_presence_of :user_id, on: :create, message: "can't be blank"
+  validates_associated  :user, on: :create
+  validates_presence_of :text, on: :create, message: "can't be blank"
 
   attr_protected :user_id, :commentable_type, :commentable_type, :ip_address
 
@@ -26,12 +26,12 @@ class Comment < ActiveRecord::Base
 
   # Helper class method to lookup all comments assigned to all commentable types for a given user.
   def self.find_comments_by_user(user)
-    find(:all, :conditions => ["user_id = ?", user.id], :order => "created_at DESC")
+    find(:all, conditions: ["user_id = ?", user.id], order: "created_at DESC")
   end
 
   # Helper class method to look up all comments for commentable class name and commentable id.
   def self.find_comments_for_commentable(commentable_str, commentable_id)
-    find(:all, :conditions => ["commentable_type = ? and commentable_id = ?", commentable_str, commentable_id], :order => "created_at DESC")
+    find(:all, conditions: ["commentable_type = ? and commentable_id = ?", commentable_str, commentable_id], order: "created_at DESC")
   end
 
   # Helper class method to look up a commentable object given the commentable class name and id
@@ -50,7 +50,7 @@ protected
   end
 
   def create_notification
-    Notification.create(:subject => self, :verb => 'created', :user => self.user)
+    Notification.create(subject: self, verb: 'created', user: self.user)
   end
 
   def send_email

@@ -1,6 +1,6 @@
 class CommentsController < ApplicationController
 
-  before_filter :require_user, :only => [:new, :create, :edit, :update, :destroy]
+  before_filter :require_user, only: [:new, :create, :edit, :update, :destroy]
   before_filter :setup
 
   def create
@@ -20,11 +20,11 @@ class CommentsController < ApplicationController
   end
 
   def edit
-    render :text => "TODO", :status => 420
+    render text: "TODO", status: 420
   end
 
   def update
-    render :text => "TODO", :status => 420
+    render text: "TODO", status: 420
   end
 
   def destroy

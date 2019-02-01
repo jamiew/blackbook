@@ -12,10 +12,10 @@ RSpec.describe Comment, type: :model do
   end
 
   it "should fail without a commentable object" do
-    FactoryBot.build(:comment, :commentable => nil).should_not be_valid
+    FactoryBot.build(:comment, commentable: nil).should_not be_valid
   end
 
   it "should be invalid with blank text" do
-    FactoryBot.build(:comment, :text => '').should_not be_valid
+    FactoryBot.build(:comment, text: '').should_not be_valid
   end
 end

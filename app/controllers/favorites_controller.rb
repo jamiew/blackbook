@@ -1,5 +1,5 @@
 class FavoritesController < ApplicationController
-  before_filter :require_user, :only => [:create, :update, :destroy]
+  before_filter :require_user, only: [:create, :update, :destroy]
 
   def index
     @user = current_user
@@ -13,7 +13,7 @@ class FavoritesController < ApplicationController
     @favorites = @tags
 
     set_page_title "Your Favorites"
-    render :template => 'tags/index'
+    render template: 'tags/index'
   end
 
   # Double-duty favorite/unfavorite -- seems better than individual controller favorite/unfavorites

@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
 
-  # caches_action :index, :cache_path => 'home/index', :expires_in => 30.minutes, :if => :cache_request?
+  # caches_action :index, cache_path: 'home/index', expires_in: 30.minutes, if: :cache_request?
 
   def index
     @tags = Tag.order('created_at DESC').limit(30).includes(:user)
@@ -21,7 +21,7 @@ class HomeController < ApplicationController
   # Ghetto handling for known-bad URLs -- mapping them here as a blackhole
   def discard
     logger.warn "Discarding request..."
-    render :nothing => true, :status => 304 # Not Modified
+    render nothing: true, status: 304 # Not Modified
   end
 
 end

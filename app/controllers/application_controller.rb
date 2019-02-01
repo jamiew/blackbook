@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   # before_filter :activate_authlogic
   before_filter :set_format
 
-  rescue_from NoPermissionError, :with => :permission_denied
+  rescue_from NoPermissionError, with: :permission_denied
 
   # Oink object debugging in dev
   # if Rails.env == 'development'
@@ -56,17 +56,17 @@ class ApplicationController < ActionController::Base
   # Catch-all render for no-permission errors
   def permission_denied
     flash[:error] = "You don't have permission to do that"
-    render :text => flash[:error], :status => 403
+    render text: flash[:error], status: 403
   end
 
   # Automatically respond with 404 for ActiveRecord::RecordNotFound
   def record_not_found
-    render :file => File.join(RAILS_ROOT, 'public', '404.html'), :status => 404
+    render file: File.join(RAILS_ROOT, 'public', '404.html'), status: 404
   end
 
   # Render a partial into a string
   def fetch_partial(file, opts = {})
-    render_to_string :partial => file, :locals => opts
+    render_to_string partial: file, locals: opts
   end
   helper_method :fetch_partial
 
@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
   def render(*args)
     if request.xhr?
       if args.blank?
-        return(super :layout => false)
+        return(super layout: false)
       else
         args.first[:layout] = false if args.first.is_a?(Hash) && args.first[:layout].blank?
       end
@@ -178,22 +178,22 @@ class ApplicationController < ActionController::Base
   # TODO handle arrays better
   def default_respond_to(object, opts={})
 
-    opts = { :exclude => [:id, :created_at, :cached_tag_list] }.merge(opts)
+    opts = { exclude: [:id, :created_at, :cached_tag_list] }.merge(opts)
     which_layout = opts[:layout] || false
     # TODO strip out excluded attributes
 
     respond_to do |format|
       format.html {
         if request.xhr? && !opts[:html_partial].blank?
-          render :partial => opts[:html_partial], :object => object
+          render partial: opts[:html_partial], object: object
         else
-          render :text => object.to_html(:exclude => opts[:exclude]), :layout => which_layout
+          render text: object.to_html(exclude: opts[:exclude]), layout: which_layout
         end
       }
 
-      format.xml  { render :text => object.to_xml }
-      format.json { render :text => object.to_json }
-      format.yaml { render :text => object.to_yaml }
+      format.xml  { render text: object.to_xml }
+      format.json { render text: object.to_json }
+      format.yaml { render text: object.to_yaml }
       # TODO: js, txt, rss, atom
     end and return
   end

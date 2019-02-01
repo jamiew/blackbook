@@ -1,32 +1,32 @@
 class TagsController < ApplicationController
 
   # We allow open access to API #create -- no authentication or forgery protection
-  protect_from_forgery :except => [:show, :create, :thumbnail, :validate]
-  before_filter :get_tag, :only => [:show, :edit, :update, :destroy, :thumbnail, :nominate]
-  before_filter :require_user, :only => [:new, :edit, :update, :destroy, :nominate]
-  before_filter :require_owner, :only => [:edit, :update, :destroy]
-  before_filter :convert_app_id_to_app_name, :only => [:update, :create]
+  protect_from_forgery except: [:show, :create, :thumbnail, :validate]
+  before_filter :get_tag, only: [:show, :edit, :update, :destroy, :thumbnail, :nominate]
+  before_filter :require_user, only: [:new, :edit, :update, :destroy, :nominate]
+  before_filter :require_owner, only: [:edit, :update, :destroy]
+  before_filter :convert_app_id_to_app_name, only: [:update, :create]
 
   # Basic caching for :index?page=1 and :show actions
-  after_filter :expire_caches, :only => [:update, :create, :destroy]
-  # caches_action :index, :expires_in => 30.minutes, :if => :cache_request?
-  # caches_action :show,  :expires_in => 30.minutes, :if => :cache_request?
+  after_filter :expire_caches, only: [:update, :create, :destroy]
+  # caches_action :index, expires_in: 30.minutes, if: :cache_request?
+  # caches_action :show,  expires_in: 30.minutes, if: :cache_request?
 
   def index
 
     # Setup a search context for this tag: currently user or app
     if !params[:app].blank?
-      @search_context = {:key => :application, :value => params[:app], :conditions => ["application = ? OR gml_application = ?",params[:app],params[:app]] }
+      @search_context = {key: :application, value: params[:app], conditions: ["application = ? OR gml_application = ?",params[:app],params[:app]] }
     elsif !params[:user].blank?
       # Specifically customized for the secret_username using gml_uniquekey_hash trailing 5 digits! breakable coupling!
-      @search_context = {:key => :user, :value => params[:user], :conditions => ["SUBSTRING(gml_uniquekey_hash, -5, 5) = ?", params[:user].gsub('anon-','')] }
+      @search_context = {key: :user, value: params[:user], conditions: ["SUBSTRING(gml_uniquekey_hash, -5, 5) = ?", params[:user].gsub('anon-','')] }
     elsif !params[:location].blank?
-      @search_context = {:key => :location, :value => params[:location], :conditions => ["location LIKE ?", params[:location]] }
+      @search_context = {key: :location, value: params[:location], conditions: ["location LIKE ?", params[:location]] }
     elsif !params[:keywords].blank?
-      @search_context = {:key => :keywords, :value => params[:keywords], :conditions => ["gml_keywords LIKE ?", params[:keywords]]}
+      @search_context = {key: :keywords, value: params[:keywords], conditions: ["gml_keywords LIKE ?", params[:keywords]]}
     elsif !params[:user_id].blank?
       @user = User.find_by_param(params[:user_id])
-      @search_context = {:key => :user, :value => @user.login, :conditions => ["user_id = ?",@user.id]}
+      @search_context = {key: :user, value: @user.login, conditions: ["user_id = ?",@user.id]}
     end
 
     @page, @per_page = params[:page] && params[:page].to_i || 1, 15
@@ -36,14 +36,14 @@ class TagsController < ApplicationController
 
     set_page_title "GML Tags"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
 
-    # fresh_when :last_modified => @tags.first.updated_at.utc unless @tags.blank?
-    #, :etag => @tags.first
-    # expires_in 5.minutes, :public => true unless logged_in? # Rack::Cache
+    # fresh_when last_modified: @tags.first.updated_at.utc unless @tags.blank?
+    #, etag: @tags.first
+    # expires_in 5.minutes, public: true unless logged_in? # Rack::Cache
     respond_to do |wants|
       wants.html { render 'index' }
-      wants.xml  { render :xml => @tags.to_xml(:dasherize => false, :except => Tag::HIDDEN_ATTRIBUTES, :skip_types => true) }
-      wants.json { render :json => @tags.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback], :processingjs => params[:processingjs] }
-      wants.rss  { render :rss => @tags }
+      wants.xml  { render xml: @tags.to_xml(dasherize: false, except: Tag::HIDDEN_ATTRIBUTES, skip_types: true) }
+      wants.json { render json: @tags.to_json(except: Tag::HIDDEN_ATTRIBUTES), callback: params[:callback], processingjs: params[:processingjs] }
+      wants.rss  { render rss: @tags }
     end
   end
 
@@ -59,34 +59,34 @@ class TagsController < ApplicationController
       @user ||= @tag.user
 
       # No real comment pagination yet
-      @comments = @tag.comments.visible.paginate(:page => params[:comments_page] || 1, :per_page => 10)
+      @comments = @tag.comments.visible.paginate(page: params[:comments_page] || 1, per_page: 10)
 
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
       # FIXME wow. just wow.
       @tag.gml && @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
 
-    # fresh_when :last_modified => @tag.updated_at.utc, :etag => @tag
+    # fresh_when last_modified: @tag.updated_at.utc, etag: @tag
     respond_to do |wants|
       wants.html  { render }
-      wants.gml   { render :xml => @tag.gml(:iphone_rotate => params[:iphone_rotate]) }
-      wants.xml   { render :xml => @tag.to_xml(:except => Tag::HIDDEN_ATTRIBUTES, :dasherize => false, :skip_types => true) }
-      wants.json  { render :json => @tag.to_json(:except => Tag::HIDDEN_ATTRIBUTES), :callback => params[:callback] }
+      wants.gml   { render xml: @tag.gml(iphone_rotate: params[:iphone_rotate]) }
+      wants.xml   { render xml: @tag.to_xml(except: Tag::HIDDEN_ATTRIBUTES, dasherize: false, skip_types: true) }
+      wants.json  { render json: @tag.to_json(except: Tag::HIDDEN_ATTRIBUTES), callback: params[:callback] }
     end
   end
 
   # Quick accessor to grab the latest tag -- great for running installations with the freshest GML
   # Hand off to :show except for HTML, which should redirect -- keep permalinks happy
   def latest
-    @tag = Tag.find(:first, :order => 'created_at DESC')
-    redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
+    @tag = Tag.find(:first, order: 'created_at DESC')
+    redirect_to(tag_path(@tag), status: 302) and return if [nil,'html'].include?(params[:format])
     show
   end
 
   # Just a random tag -- redirect to canonical for HTML, but otherwise don't bother (API)
   def random
     @tag = Tag.random
-    redirect_to(tag_path(@tag), :status => 302) and return if [nil,'html'].include?(params[:format])
+    redirect_to(tag_path(@tag), status: 302) and return if [nil,'html'].include?(params[:format])
     show
   end
 
@@ -98,7 +98,7 @@ class TagsController < ApplicationController
 
   def edit
     set_page_title "Editing Tag ##{@tag.id}"
-    render :action => 'new'
+    render action: 'new'
   end
 
   # Calls either create_from_form (on-site, more strict) or create_from_api (less strict)
@@ -110,7 +110,7 @@ class TagsController < ApplicationController
 
     if params[:check] == 'connected' #DustTag weirdness?
       logger.debug "connected check"
-      render :nothing => true, :status => 200
+      render nothing: true, status: 200
       return
     end
 
@@ -124,7 +124,7 @@ class TagsController < ApplicationController
       # Otherwise error out, without displaying any sensitive or internal params
       error_text = "Error, could not create tag from your parameters: #{clean_params.inspect}"
       logger.warn error_text
-      render text: error_text, :status => 422 #Unprocessable Entity
+      render text: error_text, status: 422 #Unprocessable Entity
       return
     end
 
@@ -138,7 +138,7 @@ class TagsController < ApplicationController
       redirect_to tag_path(@tag)
     else
       flash[:error] = "Could not update tag: #{$!}"
-      render :action => 'edit'
+      render action: 'edit'
     end
   end
 
@@ -156,14 +156,14 @@ class TagsController < ApplicationController
   # Upload an image for a tag if one doesn't already exist (for GMLImageRenderer)
   def thumbnail
     if @tag.image.exists?
-      render :text => 'thumbnail already exists', :status => 409 and return
+      render text: 'thumbnail already exists', status: 409 and return
     end
     @tag.image = params[:image]
     @tag.save!
-    render :text => "OK", :status => 200, :layout => false
+    render text: "OK", status: 200, layout: false
   rescue
     logger.error $!
-    render :text => "Error: #{$!}", :status => 500
+    render text: "Error: #{$!}", status: 500
   end
 
   # Interactive GML Syntax Validator
@@ -184,17 +184,17 @@ class TagsController < ApplicationController
     respond_to do |wants|
       wants.html {
         if request.xhr?
-          render :text => @tag..validation_results.inspect
+          render text: @tag..validation_results.inspect
         else
           render 'validator'
         end
       }
       # FIXME to_xml does the fuckin' <hash> thing :(
       joined_hash = Hash[@tag.validation_results.map { |k,v| [k, v.join(";\n")] }]
-      wants.xml   { render :xml => joined_hash.to_xml(:dasherize => false, :skip_types => true) }
-      wants.json  { render :json => @tag.validation_results.to_json(:callback => params[:callback]) }
-      wants.xhr   { render :text => @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
-      wants.text  { render :text => @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
+      wants.xml   { render xml: joined_hash.to_xml(dasherize: false, skip_types: true) }
+      wants.json  { render json: @tag.validation_results.to_json(callback: params[:callback]) }
+      wants.xhr   { render text: @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
+      wants.text  { render text: @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
     end
   end
 
@@ -217,30 +217,30 @@ protected
   def create_from_api
     # TODO add app uuid? or Hash app uuid?
     opts = {
-      :gml => params[:gml],
-      :ip => request.remote_ip,
-      :location => params[:location],
-      :application => params[:application],
-      :remote_secret => params[:secret],
-      :gml_uniquekey => params[:uniquekey],
-      :image => params[:image]
+      gml: params[:gml],
+      ip: request.remote_ip,
+      location: params[:location],
+      application: params[:application],
+      remote_secret: params[:secret],
+      gml_uniquekey: params[:uniquekey],
+      image: params[:image]
     }
 
     # Merge opts & params to let people attempt to add whatever...
     @tag = Tag.new(opts)
     if @tag.save
       if params[:redirect] && ['true','1'].include?(params[:redirect].to_s)
-        redirect_to(@tag, :status => 302) and return
+        redirect_to(@tag, status: 302) and return
       elsif !params[:redirect_back].blank? && !request.referer.blank?
         redirect_to(request.referer) and return
       elsif !params[:redirect_to].blank?
         redirect_to(params[:redirect_to]) and return
       else
-        render :text => @tag.id, :status => 200 #OK
+        render text: @tag.id, status: 200 #OK
       end
     else
       logger.error "Could not create tag from API... Tag: #{@tag.errors.full_messages.inspect}\nGMLObject#{@tag.gml_object.errors.full_messages.inspect}"
-      render :text => "ERROR: #{@tag.errors.inspect}", :status => 422 # Unprocessable Entity
+      render text: "ERROR: #{@tag.errors.inspect}", status: 422 # Unprocessable Entity
     end
   end
 
@@ -273,7 +273,7 @@ protected
     redirect_to tag_path(@tag)
   rescue
     flash[:error] = "Error saving your tag! #{$!}"
-    render :action => 'new', :status => 422 #Unprocessable entity
+    render action: 'new', status: 422 #Unprocessable entity
   end
 
   # For converting from the pre-existing 'Application' params into a string in create/update
@@ -294,16 +294,16 @@ protected
 
     # Tags#show
     if @tag && !@tag.new_record?
-      formats.each { |format| expire_fragment(:controller => 'tags', :action => 'show', :id => @tag.id, :format => format) }
+      formats.each { |format| expire_fragment(controller: 'tags', action: 'show', id: @tag.id, format: format) }
       # Write-through(ish) object caching of the raw GML
       Rails.cache.write(@tag.gml_hash_cache_key, @tag.convert_gml_to_hash)
     end
 
     # Tags#index
-    formats.each { |format| expire_fragment(:controller => 'tags', :action => 'index', :format => format) }
+    formats.each { |format| expire_fragment(controller: 'tags', action: 'index', format: format) }
 
     # Home#index -- FIXME which of these is correct?!
-    expire_fragment(:controller => 'home', :action => 'index')
+    expire_fragment(controller: 'home', action: 'index')
     expire_fragment('home/index')
   end
 

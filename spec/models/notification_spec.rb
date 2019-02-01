@@ -4,12 +4,12 @@ RSpec.describe Notification, type: :model do
 
   before(:each) do
     @valid_attributes = {
-      :subject_id => 1,
-      :subject_type => "Comment",
-      :verb => "created",
-      :user_id => 1,
-      :supplement_id => 1,
-      :supplement_type => "Video"
+      subject_id: 1,
+      subject_type: "Comment",
+      verb: "created",
+      user_id: 1,
+      supplement_id: 1,
+      supplement_type: "Video"
     }
   end
 

@@ -5,13 +5,13 @@ class Tag < ActiveRecord::Base
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   belongs_to :user
-  has_many :comments, :as => :commentable
+  has_many :comments, as: :commentable
   has_many :likes
 
   # delegate :data, to: :gml_object
 
-  # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
-  validates_associated :user, :on => :create
+  # validates_presence_of :user_id, on: :create, message: "can't be blank"
+  validates_associated :user, on: :create
 
   # before_save :process_gml
   # before_save :process_app_id
@@ -31,11 +31,11 @@ class Tag < ActiveRecord::Base
   # validates_attachment :image, content_type: { content_type: ["image/jpg", "image/jpeg", "image/png", "image/gif"] }
   do_not_validate_attachment_file_type :image
   has_attached_file :image,
-    :default_style => :medium,
-    :default_url => "/images/defaults/tag_:style.jpg",
-    :url => "/system/:attachment/:id_partition/:style/:basename.:extension",
-    :path => ":rails_root/public/system/:attachment/:id_partition/:style/:basename.:extension",
-    :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
+    default_style: :medium,
+    default_url: "/images/defaults/tag_:style.jpg",
+    url: "/system/:attachment/:id_partition/:style/:basename.:extension",
+    path: ":rails_root/public/system/:attachment/:id_partition/:style/:basename.:extension",
+    styles: { large: '600x600>', medium: "300x300>", small: '100x100#', tiny: "32x32#" }
 
   # Placeholders for assigning data from forms
   attr_accessor :gml_file
@@ -144,7 +144,7 @@ class Tag < ActiveRecord::Base
     return @gml_hash
   end
 
-  # Override so we can add :gml => :gml_hash
+  # Override so we can add gml: :gml_hash
   # Arguably could just be using :methods but we always want this
   def as_json(_opts = {})
     Rails.logger.debug "Tag #{id}: as_json"
@@ -312,7 +312,7 @@ class Tag < ActiveRecord::Base
 protected
 
   def create_notification
-    Notification.create(:subject => self, :verb => 'created', :user => self.user)
+    Notification.create(subject: self, verb: 'created', user: self.user)
   end
 
   # before_create hook to copy over our temp data & then read our GML /

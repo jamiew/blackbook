@@ -6,7 +6,7 @@ class Mailer < ActionMailer::Base
     from          "000000book <noreply@000000book.com>"
     recipients    user.email
     sent_on       Time.now
-    body          :edit_password_reset_url => edit_password_reset_url(user.perishable_token)
+    body          edit_password_reset_url: edit_password_reset_url(user.perishable_token)
   end
 
   def signup_notification(user)
@@ -14,7 +14,7 @@ class Mailer < ActionMailer::Base
     from          "000000book <noreply@000000book.com>"
     recipients    user.email
     bcc           ["info+signups@000000book.com"]
-    body          :user => user
+    body          user: user
   end
 
   # def comment_notification(comment, user)
@@ -22,7 +22,7 @@ class Mailer < ActionMailer::Base
   #   from          "000000book <noreply@000000book.com>"
   #   recipients    recipient.email
   #   bcc           ["info+signups@000000book.com"]
-  #   body          :comment => comment, :user => user
+  #   body          comment: comment, user: user
   # end
 
   # TODO New tag posted
