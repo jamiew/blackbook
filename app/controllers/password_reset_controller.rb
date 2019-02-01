@@ -1,5 +1,5 @@
 class PasswordResetController < ApplicationController
-  before_filter :load_user_using_perishable_token, :only => [:edit, :update]
+  before_filter :load_user_using_perishable_token, only: [:edit, :update]
   before_filter :require_no_user
 
   def create
@@ -11,7 +11,7 @@ class PasswordResetController < ApplicationController
       redirect_to root_url
     else
       flash[:error] = "No user was found with that email address"
-      render :action => :new
+      render action: :new
     end
   end
 
@@ -25,7 +25,7 @@ class PasswordResetController < ApplicationController
       flash[:notice] = "Password successfully updated"
       redirect_to(user_path)
     else
-      render :action => :edit
+      render action: :edit
     end
   end
 

@@ -38,29 +38,29 @@ describe FavoritesController do
 
     it "should fail if not logged-in" do
       current_user_session.destroy
-      post :create, :tag_id => @tag.id
+      post :create, tag_id: @tag.id
       response.should_not be_success
       flash[:error].should_not be_blank
     end
 
     it "should work" do
       login_as_user(@user)
-      post :create, :tag_id => @tag.id
+      post :create, tag_id: @tag.id
       response.should be_redirect
       flash[:notice].should_not be_blank
     end
 
     it "1st time should create a favorite" do
       login_as_user(@user)
-      lambda { post :create, :tag_id => @tag.id }.should change(@user.favorites, :count).by(1)
+      lambda { post :create, tag_id: @tag.id }.should change(@user.favorites, :count).by(1)
       flash[:notice].should_not be_blank
     end
 
     it "2nd time should delete the favorite (unfavorite)" do
       login_as_user(@user)
       lambda {
-        post :create, :tag_id => @tag.id
-        post :create, :tag_id => @tag.id
+        post :create, tag_id: @tag.id
+        post :create, tag_id: @tag.id
       }.should change(@user.favorites, :count).by(0)
       flash[:notice].should_not be_blank
     end

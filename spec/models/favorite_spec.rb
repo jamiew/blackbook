@@ -22,7 +22,7 @@ RSpec.describe Favorite, type: :model do
     @user = FactoryBot.create(:user)
     @tag = FactoryBot.create(:tag)
     lambda {
-      Favorite.create!(:user => @user, :object => @tag)
+      Favorite.create!(user: @user, object: @tag)
     }.should change(Notification, :count).by(1)
   end
 end

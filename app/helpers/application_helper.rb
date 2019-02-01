@@ -2,11 +2,11 @@ module ApplicationHelper
 
   # dirty ugly hack to get rcov to see this
   def html_attrs(lang = 'en-US')
-    { :xmlns => "http://www.w3.org/1999/xhtml", 'xml:lang' => lang, :lang => lang }
+    { xmlns: "http://www.w3.org/1999/xhtml", 'xml:lang' => lang, lang: lang }
   end
 
   def http_equiv_attrs
-    { 'http-equiv' => 'Content-Type', :content => 'text/html;charset=UTF-8' }
+    { 'http-equiv' => 'Content-Type', content: 'text/html;charset=UTF-8' }
   end
 
 
@@ -15,7 +15,7 @@ module ApplicationHelper
     messages = []
     %w(notice warning error).each do |msg|
       if flash[msg.to_sym].present?
-        messages << content_tag(:div, html_escape(flash[msg.to_sym]), :id => "flash-#{msg}").html_safe
+        messages << content_tag(:div, html_escape(flash[msg.to_sym]), id: "flash-#{msg}").html_safe
       end
     end
     @flash_messages ||= messages
@@ -34,12 +34,12 @@ module ApplicationHelper
   # DOCME
   def delete_img(obj, path)
     link_to_remote(image_tag('delete.png',
-        :title => "Delete this #{obj.class}",
-        :class => 'action'
+        title: "Delete this #{obj.class}",
+        class: 'action'
       ), {
-        :url => path,
-        :method => :delete,
-        :confirm => "This happens immediately.\nAre you sure you want to delete it?"
+        url: path,
+        method: :delete,
+        confirm: "This happens immediately.\nAre you sure you want to delete it?"
       }
     ) unless obj.id.blank?
   end
@@ -47,8 +47,8 @@ module ApplicationHelper
   # DOCME
   def edit_img(obj, path)
     link_to(image_tag('pencil.png',
-        :title => "Edit this #{obj.class}",
-        :class => 'action'
+        title: "Edit this #{obj.class}",
+        class: 'action'
       ),
       path
     ) unless obj.id.blank?
@@ -56,7 +56,7 @@ module ApplicationHelper
 
   # ...
   def drag_img
-    image_tag 'arrow_up_down.png', :class => 'action drag', :title => 'Drag to reorder'
+    image_tag 'arrow_up_down.png', class: 'action drag', title: 'Drag to reorder'
   end
 
   # ...

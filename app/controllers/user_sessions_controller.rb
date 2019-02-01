@@ -1,6 +1,6 @@
 class UserSessionsController < ApplicationController
-  before_filter :require_no_user, :only => [:new, :create]
-  before_filter :require_user, :only => :destroy
+  before_filter :require_no_user, only: [:new, :create]
+  before_filter :require_user, only: :destroy
 
   def new
     @user_session = UserSession.new
@@ -17,7 +17,7 @@ class UserSessionsController < ApplicationController
     else
       flash[:error] = "Something bad happened. Why don't you try that again?"
       Rails.logger.debug @user_session.errors.inspect
-      render :action => :new
+      render action: :new
     end
   end
 

@@ -11,7 +11,7 @@ describe CommentsController do
 
   it "POST #create should work" do
     login_as_user
-    post :create, :tag_id => @tag.id, :comment => {:text => 'Lolcats R awesome'}
+    post :create, tag_id: @tag.id, comment: {text: 'Lolcats R awesome'}
   end
 
   describe "DELETE#destroy" do
@@ -21,26 +21,26 @@ describe CommentsController do
 
     it "should work for admins" do
       login_as_admin
-      delete :destroy, :tag_id => @tag.id, :id => @comment.id
+      delete :destroy, tag_id: @tag.id, id: @comment.id
       Comment.find(@comment.id).hidden?.should == true
       response.should be_redirect
     end
 
     it "should work for the comment owner" do
       login_as_user(@comment.user)
-      delete :destroy, :tag_id => @tag.id, :id => @comment.id
+      delete :destroy, tag_id: @tag.id, id: @comment.id
       Comment.find(@comment.id).hidden?.should == true
       response.should be_redirect
     end
 
     it "should fail for non-owner users" do
       login_as_user
-      delete :destroy, :tag_id => @tag.id, :id => @comment.id
+      delete :destroy, tag_id: @tag.id, id: @comment.id
       response.status.should == 403 # Forbidden
     end
 
     it "should fail for logged-out users" do
-      delete :destroy, :tag_id => @tag.id, :id => @comment.id
+      delete :destroy, tag_id: @tag.id, id: @comment.id
       response.status.should == 403 # Forbidden
     end
   end

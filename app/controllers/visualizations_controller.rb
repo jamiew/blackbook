@@ -1,10 +1,10 @@
 class VisualizationsController < ApplicationController
 
-  before_filter :setup_user, :only => [:create] # Not update
+  before_filter :setup_user, only: [:create] # Not update
   before_filter :get_visualization, only: [:show, :edit, :update, :destroy, :approve, :unapprove]
-  before_filter :require_admin, :only => [:approve, :unapprove]
-  before_filter :require_owner, :only => [:edit, :update, :destroy]
-  before_filter :require_user, :only => [:new, :create]
+  before_filter :require_admin, only: [:approve, :unapprove]
+  before_filter :require_owner, only: [:edit, :update, :destroy]
+  before_filter :require_user, only: [:new, :create]
 
   respond_to :html, :js, :xml, :json
 
@@ -74,7 +74,7 @@ class VisualizationsController < ApplicationController
         which = which.by_user(@user.id)
         #TODO: set page_title etc. Also handle all this logic less if/elsify
       end
-      @visualizations ||= which.paginate(:page => @page, :per_page => @per_page, :include => [:user], :order => 'approved_at DESC, name ASC')
+      @visualizations ||= which.paginate(page: @page, per_page: @per_page, include: [:user], order: 'approved_at DESC, name ASC')
     end
 
     def update_approval_state(obj, enabled)

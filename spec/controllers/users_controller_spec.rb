@@ -35,13 +35,13 @@ describe UsersController do
     end
 
     it "should redirect to account on successful :create" do
-      resp = post :create, :user => {
-        :login => 'bobby', :email => 'bob@example.com',
-        :password => 'bobs_pass', :password_confirmation => 'bobs_pass'
+      resp = post :create, user: {
+        login: 'bobby', email: 'bob@example.com',
+        password: 'bobs_pass', password_confirmation: 'bobs_pass'
       }
       found_user = User.find_by_login('bobby')
       found_user.should_not be_nil
-      response.should redirect_to(user_path(:id => 'bobby'))
+      response.should redirect_to(user_path(id: 'bobby'))
     end
   end
 
@@ -65,7 +65,7 @@ describe UsersController do
     end
 
     it "should not redirect to account on failed :update" do
-      post :update, :user => { :email => 'not_a_valid_email' }
+      post :update, user: { email: 'not_a_valid_email' }
       response.should_not be_redirect
       assigns(:user).errors.should be_present
       # flash[:error].should be_present
