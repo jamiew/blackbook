@@ -87,6 +87,13 @@ describe UsersController do
       assigns(:user).should == @user
     end
 
+    it 'works if you are logged-in' do
+      activate_authlogic
+      @user = FactoryBot.create(:user, login: 'bobisok')
+      get :show, id: @user.login
+      response.should be_success
+    end
+
     it 'returns 404 if user does not exist' do
       User.find_by_id(666).should be_nil
       lambda {

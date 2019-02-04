@@ -31,7 +31,6 @@
     -# Simple stats
     %ul.stats.circle
       %li= link_to pluralize(@user.tags.count, 'tag'), user_tags_path(@user)
-      %li= pluralize(@user.comments.count, 'comment')
       %li= pluralize(@user.favorites.count, 'favorite')
 
     -# Personal editing...
@@ -52,14 +51,6 @@
         %ul.square
           - @user.visualizations.each do |vis|
             %li= link_to vis.name, visualization_path(vis)
-
-
-    -# Wall posts yall
-    - if true
-      %br
-      #wall
-        %h4 Wall/Trash Talk
-        = render partial: 'comments/comments', object: @wall_posts, locals: {commentable:@user}
 
   -#Notifis... activity feed? comments etc.
   - if true
