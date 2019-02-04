@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
 
-  # Deprecated requests to blackhole
-  # TODO handle inside nginx or similar instead
+  # Old/bad URLs to send to /dev/null
+  # TODO handle inside nginx or similar instead! Yeesh
   get '/temp.png', controller: 'home', action: 'discard', as: 'discard_temp_png'
   get '/data/temp.png', controller: 'home', action: 'discard', as: 'discard_data_temp_png'
   get '/tags/temp.png', controller: 'home', action: 'discard', as: 'discard_tags_temp_png'
@@ -19,11 +19,9 @@ Rails.application.routes.draw do
   end
   get '/settings', controller: 'users', action: 'edit', as: 'settings'
   get '/account/change_password' => 'users#change_password', as: 'change_password_user'
+  resource :account, controller: "users" # FIXME needed for password resets...
 
-  resource :account, controller: "users" # FIXME DEPRECATEME
-  # ^^^ what is this?
-
-  # tags => /data
+  # Tags/data
   resources :tags, path: 'data' do
     resources :favorites
 
@@ -48,6 +46,7 @@ Rails.application.routes.draw do
   get  '/validator' => 'tags#validate', as: 'validator'
   post '/validate' => 'tags#validate', as: 'validate'
 
+  # Apps
   resources :visualizations, path: 'apps' do
     member do
       put :approve
@@ -55,6 +54,7 @@ Rails.application.routes.draw do
     end
   end
 
+  # Everything else
   resources :favorites
 
   get '/activity' => 'home#activity', as: 'activity'
