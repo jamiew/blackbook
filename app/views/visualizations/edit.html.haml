@@ -2,8 +2,8 @@
 
 = render "layouts/error_messages", target: @visualization
 
-= form_for(:visualization, :url => visualization_url(@visualization), :html => { :method => :put, :multipart => true }) do |f|
-  = render :partial => "form", :locals => {:f => f}
+= form_for(:visualization, url: visualization_url(@visualization), html: { method: :put, multipart: true }) do |f|
+  = render partial: "form", locals: {f: f}
   %p.buttons= submit_tag "Update"
 
 - if false

@@ -15,7 +15,7 @@
 
     - unless @user.website.blank?
       .website
-        = link_to @user.website.gsub('http://',''), @user.website =~ /^http/ ? @user.website : "http://#{@user.website}", :rel => 'nofollow'
+        = link_to @user.website.gsub('http://',''), @user.website =~ /^http/ ? @user.website : "http://#{@user.website}", rel: 'nofollow'
 
     -# About/Bio down low...
     - unless @user.about.blank?
@@ -59,7 +59,7 @@
       %br
       #wall
         %h4 Wall/Trash Talk
-        = render :partial => 'comments/comments', :object => @wall_posts, :locals => {:commentable=>@user}
+        = render partial: 'comments/comments', object: @wall_posts, locals: {commentable:@user}
 
   -#Notifis... activity feed? comments etc.
   - if true
@@ -68,7 +68,7 @@
       - if @notifications.blank?
         = "None yet."
       - else
-        = render :partial => 'home/notifications', :object => @notifications
+        = render partial: 'home/notifications', object: @notifications
 
   -# User's tags
   #main
@@ -78,7 +78,7 @@
           %strong Nothing yet!
       - else
         %h1== #{@tags.total_entries} Uploaded Tags
-        = render :partial => 'tags/tag', :collection => @tags
+        = render partial: 'tags/tag', collection: @tags
 
       %br.clear
       %p= pagination(@tags)

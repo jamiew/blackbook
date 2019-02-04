@@ -10,7 +10,7 @@
   %ul.users
     - @users.each do |user|
       -# FIXME -- old users failing
-      - link = user_path(user) rescue user_path(:id => user.to_param)
+      - link = user_path(user) rescue user_path(id: user.to_param)
       %li
         = link_to image_tag(user.photo.url(:small)), link
         = link_to user.login, link

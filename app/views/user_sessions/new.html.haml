@@ -1,7 +1,7 @@
 #login.signup_or_login.user_form.quarter.centered
   - logger.info flash.inspect
 
-  = form_for @user_session, :url => user_session_path do |f|
+  = form_for @user_session, url: user_session_path do |f|
 
     %h2 Login
     = f.label :login, 'Username'
@@ -20,5 +20,5 @@
 
     .help
       %ol.square
-        %li= link_to 'no account? signup here', signup_path, :class => 'signup'
-        %li= link_to 'forgot your password?', forgot_password_path, :class => 'forgotten_password'
+        %li= link_to 'no account? signup here', signup_path, class: 'signup'
+        %li= link_to 'forgot your password?', forgot_password_path, class: 'forgotten_password'
