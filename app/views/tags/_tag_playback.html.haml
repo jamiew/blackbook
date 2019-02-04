@@ -7,7 +7,7 @@
     %li= link_to 'image', '#image'
 
   #html5
-    %p= render :partial => 'tags/canvas_player', :object => @tag
+    %p= render partial: 'tags/canvas_player', object: @tag
     %span.beta== *note: html5 &lt;canvas&gt; player is beta; developers please check out the <a href="http://github.com/jamiew/canvasplayer">source code</a>
 
   #image

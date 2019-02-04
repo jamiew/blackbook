@@ -1,12 +1,12 @@
 
-= auto_discovery_link_tag(:rss, params.merge({:format => :rss}), :title => page_title)
+= auto_discovery_link_tag(:rss, params.merge({format: :rss}), title: page_title)
 
 -# Some ghetto custom mastheads
 - if @user
   .left
     = link_to "&larr; Back to user profile".html_safe, user_path(@user)
     %h3
-      .left{:style => 'margin-right: 8px; margin-top: 2px;'}
+      .left{style: 'margin-right: 8px; margin-top: 2px;'}
         = link_to image_tag(@user.photo(:tiny)), user_path(@user)
       == #{@user.login}'s #{@favorites ? 'favorites' : 'tags'} (#{@tags.total_entries})
     %br
@@ -15,14 +15,14 @@
     = link_to '&larr; Back to all data'.html_safe, tags_path
     %h3
       Search:
-      %span{:style => 'font-weight: normal;'}== #{@search_context[:key]} = #{@search_context[:value]}
+      %span{style: 'font-weight: normal;'}== #{@search_context[:key]} = #{@search_context[:value]}
 
 %p.create_new
-  = link_to '+ Upload GML', new_tag_path, :class => 'button facebox add'
+  = link_to '+ Upload GML', new_tag_path, class: 'button facebox add'
 
 - if @applications
   #app_nav
-    %form{:method => 'get', :action => tags_path}
+    %form{method: 'get', action: tags_path}
       %span filter by app:
       -# FIXME don't use params[] directly... dynamically use @search_context
       - param = CGI.unescape(params[:app]) rescue ''
@@ -31,18 +31,18 @@
 
 %p= pagination
 
-%table{:style => 'width: 100%'}
+%table{style: 'width: 100%'}
   %tr
-    %th.thumbnail{:style => 'width: 110px;'}
+    %th.thumbnail{style: 'width: 110px;'}
     %th.name name
     %th.application application
     %th.keywords keywords
     %th.who who
-    %th.uploaded{:style => 'width: 130px'} uploaded
+    %th.uploaded{style: 'width: 130px'} uploaded
     %th
   - if @tags.empty?
     %tr
-      %td{:colspan => 6}
+      %td{colspan: 6}
         %h3 No results!
 
   - @tags.each do |tag|
@@ -54,8 +54,8 @@
         - if Rails.env.development?
           n/a
         - else
-          = link_to(image_tag(tag.thumbnail_image(:medium), :width => 190), url)
-      %td.name{:style => 'padding-left: 10px;'}
+          = link_to(image_tag(tag.thumbnail_image(:medium), width: 190), url)
+      %td.name{style: 'padding-left: 10px;'}
         %strong= link_to(tag_title(tag), url)
       %td.application
         = application_link(tag.sexy_app_name)
@@ -63,11 +63,11 @@
         - if tag.gml_keywords.blank?
           &mdash;
         - else
-          = tag.gml_keywords.split(',').map { |word| link_to word, tags_path(:keywords => word) }.join(',').html_safe
+          = tag.gml_keywords.split(',').map { |word| link_to word, tags_path(keywords: word) }.join(',').html_safe
       %td.who
         - if !user.nil?
-          %a{:href => user_path(user)}
-            .user_photo.left{:style => 'margin-top: -7px; padding-right: 5px;'}= image_tag(user.photo(:tiny))
+          %a{href: user_path(user)}
+            .user_photo.left{style: 'margin-top: -7px; padding-right: 5px;'}= image_tag(user.photo(:tiny))
             = user.login
         - elsif tag.secret_username
           = secret_username_link(tag.secret_username)
@@ -76,14 +76,14 @@
         - else
           &mdash;
       %td.timeago.uploaded
-        %abbr{:title => tag.created_at.strftime('%D %T')}== #{timeago(tag.created_at)} ago
+        %abbr{title: tag.created_at.strftime('%D %T')}== #{timeago(tag.created_at)} ago
       / Meta
       %td.center
-        = link_to 'download GML', tag_path(tag, :format => :gml), :class => 'button smallbutton'
+        = link_to 'download GML', tag_path(tag, format: :gml), class: 'button smallbutton'
         - if is_admin? || is_owner?
           %br
           %p.controls.right
             = link_to 'edit', edit_tag_path(tag)
-            = link_to 'delete', tag_path(tag), :method => 'delete', :class => 'delete', :confirm => 'Are you sure?'
+            = link_to 'delete', tag_path(tag), method: 'delete', class: 'delete', confirm: 'Are you sure?'
 
 %p= pagination

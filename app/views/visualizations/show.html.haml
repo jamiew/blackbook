@@ -1,11 +1,11 @@
 
 %p.back= link_to '&larr; back to applications'.html_safe, visualizations_path
 
-.left{:style => 'margin-top: 40px;'}
+.left{style: 'margin-top: 40px;'}
   = image_tag(@visualization.image(:medium))
-  =# image_tag(@visualization.image(:large), :width => 300)
+  =# image_tag(@visualization.image(:large), width: 300)
 
-.centered{:style => 'width: 400px; margin: 20px 0 0 330px;'}
+.centered{style: 'width: 400px; margin: 20px 0 0 330px;'}
   %h1
     =h @visualization.name
     %span.version=h @visualization.version
@@ -45,7 +45,7 @@
     %p.controls
       = link_to 'Edit', edit_visualization_path
       |
-      = link_to 'Delete', visualization_path, :confirm => 'Are you sure?', :method => :delete
+      = link_to 'Delete', visualization_path, confirm: 'Are you sure?', method: :delete
 
   - if is_admin?
     %p
