@@ -23,7 +23,7 @@ Rails.application.routes.draw do
 
   # Tags/data
   resources :tags, path: 'data' do
-    resources :favorites
+    resources :favorites, only: [:create, :destroy]
 
     collection do
       get :latest
@@ -55,6 +55,7 @@ Rails.application.routes.draw do
   end
 
   # Everything else
+  # FIXME restrict this some more too
   resources :favorites
 
   get '/activity' => 'home#activity', as: 'activity'
