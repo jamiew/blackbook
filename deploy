@@ -14,12 +14,12 @@ ssh blackbook "
 "
 
 # curl -I http://new.000book.com
-curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
 sleep 1
-curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
 sleep 1
-curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
 sleep 1
-curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
 sleep 1
-curl -sL -w "%{http_code}" http://new.000book.com -o /dev/null; echo
+curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
