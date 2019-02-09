@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   resource :account, controller: "users" # FIXME needed for password resets...
 
   # Tags/data
+  post '/tags' => 'tags#create' # backwards-compatibility
   resources :tags, path: 'data' do
     resources :favorites, only: [:create, :destroy]
 
