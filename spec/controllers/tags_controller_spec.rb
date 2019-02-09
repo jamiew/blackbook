@@ -11,6 +11,9 @@ describe TagsController do
   end
 
   describe "POST #create" do
+    it "routes from POST /tags"
+    it "routes from POST /data"
+    
     it "should create given params[:gml]" do
       post :create, gml: @gml
       assigns[:tag].should be_valid
