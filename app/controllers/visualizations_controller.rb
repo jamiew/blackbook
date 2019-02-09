@@ -78,7 +78,7 @@ class VisualizationsController < ApplicationController
     end
 
     def update_approval_state(obj, enabled)
-      logger.info "hi from update_approval_state obj=#{obj.inspect}"
+      logger.debug "hi from update_approval_state obj=#{obj.inspect}"
       obj.approved_at = (enabled ? Time.now : nil)
       obj.approved_by = (enabled ? current_user.id : nil)
       obj.save!

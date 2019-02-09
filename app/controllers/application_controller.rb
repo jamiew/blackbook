@@ -94,7 +94,7 @@ class ApplicationController < ActionController::Base
   # Permission requirements
   def require_user
     unless current_user
-      logger.info "require_user failed"
+      logger.debug "require_user failed"
       store_location
       flash[:error] = "You must be logged in to do that"
       redirect_to(login_path)
@@ -104,7 +104,7 @@ class ApplicationController < ActionController::Base
 
   def require_no_user
     if current_user
-      logger.info "require_no_user failed"
+      logger.debug "require_no_user failed"
       store_location
       flash[:error] = "You must *not* be logged-in to access that."
       # redirect_back_or_default(user_path(current_user))
