@@ -78,9 +78,9 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Terse logging via lograge gem
-  config.lograge.enabled = true
+  #config.lograge.enabled = true
 
   # Silence ActiveRecord logging in production (this isn't default?!)
-  config.active_record.logger = nil
+  #config.active_record.logger = nil
 
 end
