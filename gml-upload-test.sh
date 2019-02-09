@@ -1,9 +1,12 @@
 #!/bin/sh
 
+url="http://www.000000book.com"
+# url="https://blackbook4.test"
+
 # for i in 60 600 6000 6040 6041; do
 for i in 6000; do
-  # curl --data @data/$i.gml https://blackbook4.test/data; echo
-  curl -F gml=@data/$i.gml https://blackbook4.test/data; echo
+  # curl --data @public/data/$i.gml https://blackbook4.test/data; echo
+  curl -F gml=@public/data/$i.gml $url/data; echo
   # sleep 1
 done
 
