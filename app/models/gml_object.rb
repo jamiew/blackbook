@@ -63,7 +63,7 @@ class GmlObject
       end
 
       if tag.gml_object.blank?
-        Rails.logger.info "No GmlObject for Tag #{id}, creating"
+        Rails.logger.debug "No GmlObject for Tag #{id}, creating"
         tag.send(:build_gml_object) # sorry
         tag.send(:save_gml_object) # really I mean it
       end
@@ -100,7 +100,7 @@ class GmlObject
       FileUtils.mkdir(self.class.file_dir)
     end
 
-    Rails.logger.info "GmlObject(tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
+    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
 
     File.open(filename, 'w+') do |file|
       file.write(data)
@@ -112,7 +112,7 @@ class GmlObject
     return nil if filename.blank?
     return nil unless File.exists?(filename)
     data = File.read(filename)
-    Rails.logger.info "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
+    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
     return data
   end
 
@@ -163,7 +163,7 @@ class GmlObject
     Rails.logger.debug ret.pretty_inspect
     added_file_hash = ret.hashcode
 
-    Rails.logger.info "IPFS: added tag ##{self.tag_id} (#{size} bytes) to IPFS => #{added_file_hash}"
+    Rails.logger.debug "IPFS: added tag ##{self.tag_id} (#{size} bytes) to IPFS => #{added_file_hash}"
 
     self.update_attribute(:ipfs_hash, added_file_hash)
     self.update_attribute(:size, size) # FIXME should be setting on-create and treating as immutable

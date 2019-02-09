@@ -303,8 +303,8 @@ class Tag < ActiveRecord::Base
     self.validation_results[:warnings] = warnings.compact unless warnings.blank?
     self.validation_results[:recommendations] = recommendations.compact unless recommendations.blank?
 
-    Rails.logger.info "GML Validation Results..."
-    Rails.logger.info self.validation_results.inspect
+    Rails.logger.debug "GML Validation Results..."
+    Rails.logger.debug self.validation_results.inspect
     return validation_results
   end
 
@@ -354,7 +354,7 @@ protected
     return if self.gml_uniquekey.blank?
     user = User.find_by_iphone_uniquekey(self.gml_uniquekey)
     return if user.nil?
-    Rails.logger.info "Pairing with user=#{user.login.inspect}"
+    Rails.logger.debug "Pairing with user=#{user.login.inspect}"
     self.user = user
   end
 

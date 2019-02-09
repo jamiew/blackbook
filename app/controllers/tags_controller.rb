@@ -115,10 +115,10 @@ class TagsController < ApplicationController
     end
 
     if !params[:tag].blank? # sent by the form
-      logger.info "sent by the form"
+      logger.debug "sent by the form"
       return create_from_form
     elsif !params[:gml].blank? # sent from an app!
-      logger.info "sent from an app"
+      logger.debug "sent from an app"
       return create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
@@ -208,7 +208,7 @@ protected
   end
 
   def require_owner
-    logger.info "require_owner (tag.id=#{@tag.id rescue nil}): current_user=#{current_user.id rescue nil}; tag.user.id=#{@tag.user.id rescue nil}"
+    logger.debug "require_owner (tag.id=#{@tag.id rescue nil}): current_user=#{current_user.id rescue nil}; tag.user.id=#{@tag.user.id rescue nil}"
     raise NoPermissionError unless current_user && @tag && (@tag.user == current_user || is_admin?)
   end
 
@@ -254,7 +254,7 @@ protected
     # GML file overrides anything in the textarea -- that was probably accidental input
     file = params[:tag][:gml_file]
     if file
-      logger.info "Reading from GML file = #{file.inspect}"
+      logger.debug "Reading from GML file = #{file.inspect}"
       params[:tag][:gml] = file.read
     end
 
