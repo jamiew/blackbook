@@ -28,15 +28,6 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # Log extra info we like
-  def log_processing
-    super
-    if logger && logger.info?
-      logger.info("  HTTP Referer: #{request.referer}") if !request.referer.blank?
-      logger.info("  User Agent: #{request.env["HTTP_USER_AGENT"]}")
-    end
-  end
-
   # Modify the global page title -- could also use @page_title
   # TODO change to page_title= (or just use @page_title/@title directly)
   def set_page_title(title, suffix = true)
