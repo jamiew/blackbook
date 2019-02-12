@@ -4,7 +4,7 @@
 - else
   %table.notifications
     - notifications.each do |notif|
-      - next if notif.nil? || notif.subject.nil?
+      - next if notif.nil? || notif.subject.nil? || notif.subject == Comment
       %tr
         %td.timeago
           = time_ago_in_words(notif.created_at).gsub('about ','')
