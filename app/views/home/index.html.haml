@@ -47,8 +47,8 @@
           == &ndash; uploaded #{time_ago_in_words(@tag.created_at)} ago
       = render partial: 'tags/tag_playback', object: @tag
 
-    - # DISABLED tag list
-    - if false
+    - # List of tags
+    - if true
       #tag-list
         %ul#frontpage_tags
           - @tags.each do |tag|
