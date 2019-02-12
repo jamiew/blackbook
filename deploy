@@ -6,7 +6,9 @@ ssh blackbook "
   ruby --version
   # rbenv install $(cat .ruby-version)
   echo 'Bundle install...'
-  /home/rails/.rbenv/shims/bundle install
+  bin/bundle install
+  echo 'Compiling assets...'
+  bin/rake assets:precompile
   touch tmp/restart.txt
   echo 'Restarting service...'
   sudo systemctl restart blackbook4
