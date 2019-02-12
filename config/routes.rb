@@ -22,7 +22,6 @@ Rails.application.routes.draw do
   resource :account, controller: "users" # FIXME needed for password resets...
 
   # Tags/data
-  post '/tags' => 'tags#create' # backwards-compatibility
   resources :tags, path: 'data' do
     resources :favorites, only: [:create, :destroy]
 
@@ -39,6 +38,7 @@ Rails.application.routes.draw do
       get :validate
     end
   end
+  post '/tags' => 'tags#create' # backwards-compatibility
 
   # TODO can these be inside the :tags resource declaration but maintain the /shorturls?
   get '/latest', controller: 'tags', action: 'latest', as: 'latest_tag'
