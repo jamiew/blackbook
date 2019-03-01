@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190103193543) do
+ActiveRecord::Schema.define(version: 20190301153530) do
 
   create_table "apps", force: :cascade do |t|
     t.datetime "created_at"
@@ -80,6 +80,8 @@ ActiveRecord::Schema.define(version: 20190103193543) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
 
   create_table "tags", force: :cascade do |t|
     t.integer  "user_id",            limit: 4
@@ -157,8 +159,8 @@ ActiveRecord::Schema.define(version: 20190103193543) do
     t.string   "version",            limit: 255
     t.text     "description",        limit: 65535
     t.string   "authors",            limit: 255
-    t.string   "kind",               limit: 255,        default: ""
-    t.boolean  "is_embeddable",                         default: false
+    t.string   "kind",               limit: 255,   default: ""
+    t.boolean  "is_embeddable",                    default: false
     t.string   "embed_url",          limit: 255
     t.string   "embed_callback",     limit: 255
     t.string   "embed_params",       limit: 255
