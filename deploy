@@ -7,6 +7,8 @@ ssh blackbook "
   # rbenv install $(cat .ruby-version)
   echo 'Bundle install...'
   /home/rails/.rbenv/shims/bundle install
+  echo 'Running migrations...'
+  /home/rails/.rbenv/shims/rake db:migrate
   echo 'Compiling assets...'
   /home/rails/.rbenv/shims/rake assets:precompile
   touch tmp/restart.txt
