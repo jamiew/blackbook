@@ -24,7 +24,6 @@
   #vanderplayer
 
     .prevnext
-      - @prev ||= @tags.first
       - next_text = '&larr; next'.html_safe
       - prev_text = 'previous &rarr;'.html_safe
       %li= @next.nil? ? next_text : link_to(next_text, tag_path(@next), class: 'button')
@@ -47,21 +46,20 @@
           == &ndash; uploaded #{time_ago_in_words(@tag.created_at)} ago
       = render partial: 'tags/tag_playback', object: @tag
 
-    - # List of tags
-    - if true
-      #tag-list
-        %ul#frontpage_tags
-          - @tags.each do |tag|
-            %li
-              %span
-                %a{href: tag_path(tag)}= tag_title(tag)
-              %small
-                -# unless tag.application.blank? && tag.gml_application.blank?
-                - if true
-                  %span.application== <em>|</em> #{application_link(tag.sexy_app_name, short: true)}
-                - if !tag.user.nil?
-                  %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
-                - elsif !tag.secret_username.blank?
-                  %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
-        %p.right
-          %strong= link_to '<span>View all data &raquo;</span>'.html_safe, tags_path, class: 'button ghost small'
+  - # List of tags
+  #tag-list
+    %ul#frontpage_tags
+      - @tags.each do |tag|
+        %li
+          %span
+            %a{href: tag_path(tag)}= tag_title(tag)
+          %small
+            -# unless tag.application.blank? && tag.gml_application.blank?
+            - if true
+              %span.application== <em>|</em> #{application_link(tag.sexy_app_name, short: true)}
+            - if !tag.user.nil?
+              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
+            - elsif !tag.secret_username.blank?
+              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
+    %p.right
+      %strong= link_to '<span>View all data &raquo;</span>'.html_safe, tags_path, class: 'button ghost small'
