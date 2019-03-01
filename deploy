@@ -8,9 +8,9 @@ ssh blackbook "
   echo 'Bundle install...'
   /home/rails/.rbenv/shims/bundle install
   echo 'Running migrations...'
-  /home/rails/.rbenv/shims/rake db:migrate
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake db:migrate
   echo 'Compiling assets...'
-  /home/rails/.rbenv/shims/rake assets:precompile
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake assets:precompile
   touch tmp/restart.txt
   echo 'Restarting service...'
   sudo systemctl restart blackbook4
