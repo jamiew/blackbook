@@ -233,7 +233,7 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
   font-style: italic;
 }
 
-#footer { clear: both; padding: 0 16px; margin: 8em 2em 1em 2em; height: 3em; text-align: right; color: #777; font-size: 90%; }
+#footer { padding: 0 1em; margin: 8em 2em 1em 2em; height: 3em; text-align: right; color: #777; font-size: 90%; }
 
 
 /* Flash */
@@ -277,8 +277,12 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 #home #intro { line-height: 1.4em; font-size: 90%; color: #aaa; margin: 5px 0 5px 0; padding: 5px 5px 7px 5px; border-bottom: 1px solid #222; }
 #tags a img { margin-right: 5px; }
 
+#home #vanderplayer { float: left; }
+
+ul#frontpage_tags { float: right; margin-top: 1em; }
 ul#frontpage_tags li { line-height: 1.3em; }
 ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* span is occupied */
+
 
 /* General sidebar (tag/user) */
 #main { width: 590px; padding: 0; }
@@ -295,7 +299,7 @@ ul#frontpage_tags li em { font-style: normal; color: #333; padding: 0 2px; } /* 
 
 
 /* User.show */
-#profile { width: 980px; margin: 0 auto; margin-left: -50px; }
+#profile { width: 980px; margin: 0 auto; }
 #profile #main { width: 425px; overflow: hidden; font-size: .9em; }
 #profile #main .image img { width: 260px; }
 

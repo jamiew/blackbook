@@ -4,7 +4,8 @@ class HomeController < ApplicationController
 
   def index
     @tags = Tag.order('created_at DESC').limit(30).includes(:user)
-    @tag = @tags.present? && @tags.first # formerly .shift to pop it off, should do that on frontend
+    @tag = @tags.present? && @tags[0] # formerly .shift to pop it off, should do that on frontend
+    @prev = @tags.present? && @tags[1]
     set_page_title("#000000book - an open database for Graffiti Markup Language (GML) files", false)
   end
 
