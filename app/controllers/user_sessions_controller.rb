@@ -7,17 +7,16 @@ class UserSessionsController < ApplicationController
   end
 
   def create
-    sess = params[:user_session]
-    session_params = { login: sess.try(:login), password: sess.try(:password), remember_me: sess.try(:remember_me) }
-    Rails.logger.debug session_params.inspect
+    sess = params['user_session'] || {}
+    session_params = { login: sess['login'], password: sess['password'], remember_me: sess['remember_me'] }
     @user_session = UserSession.new(session_params)
     if @user_session.save
       flash[:notice] = "Login successful!"
       redirect_back_or_default(user_path(current_user))
     else
-      flash[:error] = "Something bad happened. Why don't you try that again?"
-      Rails.logger.debug @user_session.errors.inspect
-      render action: :new
+      flash[:error] = "Failed to authenticate. Why don't you try that again?"
+      logger.debug @user_session.errors.inspect
+      render action: :new, status: 401
     end
   end
 
