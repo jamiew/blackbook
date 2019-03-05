@@ -9,6 +9,15 @@ describe PasswordResetController do
     @user = FactoryBot.create(:user)
   end
 
+  describe "GET #new" do
+    it "should render a form input field correctly" do
+      get :new
+      response.should be_ok
+      response.body should match(/Fill out the form below/)
+      response.body.should match(/password_reset[email]/)
+    end
+  end
+
   describe "requesting a password reset" do
     it "should send an email to the user if found" do
       expect(Mailer).to receive(:password_reset_instructions).and_return(nil)
