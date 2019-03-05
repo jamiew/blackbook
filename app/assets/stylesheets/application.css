@@ -269,7 +269,6 @@ div.tabs ul.tab_navigation li a.selected:hover { background-color: #ff5; color: 
 #login .remember_me { margin-left: 100px; font-size: 0.8em; margin-top: 10px; }
 #login .remember_me input { float: left; margin-right: 10px; }
 #login .remember_me label { text-align: left; margin-left: 3px; }
-.signup_or_login .buttons, .signup_or_login .help { margin-left: 6em; }
 .signup_or_login .help { font-size: 0.9em; margin-top: 2em; }
 
 
