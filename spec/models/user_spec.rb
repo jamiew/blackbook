@@ -15,4 +15,30 @@ RSpec.describe User, type: :model do
     lambda { FactoryBot.create(:user, email: '') }.should raise_error
   end
 
+  describe "#deliver_password_reset_instructions!" do
+    let(:user){ FactoryBot.create(:user) }
+
+    it "sends an email" do
+      expect {
+        user.deliver_password_reset_instructions!
+      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+
+    it "calls user.reset_perishable_token!" do
+      user.should_receive(:reset_perishable_token!)
+      user.deliver_password_reset_instructions!
+    end
+  end
+
+  describe "#reset_perishable_token!" do
+    let(:user){ FactoryBot.create(:user) }
+
+    it "changes the user's perishable token" do
+      user.perishable_token.should_not be_blank
+      expect {
+        user.deliver_password_reset_instructions!
+      }.to change(user, :perishable_token)
+    end
+  end
+
 end

@@ -5,6 +5,17 @@ describe UsersController do
 
   render_views
 
+  let(:valid_user_params) {
+    {
+      user: {
+        login: 'bobby',
+        email: 'bob@example.com',
+        password: 'bobs_pass',
+        password_confirmation: 'bobs_pass'
+      }
+    }
+  }
+
   describe "actions requiring no current user" do
     let!(:user){ FactoryBot.create(:user) }
 
@@ -33,15 +44,28 @@ describe UsersController do
       response.should be_redirect
       flash[:error].should_not be_blank
     end
+  end
 
-    it "should redirect to account on successful :create" do
-      resp = post :create, user: {
-        login: 'bobby', email: 'bob@example.com',
-        password: 'bobs_pass', password_confirmation: 'bobs_pass'
-      }
-      found_user = User.find_by_login('bobby')
+  # TODO refactor all above to be per-method...
+  describe "POST #create" do
+    it "works, creating a new, valid user record" do
+      expect {
+        post :create, valid_user_params
+      }.to change(User, :count).by(1)
+    end
+
+    it "sets flash and redirects to profile page" do
+      post :create, valid_user_params
+      flash[:notice].should_not be_blank
+      found_user = User.find_by_login(valid_user_params[:user][:login])
       found_user.should_not be_nil
-      response.should redirect_to(user_path(id: 'bobby'))
+      response.should redirect_to(user_path(id: valid_user_params[:user][:login]))
+    end
+
+    it "sends an email" do
+      expect {
+        post :create, valid_user_params
+      }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
 
