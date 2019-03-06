@@ -5,7 +5,7 @@ ssh blackbook "
   git pull origin master
   ruby --version
   cd /home/rails/.rbenv/plugins/ruby-build && git pull && cd -
-  rbenv install $(cat .ruby-version)
+  # rbenv install $(cat .ruby-version)
   echo 'Bundle install...'
   /home/rails/.rbenv/shims/bundle install
   echo 'Running migrations...'
