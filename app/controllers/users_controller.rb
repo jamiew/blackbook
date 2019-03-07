@@ -28,7 +28,6 @@ class UsersController < ApplicationController
     set_page_title @user.name || @user.login
   end
 
-  # Setup a new user
   def new
     @user = User.new
   end
@@ -45,13 +44,8 @@ class UsersController < ApplicationController
     end
   end
 
-  # Change information about ourselves
   def edit
     set_page_title "Your Settings"
-  end
-
-  def change_password
-    #TODO? ack
   end
 
   def update
