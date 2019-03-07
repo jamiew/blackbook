@@ -89,7 +89,7 @@ class GmlObject
   end
 
   def store_on_disk
-    puts "GmlObject.store_on_disk data[0..100]=#{data[0..100]}"
+    # puts "GmlObject.store_on_disk data[0..100]=#{data[0..100]}"
 
     if filename.blank?
       Rails.logger.error "Cannot store GmlObject(tag_id=#{tag_id}) on disk, invalid filename. tag_id=#{self.tag_id.inspect} filename=#{filename.inspect}"
@@ -126,7 +126,6 @@ class GmlObject
   end
 
   def s3_object
-    puts s3_file_key
     @s3_object ||= S3_BUCKET.object(s3_file_key)
   end
 
