@@ -5,6 +5,7 @@ class UserSessionsController < ApplicationController
   force_ssl
 
   def new
+    set_page_title 'Login'
     @user_session = UserSession.new
   end
 
