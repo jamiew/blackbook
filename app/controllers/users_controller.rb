@@ -3,6 +3,8 @@ class UsersController < ApplicationController
   before_filter :require_user, only: [:edit, :change_password, :update]
   before_filter :set_user_from_current_user, only: [:edit, :change_password, :update]
 
+  invisible_captcha only: [:create]
+
   # Show all users
   def index
     @page, @per_page = params[:page] && params[:page].to_i || 1, 28
