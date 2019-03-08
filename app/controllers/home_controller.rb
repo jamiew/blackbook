@@ -13,7 +13,7 @@ class HomeController < ApplicationController
 
   def activity
     @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    @notifications = Notification.paginate(page: @page, per_page: @per_page).order('created_at DESC').includes(:subject)
+    @notifications = Notification.paginate(page: @page, per_page: @per_page).order('id DESC').includes(:subject)
     set_page_title "Activity"
   end
 
