@@ -1,6 +1,6 @@
 class Mailer < ActionMailer::Base
   default_url_options[:host] = '000000book.com'
-  default from: 'no-reply@000book.com'
+  default from: '000000book <no-reply@000book.com>'
 
   def password_reset_instructions(user)
     @edit_password_reset_url = edit_password_reset_url(user.perishable_token)
