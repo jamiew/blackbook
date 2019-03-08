@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     raise ActiveRecord::RecordNotFound if @user.nil?
     @page, @per_page = params[:page] && params[:page].to_i || 1, 10
 
-    @tags = @user.tags.includes(:user).paginate(page: @page, per_page: @per_page)
+    @tags = @user.tags.order('created_at DESC').includes(:user).paginate(page: @page, per_page: @per_page)
     @wall_posts = @user.wall_posts.includes(:user).order('created_at DESC').paginate(page: 1, per_page: 10)
     @notifications = @user.notifications.includes(:subject, :user).order('created_at DESC').paginate(page: 1, per_page: 15)
 
