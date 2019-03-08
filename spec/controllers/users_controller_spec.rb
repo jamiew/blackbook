@@ -5,16 +5,19 @@ describe UsersController do
 
   render_views
 
-  let(:valid_user_params) {
-    {
-      user: {
-        login: 'bobby',
-        email: 'bob@example.com',
-        password: 'bobs_pass',
-        password_confirmation: 'bobs_pass'
-      }
+  before do
+    request.env["rack.url_scheme"] = "https"
+    InvisibleCaptcha.timestamp_enabled = false
+  end
+
+  let(:valid_user_params){{
+    user: {
+      login: 'bobby',
+      email: 'bob@example.com',
+      password: 'bobs_pass',
+      password_confirmation: 'bobs_pass'
     }
-  }
+  }}
 
   describe "actions requiring no current user" do
     let!(:user){ FactoryBot.create(:user) }

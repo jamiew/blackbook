@@ -4,6 +4,10 @@ require 'rails_helper'
 describe UserSessionsController do
   render_views
 
+  before do
+    request.env["rack.url_scheme"] = "https"
+  end
+
   describe "actions requiring no current user" do
     it "should not redirect for a non-logged in user on :new" do
       get :new
