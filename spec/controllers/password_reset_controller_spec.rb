@@ -5,6 +5,7 @@ describe PasswordResetController do
   render_views
 
   before do
+    request.env["rack.url_scheme"] = "https"
     # activate_authlogic
     @user = FactoryBot.create(:user)
   end
@@ -13,17 +14,18 @@ describe PasswordResetController do
     it "should render a form input field correctly" do
       get :new
       response.should be_ok
-      response.body should match(/Fill out the form below/)
-      response.body.should match(/password_reset[email]/)
+      response.body.should match(/Fill out the form below/)
+      response.body.should match(/form action=\"\/password_reset\"/)
     end
   end
 
-  describe "requesting a password reset" do
+  describe "POST #create" do
     it "should send an email to the user if found" do
-      expect(Mailer).to receive(:password_reset_instructions).and_return(nil)
-      post :create, email: @user.email
-      @user.perishable_token.should_not be_blank
-      response.should redirect_to(root_path)
+      expect {
+        post :create, email: @user.email
+        @user.perishable_token.should_not be_blank
+        response.should redirect_to(root_path)
+      }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it "should re-render the new template given an invalid email" do
@@ -32,7 +34,9 @@ describe PasswordResetController do
       flash[:error].should_not be_blank
       response.should render_template('password_reset/new')
     end
+  end
 
+  describe "POST #update" do
     it "should change password given a valid token and matching passwords" do
       @user.reset_perishable_token!
       expect {
@@ -55,10 +59,14 @@ describe PasswordResetController do
     end
 
     it "should not change password given an invalid token" do
-      # TODO "expects to NOT change password"
-      post :update, id: 'not_a_valid_token', user: {
-        password: 'new_pass', password_confirmation: 'new' }
-      response.should redirect_to(root_url)
+      expect {
+        post :update, id: 'not_a_valid_token', user: {
+          password: 'new_pass', password_confirmation: 'new' }
+        response.should redirect_to(root_url)
+      }.to_not change(@user, :crypted_password)
     end
+
+    it "should email the user that password was reset"
+
   end
 end

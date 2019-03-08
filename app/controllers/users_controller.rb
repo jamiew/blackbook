@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 
   force_ssl
 
+  # FIXME would love a smarter way to avoid test failures using this
   invisible_captcha only: [:create]
 
   # Show all users
@@ -37,7 +38,7 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
     if @user.save
       flash[:notice] = "Account registered!"
-      Mailer.signup_notification(@user).deliver
+      Mailer.signup_notification(@user).deliver_now
       redirect_back_or_default(user_path(@user))
     else
       render action: :new
