@@ -406,7 +406,7 @@ protected
     if self.gml_object.nil?
       Rails.logger.error "ERROR: Missing gml_object for Tag #{self.id}"
     elsif !self.gml_object.valid?
-      Rails.logger.warn "Warning: Invalid gml_object for Tag #{self.id}"
+      # Rails.logger.warn "Warning: Invalid gml_object for Tag #{self.id}"
     end
   end
 
