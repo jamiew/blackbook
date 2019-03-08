@@ -61,5 +61,6 @@
               %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
             - elsif !tag.secret_username.blank?
               %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
+    %br
     %p.right
       %strong= link_to '<span>View all data &raquo;</span>'.html_safe, tags_path, class: 'button ghost small'
