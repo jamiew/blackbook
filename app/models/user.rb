@@ -23,7 +23,10 @@ class User < ActiveRecord::Base
   # TODO email regex validation
 
   has_attached_file :photo,
-    styles: { medium: "300x300>", small: "100x100#", tiny: '32x32#' }
+    styles: { medium: "300x300>", small: "100x100#", tiny: '32x32#' },
+    path: ":rails_root/public/system/photos/:id/:style/:filename",
+    url: "/system/photos/:id/:style/:filename"
+
 
   after_create  :create_notification
   after_save    :activate_device_pairing
