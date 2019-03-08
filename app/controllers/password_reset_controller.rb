@@ -5,6 +5,7 @@ class PasswordResetController < ApplicationController
   force_ssl
 
   def new
+    set_page_title 'Forgot your password?'
   end
 
   def create
@@ -21,6 +22,7 @@ class PasswordResetController < ApplicationController
   end
 
   def edit
+    set_page_title 'Resetting your password'
   end
 
   def update
