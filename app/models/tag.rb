@@ -60,7 +60,7 @@ class Tag < ActiveRecord::Base
   end
 
   def gml_object=(obj)
-    Rails.logger.debug "Tag #{id}: gml_object="
+    # Rails.logger.debug "Tag #{id}: gml_object="
     self._gml_object = obj
   end
 
@@ -103,13 +103,13 @@ class Tag < ActiveRecord::Base
   end
 
   def data
-    Rails.logger.debug "Tag #{id}: data"
+    # Rails.logger.debug "Tag #{id.inspect}: data"
     # rotate_gml
     gml
   end
 
   def data=(arg)
-    Rails.logger.debug "Tag #{id}: data="
+    # Rails.logger.debug "Tag #{id.inspect}: data="
     # raise "why are you doing tag.data="
     @gml_temp = arg
     gml_object.data = arg
@@ -117,7 +117,7 @@ class Tag < ActiveRecord::Base
 
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
   def rotated_gml
-    Rails.logger.debug "Tag #{id}: rotated_gml (cached)"
+    # Rails.logger.debug "Tag #{id}: rotated_gml (cached)"
     Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml.to_s }
   end
 
@@ -129,13 +129,13 @@ class Tag < ActiveRecord::Base
       fresh = fresh.read
     end
 
-    Rails.logger.debug "Tag #{id}: gml= (#{fresh[0..100]}"
+    # Rails.logger.debug "Tag #{id}: gml= (#{fresh[0..100]}"
     @gml_temp = fresh
   end
 
   # the GML data (String) as a Hash (w/ caching, conversion is an expensive operation)
   def gml_hash
-    Rails.logger.debug "Tag #{id}: gml_hash"
+    # Rails.logger.debug "Tag #{id}: gml_hash"
     @gml_hash ||= Rails.cache.read(gml_hash_cache_key)
     if @gml_hash.blank?
       @gml_hash = convert_gml_to_hash
@@ -147,7 +147,7 @@ class Tag < ActiveRecord::Base
   # Override so we can add gml: :gml_hash
   # Arguably could just be using :methods but we always want this
   def as_json(_opts = {})
-    Rails.logger.debug "Tag #{id}: as_json"
+    # Rails.logger.debug "Tag #{id}: as_json"
     hash = super(_opts)
     hash.reject! {|k,v| v.blank? }
     hash[:gml] = self.gml_hash && self.gml_hash['gml']
@@ -158,7 +158,7 @@ class Tag < ActiveRecord::Base
 
   # Also hide what we'd like, and strip empty records (for now)
   def to_xml(options = {})
-    Rails.logger.debug "Tag #{id}: to_xml"
+    # Rails.logger.debug "Tag #{id}: to_xml"
     options[:except] ||= []
     options[:except] += self.attributes.map {|k,v| k if v.blank? }.compact
     super(options)
@@ -166,7 +166,7 @@ class Tag < ActiveRecord::Base
 
   # GML as a Nokogiri object...
   def gml_document
-    Rails.logger.debug "Tag #{id}: gml_document"
+    # Rails.logger.debug "Tag #{id}: gml_document"
     return nil if self.gml.blank?
     @document ||= Nokogiri::XML(self.gml)
   rescue ArgumentError
@@ -176,7 +176,7 @@ class Tag < ActiveRecord::Base
 
   # Read the important bits of the GML -- also called by the save_header :before_save hook
   def gml_header
-    Rails.logger.debug "Tag #{id}: gml_header"
+    # Rails.logger.debug "Tag #{id}: gml_header"
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
 
@@ -236,7 +236,7 @@ class Tag < ActiveRecord::Base
   end
 
   def convert_gml_to_hash
-    Rails.logger.debug "Tag #{id}: convert_gml_to_hash"
+    # Rails.logger.debug "Tag #{id}: convert_gml_to_hash"
     return {} if self.gml.blank?
     Hash.from_xml(gml_document.to_xml)
   rescue
@@ -249,7 +249,7 @@ class Tag < ActiveRecord::Base
   end
 
   def rotate_gml
-    Rails.logger.debug "Tag #{id}: rotate_gml"
+    # Rails.logger.debug "Tag #{id}: rotate_gml"
     doc = gml_document
     strokes = (doc/'drawing'/'stroke')
     strokes.each { |stroke|
@@ -268,7 +268,7 @@ class Tag < ActiveRecord::Base
   # Parse and build errors & warnings
   # Not actually used as a validation, but
   def validate_gml
-    Rails.logger.debug "Tag #{id}: validate_gml"
+    # Rails.logger.debug "Tag #{id}: validate_gml"
     doc = gml_document
     errors, warnings, recommendations = [], [], []
 
@@ -328,13 +328,13 @@ protected
 
   # after_create hook to finalize the GmlObject
   def save_gml_object
-    Rails.logger.debug "Tag #{id}: save_gml_object..."
+    # Rails.logger.debug "Tag #{id}: save_gml_object..."
     self.gml_object.tag_id ||= id # FIXME? fail-safe for if you build object pre-save, when tag has no id
     self.gml_object.save!
   end
 
   def copy_gml_temp_to_gml_object
-    Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object..."
+    # Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object..."
     return if gml_object.nil? || @gml_temp.blank?
     gml_object.data = @gml_temp
   end

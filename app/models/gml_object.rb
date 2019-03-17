@@ -3,7 +3,7 @@ class GmlObject
   attr_accessor :tag_id
 
   def initialize(**opts)
-    Rails.logger.debug "GmlObject.new opts=#{opts.inspect}"
+    # Rails.logger.debug "GmlObject.new opts=#{opts.inspect}"
     self.tag_id = opts[:tag_id]
     self.tag_id ||= opts[:tag] && opts[:tag].try(:id)
 
@@ -43,7 +43,7 @@ class GmlObject
   end
 
   def data=(args)
-    Rails.logger.debug "*** GmlObject #data=, #{args.try(:length).inspect} bytes"
+    # Rails.logger.debug "*** GmlObject #data=, #{args.try(:length).inspect} bytes"
     @_data = args
   end
 
@@ -53,7 +53,7 @@ class GmlObject
   end
 
   def valid?
-    Rails.logger.debug "GmlObject.valid? data?=#{data.present?} tag?=#{tag_id.present?}"
+    # Rails.logger.debug "GmlObject.valid? data?=#{data.present?} tag?=#{tag_id.present?}"
     data.present? && tag_id.present?
   end
 
@@ -79,13 +79,13 @@ class GmlObject
   end
 
   def save!
-    Rails.logger.debug "GmlObject.save! here"
+    # Rails.logger.debug "GmlObject.save! here"
     raise "invalid GmlObject, not saving" unless valid?
 
     # raise "Oh no you called GmlObject#save!"
     store_on_disk
     # store_on_s3
-    # store_on_ipfs
+    store_on_ipfs
   end
 
   def exists_on_disk?
@@ -161,25 +161,35 @@ class GmlObject
     @ipfs ||= IPFS::Client.default
   end
 
+  def self.ensure_ipfs_is_running!
+    # FIXME this won't scale
+    res = `pidof ipfs`
+    raise "Cannot connect to IPFS daemon" if res.blank?
+  end
+
   def ipfs_hash
     tag.ipfs_hash
   end
 
   def size
-    tag.size
+    tag.data.length || 0
   end
 
   def store_on_ipfs
+    # Rails.logger.debug "store_on_ipfs, filename=#{filename.inspect}"
     ret = ipfs.add File.open(filename)
-    Rails.logger.debug ret.pretty_inspect
     added_file_hash = ret.hashcode
 
-    Rails.logger.debug "IPFS: added tag ##{self.tag_id} (#{size} bytes) to IPFS => #{added_file_hash}"
+    Rails.logger.debug "GmlObject.store_on_ipfs(tag_id=#{self.tag_id}): added Tag ##{self.tag_id} to IPFS (ipfs_size=#{ret.size}b, self.size=#{self.size}b) => #{added_file_hash}"
 
-    self.update_attribute(:ipfs_hash, added_file_hash)
-    self.update_attribute(:size, size) # FIXME should be setting on-create and treating as immutable
+    self.tag.ipfs_hash = added_file_hash
+    self.tag.size = ret.size # FIXME should be setting on-create and treating as immutable
+    self.tag.save!
 
     added_file_hash
+  rescue HTTP::ConnectionError
+    Rails.logger.error "store_on_ipfs: no IPFS daemon, can't save"
+    nil
   end
 
   def open_ipfs_file
