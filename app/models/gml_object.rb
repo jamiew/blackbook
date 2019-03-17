@@ -16,6 +16,10 @@ class GmlObject
     end
   end
 
+  def tag
+    @tag ||= Tag.find(tag_id)
+  end
+
   def self.file_dir
     "#{Rails.root}/public/data"
   end
@@ -155,6 +159,14 @@ class GmlObject
   # TODO test that daemon is running or use infura node as fallback ^_^
   def ipfs
     @ipfs ||= IPFS::Client.default
+  end
+
+  def ipfs_hash
+    tag.ipfs_hash
+  end
+
+  def size
+    tag.size
   end
 
   def store_on_ipfs
