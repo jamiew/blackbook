@@ -40,9 +40,13 @@ FactoryBot.define do
   factory :tag do |t|
     t.user {|a| a.association(:user) }
     t.application { 'TestApp' }
+    t.gml_application { 'testing_app_maybe' }
     t.author { 'JDUBS' }
     # t.gml_object {|a| a.association(:gml_object) }
     t.data { DEFAULT_GML }
+    t.size { 12345 }
+    t.ipfs_hash { "Qmd3ADB33FBeeFbEeFlol" }
+
   end
 
   # A tag sent via the API is slightly different than through the site

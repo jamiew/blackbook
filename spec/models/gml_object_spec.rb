@@ -85,9 +85,13 @@ RSpec.describe GmlObject, type: :model do
     it "works"
   end
 
-  describe "#store_on_ipfs" do
-    it "works if IPFS daemon is running"
-    it "fails if no IPFS daemon available"
+  describe "#tag" do
+    it "loads a Tag" do
+      tag = FactoryBot.create(:tag)
+      obj = FactoryBot.build(:gml_object, tag_id: tag.id)
+      obj.tag.kind_of?(Tag).should == true
+      obj.tag.gml_application.should == tag.gml_application
+    end
   end
 
 end
