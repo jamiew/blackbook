@@ -2,28 +2,28 @@
 
 ssh blackbook "
   cd ~/blackbook4/
-  git pull origin master
-  ruby --version
-  cd /home/rails/.rbenv/plugins/ruby-build && git pull && cd -
+  git fetch --all
+  git reset --hard origin/master
+  ln -fs ~/blackbook-data ~/blackbook/public/data
+  # ruby --version
+  # cd /home/rails/.rbenv/plugins/ruby-build && git pull && cd -
   # rbenv install $(cat .ruby-version)
   echo 'Bundle install...'
-  /home/rails/.rbenv/shims/bundle install
+  /home/rails/.rbenv/shims/bundle install --quiet
   echo 'Running migrations...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/rake db:migrate
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake db:migrate | grep -v 'previous definition'
   echo 'Compiling assets...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/rake assets:precompile
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake assets:precompile | grep -v 'previous definition'
   touch tmp/restart.txt
   echo 'Restarting service...'
   sudo systemctl restart blackbook4
   echo 'All done'
 "
 
-curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
-sleep 1
-curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
-sleep 1
-curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
-sleep 1
-curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
-sleep 1
-curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
+echo "Testing..."
+for i in {1..10}; do
+  curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
+  sleep 1
+done
+
+echo "All done"
