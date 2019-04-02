@@ -5,9 +5,10 @@
 .env
 config/database.yml
 coverage
+data/
+data2/
 db/*.sqlite3
 log/*
 !log/.keep
 tmp
-public/data
 public/system
