@@ -22,6 +22,7 @@ gem 'rails_12factor'
 gem 'dotenv-rails', groups: [:development, :test]
 gem 'lograge'
 gem 'invisible_captcha'
+gem 'exception_notification'
 
 group :development, :test do
   gem 'byebug'
