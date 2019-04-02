@@ -203,7 +203,6 @@ class TagsController < ApplicationController
 protected
 
   def get_tag
-    # @tag ||= Tag.find(params[:tag_id])
     @tag = Tag.find(params[:id])
   end
 
