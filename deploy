@@ -4,7 +4,7 @@ ssh blackbook "
   cd ~/blackbook4/
   git fetch --all
   git reset --hard origin/master
-  ln -fs ~/blackbook-data ~/blackbook/public/data
+  ln -fs ~/blackbook-data ~/blackbook/data
   # ruby --version
   # cd /home/rails/.rbenv/plugins/ruby-build && git pull && cd -
   # rbenv install $(cat .ruby-version)

@@ -21,7 +21,7 @@ class GmlObject
   end
 
   def self.file_dir
-    "#{Rails.root}/public/data"
+    "#{Rails.root}/data"
   end
 
   def filename
