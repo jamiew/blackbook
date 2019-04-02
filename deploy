@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ssh blackbook "
-  cd ~/blackbook4/
+  cd ~/blackbook/
   git fetch --all
   git reset --hard origin/master
   ln -fs ~/blackbook-data ~/blackbook/data
@@ -11,9 +11,9 @@ ssh blackbook "
   echo 'Bundle install...'
   /home/rails/.rbenv/shims/bundle install --quiet
   echo 'Running migrations...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/rake db:migrate 2>&1 | grep -v 'previous definition'
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake db:migrate 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
   echo 'Compiling assets...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/rake assets:precompile 2>&1 | grep -v 'previous definition'
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake assets:precompile 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
   touch tmp/restart.txt
   echo 'Restarting service...'
   sudo systemctl restart blackbook4
