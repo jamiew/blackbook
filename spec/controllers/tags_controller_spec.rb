@@ -115,6 +115,20 @@ describe TagsController do
       get :index, user: tag.secret_username # TODO rename this method, it is undescriptive
       # @should_mention_application.call(/user_test/)
     end
+
+    it "should work for a valid user" do
+      user = FactoryBot.create(:user)
+      get :index, user_id: user.login
+      assigns(:user).should == user
+      response.should be_success
+    end
+
+    it "should 404 for a missing user" do
+      lambda {
+        get :index, user_id: 'asfdasadfasdf'
+        assigns(:user).should be_blank
+      }.should raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   describe "GET #show" do
