@@ -86,4 +86,13 @@ Rails.application.configure do
   # Silence ActiveRecord logging in production (this isn't default?!)
   config.active_record.logger = nil
 
+  # exception_notification
+  Rails.application.config.middleware.use ExceptionNotification::Rack,
+    :email => {
+      # :deliver_with => :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
+      :email_prefix => "[blackbook-prod] ",
+      :sender_address => %{"000000book Errors" <no-reply@000book.com>},
+      :exception_recipients => %w{jamie@jamiedubs.com}
+    }
+
 end
