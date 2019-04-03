@@ -1,40 +1,43 @@
 
 %h2 Your Settings
-- uberform_for @user, :url => user_path(@user), :html => { :multipart => true } do |form|
-  
-  = form.error_messages
-  
-  .right_column{:style => 'margin-top: 100px;'}
+= form_for @user, url: user_path(@user), html: { multipart: true } do |form|
+
+  = render "layouts/error_messages", target: @user
+
+  .right_column{style: 'margin-top: 100px;'}
     %h3 Device Pairing <em><small>[beta]</small></em>
-    = form.text_field :iphone_uniquekey, :size => 40, :label => 'iPhone key/unique ID (for claiming your uploads)'
+    = form.label :iphone_uniquekey, 'iPhone key/unique ID (for claiming your uploads)'
+    = form.text_field :iphone_uniquekey, size: 40
     %small NOTE: changing your key will remove previously linked tags
     %p.buttons
       = form.submit "Save"
     %p.device_pairing.stats
       %ul.square
         %li
-          == #{@user.tags.from_device.count} tags currently linked from device&nbsp;        
+          == #{@user.tags.from_device.count} tags currently linked from device&nbsp;
           = link_to 'view all &raquo;', user_path(@user)
-          
-        
+
+
   .left_column
     %p
-      / .right{:style => 'margin-right: 15px;'}
+      / .right{style: 'margin-right: 15px;'}
       = image_tag(@user.photo.url(:small))
-      = form.file_field :photo, :size => 9
-          
+      = form.file_field :photo, size: 9
+
       %hr
-      - if false && is_admin?
-        = form.text_field :login, :disabled => true
-        = form.text_field :slug, :disabled => true
+
+      = form.label :email
       = form.text_field :email
+
+      = form.label :location
       = form.text_field :location
-  
+
+      = form.label :website
       = form.text_field :website
-      = form.text_field :tagline  
-      = form.text_area :about, :rows => 8
-      
+      = form.label :about
+      = form.text_area :about, rows: 8
+
       %p.buttons
         = form.submit "Save"
-      
-    
+
+

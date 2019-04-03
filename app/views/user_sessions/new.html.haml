@@ -1,14 +1,23 @@
 #login.signup_or_login.user_form.quarter.centered
-  - uberform_for @user_session, :url => user_session_path do |f|
+
+  = form_for @user_session, url: user_session_path do |f|
+
     %h2 Login
-    = f.text_field :login, :label => 'Username'
+    = f.label :login, 'Username'
+    = f.text_field :login
+
+    = f.label :password, 'Password'
     = f.password_field :password
+
     .remember_me
+      = f.label :remember_me, "Remember me"
       = f.check_box :remember_me
+
     %br
     .buttons
       = f.submit "Login"
+
     .help
       %ol.square
-        %li= link_to 'no account? signup here', signup_path, :class => 'signup'
-        %li= link_to 'forgot your password?', forgot_password_path, :class => 'forgotten_password'
+        %li= link_to 'no account? signup here', signup_path, class: 'signup'
+        %li= link_to 'forgot your password?', forgot_password_path, class: 'forgotten_password'

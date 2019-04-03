@@ -2,16 +2,11 @@
 
 # Add new mime types for use in respond_to blocks:
 # Mime::Type.register "text/richtext", :rtf
-# Mime::Type.register_alias "text/html", :iphone
 
-# Treat XHR's as a separate format from straight-up HTML
+# Graffiti Markup Language (.gml)
+# Mime::Type.register "application/xml", :gml
+Mime::Type.register_alias "application/xml", :gml
+
+# Treat XHRs as a separate format from straight-up HTML
+# TODO FIXME
 Mime::Type.register_alias "text/html", :xhr
-
-# GML
-Mime::Type.register "application/xml", :gml
-# Mime::Type.register_alias "application/xml", :gml
-
-# Image shortcuts
-Mime::Type.register "image/jpeg", :jpg
-Mime::Type.register "image/png", :png
-Mime::Type.register "image/gif", :gif

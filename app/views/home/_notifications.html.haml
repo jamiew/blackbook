@@ -4,7 +4,9 @@
 - else
   %table.notifications
     - notifications.each do |notif|
-      - next if notif.nil? || notif.subject.nil?
+      - next if notif.nil? || notif.subject.nil? 
+      - next if notif.subject.class == Comment
+
       %tr
         %td.timeago
           = time_ago_in_words(notif.created_at).gsub('about ','')
@@ -15,7 +17,7 @@
           - when Tag
             - tag = notif.subject
             - user = tag.user
-            %td.thumbnail= image_tag(tag.remote_image || tag.image.url(:small), :height => '50', :style => 'border: 1px solid #444')
+            %td.thumbnail= image_tag(tag.remote_image || tag.image.url(:small), height: '50', style: 'border: 1px solid #444')
             %td
               = link_to tag_title(tag), url_for(notif.subject)
               -# currently no user = API, and Tag should parse application name out of the GML
@@ -26,11 +28,11 @@
                 == uploaded by #{link_to(user.login, user_path(user)) rescue '(niluser)'}
           - when User
             - user = notif.subject
-            %td{:colspan => 3}
+            %td{colspan: 3}
               = link_to user.login, user_path(user)
               signed up
           - when Visualization
-            %td{:colspan => 3}
+            %td{colspan: 3}
               - app = notif.subject
               = link_to notif.user.login, user_path(notif.user)
               submitted application
@@ -41,7 +43,7 @@
             - obj = fave.object
             -#FIXME assuming it's a Tag...
             - if obj.class == Tag
-              %td.thumbnail= image_tag(obj.remote_image || obj.image.url(:small), :height => '50', :style => 'border: 1px solid #444')
+              %td.thumbnail= image_tag(obj.remote_image || obj.image.url(:small), height: '50', style: 'border: 1px solid #444')
             %td
               = link_to notif.user.login, user_path(notif.user)
               favorited
@@ -51,14 +53,14 @@
           - when Comment
             - comment = notif.subject
             - commentable = comment.commentable
-            %td{:colspan => 3}
+            %td{colspan: 3}
               %br
               = link_to notif.user.login, user_path(notif.user)
               commented on
               == #{link_to commentable_name(commentable), url_for(commentable)}:
-              .text.graytext{:style => 'margin-top: 3px; margin-left: 1px; padding: 4px 0 4px 8px; border-left: 4px solid #333;'}= comment.text
+              .text.graytext{style: 'margin-top: 3px; margin-left: 1px; padding: 4px 0 4px 8px; border-left: 4px solid #333;'}= comment.text
           - else
-            %td{:colspan => 3}
+            %td{colspan: 3}
               %em== No support for #{notif.subject.class.to_s} notification yet.
         - rescue
           == ERROR: #{$!}

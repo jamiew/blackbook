@@ -1,11 +1,13 @@
 
 / Top level navigation
 - all_link = @user ? user_tags_path(@user) : tags_path
-/ .floatLeft= link_to '&larr; back', all_link
+/ .floatLeft= link_to '&larr; back'.html_safe, all_link
 .prevnext
-  %li= @next.nil? ? '&larr; newer' : link_to('&larr; newer', tag_path(@next), :class => 'button')
+  - prev_text = '&larr; next'.html_safe
+  %li= @next.nil? ? prev_text : link_to(prev_text, tag_path(@next), class: 'button')
   %li &nbsp;::&nbsp;
-  %li= @prev.nil? ? 'older &rarr;' : link_to('older &rarr;', tag_path(@prev), :class => 'button')
+  - next_text = 'previous &rarr;'.html_safe
+  %li= @prev.nil? ? next_text : link_to(next_text, tag_path(@prev), class: 'button')
   %br.clear
 
 
@@ -15,7 +17,7 @@
     - if true # show for logged-out users as well, to encourage logging in
       .right.favorite
         - on = current_user && @tag.favorited_by?(current_user) || false
-        = link_to 'Favorite', tag_favorites_path(@tag), :method => 'post', :class => "favorite button #{on ? 'on' : 'off'}"
+        = link_to 'Favorite', tag_favorites_path(@tag), method: 'post', class: "favorite button #{on ? 'on' : 'off'}"
     %h2= tag_title(@tag)
     %hr
     %ul
@@ -38,48 +40,49 @@
       - if @tag.image.exists? || @tag.remote_image
         - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
         - #Quick little gsub to remove the queryvars... not ideal
-        %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, :target => '_blank') }
+        %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, target: '_blank') }
+
+      %hr
+      %li
+        <strong>IPFS Hash:</strong>
+        - if @tag.ipfs_hash.present?
+          = link_to "https://ipfs.io/ipfs/#{@tag.ipfs_hash}", @tag.ipfs_hash
+        - else
+          NULL
+
     %hr
     %br
-    = link_to '<small>Validate GML</small>', validate_tag_path(@tag), :class => 'button', :rel => 'nofollow'
+    = link_to '<small>Validate GML</small>'.html_safe, validate_tag_path(@tag), class: 'button', rel: 'nofollow'
     %p
     %br
 
     .gml
-      %span.download= link_to('download GML', tag_path(@tag, :format => :gml), :class => 'button smallbutton')
-      %span.what-is-gml= link_to('?', 'http://fffff.at/gml-week-graffiti-markup-language/', :target => '_blank')
-      %textarea.gml{:cols => 24, :rows => 12, :onclick => '$(this).select();'}= @tag.gml
-
-  -# Comments display
-  .comments.infobox
-    %h3== #{@comments.total_entries} Comments
-    = render :partial => 'comments/comments', :object => @comments, :locals => {:commentable => @tag}
-
-  -# Faves display...
-  -# TODO!!
+      %span.download= link_to('download GML', tag_path(@tag, format: :gml), class: 'button smallbutton')
+      %span.what-is-gml= link_to('?', 'http://fffff.at/gml-week-graffiti-markup-language/', target: '_blank')
+      %textarea.gml{cols: 24, rows: 12, onclick: '$(this).select();'}= @tag.gml
 
   -# Tag modbox -- edit/delete/debugging etc.
   - if is_owner?(@tag) || is_admin?
     .modbox.infobox
-      %h2{:style => 'color: #f0f'} MODBOX
+      %h2{style: 'color: #f0f'} MODBOX
       %ol#controls
-        %li= link_to '<strong>edit</strong>', edit_tag_path, :class => ''
-        %li= link_to 'delete', tag_path, :method => 'delete', :class => 'delete', :style => 'color: #fbb'
+        %li= link_to '<strong>edit</strong>', edit_tag_path, class: ''
+        %li= link_to 'delete', tag_path, method: 'delete', class: 'delete', style: 'color: #fbb'
       %p
-        %strong{:style => 'color: #f0f'} Secret Fields
+        %strong{style: 'color: #f0f'} Secret Fields
         - ['gml_uniquekey', 'gml_uniquekey_hash'].each do |field|
-          %p{:style => 'overflow: hidden;'}
+          %p{style: 'overflow: hidden;'}
             %strong= field
             %br
-            %input{:type => 'text', :readonly => 'readonly', :value => @tag.attributes[field], :onclick => '$(this).select();'}
+            %input{type: 'text', readonly: 'readonly', value: @tag.attributes[field], onclick: '$(this).select();'}
       %p
-        %strong{:style => 'color: #f0f'} Parsed GML Header
+        %strong{style: 'color: #f0f'} Parsed GML Header
         - @tag.gml_header.each do |k,v|
-          %p{:style => 'overflow: hidden;'}
+          %p{style: 'overflow: hidden;'}
             %strong= k
             %br
             %span=h !v.blank? && v || 'NULL'
 
 / The actual tag awwwwwww yeah
-= render :partial => "tags/tag_playback", :object => @tag
+= render partial: "tags/tag_playback", object: @tag
 

@@ -7,7 +7,7 @@ module TagsHelper
 
   def tag_user_link(tag)
     if !tag.user.nil?
-      link_to tag.user.login, user_path(tag.user), :class => 'username_link'
+      link_to tag.user.login, user_path(tag.user), class: 'username_link'
     elsif !tag.secret_username.blank?
       secret_username_link(tag.secret_username)
     else
@@ -16,7 +16,7 @@ module TagsHelper
   end
 
   def secret_username_link(secret_username)
-    link_to secret_username, tags_path(:user => secret_username), :class => 'username_link anon'
+    link_to secret_username, tags_path(user: secret_username), class: 'username_link anon'
   end
 
   def application_link(app_name, opts = {})
@@ -24,12 +24,12 @@ module TagsHelper
     # Strip out the long-ass GA name...
     # shortname = (opts[:short] == true ? app_name.gsub('Graffiti Analysis ','GrafAnalysis') : app_name)
     shortname = app_name
-    link_to shortname, tags_path(:app => app_name), :class => 'application_link anon'
+    link_to shortname, tags_path(app: app_name), class: 'application_link anon'
   end
 
   def location_link(location, opts = {})
     return "NULL" if location.blank?
-    link_to(location, tags_path(:location => location), :class => 'location_link')
+    link_to(location, tags_path(location: location), class: 'location_link')
   end
 
   # Builtin tag playback modes
@@ -43,13 +43,13 @@ module TagsHelper
     # return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
 
     # No longer specifying a specific height, just width
-    opts = { :width => '100%', :src => 'http://000000book.com/system/BlackBook.swf', :bgcolor => '#000000' }.merge(args)
+    opts = { width: '100%', src: 'http://000000book.com/system/BlackBook.swf', bgcolor: '#000000' }.merge(args)
 
     # image_urls = tag.image.styles.keys.map { |s| ["image_#{s}", "http://#{request.host}:#{request.port}"+tag.image.url(s)] }.to_hash
-    image_urls = {:image_large => tag.image.url(:large)}
-    flashvars = { :gml_url => tag_url(tag, :format => 'gml', :iphone_rotate => (tag.from_iphone? ? '1' : nil)), :embed => "&lt;embed&gt;TODOWHATUP&lt;/embed&gt;",
-        :user => (tag.user.login rescue nil),
-        :created_at => tag.created_at.to_s, :created_date => tag.created_at.strftime("%D")
+    image_urls = {image_large: tag.image.url(:large)}
+    flashvars = { gml_url: tag_url(tag, format: 'gml', iphone_rotate: (tag.from_iphone? ? '1' : nil)), embed: "&lt;embed&gt;TODOWHATUP&lt;/embed&gt;",
+        user: (tag.user.login rescue nil),
+        created_at: tag.created_at.to_s, created_date: tag.created_at.strftime("%D")
       }.merge(image_urls)
 
     public_attributes = ['id','application','location','user_id']

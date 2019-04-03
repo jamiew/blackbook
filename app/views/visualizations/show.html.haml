@@ -1,48 +1,61 @@
 
-%p.back= link_to '&larr; back to applications', visualizations_path
+%p.back= link_to '&larr; back to applications'.html_safe, visualizations_path
 
-.left{:style => 'margin-top: 40px;'}
-  = image_tag(current_object.image(:medium))
-  =# image_tag(current_object.image(:large), :width => 300)  
-  
-.centered{:style => 'width: 400px; margin: 20px 0 0 330px;'}
+.left{style: 'margin-top: 40px;'}
+  = image_tag(@visualization.image(:medium))
+  =# image_tag(@visualization.image(:large), width: 300)
+
+.centered{style: 'width: 400px; margin: 20px 0 0 330px;'}
   %h1
-    =h current_object.name
-    %span.version=h current_object.version
-  %div[current_object]
+    =h @visualization.name
+    %span.version=h @visualization.version
+  %div[@visualization]
     %p.authors
       %strong Author(s):
-      =h current_object.authors
+      =h @visualization.authors
     %p.website
       %strong Website:
-      = link_to current_object.website, "http://#{current_object.website.gsub("http://",'')}"
-  
+      = link_to @visualization.website, "http://#{@visualization.website.gsub("http://",'')}"
+
     %hr
-    - unless current_object.kind.blank?
+    - unless @visualization.kind.blank?
       %p
         %strong Language:
-        =h Visualization::KINDS.select { |k,v| v == current_object.kind }[0][0] rescue current_object.kind
-    - unless current_object.download.blank?
+        =h Visualization::KINDS.select { |k,v| v == @visualization.kind }[0][0] rescue @visualization.kind
+    - unless @visualization.download.blank?
       %p
         %strong Download:
-        = link_to(current_object.download, current_object.download)
-  
+        = link_to(@visualization.download, @visualization.download)
+
     .description
       %strong Description:
-      = h current_object.description || '(none)'
+      = h @visualization.description || '(none)'
 
-    - unless current_object.user.nil?
+    - unless @visualization.user.nil?
       %hr
       %p
         %strong Submitted by:
         %span.user
-          = link_to current_object.user.login, user_path(current_object.user)                 
-        %span.submitted_at= current_object.created_at.strftime('%D')
+          = link_to @visualization.user.login, user_path(@visualization.user)
+        %span.submitted_at= @visualization.created_at.strftime('%D')
 
 
-  - if logged_in? && (current_object.respond_to?(:user) && current_object.user == current_user) || is_admin?
+  - if logged_in? && (@visualization.respond_to?(:user) && @visualization.user == current_user) || is_admin?
     %hr
     %p.controls
-      = link_to 'Edit', edit_object_path
+      = link_to 'Edit', edit_visualization_path
       |
-      = link_to 'Delete', object_path, :confirm => 'Are you sure?', :method => :delete
+      = link_to 'Delete', visualization_path, confirm: 'Are you sure?', method: :delete
+
+  - if is_admin?
+    %p
+      - if @visualization.approved?
+        Approved by
+        = link_to @visualization.approver.login, user_path(@visualization.approver)
+        @
+        = @visualization.approved_at
+        = link_to 'Unapprove', unapprove_visualization_path, confirm: 'Are you sure?', method: :put
+      - else
+        Unapproved.
+        = link_to 'Approve', approve_visualization_path, method: :put
+

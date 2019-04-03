@@ -1,10 +1,9 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'rails_helper'
 
-describe Comment do
+RSpec.describe Comment, type: :model do
 
   before do
-    @comment = Factory.build(:comment)
-
+    @comment = FactoryBot.build(:comment)
   end
 
   it "factory should be valid" do
@@ -13,10 +12,10 @@ describe Comment do
   end
 
   it "should fail without a commentable object" do
-    Factory.build(:comment, :commentable => nil).should_not be_valid
+    FactoryBot.build(:comment, commentable: nil).should_not be_valid
   end
 
   it "should be invalid with blank text" do
-    Factory.build(:comment, :text => '').should_not be_valid
+    FactoryBot.build(:comment, text: '').should_not be_valid
   end
 end

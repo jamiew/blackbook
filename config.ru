@@ -1,6 +1,4 @@
-ENV['RAILS_ENV'] = ENV['RACK_ENV']
-require "./config/environment"
+# This file is used by Rack-based servers to start the application.
 
-use Rails::Rack::LogTailer
-use Rails::Rack::Static
-run ActionController::Dispatcher.new
+require ::File.expand_path('../config/environment', __FILE__)
+run Rails.application

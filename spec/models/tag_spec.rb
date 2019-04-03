@@ -1,10 +1,15 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'rails_helper'
 
-describe Tag do
+RSpec.describe Tag, type: :model do
+
+  before do
+    # FIXME DRY with TagsController specs...
+    # allow_any_instance_of(GmlObject).to receive(:data).and_return(DEFAULT_GML)
+  end
 
   describe 'create' do
     it 'should succeed w/ valid GML' do
-      expect { Factory.create(:tag, :gml => base_gml.to_s) }.to_not raise_error
+      lambda { FactoryBot.build(:tag, gml: base_gml.to_s) }.should_not raise_error
     end
   end
 
@@ -17,41 +22,41 @@ describe Tag do
   # Clashing field names are saved into a gml_* namespace
   describe 'reading GML header' do
     it 'should read header/client/name => gml_application' do
-      create_tag_with_gml_header(:name => 'jdubsatron').gml_application.should == 'jdubsatron'
+      create_tag_with_gml_header(name: 'jdubsatron').gml_application.should == 'jdubsatron'
     end
 
     it 'should read header/client/username => gml_username' do
-      create_tag_with_gml_header(:username => 'jamiew').gml_username.should == 'jamiew'
+      create_tag_with_gml_header(username: 'jamiew').gml_username.should == 'jamiew'
     end
 
     it 'should read header/client/keywords => gml_keywords' do
-      create_tag_with_gml_header(:keywords => 'tag,phat,fffffat').gml_keywords.should == 'tag,phat,fffffat'
+      create_tag_with_gml_header(keywords: 'tag,phat,fffffat').gml_keywords.should == 'tag,phat,fffffat'
     end
 
     it 'should read header/client/uniqueKey => gml_uniquekey' do
-      create_tag_with_gml_header(:uniqueKey => '#ff00ff').gml_uniquekey.should == '#ff00ff'
+      create_tag_with_gml_header(uniqueKey: '#ff00ff').gml_uniquekey.should == '#ff00ff'
     end
 
     it 'should read header/client/filename => remote_image' do
-      create_tag_with_gml_header(:filename => 'image007.jpg').remote_image.should == Tag.remote_image_prefix+'/image007.jpg'
+      create_tag_with_gml_header(filename: 'image007.jpg').remote_image.should == Tag.remote_image_prefix+'/image007.jpg'
     end
 
     it 'should read header/client/location => location' do
-      create_tag_with_gml_header(:location => 'http://google.com').location.should == 'http://google.com'
+      create_tag_with_gml_header(location: 'http://google.com').location.should == 'http://google.com'
     end
   end
 
   # various GML headers are saved back onto the model each time
   describe 'saving GML header fields' do
     it 'location => location' do
-      tag = create_tag_with_gml_header(:location => 'mylocale')
+      tag = create_tag_with_gml_header(location: 'mylocale')
       tag.location.should == 'mylocale'
     end
   end
 
   describe "validating GML" do
     before do
-      @tag = Factory.create(:tag_from_api)
+      @tag = FactoryBot.build(:tag_from_api)
     end
 
     # it "should error on no strokes"
@@ -72,7 +77,7 @@ describe Tag do
 
   describe "format conversion" do
     before do
-      @tag = Factory.create(:tag)
+      @tag = FactoryBot.build(:tag)
     end
 
     describe "to_json" do
@@ -106,16 +111,18 @@ describe Tag do
     end
 
     it "gml_document should be a valid Nokogiri document" do
-      tag = Factory(:tag)
+      tag = FactoryBot.build(:tag)
+      # tag.gml.should_not be_blank
+      tag.stub(:gml).and_return(DEFAULT_GML) # FIXME use expect() syntax
       doc = tag.gml_document
-      tag.gml.should_not be_blank
       doc.class.should == Nokogiri::XML::Document
       (doc/'header').should_not be_blank
     end
 
     it "gml_hash should output a valid Hash" do
-      tag = Factory(:tag)
-      tag.gml.should_not be_blank
+      tag = FactoryBot.build(:tag)
+      # tag.gml.should_not be_blank
+      tag.stub(:gml).and_return(DEFAULT_GML) # FIXME use expect() syntax
       tag.gml_hash.class.should == Hash
       tag.gml_hash.should_not be_blank
     end
@@ -137,14 +144,14 @@ describe Tag do
 
   def base_gml
     {
-      :header => {:client => {:name=>'test'} },
-      :drawing => { :stroke => {:pt => [{:x=>0,:y=>0,:time=>0}]} }
+      header: {client: {name:'test'} },
+      drawing: { stroke: {pt: [{x:0,y:0,time:0}]} }
     }
   end
 
   def create_tag_with_gml_header(attrs)
-    merged = base_gml.merge({:header => {:client => attrs}})
-    return Factory.create(:tag, :gml => merged.to_xml)
+    merged = base_gml.merge({header: {client: attrs}})
+    return FactoryBot.create(:tag, gml: merged.to_xml)
   end
 
 end

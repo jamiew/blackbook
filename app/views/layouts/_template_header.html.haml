@@ -1,15 +1,16 @@
 %head
   %meta{ http_equiv_attrs }
-  %meta{ 'http-equiv' => 'imagetoolbar', :content => 'no' }
-  %meta{ :name => 'distribution', :content => 'all' }
-  %meta{ :name => 'robots', :content => @noindex ? 'noindex,follow' : 'all' }
-  %meta{ :name => 'resource-type', :content => 'document' }
-  %meta{ :name => 'MSSmartTagsPreventParsing', :content => 'true' }
-  = stylesheet_link_tag 'application'
-  = stylesheet_link_tag 'print', :media => 'print'
+  %meta{ 'http-equiv' => 'imagetoolbar', content: 'no' }
+  %meta{ name: 'distribution', content: 'all' }
+  %meta{ name: 'robots', content: @noindex ? 'noindex,follow' : 'all' }
+  %meta{ name: 'resource-type', content: 'document' }
+  %meta{ name: 'MSSmartTagsPreventParsing', content: 'true' }
+
+  = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true
+  = javascript_include_tag 'application', 'data-turbolinks-track' => true
+  = csrf_meta_tags
+
   = yield :head
+
   %title= page_title
 
-= remote_javascript_includes
-- bundle do
-  = local_javascript_includes

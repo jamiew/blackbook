@@ -1,8 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'rails_helper'
 
-describe Favorite do
+RSpec.describe Favorite, type: :model do
+
   before(:each) do
-    @favorite = Factory(:favorite)
+    @favorite = FactoryBot.build(:favorite)
   end
 
   it "should be valid" do
@@ -18,9 +19,10 @@ describe Favorite do
   end
 
   it "should make a notification after create" do
-    @user, @tag = Factory(:user), Factory(:tag)
-    expect {
-      Favorite.create!(:user => @user, :object => @tag)
-    }.to change(Notification, :count).by(1)
+    @user = FactoryBot.create(:user)
+    @tag = FactoryBot.create(:tag)
+    lambda {
+      Favorite.create!(user: @user, object: @tag)
+    }.should change(Notification, :count).by(1)
   end
 end

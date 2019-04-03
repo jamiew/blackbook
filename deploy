@@ -1,0 +1,29 @@
+#!/bin/sh
+
+ssh blackbook "
+  cd ~/blackbook/
+  git fetch --all
+  git reset --hard origin/master
+  ln -fs ~/blackbook-data ~/blackbook/data
+  # ruby --version
+  # cd /home/rails/.rbenv/plugins/ruby-build && git pull && cd -
+  # rbenv install $(cat .ruby-version)
+  echo 'Bundle install...'
+  /home/rails/.rbenv/shims/bundle install --quiet
+  echo 'Running migrations...'
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake db:migrate 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
+  echo 'Compiling assets...'
+  RAILS_ENV=production /home/rails/.rbenv/shims/rake assets:precompile 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
+  touch tmp/restart.txt
+  echo 'Restarting service...'
+  sudo systemctl restart blackbook4
+  echo 'All done'
+"
+
+echo "Testing..."
+for i in {1..10}; do
+  curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
+  sleep 1
+done
+
+echo "All done"

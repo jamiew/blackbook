@@ -1,18 +1,25 @@
 class UserSessionsController < ApplicationController
-  before_filter :require_no_user, :only => [:new, :create]
-  before_filter :require_user, :only => :destroy
+  before_filter :require_no_user, only: [:new, :create]
+  before_filter :require_user, only: :destroy
+
+  force_ssl
 
   def new
+    set_page_title 'Login'
     @user_session = UserSession.new
   end
 
   def create
-    @user_session = UserSession.new(params[:user_session])
+    sess = params['user_session'] || {}
+    session_params = { login: sess['login'], password: sess['password'], remember_me: sess['remember_me'] }
+    @user_session = UserSession.new(session_params)
     if @user_session.save
       flash[:notice] = "Login successful!"
       redirect_back_or_default(user_path(current_user))
     else
-      render :action => :new
+      flash[:error] = "Failed to authenticate. Why don't you try that again?"
+      logger.debug @user_session.errors.inspect
+      render action: :new, status: 401
     end
   end
 

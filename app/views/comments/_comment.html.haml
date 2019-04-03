@@ -12,7 +12,8 @@
     %span.author= link_to user.login, user_path(user)
     - if is_admin? || is_owner?(comment)
       .right.controls
-        %small= link_to 'delete', comment_path(comment), :method => 'delete', :class => 'delete'
+        %small= link_to 'delete', comment_path(comment), method: 'delete', class: 'delete'
     %span.timeago== #{timeago(comment.created_at)} ago
-    
-  %p.text= sanitize(comment.text, ['b','i','a','strong','em','img'])
+
+  %p.text=# sanitize(comment.text, ['b','i','a','strong','em','img'])
+  %p.text= comment.text
