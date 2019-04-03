@@ -3,5 +3,5 @@
 #
 # Examples:
 #   
-#   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
-#   Major.create(:name => 'Daley', :city => cities.first)
+#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
+#   Major.create(name: 'Daley', city: cities.first)

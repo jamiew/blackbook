@@ -10,7 +10,7 @@ class CreateGmlObjects < ActiveRecord::Migration
     add_index :gml_objects, :tag_id
     # ^^possibly as a unique key? Going to do this model-level -- don't want dupes accidentally
 
-    # bootstrap Tag.gml => GMLObject
+    # bootstrap Tag.gml => GmlObject
     Tag.all.each { |v|
       begin
         v.send(:create_gml_object)

@@ -1,30 +1,14 @@
-- tag = tag_playback # be semantic
+- tag = tag_playback # FIXME
 
 #main.tag.tabs
+
   %ul.tab_navigation
-    %li= link_to 'flash', '#flash', :class => 'selected'
-    %li= link_to 'HTML5', '#html5'
+    %li= link_to 'HTML5', '#html5', class: 'selected'
     %li= link_to 'image', '#image'
 
-  #flash
-    - if RAILS_ENV == 'development'
-      %p
-        %span.beta *Flashplayer disabled in development
-    - elsif true # Player hosted on Todd's site is busted and I have old code :-(
-      %p 
-        %span.beta (Flashplayer temporarily unavailable)
-    - else
-      - html = tag_player(@tag, :width => '580px')
-      %p= html
-      - encoded_embed = HTMLEntities.new.encode(html).gsub("\n",'').squeeze(" ").chomp
-      %label{:for => 'player_embed'} Embed Code
-      %input{:type=>'text', :name=>'player_embed', :id=>'player_embed', :class=>'embed clickselect', :size=>50, :onclick => '$(this).select();', :value => encoded_embed}
-
   #html5
-    %p= render :partial => 'tags/canvas_player', :object => @tag
+    %p= render partial: 'tags/canvas_player', object: @tag
     %span.beta== *note: html5 &lt;canvas&gt; player is beta; developers please check out the <a href="http://github.com/jamiew/canvasplayer">source code</a>
-    %br
-    %br
 
   #image
     - imgopts = {}
@@ -33,5 +17,4 @@
     - elsif @tag.remote_image
       .image= image_tag @tag.remote_image, imgopts
     - else
-      %br
-      %h4 No thumbnail generated yet.
+      %h4.warning No thumbnail generated yet.

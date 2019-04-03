@@ -11,17 +11,16 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_session, :current_user, :page_title, :set_page_title
 
   # Don't show raw GML in the logs
-  filter_parameter_logging :password, :password_confirmation, :gml, :data
-  protect_from_forgery
+  # filter_parameter_logging :password, :password_confirmation, :gml, :data
+  # protect_from_forgery
 
-  # Global filters
-  before_filter :activate_authlogic, :set_format
+  # before_filter :activate_authlogic
+  before_filter :set_format
 
-  # Global exceptions to catch
-  rescue_from NoPermissionError, :with => :permission_denied
+  rescue_from NoPermissionError, with: :permission_denied
 
   # Oink object debugging in dev
-  # if RAILS_ENV == 'development'
+  # if Rails.env == 'development'
   #   include Oink::MemoryUsageLogger
   #   include Oink::InstanceTypeCounter
   # end
@@ -29,19 +28,10 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # Log extra info we like
-  def log_processing
-    super
-    if logger && logger.info?
-      logger.info("  HTTP Referer: #{request.referer}") if !request.referer.blank?
-      logger.info("  User Agent: #{request.env["HTTP_USER_AGENT"]}")
-    end
-  end
-
   # Modify the global page title -- could also use @page_title
   # TODO change to page_title= (or just use @page_title/@title directly)
   def set_page_title(title, suffix = true)
-    title += (suffix ? " - #{SiteConfig.site_name}" : '')
+    title += (suffix ? " - 000000book" : '')
     title += " (page #{@page})" if @page.to_i > 1
     @page_title = title
   end
@@ -50,24 +40,24 @@ class ApplicationController < ActionController::Base
     if @page_title
       @page_title
     else
-      SiteConfig.site_name
+      '000000book'
     end
   end
 
   # Catch-all render for no-permission errors
   def permission_denied
     flash[:error] = "You don't have permission to do that"
-    render :text => flash[:error], :status => 403
+    render text: flash[:error], status: 403
   end
 
   # Automatically respond with 404 for ActiveRecord::RecordNotFound
   def record_not_found
-    render :file => File.join(RAILS_ROOT, 'public', '404.html'), :status => 404
+    render file: File.join(RAILS_ROOT, 'public', '404.html'), status: 404
   end
 
   # Render a partial into a string
   def fetch_partial(file, opts = {})
-    render_to_string :partial => file, :locals => opts
+    render_to_string partial: file, locals: opts
   end
   helper_method :fetch_partial
 
@@ -104,7 +94,7 @@ class ApplicationController < ActionController::Base
   # Permission requirements
   def require_user
     unless current_user
-      logger.info "require_user failed"
+      logger.debug "require_user failed"
       store_location
       flash[:error] = "You must be logged in to do that"
       redirect_to(login_path)
@@ -114,7 +104,7 @@ class ApplicationController < ActionController::Base
 
   def require_no_user
     if current_user
-      logger.info "require_no_user failed"
+      logger.debug "require_no_user failed"
       store_location
       flash[:error] = "You must *not* be logged-in to access that."
       # redirect_back_or_default(user_path(current_user))
@@ -135,7 +125,7 @@ class ApplicationController < ActionController::Base
   # Stash the current page for use in redirection, e.g. login
   # using :back doesn't work inside a POST
   def store_location
-    session[:return_to] = request.request_uri
+    session[:return_to] = request.url
   end
 
   # Allow for using all 3 of: a specific redirect_to, a general :back, OR the specified default
@@ -157,8 +147,9 @@ class ApplicationController < ActionController::Base
 
   # Set XHR as a totally differnet response format than HTML
   # We don't want to override .js, we use that for actual javascript
+  # FIXME probably no longer applies
   def set_format
-    @template.template_format = 'html'
+    # @template.template_format = 'html'
     request.format = :xhr if request.xhr?
   end
 
@@ -166,7 +157,7 @@ class ApplicationController < ActionController::Base
   def render(*args)
     if request.xhr?
       if args.blank?
-        return(super :layout => false)
+        return(super layout: false)
       else
         args.first[:layout] = false if args.first.is_a?(Hash) && args.first[:layout].blank?
       end
@@ -178,22 +169,22 @@ class ApplicationController < ActionController::Base
   # TODO handle arrays better
   def default_respond_to(object, opts={})
 
-    opts = { :exclude => [:id, :created_at, :cached_tag_list] }.merge(opts)
+    opts = { exclude: [:id, :created_at, :cached_tag_list] }.merge(opts)
     which_layout = opts[:layout] || false
     # TODO strip out excluded attributes
 
     respond_to do |format|
       format.html {
         if request.xhr? && !opts[:html_partial].blank?
-          render :partial => opts[:html_partial], :object => object
+          render partial: opts[:html_partial], object: object
         else
-          render :text => object.to_html(:exclude => opts[:exclude]), :layout => which_layout
+          render text: object.to_html(exclude: opts[:exclude]), layout: which_layout
         end
       }
 
-      format.xml  { render :text => object.to_xml }
-      format.json { render :text => object.to_json }
-      format.yaml { render :text => object.to_yaml }
+      format.xml  { render text: object.to_xml }
+      format.json { render text: object.to_json }
+      format.yaml { render text: object.to_yaml }
       # TODO: js, txt, rss, atom
     end and return
   end
@@ -225,8 +216,8 @@ class ApplicationController < ActionController::Base
   end
   helper_method :url_escape
 
-  def dev?; RAILS_ENV == 'development'; end
-  def production?; RAILS_ENV == 'production'; end
+  def dev?; Rails.env == 'development'; end
+  def production?; Rails.env == 'production'; end
   helper_method :dev?, :production?
 
 end

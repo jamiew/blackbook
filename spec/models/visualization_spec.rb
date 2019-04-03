@@ -1,18 +1,18 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe Visualization do
+RSpec.describe Visualization, type: :model do
 
   it "should create" do
-    user = Factory.build(:user)
+    user = FactoryBot.build(:user)
     user.save!
   end
 
   it "should fail without a login" do
-    lambda { Factory.create(:user, :login => '') }.should raise_error
+    lambda { FactoryBot.create(:user, login: '') }.should raise_error
   end
 
   it "should fail without an email" do
-    lambda { Factory.create(:user, :email => '') }.should raise_error
+    lambda { FactoryBot.create(:user, email: '') }.should raise_error
   end
 
 end

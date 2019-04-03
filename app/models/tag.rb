@@ -5,47 +5,64 @@ class Tag < ActiveRecord::Base
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   belongs_to :user
-  has_one :gml_object, :class_name => 'GMLObject' # used to store the actual data, nice & gzipped
-  has_many :comments, :as => :commentable, :order => 'created_at DESC'
+  has_many :comments, as: :commentable
   has_many :likes
 
-  # validates_presence_of :user_id, :on => :create, :message => "can't be blank"
-  validates_associated :user, :on => :create
+  # delegate :data, to: :gml_object
+
+  # validates_presence_of :user_id, on: :create, message: "can't be blank"
+  validates_associated :user, on: :create
 
   # before_save :process_gml
   # before_save :process_app_id
-  before_create :detect_tempt_one
   before_save   :copy_gml_temp_to_gml_object
+  before_save   :check_for_gml_object
   before_create :build_gml_object
   after_create  :save_gml_object
   after_create  :create_notification
 
-  # Caching related -- currently handled in the Controller
-  # after_save    :expire_gml_hash_cache
-  # after_destroy :delete_gml_hash_cache
-
-  # Security: protect from mass assignment
   attr_protected :user_id
 
-  # Scopes -- mostly related to presence of uniquekeys
-  named_scope :from_device, {:conditions => 'gml_uniquekey IS NOT NULL'}
-  named_scope :claimed, {:conditions => 'gml_uniquekey IS NOT NULL AND user_id IS NOT NULL'}
-  named_scope :unclaimed, {:conditions => 'gml_uniquekey IS NOT NULL AND user_id IS NULL' }
-  named_scope :by_uniquekey, lambda { |key| {:conditions => ['gml_uniquekey = ?',key]} }
+  scope :from_device, -> { where('gml_uniquekey IS NOT NULL') }
+  scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
+  scope :unclaimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NULL') }
 
   # validates_attachment_presence :image
+  # validates_attachment :image, content_type: { content_type: ["image/jpg", "image/jpeg", "image/png", "image/gif"] }
+  do_not_validate_attachment_file_type :image
   has_attached_file :image,
-    :default_style => :medium,
-    :default_url => "/images/defaults/tag_:style.jpg",
-    :url => "/system/:attachment/:id_partition/:style/:basename.:extension",
-    :path => ":rails_root/public/system/:attachment/:id_partition/:style/:basename.:extension",
-    :styles => { :large => '600x600>', :medium => "300x300>", :small => '100x100#', :tiny => "32x32#" }
+    default_style: :medium,
+    default_url: "/images/defaults/tag_:style.jpg",
+    url: "/system/:attachment/:id_partition/:style/:basename.:extension",
+    path: ":rails_root/public/system/:attachment/:id_partition/:style/:basename.:extension",
+    styles: { large: '600x600>', medium: "300x300>", small: '100x100#', tiny: "32x32#" }
 
   # Placeholders for assigning data from forms
   attr_accessor :gml_file
+  attr_accessor :_gml_object
   attr_accessor :existing_application_id
   attr_accessor :validation_results
 
+  # Some interesting test cases
+  EXAMPLES = {
+    valid_gml: 3001,
+    rotated: 3000,
+    bad_binary_data: 5198,
+    # empty: TODO
+    # invalid_gml: TODO
+    # tempt1_eyesaver: TODO
+    # TODO one from each iPhone app
+  }
+
+  def gml_object
+    self._gml_object ||= GmlObject.new(tag: self)
+    self._gml_object
+  end
+
+  def gml_object=(obj)
+    # Rails.logger.debug "Tag #{id}: gml_object="
+    self._gml_object = obj
+  end
 
   # wrap remote_imge to always add our local FFlickr...
   # this secures tempt's tags on the site
@@ -62,7 +79,7 @@ class Tag < ActiveRecord::Base
   def thumbnail_image(size = :medium)
     if !remote_image.blank?
       return "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{self.attributes['remote_image'].gsub('gml','png')}"
-    # elsif RAILS_ENV == 'development' && !File.exist?(self.image_path(size)) #don't do image 404s in development
+    # elsif Rails.env == 'development' && !File.exist?(self.image_path(size)) #don't do image 404s in development
     #   return "/images/defaults/tag_#{size.to_s}.jpg"
     else
       return self.image(size)
@@ -77,25 +94,48 @@ class Tag < ActiveRecord::Base
     return test
   end
 
-  # Wrapper accessors for the GML data, now stored in another object
+  # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
-    return rotated_gml if opts[:iphone_rotate].to_s == '1' #handoff for backwards compt; DEPRECATEME
-    @memoized_gml ||= gml_object && gml_object.data || @gml_temp || self.attributes['gml'] || ''
+    # Rails.logger.debug "Tag #{id}: gml"
+    return rotated_gml if opts[:iphone_rotate].to_s == '1' # handoff for backwards compt; DEPRECATEME
+    @memoized_gml ||= gml_object && gml_object.data || @gml_temp
     return @memoized_gml
+  end
+
+  def data
+    # Rails.logger.debug "Tag #{id.inspect}: data"
+    # rotate_gml
+    gml
+  end
+
+  def data=(arg)
+    # Rails.logger.debug "Tag #{id.inspect}: data="
+    # raise "why are you doing tag.data="
+    @gml_temp = arg
+    gml_object.data = arg
   end
 
   # hack around todd's player not rotating, swap x/y for 90 deg turn for iphone
   def rotated_gml
-    Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml }
+    # Rails.logger.debug "Tag #{id}: rotated_gml (cached)"
+    Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml.to_s }
   end
 
   # Proxy; will be processed on save
   def gml=(fresh)
+    # FIXME wtf is going on
+    if fresh.kind_of?(ActionDispatch::Http::UploadedFile)
+      Rails.logger.warn "Warning, reading data from ActionDispatch::Http::UploadedFile"
+      fresh = fresh.read
+    end
+
+    # Rails.logger.debug "Tag #{id}: gml= (#{fresh[0..100]}"
     @gml_temp = fresh
   end
 
   # the GML data (String) as a Hash (w/ caching, conversion is an expensive operation)
   def gml_hash
+    # Rails.logger.debug "Tag #{id}: gml_hash"
     @gml_hash ||= Rails.cache.read(gml_hash_cache_key)
     if @gml_hash.blank?
       @gml_hash = convert_gml_to_hash
@@ -104,40 +144,44 @@ class Tag < ActiveRecord::Base
     return @gml_hash
   end
 
-  # Wrap to_json so the .gml string gets converted to a hash, then to json
-  # We're reimplementing Rails' to_json because we can't do :methods => {:gml_hash=>:gml},
-  # and end up with an attribute called 'gml_hash' which doesn't work
-  # Note: Rails 2.3.9 added case sensitivity to this?
-  def to_json(options = {})
-    hash = Serializer.new(self, options).serializable_record
-    hash.reject! { |k,v| v.blank? }
+  # Override so we can add gml: :gml_hash
+  # Arguably could just be using :methods but we always want this
+  def as_json(_opts = {})
+    # Rails.logger.debug "Tag #{id}: as_json"
+    hash = super(_opts)
+    hash.reject! {|k,v| v.blank? }
     hash[:gml] = self.gml_hash && self.gml_hash['gml']
     hash[:gml] ||= self.gml_hash && self.gml_hash['GML']
     hash[:gml] ||= {}
-    ActiveSupport::JSON.encode(hash)
+    hash
   end
 
   # Also hide what we'd like, and strip empty records (for now)
   def to_xml(options = {})
+    # Rails.logger.debug "Tag #{id}: to_xml"
     options[:except] ||= []
-    options[:except] += self.attributes.select { |key,value| value.blank? }
+    options[:except] += self.attributes.map {|k,v| k if v.blank? }.compact
     super(options)
   end
 
   # GML as a Nokogiri object...
   def gml_document
+    # Rails.logger.debug "Tag #{id}: gml_document"
     return nil if self.gml.blank?
     @document ||= Nokogiri::XML(self.gml)
+  rescue ArgumentError
+    Rails.logger.error "Error parsing GML document for id=#{self.id}"
+    nil
   end
-  alias :document :gml_document # Can't decide on the name; how much gml_ prefixing do we want?
 
   # Read the important bits of the GML -- also called by the save_header :before_save hook
   def gml_header
+    # Rails.logger.debug "Tag #{id}: gml_header"
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
 
     if doc.nil? || (doc/'header').nil?
-      logger.error "NIL OR NO HEADER DOC"
+      Rails.logger.error "Tag#gml_header: NIL OR NO HEADER DOC"
       return {}
     end
 
@@ -183,7 +227,7 @@ class Tag < ActiveRecord::Base
 
   # Favorites-related -- TODO this should be elsewhere/via named_scopes
   def favorited_by?(user)
-    Favorite.count(:conditions => ['object_id = ? AND object_type = ? AND user_id = ?', self.id, self.class.to_s, user.id]) > 0
+    Favorite.where('object_id = ? AND object_type = ? AND user_id = ?', self.id, self.class.to_s, user.id).count > 0
   end
 
   # Transforms (cached)
@@ -192,10 +236,11 @@ class Tag < ActiveRecord::Base
   end
 
   def convert_gml_to_hash
+    # Rails.logger.debug "Tag #{id}: convert_gml_to_hash"
     return {} if self.gml.blank?
     Hash.from_xml(gml_document.to_xml)
   rescue
-    logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
+    Rails.logger.error "ERROR: could not parse GML for Tag #{self.id} into a hash: #{$!}"
     return {}
   end
 
@@ -204,6 +249,7 @@ class Tag < ActiveRecord::Base
   end
 
   def rotate_gml
+    # Rails.logger.debug "Tag #{id}: rotate_gml"
     doc = gml_document
     strokes = (doc/'drawing'/'stroke')
     strokes.each { |stroke|
@@ -213,16 +259,16 @@ class Tag < ActiveRecord::Base
         (pt/'y')[0].content = (1.0 - _x.to_f).to_s
       }
     }
-    # response gets cached so convert to string right away
-    return doc.to_s
+    doc
   rescue
-    logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
+    Rails.logger.error "ERROR: could not rotate GML for #{self.id}: #{$!}"
     return nil
   end
 
   # Parse and build errors & warnings
   # Not actually used as a validation, but
   def validate_gml
+    # Rails.logger.debug "Tag #{id}: validate_gml"
     doc = gml_document
     errors, warnings, recommendations = [], [], []
 
@@ -249,7 +295,7 @@ class Tag < ActiveRecord::Base
     # Geo information?
 
   rescue
-    errors << "Error parsing GML (malformed XML?)"+(RAILS_ENV == 'development' ? ": #{$!.class} - #{$!}" : '')
+    errors << "Error parsing GML (malformed XML?)"+(Rails.env == 'development' ? ": #{$!.class} - #{$!}" : '')
 
   ensure
     self.validation_results = ActiveSupport::OrderedHash.new
@@ -257,8 +303,8 @@ class Tag < ActiveRecord::Base
     self.validation_results[:warnings] = warnings.compact unless warnings.blank?
     self.validation_results[:recommendations] = recommendations.compact unless recommendations.blank?
 
-    logger.info "GML Validation Results..."
-    logger.info self.validation_results.inspect
+    Rails.logger.debug "GML Validation Results..."
+    Rails.logger.debug self.validation_results.inspect
     return validation_results
   end
 
@@ -266,13 +312,13 @@ class Tag < ActiveRecord::Base
 protected
 
   def create_notification
-    Notification.create(:subject => self, :verb => 'created', :user => self.user)
+    Notification.create(subject: self, verb: 'created', user: self.user)
   end
 
-  # before_create hook to copy over our temp data & then read our GML
+  # before_create hook to copy over our temp data & then read our GML /
   def build_gml_object
-    # STDERR.puts "Tag #{self.id}, creating GML object... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
-    obj = GMLObject.new
+    Rails.logger.debug "Tag #{self.id}: build_gml_object ... current gml attribute is #{self.attributes['gml'].length rescue nil} bytes"
+    obj = GmlObject.new(tag_id: self.id) # tag_id nil if we're unsaved, but not if it's old or being fixed
     obj.data = @gml_temp || self.attributes['gml']
     self.gml_object = obj
     process_gml
@@ -280,16 +326,17 @@ protected
     find_paired_user
   end
 
-  # after_create hook to finalize the GMLObject
+  # after_create hook to finalize the GmlObject
   def save_gml_object
-    self.gml_object.tag = self
+    # Rails.logger.debug "Tag #{id}: save_gml_object..."
+    self.gml_object.tag_id ||= id # FIXME? fail-safe for if you build object pre-save, when tag has no id
     self.gml_object.save!
   end
 
   def copy_gml_temp_to_gml_object
-    return if @gml_temp.blank? || gml_object.nil?
+    # Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object..."
+    return if gml_object.nil? || @gml_temp.blank?
     gml_object.data = @gml_temp
-    gml_object.save! if gml_object.data_changed?
   end
 
   # Parse & assign variables from the GML header
@@ -303,11 +350,11 @@ protected
 
   # assign a user if there's a paired iPhone uniquekey
   def find_paired_user
-    logger.debug "Tag.find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
+    Rails.logger.debug "Tag.find_paired_user: self.gml_uniquekey=#{self.gml_uniquekey}"
     return if self.gml_uniquekey.blank?
-    user = User.find_by_iphone_uniquekey(self.gml_uniquekey) rescue nil
+    user = User.find_by_iphone_uniquekey(self.gml_uniquekey)
     return if user.nil?
-    logger.info "Pairing with user=#{user.login.inspect}"
+    Rails.logger.debug "Pairing with user=#{user.login.inspect}"
     self.user = user
   end
 
@@ -315,12 +362,13 @@ protected
   # and insert our server signature
   # FIXME duplicating some stuff from save_header
   def process_gml
+    Rails.logger.debug "Tag #{id}: process_gml"
     doc = gml_document
     return if doc.nil?
 
     header = (doc/'header')
     if header.blank?
-      logger.error "Tag.process_gml: no header found in GML"
+      Rails.logger.error "Tag.process_gml: no header found in GML"
       # TODO raise exception
       return nil
     end
@@ -337,16 +385,8 @@ protected
 
     return attrs
   rescue
-    logger.error "Tag.process_gml error: #{$!}"
-  end
-
-  # simpe hack to check secret/appname for if this is tempt...
-  # if so, save it to his User for him
-  def detect_tempt_one
-    if self.application =~ /eyeSaver/ # weak
-      user = User.find_by_login('tempt1')
-      self.user_id = user.id
-    end
+    Rails.logger.error "Tag.process_gml error: #{$!}"
+    return nil
   end
 
   def self.hash_uniquekey(string)
@@ -359,6 +399,14 @@ protected
       return message
     else
       return nil
+    end
+  end
+
+  def check_for_gml_object
+    if self.gml_object.nil?
+      Rails.logger.error "ERROR: Missing gml_object for Tag #{self.id}"
+    elsif !self.gml_object.valid?
+      # Rails.logger.warn "Warning: Invalid gml_object for Tag #{self.id}"
     end
   end
 

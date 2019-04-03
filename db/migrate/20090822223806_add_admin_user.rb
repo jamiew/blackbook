@@ -2,10 +2,10 @@ class AddAdminUser < ActiveRecord::Migration
   def self.up
     say "adding default admin user"
     begin
-      user = User.new(:login => 'admin',
-        :email => 'admin@example.com',
-        :password => 'changeme',
-        :password_confirmation => 'changeme'
+      user = User.new(login: 'admin',
+        email: 'admin@example.com',
+        password: 'changeme',
+        password_confirmation: 'changeme'
       )
       user.admin = true
       user.save!

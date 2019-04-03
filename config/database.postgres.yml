@@ -1,0 +1,18 @@
+default: &default
+  adapter: postgresql
+  encoding: utf8
+  pool: 5
+  host: localhost
+
+development:
+  <<: *default
+  database: blackbook_dev
+
+production:
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
+
+test:
+  <<: *default
+  database: blackbook_test
+

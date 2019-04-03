@@ -1,65 +1,67 @@
-ActionController::Routing::Routes.draw do |map|
+Rails.application.routes.draw do
 
-  # Requests to blackhole -- ideally these wouldn't flood my logs either O_o
-  # TODO handle inside nginx instead
-  map.discard_temp_png '/temp.png', :controller => 'home', :action => 'discard'
-  map.discard_data_temp_png '/data/temp.png', :controller => 'home', :action => 'discard'
-  map.discard_tags_temp_png '/tags/temp.png', :controller => 'home', :action => 'discard'
+  # Old/bad URLs to send to /dev/null
+  # TODO handle inside nginx or similar instead! Yeesh
+  get '/temp.png', controller: 'home', action: 'discard', as: 'discard_temp_png'
+  get '/data/temp.png', controller: 'home', action: 'discard', as: 'discard_data_temp_png'
+  get '/tags/temp.png', controller: 'home', action: 'discard', as: 'discard_tags_temp_png'
 
-  map.admin '/admin', :controller => 'admin/base'
+  # Users/authentication via authlogic
+  resource  :user_session
+  resources :password_reset
+  get '/signup', controller: 'users', action: 'new', as: 'signup'
+  get '/login', controller: 'user_sessions', action: 'new', as: 'login'
+  get '/logout', controller: 'user_sessions', action: 'destroy', as: 'logout'
+  get '/forgot_password', controller: 'password_reset', action: 'new', as: 'forgot_password'
 
-  map.signup '/signup', :controller => 'users', :action => 'new'
-  map.resource :user_session # For create/destroy associated with login/logout
-  map.login '/login', :controller => 'user_sessions', :action => 'new'
-  map.logout '/logout', :controller => 'user_sessions', :action => 'destroy'
-  map.forgot_password '/forgot_password',
-    :controller => 'password_reset',
-    :action => 'new'
-  map.resources :password_reset # also not my favorite.
-
-  map.resource :account, :controller => "users" #FIXME DEPRECATEME
-  map.resources :users,
-        :member => [:change_password, :latest],
-        # :has_many => [:tags, :comments]
-        :has_many => [:tags, :visualizations, :comments, :favorites] do |users|
-    users.resources :tags, :as => 'data'
+  resources :users, only: [:show, :create] do
+    resources :tags
   end
-  map.settings '/settings', :controller => 'users', :action => 'edit'
+  get '/settings', controller: 'users', action: 'edit', as: 'settings'
+  get '/account/change_password' => 'users#change_password', as: 'change_password_user'
+  resource :account, controller: "users" # FIXME needed for password resets...
 
-  # intercept bad js/robot GETS to /data/:id/favorites
-  # TODO should have a 'are you sure you wanna favorite this?' page for GETs
-  map.backup_tag_favorites_get '/data/:tag_id/favorites', :method => 'get', :controller => 'favorites', :action => 'create'
+  # Tags/data
+  resources :tags, path: 'data' do
+    resources :favorites, only: [:create, :destroy]
 
-  # tags => /data
-  map.resources :tags,
-    :as => 'data',
-    :has_many => [:comments, :favorites],
-    :member => {:flipped => :get, :nominate => :post, :thumbnail => [:post,:put], :validate => :get},
-    :collection => [:latest, :random]
-  map.resources :tags # /tags vanilla, for backwards-compat (tempt1's eyewriter uses this)
+    collection do
+      get :latest
+      get :random
+    end
 
-  map.latest_tag '/latest.:format', :controller => 'tags', :action => 'latest'
-  map.random_tag '/random.:format', :controller => 'tags', :action => 'random'
+    member do
+      get :flipped
+      post :nominate
+      post :thumbnail
+      put :thumbnail
+      get :validate
+    end
+  end
+  post '/tags' => 'tags#create' # backwards-compatibility
 
-  map.validator '/validator.:format', :controller => 'tags', :action => 'validate', :method => :get
-  map.validate  '/validate.:format',  :controller => 'tags', :action => 'validate', :method => :post
+  # TODO can these be inside the :tags resource declaration but maintain the /shorturls?
+  get '/latest', controller: 'tags', action: 'latest', as: 'latest_tag'
+  get '/random', controller: 'tags', action: 'random', as: 'random_tag'
 
-  # visualizations => /apps
-  map.resources :visualizations,
-    :as => 'apps',
-    :has_many => [:comments, :favorites],
-    :member => {:approve => :put, :unapprove => :put}
+  get  '/validator' => 'tags#validate', as: 'validator'
+  post '/validate' => 'tags#validate', as: 'validate'
 
-  map.resources :comments
+  # Apps
+  resources :visualizations, path: 'apps' do
+    member do
+      put :approve
+      put :unapprove
+    end
+  end
 
-  map.activity '/activity', :controller => 'home', :action => 'activity'
+  # Everything else
+  # FIXME restrict this some more too
+  resources :favorites
 
-  # # Install the default routes
-  # map.connect ':controller/:action/:id'
-  # map.connect ':controller/:action/:id.:format'
+  get '/activity' => 'home#activity', as: 'activity'
 
-  # Home, & lastly serve up static pages when available
-  map.root :controller => 'home', :action => 'index'
-  map.connect '/:id.:format', :controller => 'home', :action => 'static'
+  get '/about' => 'home#about', as: 'about'
 
+  root controller: 'home', action: 'index'
 end

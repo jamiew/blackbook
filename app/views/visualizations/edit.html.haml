@@ -1,12 +1,12 @@
 %h1 Editing visualization
 
-= error_messages_for :visualization
+= render "layouts/error_messages", target: @visualization
 
-- form_for(:visualization, :url => object_url, :html => { :method => :put, :multipart => true }) do |f|
-  = render :partial => "form", :locals => {:f => f}
+= form_for(:visualization, url: visualization_url(@visualization), html: { method: :put, multipart: true }) do |f|
+  = render partial: "form", locals: {f: f}
   %p.buttons= submit_tag "Update"
 
 - if false
-  = link_to 'Show', object_path
+  = link_to 'Show', visualization_path(@visualization)
   |
-  = link_to 'Back', objects_path
+  = link_to 'Back', visualizations_path

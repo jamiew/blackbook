@@ -1,23 +1,7 @@
 class CommentsController < ApplicationController
 
-  before_filter :require_user, :only => [:new, :create, :edit, :update, :destroy]
+  before_filter :require_user, only: [:new, :create, :edit, :update, :destroy]
   before_filter :setup
-
-  def index
-    # Show all comments for given @commentable (fetched in :setup)
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 20
-    @comments = @commentable.comments.sorted.paginate(:page => @page, :per_page => @per_page, :include => [:user, :commentable])
-  end
-
-  def show
-    render :partial => 'comments/comment', :object => @comment, :layout => true
-  end
-
-  def new
-    # Not Implemented
-    @comment = Comment.new
-    render :text => "Not used directly", :layout => true, :status => 420
-  end
 
   def create
     @comment = Comment.new(params[:comment])
@@ -36,11 +20,11 @@ class CommentsController < ApplicationController
   end
 
   def edit
-    render :text => "TODO", :status => 420
+    render text: "TODO", status: 420
   end
 
   def update
-    render :text => "TODO", :status => 420
+    render text: "TODO", status: 420
   end
 
   def destroy
@@ -64,7 +48,7 @@ class CommentsController < ApplicationController
     if params[:tag_id]
       @commentable = Tag.find(params[:tag_id])
     elsif params[:user_id]
-      @commentable = User.find(params[:user_id])
+      @commentable = User.find_by_param(params[:user_id])
     else
       raise ActiveRecord::RecordNotFound, "A commentable (parent) object is required"
     end

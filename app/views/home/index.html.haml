@@ -1,6 +1,6 @@
 
 -# RSS
-= auto_discovery_link_tag(:rss, {:format => :rss, :controller => 'tags', :action => 'index'}, :title => '#0000book: Latest Tags')
+= auto_discovery_link_tag(:rss, {format: :rss, controller: 'tags', action: 'index'}, title: '#0000book: Latest Tags')
 
 -# Be a little more specific about what 'today' is.
 - timezone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
@@ -9,45 +9,31 @@
 #home
 
   #intro
-    .right{:style => 'font-weight: normal; margin-left: 20px; margin-top: 0px; color: #777;'}
-      == #{pluralize Tag.count(:conditions => ["created_at >= ?", today]), 'tag'} uploaded
-      == by #{pluralize Tag.count(:conditions => ["created_at >= ?", today], :select => 'DISTINCT gml_uniquekey'), 'person'} today (last #{time_ago_in_words(today).gsub('about ','')})
+    .right{style: 'font-weight: normal; margin-left: 20px; margin-top: 0px; color: #777;'}
+      == #{pluralize Tag.where("created_at >= ?", today).count, 'tag'} uploaded
+      == by #{pluralize Tag.where("created_at >= ?", today).select('DISTINCT gml_uniquekey').count, 'person'} today (last #{time_ago_in_words(today).gsub('about ','')})
       %br
-      == &rarr; #{link_to 'view all activity', activity_path, :style => 'text-decoration: underline;'}
+      == &rarr; #{link_to 'view all activity', activity_path, style: 'text-decoration: underline;'}
 
-    .welcome{:style => 'width: 600px;'}
+    .welcome{style: 'width: 600px;'}
       %strong Welcome to #000000book
       == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
       == &ndash; uploading tags? #{link_to 'Register an account', signup_path}
-      == <br/> Don't forget to add your iPhone UUID in your #{link_to 'settings', settings_path} to link your uploads (<span style="color:red">*</span>now supported!)
+      == <br/> Signup and #{link_to 'link your iPhone', settings_path} to claim your uploads
 
-  .right_column{:style => "overflow: visible;"}
+  #vanderplayer
+
     .prevnext
-      - @prev ||= @tags.first
-      %li= @next.nil? ? '&larr; newer' : link_to('&larr; newer', tag_path(@next), :class => 'button')
+      - next_text = '&larr; next'.html_safe
+      - prev_text = 'previous &rarr;'.html_safe
+      %li= @next.nil? ? next_text : link_to(next_text, tag_path(@next), class: 'button')
       %li &nbsp;::&nbsp;
-      %li= @prev.nil? ? 'older &rarr;' : link_to('older &rarr;', tag_path(@prev), :class => 'button')
-    %br
-    %ul#frontpage_tags
-      - @tags.each do |tag|
-        %li
-          %span
-            %a{:href => tag_path(tag)}= tag_title(tag)
-          %small
-            -# unless tag.application.blank? && tag.gml_application.blank?
-            - if true
-              %span.application== <em>|</em> #{application_link(tag.sexy_app_name, :short => true)}
-            - if !tag.user.nil?
-              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
-            - elsif !tag.secret_username.blank?
-              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
-    %p.right
-      %strong= link_to '<span>View all data &raquo;</span>', tags_path, :class => 'button ghost small'
-
-  #vanderplayer.left_column
-    -  unless @tag.blank?
+      %li= @prev.nil? ? prev_text : link_to(prev_text, tag_path(@prev), class: 'button')
+    - if @tag.blank?
+      %h2.warning Warning: no tag data
+    - else
       %h2
-        %a{:href => tag_path(@tag)}= tag_title(@tag)
+        %a{href: tag_path(@tag)}= tag_title(@tag)
         %small
           - if true
             %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
@@ -58,4 +44,23 @@
           - elsif @tag.secret_username.blank?
             %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}
           == &ndash; uploaded #{time_ago_in_words(@tag.created_at)} ago
-      = render :partial => 'tags/tag_playback', :object => @tag
+      = render partial: 'tags/tag_playback', object: @tag
+
+  - # List of tags
+  #tag-list
+    %ul#frontpage_tags
+      - @tags.each do |tag|
+        %li
+          %span
+            %a{href: tag_path(tag)}= tag_title(tag)
+          %small
+            -# unless tag.application.blank? && tag.gml_application.blank?
+            - if true
+              %span.application== <em>|</em> #{application_link(tag.sexy_app_name, short: true)}
+            - if !tag.user.nil?
+              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
+            - elsif !tag.secret_username.blank?
+              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
+    %br
+    %p.right
+      %strong= link_to '<span>View all data &raquo;</span>'.html_safe, tags_path, class: 'button ghost small'
