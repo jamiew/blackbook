@@ -88,8 +88,8 @@ Rails.application.configure do
 
   # exception_notification
   Rails.application.config.middleware.use ExceptionNotification::Rack,
+    ignore_exceptions: ['ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
     :email => {
-      # :deliver_with => :deliver, # Rails >= 4.2.1 do not need this option since it defaults to :deliver_now
       :email_prefix => "[blackbook-prod] ",
       :sender_address => %{"000000book Errors" <no-reply@000book.com>},
       :exception_recipients => %w{jamie@jamiedubs.com}
