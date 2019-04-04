@@ -82,7 +82,7 @@ class TagsController < ApplicationController
   # Quick accessor to grab the latest tag -- great for running installations with the freshest GML
   # Hand off to :show except for HTML, which should redirect -- keep permalinks happy
   def latest
-    @tag = Tag.find(:first, order: 'created_at DESC')
+    @tag = Tag.order('created_at DESC').first
     redirect_to(tag_path(@tag), status: 302) and return if [nil,'html'].include?(params[:format])
     show
   end
