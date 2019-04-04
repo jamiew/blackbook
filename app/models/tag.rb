@@ -97,6 +97,7 @@ class Tag < ActiveRecord::Base
   # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
     # Rails.logger.debug "Tag #{id}: gml"
+    return nil if gml_object.blank? || gml_object.data.blank?
     return rotated_gml if opts[:iphone_rotate].to_s == '1' # handoff for backwards compt; DEPRECATEME
     @memoized_gml ||= gml_object && gml_object.data || @gml_temp
     return @memoized_gml
