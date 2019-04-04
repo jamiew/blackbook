@@ -89,6 +89,7 @@ class TagsController < ApplicationController
 
   # Just a random tag -- redirect to canonical for HTML, but otherwise don't bother (API)
   def random
+    require 'activerecord_random' # FIXME rails5 no longer autoloading the lib/ directory
     @tag = Tag.random
     redirect_to(tag_path(@tag), status: 302) and return if [nil,'html'].include?(params[:format])
     show

@@ -260,4 +260,12 @@ describe TagsController do
     end
   end
 
+  describe "GET #random" do
+    it "works" do
+      FactoryBot.create(:tag)
+      get :random
+      assigns(:tag).should_not be_nil
+      response.should_be redirect
+    end
+  end
 end
