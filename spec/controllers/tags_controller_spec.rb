@@ -241,4 +241,23 @@ describe TagsController do
       response.body.should match('warnings=')
     end
   end
+
+  describe "GET #latest" do
+    it ".html redirects to the latest" do
+      tag = FactoryBot.create(:tag)
+      get :latest
+      assigns(:tag).should == tag
+      path = tag_path(tag)
+      response.should redirect_to(path)
+    end
+
+    it ".json returns latest" do
+      tag = FactoryBot.create(:tag)
+      get :latest, format: 'json'
+      assigns(:tag).should == tag
+      response.should be_success
+      JSON.parse(response.body)['id'].should == tag.id
+    end
+  end
+
 end
