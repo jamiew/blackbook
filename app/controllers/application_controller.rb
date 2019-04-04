@@ -4,6 +4,7 @@
 # Common exceptions
 class NoPermissionError < RuntimeError; end
 class InvalidGMLError < RuntimeError; end
+class MissingDataError < RuntimeError; end
 
 class ApplicationController < ActionController::Base
 

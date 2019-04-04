@@ -67,6 +67,9 @@ class TagsController < ApplicationController
       @tag.gml && @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')
     end
 
+    # Freak out if GML data is missing; this really isn't ever supposed to happen
+    raise MissingDataError if @tag.gml.blank?
+
     # fresh_when last_modified: @tag.updated_at.utc, etag: @tag
     respond_to do |wants|
       wants.html  { render }

@@ -13,7 +13,7 @@ describe TagsController do
   describe "POST #create" do
     it "routes from POST /tags"
     it "routes from POST /data"
-    
+
     it "should create given params[:gml]" do
       post :create, gml: @gml
       assigns[:tag].should be_valid
@@ -169,6 +169,16 @@ describe TagsController do
         get :show, id: @tag.to_param, format: 'json'
         response.body.should match("\"gml\":")
       end
+    end
+
+    it ".gml should fail gracefully if GML data file is missing" do
+      tag = FactoryBot.create(:tag)
+      allow_any_instance_of(Tag).to receive(:gml).and_return(nil)
+      expect {
+        get :show, id: @tag.to_param, format: 'gml'
+        puts response.body.inspect
+        response.should be_success
+      }.to raise_error(MissingDataError)
     end
   end
 
