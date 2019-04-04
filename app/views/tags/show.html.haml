@@ -46,7 +46,7 @@
       %li
         <strong>IPFS Hash:</strong>
         - if @tag.ipfs_hash.present?
-          = link_to "https://ipfs.io/ipfs/#{@tag.ipfs_hash}", @tag.ipfs_hash
+          = link_to @tag.ipfs_hash, "https://ipfs.io/ipfs/#{@tag.ipfs_hash}"
         - else
           NULL
 
