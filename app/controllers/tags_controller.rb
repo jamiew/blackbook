@@ -82,13 +82,14 @@ class TagsController < ApplicationController
   # Quick accessor to grab the latest tag -- great for running installations with the freshest GML
   # Hand off to :show except for HTML, which should redirect -- keep permalinks happy
   def latest
-    @tag = Tag.find(:first, order: 'created_at DESC')
+    @tag = Tag.order('created_at DESC').first
     redirect_to(tag_path(@tag), status: 302) and return if [nil,'html'].include?(params[:format])
     show
   end
 
   # Just a random tag -- redirect to canonical for HTML, but otherwise don't bother (API)
   def random
+    require 'activerecord_random' # FIXME rails5 no longer autoloading the lib/ directory
     @tag = Tag.random
     redirect_to(tag_path(@tag), status: 302) and return if [nil,'html'].include?(params[:format])
     show
