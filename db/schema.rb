@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190301153530) do
+ActiveRecord::Schema.define(version: 20190420155934) do
 
   create_table "apps", force: :cascade do |t|
     t.datetime "created_at"
@@ -44,23 +44,6 @@ ActiveRecord::Schema.define(version: 20190301153530) do
 
   add_index "favorites", ["object_id", "object_type"], name: "index_favorites_on_object_id_and_object_type", using: :btree
   add_index "favorites", ["object_id", "object_type"], name: "index_on_object_id_and_object_type", using: :btree
-
-  create_table "forum_posts", force: :cascade do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "forum_threads", force: :cascade do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "forums", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.string   "description", limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "likes", force: :cascade do |t|
     t.integer  "object_id",   limit: 4
