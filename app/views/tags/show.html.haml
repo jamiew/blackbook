@@ -46,7 +46,9 @@
       %li
         <strong>IPFS Hash:</strong>
         - if @tag.ipfs_hash.present?
-          = link_to @tag.ipfs_hash, "https://ipfs.io/ipfs/#{@tag.ipfs_hash}"
+          - short_hash = @tag.ipfs_hash[0..4] + "..." + @tag.ipfs_hash[-3..-1]
+          = link_to short_hash, "https://ipfs.io/ipfs/#{@tag.ipfs_hash}"
+          == <input type="text" disabled value="#{@tag.ipfs_hash}" />
         - else
           NULL
 
