@@ -265,7 +265,7 @@ describe TagsController do
       FactoryBot.create(:tag)
       get :random
       assigns(:tag).should_not be_nil
-      response.should_be redirect
+      response.should be_redirect
     end
   end
 end
