@@ -100,24 +100,23 @@ describe UsersController do
   end
 
   describe '#show' do
+    let(:default_user){ FactoryBot.create(:user) }
     it 'works with user id' do
-      @user = FactoryBot.create(:user)
-      get :show, id: @user.id
+      get :show, id: default_user.id
       response.should be_success
-      assigns(:user).should == @user
+      assigns(:user).should == default_user
     end
 
     it 'works with user login' do
-      @user = FactoryBot.create(:user, login: 'bobisok')
-      get :show, id: 'bobisok'
+      default_user.login.should_not == default_user.id
+      get :show, id: default_user.login
       response.should be_success
-      assigns(:user).should == @user
+      assigns(:user).should == default_user
     end
 
     it 'works if you are logged-in' do
       activate_authlogic
-      @user = FactoryBot.create(:user, login: 'bobisok')
-      get :show, id: @user.login
+      get :show, id: default_user.login
       response.should be_success
     end
 
@@ -127,5 +126,18 @@ describe UsersController do
         get :show, id: 666
       }.should raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it ".json does NOT work" do
+      lambda {
+        get :show, id: default_user.to_param, format: :json
+      }.should raise_error(ActionController::UnknownFormat)
+    end
+
+    it ".xml does NOT work" do
+      lambda {
+        get :show, id: default_user.to_param, format: :xml
+      }.should raise_error(ActionController::UnknownFormat)
+    end
+
   end
 end

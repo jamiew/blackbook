@@ -27,6 +27,10 @@ class UsersController < ApplicationController
     @notifications = @user.notifications.includes(:subject, :user).order('created_at DESC').paginate(page: 1, per_page: 15)
 
     set_page_title @user.name || @user.login
+
+    respond_to do |format|
+      format.html {}
+    end
   end
 
   def new
