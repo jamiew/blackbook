@@ -74,7 +74,7 @@ module ApplicationHelper
 
   # Some common elements
   def redstar
-    '<span style="color: #f55">*</span>'
+    '<span style="color: #f55">*</span>'.html_safe
   end
 
 
