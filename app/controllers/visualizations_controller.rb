@@ -1,10 +1,10 @@
 class VisualizationsController < ApplicationController
 
-  before_filter :setup_user, only: [:create] # Not update
   before_filter :get_visualization, only: [:show, :edit, :update, :destroy, :approve, :unapprove]
   before_filter :require_admin, only: [:approve, :unapprove]
   before_filter :require_owner, only: [:edit, :update, :destroy]
   before_filter :require_user, only: [:new, :create]
+  before_filter :setup_user, only: [:create] # Not update
 
   respond_to :html, :js, :xml, :json
 
@@ -86,6 +86,7 @@ class VisualizationsController < ApplicationController
 
     def setup_user
       #Or should we set this on the object? This overrides accidental form input as well
+      return if current_user.blank?
       params[:visualization] ||= {}
       params[:visualization][:user_id] = params[:user_id] = current_user.id
     end
