@@ -86,6 +86,7 @@ class VisualizationsController < ApplicationController
 
     def setup_user
       #Or should we set this on the object? This overrides accidental form input as well
+      params[:visualization] ||= {}
       params[:visualization][:user_id] = params[:user_id] = current_user.id
     end
 
