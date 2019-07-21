@@ -1,6 +1,8 @@
 #!/bin/sh
 
+echo "*** Deploying 000000book ***"
 ssh blackbook "
+  echo Hello from the remote server
   cd ~/blackbook/
   git fetch --all
   git reset --hard origin/master
