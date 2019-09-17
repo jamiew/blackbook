@@ -86,6 +86,18 @@ describe TagsController do
       }
     end
 
+    it "should work" do
+      get :index
+      response.should be_success
+      response.body.should match(/'application'/)
+    end
+
+    it "should not raise exception if invalid ?page= param is passed" do
+      get :index, page: "-3242' UNION ALL SELECT 70,70,70,70#"
+      flash[:error].should match(/Invalid page number/)
+      response.should redirect_to(tags_path)
+    end
+
     it "should filter on keywords" do
       FactoryBot.create(:tag, application: 'mfcc_test_app', gml_keywords: 'mfcc')
       get :index, keywords: 'mfcc'
