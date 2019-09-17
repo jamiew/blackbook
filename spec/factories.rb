@@ -81,10 +81,10 @@ FactoryBot.define do
     t.object {|a| a.association(:tag) }
   end
 
-  factory :comment do |t|
-    t.user {|a| a.association(:user) }
-    t.commentable {|a| a.association(:tag) }
-    t.text { 'Default comment yo' }
+  factory :comment do
+    association :user
+    association :commentable, factory: :tag
+    text { 'Default comment yo' }
   end
 
 end

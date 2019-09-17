@@ -105,7 +105,8 @@ RSpec.describe Tag, type: :model do
     end
 
     it "to_xml" do
-      xml = @tag.to_xml
+      saved_tag = FactoryBot.create(:tag_from_api)
+      xml = saved_tag.to_xml
       xml.should_not be_blank
       xml.to_s.should match(/id/)
     end
