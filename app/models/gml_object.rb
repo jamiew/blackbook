@@ -188,7 +188,7 @@ class GmlObject
 
     added_file_hash
   rescue HTTP::ConnectionError
-    Rails.logger.warn "GmlObject.store_on_ipfs: failed, can't connect to IPFS daemon"
+    Rails.logger.debug "GmlObject.store_on_ipfs: failed, can't connect to IPFS daemon"
     nil
   end
 
