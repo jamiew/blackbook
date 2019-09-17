@@ -2,13 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Comment, type: :model do
 
-  before do
-    @comment = FactoryBot.build(:comment)
-  end
-
   it "factory should be valid" do
-    @comment.should be_valid
-    lambda { @comment.save! }.should_not raise_error
+    # invalid if we just use :build; doesn't save associations
+    comment = FactoryBot.create(:comment)
+    lambda { comment.save! }.should_not raise_error
   end
 
   it "should fail without a commentable object" do

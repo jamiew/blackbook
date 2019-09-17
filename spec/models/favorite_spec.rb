@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe Favorite, type: :model do
 
   before(:each) do
-    @favorite = FactoryBot.build(:favorite)
+    # FIXME wish this could use :build; not saving associations
+    @favorite = FactoryBot.create(:favorite)
   end
 
   it "should be valid" do
