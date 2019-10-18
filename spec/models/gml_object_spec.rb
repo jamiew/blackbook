@@ -4,24 +4,24 @@ require 'rails_helper'
 RSpec.describe GmlObject, type: :model do
 
   it 'factory should work' do
-    lambda {
+    expect {
       FactoryBot.create(:gml_object)
-    }.should_not raise_error
+    }.not_to raise_error
 
     gml = FactoryBot.build(:gml_object)
-    gml.valid?.should == true
+    expect(gml.valid?).to eq(true)
   end
 
   it 'should fail to create without a tag_id' do
-    lambda {
+    expect {
       FactoryBot.create(:gml_object, tag_id: nil)
-    }.should raise_error
+    }.to raise_error
   end
 
   it 'should fail to create without any data' do
-    lambda {
+    expect {
       FactoryBot.create(:gml_object, data: nil)
-    }.should raise_error
+    }.to raise_error
   end
 
   it 'should call store_on_disk after_save' do
@@ -34,23 +34,23 @@ RSpec.describe GmlObject, type: :model do
     tag = FactoryBot.create(:tag)
     Rails.logger.debug "OK tag created. id=#{tag.id}"
     gml = FactoryBot.build(:gml_object, tag: tag)
-    gml.tag_id.should == tag.id
-    gml.data.should_not be_blank
-    gml.should be_valid
+    expect(gml.tag_id).to eq(tag.id)
+    expect(gml.data).not_to be_blank
+    expect(gml).to be_valid
   end
 
   it 'should fail if passed a bad Tag object' do
-    lambda {
+    expect {
       tag = nil
       gml = FactoryBot.create(:gml_object, tag: tag)
-      gml.should_not be_valid
-    }.should raise_error
+      expect(gml).not_to be_valid
+    }.to raise_error
   end
 
   describe "#store_on_disk" do
     it "fails if tag_id is blank" do
       gml = FactoryBot.build(:gml_object, tag_id: nil)
-      gml.read_from_disk.should == nil
+      expect(gml.read_from_disk).to eq(nil)
       expect { gml.store_on_disk }.to raise_error
     end
 
@@ -61,10 +61,10 @@ RSpec.describe GmlObject, type: :model do
       # TODO would be nice to have method on this object to verify itself
       # maybe use a separate GmlValidator object or concern
       # gml.validate_gml_syntax.should == true
-      gml.data.should_not be_blank
-      gml.data.should match(/\<gml\>/)
+      expect(gml.data).not_to be_blank
+      expect(gml.data).to match(/\<gml\>/)
 
-      gml.read_from_disk.should == gml.data
+      expect(gml.read_from_disk).to eq(gml.data)
     end
   end
 
@@ -76,8 +76,8 @@ RSpec.describe GmlObject, type: :model do
       # so use to avoid messy issues because of  `read_from_disk` being called automatically
       gml = FactoryBot.build(:gml_object, tag_id: 1)
       FileUtils.rm_f(gml.filename)
-      File.exists?(gml.filename).should == false
-      gml.read_from_disk.should == nil
+      expect(File.exists?(gml.filename)).to eq(false)
+      expect(gml.read_from_disk).to eq(nil)
     end
   end
 
@@ -99,7 +99,7 @@ RSpec.describe GmlObject, type: :model do
       gml = FactoryBot.build(:gml_object, tag_id: tag.id)
       result = gml.store_on_ipfs
       # hash of the current public/data/1.gml file =>
-      result.should == "QmbQJhosiiUUTXk12ueQM79iuWpDohu9WRiige61HqkqtS"
+      expect(result).to eq("QmbQJhosiiUUTXk12ueQM79iuWpDohu9WRiige61HqkqtS")
     end
 
     it "fails if no IPFS daemon available" do
@@ -120,8 +120,8 @@ RSpec.describe GmlObject, type: :model do
     it "loads a Tag" do
       tag = FactoryBot.create(:tag)
       obj = FactoryBot.build(:gml_object, tag_id: tag.id)
-      obj.tag.kind_of?(Tag).should == true
-      obj.tag.gml_application.should == tag.gml_application
+      expect(obj.tag.kind_of?(Tag)).to eq(true)
+      expect(obj.tag.gml_application).to eq(tag.gml_application)
     end
   end
 

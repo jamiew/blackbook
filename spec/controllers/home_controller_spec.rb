@@ -15,14 +15,14 @@ describe HomeController do
 
   it "/ works" do
     get :index
-    response.body.should match(/an open database for Graffiti Markup Language/)
-    response.should be_success
+    expect(response.body).to match(/an open database for Graffiti Markup Language/)
+    expect(response).to be_success
   end
 
   it "/about works" do
     get :about
-    response.body.should match(/About/)
-    response.should render_template('home/about')
-    response.should be_success
+    expect(response.body).to match(/About/)
+    expect(response).to render_template('home/about')
+    expect(response).to be_success
   end
 end
