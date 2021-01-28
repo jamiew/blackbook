@@ -88,7 +88,7 @@ function load_gml(data)
 		  size(600, 500); \
 		  frameRate(30); \
 		  var app_name = gml.tag.header && gml.tag.header.client && gml.tag.header.client.name; \
-		  if(app_name == 'Graffiti Analysis 2.0: DustTag' || app_name == 'DustTag: Graffiti Analysis 2.0' || app_name == 'Fat Tag - Katsu Edition'){ \
+		  if(app_name == 'Graffiti Analysis 2.0: DustTag' || app_name == 'DustTag: Graffiti Analysis 2.0'){ \
   			rotation = 80; \
   			translation = [0, 500]; \
 		  } else { \
