@@ -249,7 +249,7 @@ protected
         render text: @tag.id, status: 200 #OK
       end
     else
-      logger.error "Could not create tag from API... Tag: #{@tag.errors.full_messages.inspect}\nGMLObject#{@tag.gml_object.errors.full_messages.inspect}"
+      logger.error "Could not create tag from API... Tag: #{@tag.errors.full_messages.inspect}\nGMLObject#{@tag.gml_object.inspect}"
       render text: "ERROR: #{@tag.errors.inspect}", status: 422 # Unprocessable Entity
     end
   end
