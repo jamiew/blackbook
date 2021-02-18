@@ -85,7 +85,7 @@ class GmlObject
     # raise "Oh no you called GmlObject#save!"
     store_on_disk
     # store_on_s3
-    store_on_ipfs
+    # store_on_ipfs
   end
 
   def exists_on_disk?
