@@ -109,6 +109,11 @@ RSpec.describe GmlObject, type: :model do
       # gml_store_on_ipfs
       skip
     end
+
+    it "handles JSON parser errors" do
+      # TODO simulate JSON::ParserError
+      skip
+    end
   end
 
   describe "#read_from_ipfs" do
