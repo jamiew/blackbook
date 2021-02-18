@@ -13,9 +13,9 @@ ssh blackbook "
   echo 'Bundle install...'
   /home/rails/.rbenv/shims/bundle install --quiet
   echo 'Running migrations...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/rake db:migrate 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
+  RAILS_ENV=production /home/rails/.rbenv/shims/bundle exec rake db:migrate 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
   echo 'Compiling assets...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/rake assets:precompile 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
+  RAILS_ENV=production /home/rails/.rbenv/shims/bundle exec rake assets:precompile 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
   touch tmp/restart.txt
   echo 'Restarting service...'
   sudo systemctl restart blackbook4
