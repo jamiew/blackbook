@@ -1,0 +1,86 @@
+name: "CI Tests"
+
+on: push
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:12-3.0-alpine
+        env:
+          POSTGRES_USER: blackbook
+          POSTGRES_DB: blackbook_test
+          POSTGRES_PASSWORD: blackbook_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Cache Gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
+      - name: Install Gems
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Get yarn cache path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache Yarn
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install Node Packages
+        run: |
+          yarn install --pure-lockfile
+
+      - name: Set up database
+        env:
+          RAILS_ENV: test
+          PGHOST: localhost
+          PGUSER: blackbook
+          PGPASSWORD: blackbook_test
+          PGPORT: 5432
+          GOOGLE_MAPS_API: fake-key
+        run: |
+          bin/rails db:schema:load --trace
+
+      - name: Run tests
+        env:
+          PGHOST: localhost
+          PGUSER: blackbook
+          PGPASSWORD: blackbook_test
+          PGPORT: 5432
+          GOOGLE_MAPS_API: fake-key
+        run: |
+          bin/rails spec
