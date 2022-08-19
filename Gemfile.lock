@@ -119,12 +119,12 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.0)
-    mini_portile2 (2.5.3)
+    mini_portile2 (2.6.1)
     minitest (5.14.4)
     mysql2 (0.4.10)
     nio4r (2.5.8)
-    nokogiri (1.11.7)
-      mini_portile2 (~> 2.5.0)
+    nokogiri (1.12.5)
+      mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
     paperclip (6.1.0)
       activemodel (>= 4.2.0)
@@ -138,7 +138,7 @@ GEM
     public_suffix (4.0.6)
     puma (5.6.4)
       nio4r (~> 2.0)
-    racc (1.5.2)
+    racc (1.6.0)
     rack (1.6.13)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -238,7 +238,7 @@ DEPENDENCIES
   jquery-rails
   lograge
   mysql2 (~> 0.4.10)
-  nokogiri (~> 1.11)
+  nokogiri (~> 1.12)
   paperclip
   pg (~> 0.15)
   protected_attributes
