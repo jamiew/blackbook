@@ -13,11 +13,6 @@
 
 ActiveRecord::Schema.define(version: 20190420155934) do
 
-  create_table "apps", force: :cascade do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "comments", force: :cascade do |t|
     t.string   "title",            limit: 50,    default: ""
     t.text     "text",             limit: 65535
