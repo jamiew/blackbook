@@ -81,7 +81,12 @@ class TagsController < ApplicationController
       wants.html  { render }
       wants.gml   { render xml: @tag.gml(iphone_rotate: params[:iphone_rotate]) }
       wants.xml   { render xml: @tag.to_xml(except: Tag::HIDDEN_ATTRIBUTES, dasherize: false, skip_types: true) }
-      wants.json  { render json: @tag.to_json(except: Tag::HIDDEN_ATTRIBUTES), callback: params[:callback] }
+      wants.json  {
+        response['Access-Control-Allow-Origin'] = '*'
+        response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+        response['Access-Control-Max-Age'] = '1728000'
+        render json: @tag.to_json(except: Tag::HIDDEN_ATTRIBUTES), callback: params[:callback]
+      }
     end
   end
 
