@@ -7,15 +7,15 @@ RSpec.describe Mailer, type: :mailer do
   describe 'password_reset_instructions' do
     it 'works' do
       resp = Mailer.password_reset_instructions(user)
-      resp.body.should match(/If you did not make this request, simply ignore this email/)
-      resp.body.should match(/\/password_reset\//)
+      expect(resp.body).to match(/If you did not make this request, simply ignore this email/)
+      expect(resp.body).to match(/\/password_reset\//)
     end
   end
 
   describe 'signup_notification' do
     it 'works' do
       resp = Mailer.signup_notification(user)
-      resp.body.should match(/Welcome to Blackbook/)
+      expect(resp.body).to match(/Welcome to Blackbook/)
     end
   end
 

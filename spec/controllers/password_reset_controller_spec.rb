@@ -13,9 +13,9 @@ describe PasswordResetController do
   describe "GET #new" do
     it "should render a form input field correctly" do
       get :new
-      response.should be_ok
-      response.body.should match(/Fill out the form below/)
-      response.body.should match(/form action=\"\/password_reset\"/)
+      expect(response).to be_ok
+      expect(response.body).to match(/Fill out the form below/)
+      expect(response.body).to match(/form action=\"\/password_reset\"/)
     end
   end
 
@@ -23,16 +23,16 @@ describe PasswordResetController do
     it "should send an email to the user if found" do
       expect {
         post :create, email: @user.email
-        @user.perishable_token.should_not be_blank
-        response.should redirect_to(root_path)
+        expect(@user.perishable_token).not_to be_blank
+        expect(response).to redirect_to(root_path)
       }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it "should re-render the new template given an invalid email" do
       post :create, email: 'jamie@notauser.com'
-      assigns[:user].should be_nil
-      flash[:error].should_not be_blank
-      response.should render_template('password_reset/new')
+      expect(assigns[:user]).to be_nil
+      expect(flash[:error]).not_to be_blank
+      expect(response).to render_template('password_reset/new')
     end
   end
 
@@ -44,8 +44,8 @@ describe PasswordResetController do
           password: 'totally_fresh!', password_confirmation: 'totally_fresh!' }
         @user.reload
       }.to change(@user, :crypted_password)
-      flash[:notice].should_not be_blank
-      response.should redirect_to(user_path)
+      expect(flash[:notice]).not_to be_blank
+      expect(response).to redirect_to(user_path)
     end
 
     it "should not change password given a valid token and non-matching passwords" do
@@ -55,14 +55,14 @@ describe PasswordResetController do
           password: 'new_pass', password_confirmation: 'new' }
         @user.reload
       }.to_not change(@user, :crypted_password)
-      response.should_not be_redirect
+      expect(response).not_to be_redirect
     end
 
     it "should not change password given an invalid token" do
       expect {
         post :update, id: 'not_a_valid_token', user: {
           password: 'new_pass', password_confirmation: 'new' }
-        response.should redirect_to(root_url)
+        expect(response).to redirect_to(root_url)
       }.to_not change(@user, :crypted_password)
     end
 
