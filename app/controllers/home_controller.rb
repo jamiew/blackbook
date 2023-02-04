@@ -2,8 +2,6 @@ class HomeController < ApplicationController
 
   # caches_action :index, cache_path: 'home/index', expires_in: 30.minutes, if: :cache_request?
 
-  force_ssl
-
   def index
     @tags = Tag.order('created_at DESC').limit(30).includes(:user)
     @tag = @tags.present? && @tags[0] || nil

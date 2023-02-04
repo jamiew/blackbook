@@ -2,8 +2,6 @@ class PasswordResetController < ApplicationController
   before_filter :load_user_using_perishable_token, only: [:edit, :update]
   before_filter :require_no_user
 
-  force_ssl
-
   def new
     set_page_title 'Forgot your password?'
   end
