@@ -219,7 +219,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
-    will_paginate (3.3.0)
+    will_paginate (3.3.1)
 
 PLATFORMS
   ruby
