@@ -27,6 +27,7 @@ class Visualization < ActiveRecord::Base
   validates_presence_of :authors, on: :create, message: "can't be blank, put your username if nothing else"
   # validates_presence_of :website, on: :create, message: "can't be blank"
   validates_presence_of :embed_url, on: :create, message: "can't be blank", if: :is_embeddable
+  validate :reject_if_any_html
 
   attr_protected :user_id, :slug
 
@@ -56,6 +57,15 @@ class Visualization < ActiveRecord::Base
 protected
   def create_notification
     Notification.create(subject: self, verb: 'created', user: self.user)
+  end
+
+  def reject_if_any_html
+    self.attributes.each do |key,value|
+      # Rails.logger.warn "Visualization field #{key} contains HTML: #{value} -- objects=#{self.inspect}"
+      if value.present? && value.class == String && value.match(/href\=/)
+        errors.add(key, "is invalid")
+      end
+    end
   end
 
 end

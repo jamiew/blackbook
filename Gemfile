@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 ruby File.open(File.dirname(__FILE__)+'/.ruby-version', 'rb') { |f| f.read.chomp }
 
-gem 'rails', '4.2.11'
+gem 'rails', '4.2.11.1'
 gem 'pg', '~> 0.15'
-gem 'mysql2', '~> 0.4.10'
+gem 'mysql2', '~> 0.5.4'
 gem 'puma', groups: [:development, :production]
 
 gem 'uglifier'
@@ -11,7 +11,7 @@ gem 'jquery-rails'
 gem 'responders', '~> 2.0'
 gem 'haml'
 gem 'authlogic'
-gem 'nokogiri', '~> 1.8.2'
+gem 'nokogiri', '~> 1.12'
 gem 'paperclip'
 gem 'htmlentities'
 gem 'will_paginate'

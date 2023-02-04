@@ -1,9 +1,9 @@
+.DS_Store
 *.sql
 *.dump
 *.sublime-*
 .bundle
 .env
-config/database.yml
 coverage
 data
 data2

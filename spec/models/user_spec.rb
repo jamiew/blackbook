@@ -8,11 +8,11 @@ RSpec.describe User, type: :model do
   end
 
   it "should fail without a login" do
-    lambda { FactoryBot.create(:user, login: '') }.should raise_error
+    expect { FactoryBot.create(:user, login: '') }.to raise_error
   end
 
   it "should fail without an email" do
-    lambda { FactoryBot.create(:user, email: '') }.should raise_error
+    expect { FactoryBot.create(:user, email: '') }.to raise_error
   end
 
   describe "#deliver_password_reset_instructions!" do
@@ -25,7 +25,7 @@ RSpec.describe User, type: :model do
     end
 
     it "calls user.reset_perishable_token!" do
-      user.should_receive(:reset_perishable_token!)
+      expect(user).to receive(:reset_perishable_token!)
       user.deliver_password_reset_instructions!
     end
   end
@@ -34,7 +34,7 @@ RSpec.describe User, type: :model do
     let(:user){ FactoryBot.create(:user) }
 
     it "changes the user's perishable token" do
-      user.perishable_token.should_not be_blank
+      expect(user.perishable_token).not_to be_blank
       expect {
         user.deliver_password_reset_instructions!
       }.to change(user, :perishable_token)

@@ -30,7 +30,13 @@ class TagsController < ApplicationController
       @search_context = {key: :user, value: @user.login, conditions: ["user_id = ?",@user.id]}
     end
 
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 15
+    @page = params[:page] && params[:page].to_i || 1
+    if @page < 1
+      flash[:error] = "Invalid page number specified"
+      redirect_to tags_path and return
+    end
+
+    @per_page = 15
     @tags ||= Tag.order('tags.created_at DESC').includes(:user).where(@search_context && @search_context[:conditions]).paginate(page: @page, per_page: @per_page)
     @applications ||= Visualization.find_by_sql("SELECT DISTINCT application AS name FROM tags ORDER BY name")
     @applications.reject! { |app| app.name.blank? }
@@ -243,7 +249,7 @@ protected
         render text: @tag.id, status: 200 #OK
       end
     else
-      logger.error "Could not create tag from API... Tag: #{@tag.errors.full_messages.inspect}\nGMLObject#{@tag.gml_object.errors.full_messages.inspect}"
+      logger.error "Could not create tag from API... Tag: #{@tag.errors.full_messages.inspect}\nGMLObject#{@tag.gml_object.inspect}"
       render text: "ERROR: #{@tag.errors.inspect}", status: 422 # Unprocessable Entity
     end
   end

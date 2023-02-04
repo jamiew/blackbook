@@ -1,7 +1,7 @@
 /*
-__          __   _                          _                              
-\ \        / /  | |                        | |                             
- \ \  /\  / /___| |__  _ __ ___   __ _ _ __| | _____ _ __   _ __ ___   ___ 
+__          __   _                          _
+\ \        / /  | |                        | |
+ \ \  /\  / /___| |__  _ __ ___   __ _ _ __| | _____ _ __   _ __ ___   ___
   \ \/  \/ // _ \ '_ \| '_ ` _ \ / _` | '__| |/ / _ \ '__| | '_ ` _ \ / _ \
    \  /\  /|  __/ |_) | | | | | | (_| | |  |   <  __/ | _  | | | | | |  __/
     \/  \/  \___|_.__/|_| |_| |_|\__,_|_|  |_|\_\___|_|(_) |_| |_| |_|\___|
@@ -28,51 +28,51 @@ function hex2rgb2(hexcolor)
 
 // *************** Callback Method ************
 // ********************************************
-function load_gml(data) 
+function load_gml(data)
 {
   // TODO handle both arrays and individual items...
   // e.g. both /data.json?location=... and /data/145.json
-  
-	if(typeof(data) != 'undefined')	
+
+	if(typeof(data) != 'undefined')
 	{
 	  var i = 1;
 		gml = data.gml;
-				
+
 		// attach sketch script tag
 		var sketch_script = document.createElement('script');
 		sketch_script.setAttribute('id','sketch'+i);
 		sketch_script.type = 'application/processing';
 		document.getElementsByTagName('body')[0].appendChild(sketch_script);
-		
+
 		// use existing canvas tag
 		var wm_cp_canvas = document.getElementById('canvas');
-		
+
 		// attach Canvas Player canvas tag
     // var wm_cp_canvas = document.createElement('canvas');
     // wm_cp_canvas.setAttribute('width','200px');
-    // wm_cp_canvas.setAttribute('height','200px');    
+    // wm_cp_canvas.setAttribute('height','200px');
 		// uncomment following line to see the tags seperated
     // wm_cp_canvas.setAttribute('style','width: 100%; height: 100%; position:absolute; pointer-events:none; z-index:1001; top:0px; left:0px;');
 		//wm_cp_canvas.setAttribute('style','position:absolute; pointer-events:none; z-index:1001; top:0px; left:0px;');
 		//wm_cp_canvas.setAttribute('id','canvas'+i); // single canvas for every tag
     // wm_cp_canvas.setAttribute('id','canvas'); // one canvas for all tags
     // document.getElementsByTagName('body')[0].appendChild(wm_cp_canvas);
-				
-		/* 
+
+		/*
 		 * concatenate pointlists of one tag and set them as global variables, so the processing.js draw function can acces them.
 		 * This is kind of a workarround because one can't give parameters to the setup or drawing functions.
   		 * Working with the iteration variable here because Objects can't be serialized and attached to the created sketch scripts, but numbers/strings can.
 		 */
-		pts = []; 
-		pts_opts = []; 
-		strokes = (gml.tag.drawing.stroke instanceof Array ? gml.tag.drawing.stroke : [gml.tag.drawing.stroke]); 
-		for(j in strokes){ 
-			pts 		= pts.concat(strokes[j].pt); 
+		pts = [];
+		pts_opts = [];
+		strokes = (gml.tag.drawing.stroke instanceof Array ? gml.tag.drawing.stroke : [gml.tag.drawing.stroke]);
+		for(j in strokes){
+			pts 		= pts.concat(strokes[j].pt);
 			pts_opts 	= pts_opts.concat({
-			  stroke: (strokes[j].stroke_size || 8), 
-			  color: (strokes[j].color ? hex2rgb2(strokes[j].color) : '255,255,255'), 
+			  stroke: (strokes[j].stroke_size || 8),
+			  color: (strokes[j].color ? hex2rgb2(strokes[j].color) : '255,255,255'),
 			  drips: (strokes[j].dripping || false)
-			}); 			
+			});
 			pts.push(undefined); // blank obj to indicate new stroke
 		}
 
@@ -88,7 +88,7 @@ function load_gml(data)
 		  size(600, 500); \
 		  frameRate(30); \
 		  var app_name = gml.tag.header && gml.tag.header.client && gml.tag.header.client.name; \
-		  if(app_name == 'Graffiti Analysis 2.0: DustTag' || app_name == 'DustTag: Graffiti Analysis 2.0' || app_name == 'Fat Tag - Katsu Edition'){ \
+		  if(app_name == 'Graffiti Analysis 2.0: DustTag' || app_name == 'DustTag: Graffiti Analysis 2.0'){ \
   			rotation = 80; \
   			translation = [0, 500]; \
 		  } else { \
@@ -122,7 +122,7 @@ function load_gml(data)
 		  stroke(colors[0],colors[1],colors[2]); \
 		  line(prev.x*width, prev.y*height, pt.x*width, pt.y*height); \
 		}";
-		
+
 		//var canvas 	= document.getElementById('canvas' + i); // single canvas for every tag
 		var canvas 	= document.getElementById('canvas'); // one canvas for all tags
 		var sketch 	= document.getElementById('sketch' + i).text;
