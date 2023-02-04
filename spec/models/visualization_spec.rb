@@ -8,11 +8,11 @@ RSpec.describe Visualization, type: :model do
   end
 
   it "should fail without a login" do
-    lambda { FactoryBot.create(:user, login: '') }.should raise_error
+    expect { FactoryBot.create(:user, login: '') }.to raise_error
   end
 
   it "should fail without an email" do
-    lambda { FactoryBot.create(:user, email: '') }.should raise_error
+    expect { FactoryBot.create(:user, email: '') }.to raise_error
   end
 
   it "fails if you put HTML links in fields" do

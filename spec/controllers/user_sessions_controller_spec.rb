@@ -11,26 +11,26 @@ describe UserSessionsController do
   describe "actions requiring no current user" do
     it "should not redirect for a non-logged in user on :new" do
       get :new
-      response.should_not be_redirect
+      expect(response).not_to be_redirect
     end
 
     it "should not redirect for a non-logged in user on :create" do
       get :create
-      response.should_not be_redirect
+      expect(response).not_to be_redirect
     end
 
     it "should redirect for a logged in user on :new" do
       activate_authlogic
       UserSession.create(FactoryBot.create(:user))
       get :new
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     it "should redirect for a logged in user on :create" do
       activate_authlogic
       UserSession.create(FactoryBot.create(:user))
       get :create
-      response.should be_redirect
+      expect(response).to be_redirect
     end
   end
 
@@ -39,7 +39,7 @@ describe UserSessionsController do
       activate_authlogic
       UserSession.create(FactoryBot.create(:user))
       get :destroy
-      response.should redirect_to(login_path)
+      expect(response).to redirect_to(login_path)
     end
   end
 
@@ -53,25 +53,25 @@ describe UserSessionsController do
 
     it "should work and redirect to the account page" do
       user = User.find_by_login(username)
-      user.should_not be_nil # sanity-check our setup
+      expect(user).not_to be_nil # sanity-check our setup
       post :create, user_session: { login: username, password: password }
-      flash[:notice].should match(/Login successful/)
-      current_user.should == @user
-      response.should redirect_to(user_path(user))
+      expect(flash[:notice]).to match(/Login successful/)
+      expect(current_user).to eq(@user)
+      expect(response).to redirect_to(user_path(user))
     end
 
     it "should fail if credentials are missing" do
       post :create, some_random_stuff: { login: nil }
-      flash[:error].should match(/Failed to authenticate/)
-      current_user.should be_nil
-      response.should be_unauthorized
+      expect(flash[:error]).to match(/Failed to authenticate/)
+      expect(current_user).to be_nil
+      expect(response).to be_unauthorized
     end
 
     it "should fail if credentials are incorrect" do
       post :create, user_session: { login: username, password: 'idkman' }
-      flash[:error].should match(/Failed to authenticate/)
-      current_user.should be_nil
-      response.should be_unauthorized
+      expect(flash[:error]).to match(/Failed to authenticate/)
+      expect(current_user).to be_nil
+      expect(response).to be_unauthorized
     end
   end
 
@@ -80,16 +80,16 @@ describe UserSessionsController do
       activate_authlogic
       UserSession.create(FactoryBot.create(:user))
       post :destroy
-      flash[:notice].should  match(/Logout successful/)
-      current_user.should be_nil
-      response.should redirect_to(login_path)
+      expect(flash[:notice]).to  match(/Logout successful/)
+      expect(current_user).to be_nil
+      expect(response).to redirect_to(login_path)
     end
 
     it "should fail if logged-out" do
-      current_user.should be_nil # sanity-check
+      expect(current_user).to be_nil # sanity-check
       post :destroy
-      flash[:error].should match(/You must be logged in to do that/)
-      response.should redirect_to(login_path)
+      expect(flash[:error]).to match(/You must be logged in to do that/)
+      expect(response).to redirect_to(login_path)
     end
   end
 end
