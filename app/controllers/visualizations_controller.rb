@@ -84,9 +84,9 @@ class VisualizationsController < ApplicationController
       obj.save!
     end
 
-    def setup_user
-      #Or should we set this on the object? This overrides accidental form input as well
+    def setup_user      
       return if current_user.blank?
+      # Or should we set this on the object? This overrides accidental form input as well
       params[:visualization] ||= {}
       params[:visualization][:user_id] = params[:user_id] = current_user.id
     end
