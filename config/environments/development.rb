@@ -46,4 +46,12 @@ Rails.application.configure do
   # logger           = ActiveSupport::Logger.new(STDOUT)
   # logger.formatter = config.log_formatter
   # config.logger    = ActiveSupport::TaggedLogging.new(logger)
+
+  # Sprockets asset compilation
+  # sad we're on rails 4 lol
+  # ideas via https://stackoverflow.com/questions/35683185/rails-sprocketsrailshelperassetnotprecompiled-in-development
+  # config.assets.debug = false
+  # config.assets.unknown_asset_fallback = true
+  config.assets.check_precompiled_asset = false
+
 end
