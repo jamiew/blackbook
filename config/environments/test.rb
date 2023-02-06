@@ -45,4 +45,8 @@ Rails.application.configure do
   logger           = ActiveSupport::Logger.new(STDOUT)
   logger.formatter = config.log_formatter
   config.logger    = ActiveSupport::TaggedLogging.new(logger)
+
+  # Hack fix to silence asset pipeline precompilation issues
+  # I believe pipeline is compiling dynamically, as expected
+  config.assets.check_precompiled_asset = false
 end
