@@ -11,7 +11,7 @@ describe VisualizationsController do
     it "routes from GET /apps" do
       { get: "/apps" }.should route_to("visualizations#index")
     end
-    
+
     it "works" do
       pending 'TODO'
       fail
@@ -20,7 +20,7 @@ describe VisualizationsController do
 
   describe "GET #show" do
     it "routes from GET /apps/:id" do
-      { get: "/apps/1" }.should route_to("visualizations#show", id: 1)
+      { get: "/apps/1" }.should route_to("visualizations#show", id: "1")
     end
 
     it "works" do
@@ -32,7 +32,7 @@ describe VisualizationsController do
       expect {
         Visualization.where(id: 666).first.should be_nil
         get :show, id: 666
-      }.to_raise(ActiveRecord::RecordNotFound)
+      }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
