@@ -5,6 +5,7 @@ describe VisualizationsController do
 
   before do
     activate_authlogic
+    @visualization = create(:visualization)
   end
 
   describe "GET #index" do
@@ -13,8 +14,9 @@ describe VisualizationsController do
     end
 
     it "works" do
-      pending 'TODO'
-      fail
+      get :index
+      expect(response).to be_success
+      expect(assigns(:visualizations)).to eq([@visualization])
     end
   end
 
@@ -24,8 +26,9 @@ describe VisualizationsController do
     end
 
     it "works" do
-      pending 'TODO'
-      fail
+      get :show, id: @visualization.id
+      expect(response).to be_success
+      expect(response.body).to match(@visualization.name)
     end
 
     it "404s if that record does not exist" do
@@ -42,18 +45,33 @@ describe VisualizationsController do
     end
 
     it "works" do
-      pending 'TODO'
-      fail
+      expect {
+        post :create, visualization: { name: 'test', description: 'test', authors: 'test', embed_url: 'test' }
+        expect(response).to be_redirect
+        expect(flash[:notice]).not_to be_blank
+        expect(flash[:error]).to be_blank
+      }.to change(Visualization, :count).by(1)
     end
 
     it "fails with no data" do
-      pending 'TODO'
-      fail
+      expect {
+        post :create
+        expect(flash[:error]).to_not be_blank
+      }.to_not change(Visualization, :count)
     end
 
     it "fails with bad data" do
-      pending 'TODO'
-      fail
+      expect {
+        post :create, visualization: { name: 'other_fields_missing' }
+        expect(flash[:error]).to_not be_blank
+      }.to_not change(Visualization, :count)
+    end
+
+    it "fails if you include HTML links" do
+      expect {
+        post :create, visualization: { name: 'idk', authors: '<a href="me.com">it me</a>' }
+        expect(flash[:error]).to_not be_blank
+      }.to_not change(Visualization, :count)
     end
   end
 

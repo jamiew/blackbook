@@ -9,9 +9,10 @@ describe CommentsController do
   end
 
   it "POST #create should work" do
-    pending 'comments disabled'
+    pending 'comments are disabled'
     login_as_user
-    post :create, tag_id: @tag.id, comment: {text: 'Lolcats R awesome'}
+    post :create, tag_id: @tag.id, comment: { text: 'Lolcats R awesome' }
+    # TODO this isn't actualy testing anything either
   end
 
   describe "DELETE#destroy" do
