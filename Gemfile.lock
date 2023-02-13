@@ -78,8 +78,9 @@ GEM
       rake
     globalid (0.4.2)
       activesupport (>= 4.2.0)
-    haml (5.2.1)
-      temple (>= 0.8.0)
+    haml (6.1.1)
+      temple (>= 0.8.2)
+      thor
       tilt
     htmlentities (4.3.4)
     http (2.2.2)
@@ -205,12 +206,12 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    temple (0.8.2)
+    temple (0.10.0)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
     thor (1.2.1)
     thread_safe (0.3.6)
-    tilt (2.0.10)
+    tilt (2.0.11)
     tzinfo (1.2.10)
       thread_safe (~> 0.1)
     uglifier (4.2.0)
