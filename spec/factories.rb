@@ -71,9 +71,13 @@ FactoryBot.define do
 
   # A GML application
   factory :visualization do |t|
-    t.name { 'Jdubs TestTag' }
-    t.website { "http://jamiedubs.com/yep" }
-    t.kind { 'javascript' }
+    t.user {|a| a.association(:user) }
+    t.name { "TestTagger" }
+    t.description { "A really cool app with which you can draw tags"}
+    t.website { "http://jamiedubs.com/testtagger" }
+    t.authors { "jamiedubs" }
+    t.kind { "javascript" }
+
   end
 
   factory :favorite do |t|

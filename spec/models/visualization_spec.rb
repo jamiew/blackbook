@@ -2,18 +2,21 @@ require 'rails_helper'
 
 RSpec.describe Visualization, type: :model do
 
-  it "should create" do
-    user = FactoryBot.build(:user)
-    user.save!
+  it "factory is valid" do
+    # doing a .build doesn't save the user association, so let's build that on our own
+    user = FactoryBot.create(:user)
+    expect(FactoryBot.build(:visualization, user: user)).to be_valid
   end
 
-  it "should fail without a login" do
-    lambda { FactoryBot.create(:user, login: '') }.should raise_error
+  it "is invalid without a user" do
+    expect { FactoryBot.create(:visualization, user: nil) }.to raise_error
   end
 
-  it "should fail without an email" do
-    lambda { FactoryBot.create(:user, email: '') }.should raise_error
+  it "is invalid without a name" do
+    expect { FactoryBot.create(:visualization, name: '') }.to raise_error
   end
+
+  # TODO some other required fields -- description, authors, embed_url (if embeddable)
 
   it "fails if you put HTML links in fields" do
     expect(FactoryBot.build(:visualization, authors: '<a href="me.com">it me</a>')).to be_invalid
