@@ -103,4 +103,3 @@ end
 def current_user_session
   @current_user_session ||=UserSession.find
 end
-
