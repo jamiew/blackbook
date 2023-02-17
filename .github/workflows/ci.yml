@@ -12,10 +12,10 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_HOST: 127.0.0.1
-          MYSQL_DB: blackbook_test
           MYSQL_USER: root
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_PASSWORD: ""
+          MYSQL_DB: blackbook_test
         ports:
           - "3306:3306"
 
@@ -70,7 +70,7 @@ jobs:
         run: |
           echo RAILS_ENV=$RAILS_ENV DATABASE_URL=$DATABASE_URL
           docker ps
-          mysql -e "show databases"
+          mysql -h 127.0.0.1 -u root -e "show databases"
           bin/rake db:create
           bin/rake db:schema:load --trace
           bin/rake spec
