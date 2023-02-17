@@ -18,6 +18,7 @@ jobs:
           MYSQL_DB: blackbook_test
         ports:
           - "3306:3306"
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout Code
@@ -61,6 +62,9 @@ jobs:
       - name: Install Node Packages
         run: |
           yarn install --pure-lockfile
+
+      - name: Start MySQL again I guess
+        run: sudo /etc/init.d/mysql start
 
       - name: Run tests
         env:
