@@ -1,0 +1,71 @@
+name: "CI Tests"
+
+on: push
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        # match to the mysql version we're using in production
+        image: mysql:5.7
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DB: blackbook_test
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Cache Gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
+      - name: Install Gems
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Get yarn cache path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache Yarn
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install Node Packages
+        run: |
+          yarn install --pure-lockfile
+
+      - name: Run tests
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: mysql2://127.0.0.1:${{ job.services.mysql.ports[3306] }}/blackbook_test
+        run: |
+          bin/rake db:create
+          bin/rake db:schema:load --trace
+          bin/rake spec
