@@ -15,5 +15,5 @@ production:
 test:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
+  # FIXME do we need to alternate using ENV['CI']?
   database: blackbook_test
-
