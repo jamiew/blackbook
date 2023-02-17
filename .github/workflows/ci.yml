@@ -63,9 +63,6 @@ jobs:
         run: |
           yarn install --pure-lockfile
 
-      - name: Start MySQL again I guess
-        run: sudo /etc/init.d/mysql start
-
       - name: Run tests
         env:
           RAILS_ENV: test
