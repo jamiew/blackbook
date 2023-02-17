@@ -2,7 +2,7 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  host: localhost
+  host: 127.0.0.1
 
 development:
   <<: *default
@@ -14,5 +14,6 @@ production:
 
 test:
   <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
   database: blackbook_test
 
