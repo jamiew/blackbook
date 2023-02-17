@@ -8,12 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        # match the mysql version we're using in production
+        # match to the mysql version we're using in production
         image: mysql:5.7
         env:
           MYSQL_HOST: 127.0.0.1
-          # MYSQL_USER: root
-          # MYSQL_PASSWORD: ""
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DB: blackbook_test
         ports:
@@ -66,13 +64,8 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          # DATABASE_URL: mysql2://root:@127.0.0.1:3306/blackbook_test
           DATABASE_URL: mysql2://127.0.0.1:${{ job.services.mysql.ports[3306] }}/blackbook_test
         run: |
-          echo RAILS_ENV=$RAILS_ENV DATABASE_URL=$DATABASE_URL
-          echo db port ${{ job.services.mysql.ports[3306] }}
-          docker ps
-          mysql -h 127.0.0.1 -u root -e "show databases"
           bin/rake db:create
           bin/rake db:schema:load --trace
           bin/rake spec
