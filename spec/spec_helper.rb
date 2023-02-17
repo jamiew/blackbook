@@ -1,7 +1,6 @@
 require 'factories'
 
 RSpec.configure do |config|
-  puts "hello from rspec.configure... DATABASE_URL=#{ENV['DATABASE_URL'].inspect}"
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
     # and `failure_message` of custom matchers include text for helper methods
@@ -104,4 +103,3 @@ end
 def current_user_session
   @current_user_session ||=UserSession.find
 end
-
