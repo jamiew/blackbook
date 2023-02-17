@@ -7,19 +7,17 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     services:
-      postgres:
-        image: postgis/postgis:12-3.0-alpine
+      mysql:
+				# match the mysql version we're using in production
+        image: mysql:5.7
         env:
-          POSTGRES_USER: blackbook
-          POSTGRES_DB: blackbook_test
-          POSTGRES_PASSWORD: blackbook_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_DB: blackbook_test
+          MYSQL_USER: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_PASSWORD:
         ports:
-          - 5432:5432
+          - "3306:3306"
 
     steps:
       - name: Checkout Code
@@ -64,25 +62,12 @@ jobs:
         run: |
           yarn install --pure-lockfile
 
-      - name: Set up database
-        env:
-          RAILS_ENV: test
-          PGHOST: localhost
-          PGUSER: blackbook
-          PGPASSWORD: blackbook_test
-          PGPORT: 5432
-          GOOGLE_MAPS_API: fake-key
-        run: |
-          # bin/rails db:schema:load --trace
-          bin/rake db:schema:load --trace
-
       - name: Run tests
         env:
-          PGHOST: localhost
-          PGUSER: blackbook
-          PGPASSWORD: blackbook_test
-          PGPORT: 5432
-          GOOGLE_MAPS_API: fake-key
+          RAILS_ENV: test
+          DATABASE_PORT: 3306
         run: |
+          bin/rake db:create
+          bin/rake db:schema:load --trace
           # bin/rails spec
           bin/rake spec
