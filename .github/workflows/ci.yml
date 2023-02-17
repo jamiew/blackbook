@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-				# match the mysql version we're using in production
+        # match the mysql version we're using in production
         image: mysql:5.7
         env:
           MYSQL_HOST: 127.0.0.1
           MYSQL_DB: blackbook_test
           MYSQL_USER: root
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_PASSWORD:
+          MYSQL_PASSWORD: ""
         ports:
           - "3306:3306"
 
