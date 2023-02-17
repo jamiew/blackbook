@@ -69,6 +69,8 @@ jobs:
           DATABASE_URL: mysql2://127.0.0.1:3306/blackbook_test
         run: |
           echo RAILS_ENV=$RAILS_ENV DATABASE_URL=$DATABASE_URL
+          docker ps
+          mysql -e "show databases"
           bin/rake db:create
           bin/rake db:schema:load --trace
           bin/rake spec
