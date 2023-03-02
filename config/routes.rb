@@ -35,7 +35,7 @@ Rails.application.routes.draw do
       post :nominate
       post :thumbnail
       put :thumbnail
-      get :validate
+      # get :validate
     end
   end
   post '/tags' => 'tags#create' # backwards-compatibility
