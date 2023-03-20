@@ -17,14 +17,12 @@ Please visit the [API documentation](http://jamiedubs.com/wikis/blackbook/).
 The GML and **#000000book** development team consists of [Jamie Wilkinson](http://jamiedubs.com),
 [Evan Roth](http://evan-roth.com), [Theodore Watson](http://www.theowatson.com),
 [Chris Sugrue](http://csugrue.com/) and [Todd Vanderlin](http://toddvanderlin.com/),
-all members of the copyleft [F.A.T. Lab](http://fffff.at).
-
-Additional Flash development assistance from [Manolis Perrakis](http://art.manorius.com/)
+all members of the copyleft [F.A.T. Lab](http://fffff.at). Additional Flash development assistance from [Manolis Perrakis](http://art.manorius.com/)
 
 Contact us: _info[at]000000book.com_
 
-Code available under an MIT License
-Copyfree 2009-2010 F.A.T.
+Code available under an MIT License<br/>
+Copyfree 2009-2010 F.A.T.<br/>
 "Release early, often & w/ rap music"
 
 ![gml-file](https://000000book.com/images/gml-file.png)
