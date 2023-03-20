@@ -28,3 +28,10 @@ group :development, :test do
   gem 'rspec-rails', '~> 4.1'
   gem 'factory_bot'
 end
+
+group :development do
+  # gem 'spring'
+  # gem 'spring-commands-rspec'
+  # gem 'disable_assets_logger'
+end
+
