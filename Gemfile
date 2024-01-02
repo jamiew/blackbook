@@ -22,6 +22,7 @@ gem 'dotenv-rails', groups: [:development, :test]
 gem 'lograge'
 gem 'invisible_captcha'
 gem 'exception_notification'
+gem 'bigdecimal', '1.4.4'
 
 group :development, :test do
   gem 'byebug'
