@@ -15,7 +15,7 @@ gem 'paperclip'
 gem 'htmlentities'
 gem 'will_paginate'
 gem 'protected_attributes'
-gem 'aws-sdk', '~> 2'
+gem 'aws-sdk', '~> 3'
 gem 'ipfs', require: 'ipfs/client'
 gem 'rails_12factor'
 gem 'dotenv-rails', groups: [:development, :test]
