@@ -191,7 +191,7 @@ class TagsController < ApplicationController
     elsif params[:tag] && params[:tag][:id]
       @tag = Tag.find(params[:tag][:id])
     else
-      @tag = Tag.new(params[:tag].permit(:gml, :gml_file, :application, :description, :location, :image, :existing_application_id) || {})
+      @tag = Tag.new(params[:tag]&.permit(:gml, :gml_file, :application, :description, :location, :image, :existing_application_id) || {})
       @tag.gml = params[:gml] if @tag.gml.blank? && params[:gml]
     end
     @tag.validate_gml

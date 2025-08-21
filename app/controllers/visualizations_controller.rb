@@ -97,6 +97,6 @@ protected
   private
 
   def visualization_parameters
-    params.require(:visualization).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable, :image)
+    params.fetch(:visualization, {}).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable, :image)
   end
 end

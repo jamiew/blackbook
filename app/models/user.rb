@@ -4,6 +4,10 @@ class User < ActiveRecord::Base
     c.crypto_provider = ::Authlogic::CryptoProviders::SCrypt
   end
 
+  # Add password confirmation support for forms
+  attr_accessor :password_confirmation
+  validates_confirmation_of :password, if: :password_changed?
+
   # FIXME manually reimplmenting this for now...
   # should we just use friendly_id?
   # has_slug :login
