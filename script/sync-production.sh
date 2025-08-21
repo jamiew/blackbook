@@ -89,26 +89,17 @@ else
   echo "⏭️  Skipping database sync (SKIP_DATABASE=1)"
 fi
 
-# 2. Sync uploaded files in parallel
+# 2. Sync uploaded files
 if [[ -z "$SKIP_FILES" ]]; then
   echo "🖼️  Syncing files..."
   mkdir -p public/system data
 
-  # Start both syncs in parallel
-  echo "Starting image sync..."
-  rsync -avz --progress --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/public/system/" "./public/system/" &
-  IMAGES_PID=$!
-
-  echo "Starting GML data sync..."
-  rsync -avz --progress --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/data/" "./data/" &
-  DATA_PID=$!
-
-  # Wait for both to complete
-  echo "Waiting for syncs to complete..."
-  wait $IMAGES_PID
+  echo "Syncing images..."
+  rsync -avz --progress --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/public/system/" "./public/system/"
   echo "✅ Images sync complete!"
 
-  wait $DATA_PID
+  echo "Syncing GML data..."
+  rsync -avz --progress --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/data/" "./data/"
   echo "✅ GML data sync complete!"
 else
   echo "⏭️  Skipping files sync (SKIP_FILES=1)"
