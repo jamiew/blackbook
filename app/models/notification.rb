@@ -8,7 +8,7 @@ class Notification < ActiveRecord::Base
   validates_associated :subject, on: :create
   validates_associated :user, on: :create
 
-  belongs_to :subject, polymorphic: true
-  belongs_to :user
+  belongs_to :subject, polymorphic: true, optional: true
+  belongs_to :user, optional: true
 
 end

@@ -4,7 +4,7 @@ class Tag < ActiveRecord::Base
   # TODO convert to a whitelisted approach...
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :comments, as: :commentable
   has_many :likes
 
@@ -161,7 +161,7 @@ class Tag < ActiveRecord::Base
     # Rails.logger.debug "Tag #{id}: to_xml"
     options[:except] ||= []
     options[:except] += self.attributes.map {|k,v| k if v.blank? }.compact
-    super(options)
+    self.attributes.except(*options[:except]).to_xml(options)
   end
 
   # GML as a Nokogiri object...

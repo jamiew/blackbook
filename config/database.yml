@@ -7,13 +7,13 @@ default: &default
 development:
   <<: *default
   database: blackbook_dev
-  user: root
+  username: root
 
 test:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
   database: blackbook_test
-  user: root
+  username: root
 
 production:
   <<: *default

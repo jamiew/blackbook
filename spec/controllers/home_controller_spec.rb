@@ -16,13 +16,13 @@ describe HomeController do
   it "/ works" do
     get :index
     expect(response.body).to match(/an open database for Graffiti Markup Language/)
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "/about works" do
     get :about
     expect(response.body).to match(/About/)
     expect(response).to render_template('home/about')
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 end

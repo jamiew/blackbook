@@ -42,15 +42,6 @@
         - #Quick little gsub to remove the queryvars... not ideal
         %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, target: '_blank') }
 
-      %hr
-      %li
-        <strong>IPFS Hash:</strong>
-        - if @tag.ipfs_hash.present?
-          - short_hash = @tag.ipfs_hash[0..4] + "..." + @tag.ipfs_hash[-3..-1]
-          = link_to short_hash, "https://ipfs.io/ipfs/#{@tag.ipfs_hash}"
-          == <input type="text" disabled value="#{@tag.ipfs_hash}" />
-        - else
-          NULL
 
     %hr
     %br
@@ -75,6 +66,13 @@
             %strong= field
             %br
             %input{type: 'text', readonly: 'readonly', value: @tag.attributes[field], onclick: '$(this).select();'}
+      - unless @tag.ipfs_hash.blank?
+        %p
+          %strong{style: 'color: #f0f'} IPFS Hash
+          %br
+          %input{type: 'text', readonly: 'readonly', value: @tag.ipfs_hash, onclick: '$(this).select();'}
+          %br
+          = link_to 'View on IPFS Gateway', "https://ipfs.io/ipfs/#{@tag.ipfs_hash}", target: '_blank', class: 'button smallbutton'
       %p
         %strong{style: 'color: #f0f'} Parsed GML Header
         - @tag.gml_header.each do |k,v|

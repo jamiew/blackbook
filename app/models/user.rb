@@ -1,6 +1,8 @@
 class User < ActiveRecord::Base
 
-  acts_as_authentic
+  acts_as_authentic do |c|
+    c.crypto_provider = ::Authlogic::CryptoProviders::SCrypt
+  end
 
   # FIXME manually reimplmenting this for now...
   # should we just use friendly_id?

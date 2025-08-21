@@ -1,3 +1,5 @@
+require 'ostruct'
+
 class TagsController < ApplicationController
 
   # We allow open access to API #create -- no authentication or forgery protection
@@ -38,7 +40,7 @@ class TagsController < ApplicationController
 
     @per_page = 15
     @tags ||= Tag.order('tags.created_at DESC').includes(:user).where(@search_context && @search_context[:conditions]).paginate(page: @page, per_page: @per_page)
-    @applications ||= Tag.select("DISTINCT application AS name").order("name").where.not(application: [nil, ""]).map { |t| OpenStruct.new(name: t.application) }
+    @applications ||= Tag.select("DISTINCT application AS name").order("name").where.not(application: [nil, ""]).map { |t| OpenStruct.new(name: t.name) }
     @applications.reject! { |app| app.name.blank? }
 
     set_page_title "GML Tags"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
@@ -126,7 +128,7 @@ class TagsController < ApplicationController
 
     if params[:check] == 'connected' #DustTag weirdness?
       logger.debug "connected check"
-      render nothing: true, status: 200
+      head :ok
       return
     end
 
@@ -247,9 +249,9 @@ protected
       if params[:redirect] && ['true','1'].include?(params[:redirect].to_s)
         redirect_to(@tag, status: 302) and return
       elsif !params[:redirect_back].blank? && !request.referer.blank?
-        redirect_to(request.referer) and return
+        redirect_to(request.referer, allow_other_host: true) and return
       elsif !params[:redirect_to].blank?
-        redirect_to(params[:redirect_to]) and return
+        redirect_to(params[:redirect_to], allow_other_host: true) and return
       else
         render plain: @tag.id, status: 200 #OK
       end

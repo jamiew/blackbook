@@ -15,9 +15,9 @@ class Visualization < ActiveRecord::Base
       ['Other','other'],
     ]
 
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :comments, as: :commentable
-  belongs_to :approver, class_name: 'User', foreign_key: :approved_by
+  belongs_to :approver, class_name: 'User', foreign_key: :approved_by, optional: true
 
   validates :user_id, presence: { message: "can't be blank" }, on: :create
   validates_associated :user, on: :create
