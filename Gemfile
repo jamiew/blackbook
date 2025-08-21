@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby File.open(File.dirname(__FILE__)+'/.ruby-version', 'rb') { |f| f.read.chomp }
 
 gem 'rails', '4.2.11.3'
-gem 'mysql2', '~> 0.5.5'
+gem 'mysql2', '~> 0.5.6'
 gem 'puma', groups: [:development, :production]
 
 gem 'uglifier'
