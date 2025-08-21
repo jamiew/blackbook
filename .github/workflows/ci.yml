@@ -20,10 +20,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@v1.256.0
         with:
           bundler-cache: true
 
@@ -41,7 +41,7 @@ jobs:
           bundle install --jobs 4 --retry 3
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 14
 
