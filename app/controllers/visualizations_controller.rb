@@ -18,8 +18,7 @@ class VisualizationsController < ApplicationController
 
   def index
     set_page_title "GML Applications"
-    @page, @per_page = pagination_params
-    @visualizations = Visualization.paginate(page: @page, per_page: @per_page).order('created_at ASC')
+    current_objects
   end
 
   def new
@@ -71,13 +70,12 @@ protected
     @visualization = Visualization.find(params[:id])
   end
 
-  # FIXME these date back to using some magic super controller class magic
   def current_objects
     @page, @per_page = pagination_params
-    which = is_admin? ? current_model : current_model.approved
+    which = is_admin? ? Visualization : Visualization.approved
     if params[:user_id]
       @user = User.find_by_param(params[:user_id])
-      which = which.by_user(@user.id)
+      which = which.where(user_id: @user.id)
       #TODO: set page_title etc. Also handle all this logic less if/elsify
     end
     @visualizations ||= which.paginate(page: @page, per_page: @per_page, include: [:user], order: 'approved_at DESC, name ASC')
