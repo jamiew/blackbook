@@ -66,13 +66,6 @@
             %strong= field
             %br
             %input{type: 'text', readonly: 'readonly', value: @tag.attributes[field], onclick: '$(this).select();'}
-      - unless @tag.ipfs_hash.blank?
-        %p
-          %strong{style: 'color: #f0f'} IPFS Hash
-          %br
-          %input{type: 'text', readonly: 'readonly', value: @tag.ipfs_hash, onclick: '$(this).select();'}
-          %br
-          = link_to 'View on IPFS Gateway', "https://ipfs.io/ipfs/#{@tag.ipfs_hash}", target: '_blank', class: 'button smallbutton'
       %p
         %strong{style: 'color: #f0f'} Parsed GML Header
         - @tag.gml_header.each do |k,v|

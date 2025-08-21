@@ -10,60 +10,60 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
-  create_table "comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+ActiveRecord::Schema[8.0].define(version: 2025_08_21_231341) do
+  create_table "comments", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
     t.string "title", limit: 50, default: ""
-    t.text "text"
+    t.text "text", size: :medium
     t.integer "commentable_id"
     t.string "commentable_type"
     t.integer "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "ip_address"
-    t.datetime "hidden_at"
+    t.datetime "hidden_at", precision: nil
     t.index ["commentable_id"], name: "index_comments_on_commentable_id"
     t.index ["commentable_type"], name: "index_comments_on_commentable_type"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "favorites", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "favorites", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
     t.integer "user_id"
     t.string "object_type"
     t.integer "object_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["object_id", "object_type"], name: "index_favorites_on_object_id_and_object_type"
     t.index ["object_id", "object_type"], name: "index_on_object_id_and_object_type"
   end
 
-  create_table "likes", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "likes", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
     t.integer "object_id"
     t.string "object_type"
     t.integer "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
   end
 
-  create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "notifications", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
     t.string "subject_id"
     t.string "subject_type"
     t.string "verb"
     t.integer "user_id"
     t.integer "supplement_id"
     t.string "supplement_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
-  create_table "tags", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "tags", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
     t.integer "user_id"
     t.string "title"
     t.string "slug"
     t.integer "comment_count"
     t.integer "likes_count"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "location"
     t.string "application"
     t.string "author"
@@ -71,10 +71,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.string "image_file_name"
     t.string "image_content_type"
     t.integer "image_file_size"
-    t.datetime "image_updated_at"
+    t.datetime "image_updated_at", precision: nil
     t.string "uuid"
     t.string "ip"
-    t.text "description"
+    t.text "description", size: :medium
     t.string "remote_image"
     t.string "remote_secret"
     t.string "gml_application"
@@ -83,13 +83,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.string "gml_uniquekey"
     t.string "gml_uniquekey_hash"
     t.string "gml_keywords"
-    t.integer "size"
-    t.string "ipfs_hash"
   end
 
-  create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table "users", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.string "login", null: false
     t.string "email", default: "", null: false
     t.string "crypted_password", null: false
@@ -97,19 +95,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.string "persistence_token", null: false
     t.string "perishable_token", default: "", null: false
     t.integer "login_count", default: 0, null: false
-    t.datetime "last_request_at"
-    t.datetime "last_login_at"
-    t.datetime "current_login_at"
+    t.datetime "last_request_at", precision: nil
+    t.datetime "last_login_at", precision: nil
+    t.datetime "current_login_at", precision: nil
     t.string "last_login_ip"
     t.string "current_login_ip"
     t.boolean "admin"
     t.string "photo_file_name"
     t.string "photo_content_type"
     t.integer "photo_file_size"
-    t.datetime "photo_updated_at"
+    t.datetime "photo_updated_at", precision: nil
     t.string "website"
     t.string "tagline"
-    t.text "about"
+    t.text "about", size: :medium
     t.string "location"
     t.string "slug"
     t.string "name"
@@ -122,24 +120,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.index ["persistence_token"], name: "index_users_on_persistence_token"
   end
 
-  create_table "visualizations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "visualizations", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
     t.integer "user_id"
     t.string "name"
     t.string "slug"
     t.string "website"
     t.string "download"
     t.string "version"
-    t.text "description"
+    t.text "description", size: :medium
     t.string "authors"
     t.string "kind", default: ""
     t.boolean "is_embeddable", default: false
     t.string "embed_url"
     t.string "embed_callback"
     t.string "embed_params"
-    t.text "embed_code"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "approved_at"
+    t.text "embed_code", size: :long
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
+    t.datetime "approved_at", precision: nil
     t.integer "approved_by"
     t.string "image_file_name"
     t.string "image_content_type"

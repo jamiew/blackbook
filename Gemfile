@@ -26,7 +26,6 @@ gem 'exception_notification'
 gem 'bigdecimal', '~> 3.1'
 gem 'rexml'
 gem 'ostruct'
-gem 'ipfs', require: 'ipfs/client'
 
 group :development, :test do
   gem 'rspec-rails', '~> 8.0'

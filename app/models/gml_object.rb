@@ -156,52 +156,5 @@ class GmlObject
     tag.data.length || 0
   end
 
-  # IPFS support
-  IPFS_CLIENT_HOST = ENV['IPFS_CLIENT_HOST'] || '127.0.0.1'
-  IPFS_CLIENT_PORT = ENV['IPFS_CLIENT_PORT'] || 5001
-
-  def ipfs_client
-    @ipfs_client ||= IPFS::Client.new(IPFS_CLIENT_HOST, IPFS_CLIENT_PORT)
-  end
-
-  def save_to_ipfs
-    raise "invalid GmlObject, not saving" unless valid?
-    
-    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).save_to_ipfs ..."
-    
-    begin
-      response = ipfs_client.add(data)
-      ipfs_hash = response['Hash']
-      
-      Rails.logger.info "Saved GML to IPFS: #{ipfs_hash}"
-      
-      # Update the tag with the IPFS hash
-      tag.update_column(:ipfs_hash, ipfs_hash) if tag
-      
-      return ipfs_hash
-    rescue => e
-      Rails.logger.error "Failed to save to IPFS: #{e.message}"
-      raise e
-    end
-  end
-
-  def read_from_ipfs
-    return nil if tag.ipfs_hash.blank?
-    
-    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).read_from_ipfs hash=#{tag.ipfs_hash} ..."
-    
-    begin
-      response = ipfs_client.cat(tag.ipfs_hash)
-      Rails.logger.debug "Read #{response.length} bytes from IPFS"
-      return response
-    rescue => e
-      Rails.logger.error "Failed to read from IPFS: #{e.message}"
-      return nil
-    end
-  end
-
-  def exists_on_ipfs?
-    tag.ipfs_hash.present?
-  end
 
 end
