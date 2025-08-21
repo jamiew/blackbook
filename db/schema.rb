@@ -11,7 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
-  create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title", limit: 50, default: ""
     t.text "text"
     t.integer "commentable_id"
@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "favorites", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "favorites", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
     t.string "object_type"
     t.integer "object_id"
@@ -36,7 +36,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.index ["object_id", "object_type"], name: "index_on_object_id_and_object_type"
   end
 
-  create_table "likes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "likes", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "object_id"
     t.string "object_type"
     t.integer "user_id"
@@ -44,7 +44,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.datetime "updated_at"
   end
 
-  create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "subject_id"
     t.string "subject_type"
     t.string "verb"
@@ -56,7 +56,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
-  create_table "tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "tags", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
     t.string "title"
     t.string "slug"
@@ -87,7 +87,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.string "ipfs_hash"
   end
 
-  create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "login", null: false
@@ -122,7 +122,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_173228) do
     t.index ["persistence_token"], name: "index_users_on_persistence_token"
   end
 
-  create_table "visualizations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "visualizations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
     t.string "name"
     t.string "slug"
