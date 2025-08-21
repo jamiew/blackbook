@@ -11,5 +11,6 @@ db/*.sqlite3
 log/*
 !log/.keep
 tmp
+config/master.key
 public/assets
 public/system

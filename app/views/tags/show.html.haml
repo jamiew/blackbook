@@ -42,15 +42,6 @@
         - #Quick little gsub to remove the queryvars... not ideal
         %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, target: '_blank') }
 
-      %hr
-      %li
-        <strong>IPFS Hash:</strong>
-        - if @tag.ipfs_hash.present?
-          - short_hash = @tag.ipfs_hash[0..4] + "..." + @tag.ipfs_hash[-3..-1]
-          = link_to short_hash, "https://ipfs.io/ipfs/#{@tag.ipfs_hash}"
-          == <input type="text" disabled value="#{@tag.ipfs_hash}" />
-        - else
-          NULL
 
     %hr
     %br

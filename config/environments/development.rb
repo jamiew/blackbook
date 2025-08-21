@@ -31,10 +31,8 @@ Rails.application.configure do
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
 
-  # Adds additional error checking when serving assets at runtime.
-  # Checks for improperly declared sprockets dependencies.
-  # Raises helpful error messages.
-  config.assets.raise_runtime_errors = true
+  # Enable server timing
+  config.server_timing = true
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
@@ -47,11 +45,7 @@ Rails.application.configure do
   # logger.formatter = config.log_formatter
   # config.logger    = ActiveSupport::TaggedLogging.new(logger)
 
-  # Sprockets asset compilation
-  # sad we're on rails 4 lol
-  # ideas via https://stackoverflow.com/questions/35683185/rails-sprocketsrailshelperassetnotprecompiled-in-development
-  # config.assets.debug = false
-  # config.assets.unknown_asset_fallback = true
+  # Updated for Rails 7
   config.assets.check_precompiled_asset = false
 
 end

@@ -15,21 +15,19 @@ class Visualization < ActiveRecord::Base
       ['Other','other'],
     ]
 
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :comments, as: :commentable
-  belongs_to :approver, class_name: 'User', foreign_key: :approved_by
+  belongs_to :approver, class_name: 'User', foreign_key: :approved_by, optional: true
 
-  validates_presence_of :user_id, on: :create, message: "can't be blank"
+  validates :user_id, presence: { message: "can't be blank" }, on: :create
   validates_associated :user, on: :create
-  validates_presence_of :name, on: :create, message: "can't be blank (and should be cool)"
-  validates_uniqueness_of :name, on: :create, message: "must be unique & that name already exists"
-  validates_presence_of :description, on: :create, message: "can't be blank, what is this supposed to do?"
-  validates_presence_of :authors, on: :create, message: "can't be blank, put your username if nothing else"
-  # validates_presence_of :website, on: :create, message: "can't be blank"
-  validates_presence_of :embed_url, on: :create, message: "can't be blank", if: :is_embeddable
+  validates :name, presence: { message: "can't be blank (and should be cool)" }, uniqueness: { message: "must be unique & that name already exists" }, on: :create
+  validates :description, presence: { message: "can't be blank, what is this supposed to do?" }, on: :create
+  validates :authors, presence: { message: "can't be blank, put your username if nothing else" }, on: :create
+  # validates :website, presence: { message: "can't be blank" }, on: :create
+  validates :embed_url, presence: { message: "can't be blank" }, on: :create, if: :is_embeddable
   validate :reject_if_any_html
 
-  attr_protected :user_id, :slug
 
   scope :approved, -> { where('approved_at < ?', Time.now) }
   scope :pending, -> { where('approved_at IS NULL OR approved_at > ?', Time.now) }
@@ -45,8 +43,8 @@ class Visualization < ActiveRecord::Base
     styles: { large: '600x600>', medium: "300x300>", small: '100x100#', tiny: "32x32#" }
   # validates_attachment_presence :image
   #TODO: remove :if conditionals; only needed with new version of Paperclip + Rails 2.3 (???); Weird bug.
-	validates_attachment_content_type :image, content_type: ['image/jpeg', 'image/pjpeg', 'image/jpg', 'image/gif', 'image/png', 'image/x-png'], message: "Your thumbnail is not a valid image filetype (we accept JPG, PNG & GIF)", if: lambda { |e| !e.image_file_name.blank? }
-  validates_attachment_size :image, less_than: 1.megabyte, message: 'Your thumbnail must be less than 1 megabyte (MB).', if: lambda { |e| !e.image_file_name.blank? }
+	validates_attachment_content_type :image, content_type: ['image/jpeg', 'image/pjpeg', 'image/jpg', 'image/gif', 'image/png', 'image/x-png'], message: "Your thumbnail is not a valid image filetype (we accept JPG, PNG & GIF)", if: -> (e) { !e.image_file_name.blank? }
+  validates_attachment_size :image, less_than: 1.megabyte, message: 'Your thumbnail must be less than 1 megabyte (MB).', if: -> (e) { !e.image_file_name.blank? }
 
 
 

@@ -1,6 +1,12 @@
 class User < ActiveRecord::Base
 
-  acts_as_authentic
+  acts_as_authentic do |c|
+    c.crypto_provider = ::Authlogic::CryptoProviders::SCrypt
+  end
+
+  # Add password confirmation support for forms
+  attr_accessor :password_confirmation
+  validates_confirmation_of :password, if: :password_changed?
 
   # FIXME manually reimplmenting this for now...
   # should we just use friendly_id?
@@ -13,13 +19,10 @@ class User < ActiveRecord::Base
   has_many :visualizations
   has_many :notifications
 
-  attr_protected :admin
 
-  validates_presence_of :login, on: :create, message: "can't be blank"
-  validates_uniqueness_of :login, on: :create, message: "is already taken by another user; try a different one."
-  validates_presence_of :email, on: :create, message: "can't be blank"
-  validates_uniqueness_of :email, on: :create, message: "already exists in our system; an email address can only be used once."
-  validates_uniqueness_of :iphone_uniquekey, on: :save, message: "has already been claimed by another user! If you believe this is an error email the admins => info@000000book.com", unless: lambda { |u| u.iphone_uniquekey.blank? }
+  validates :login, presence: { message: "can't be blank" }, uniqueness: { message: "is already taken by another user; try a different one." }, on: :create
+  validates :email, presence: { message: "can't be blank" }, uniqueness: { message: "already exists in our system; an email address can only be used once." }, on: :create
+  validates :iphone_uniquekey, uniqueness: { message: "has already been claimed by another user! If you believe this is an error email the admins => info@000000book.com" }, on: :save, unless: -> { iphone_uniquekey.blank? }
   # TODO email regex validation
 
   has_attached_file :photo,

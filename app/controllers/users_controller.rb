@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_filter :require_no_user, only: [:new, :create]
-  before_filter :require_user, only: [:edit, :change_password, :update]
-  before_filter :set_user_from_current_user, only: [:edit, :change_password, :update]
+  before_action :require_no_user, only: [:new, :create]
+  before_action :require_user, only: [:edit, :change_password, :update]
+  before_action :set_user_from_current_user, only: [:edit, :change_password, :update]
 
   # FIXME would love a smarter way to avoid test failures using this
   invisible_captcha only: [:create]
@@ -36,8 +36,9 @@ class UsersController < ApplicationController
   end
 
   def create
-    params[:user][:password_confirmation] = params[:user][:password] if params[:user]
-    @user = User.new(params[:user])
+    user_params = user_parameters
+    user_params[:password_confirmation] = user_params[:password] if user_params
+    @user = User.new(user_params)
     if @user.save
       flash[:notice] = "Account registered!"
       Mailer.signup_notification(@user).deliver_now
@@ -52,9 +53,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user.attributes = params[:user]
-
-    if @user.update_attributes(params[:user])
+    if @user.update(user_parameters)
       flash[:notice] = "Settings updated! "
       redirect_to(settings_path)
     else
@@ -63,6 +62,12 @@ class UsersController < ApplicationController
     end
   end
 
+
+private
+
+  def user_parameters
+    params.require(:user).permit(:login, :email, :password, :password_confirmation, :name, :iphone_uniquekey, :photo)
+  end
 
 protected
 
