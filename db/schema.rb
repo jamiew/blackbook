@@ -1,155 +1,148 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# Note that this schema.rb definition is the authoritative source for your
-# database schema. If you need to create the application database on another
-# system, you should be using db:schema:load, not running all the migrations
-# from scratch. The latter is a flawed and unsustainable approach (the more migrations
-# you'll amass, the slower it'll run and the greater likelihood for issues).
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190420155934) do
-
-  create_table "comments", force: :cascade do |t|
-    t.string   "title",            limit: 50,    default: ""
-    t.text     "text",             limit: 65535
-    t.integer  "commentable_id",   limit: 4
-    t.string   "commentable_type", limit: 255
-    t.integer  "user_id",          limit: 4
+ActiveRecord::Schema[7.1].define(version: 2025_08_21_173228) do
+  create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "title", limit: 50, default: ""
+    t.text "text"
+    t.integer "commentable_id"
+    t.string "commentable_type"
+    t.integer "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "ip_address",       limit: 255
+    t.string "ip_address"
     t.datetime "hidden_at"
+    t.index ["commentable_id"], name: "index_comments_on_commentable_id"
+    t.index ["commentable_type"], name: "index_comments_on_commentable_type"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  add_index "comments", ["commentable_id"], name: "index_comments_on_commentable_id", using: :btree
-  add_index "comments", ["commentable_type"], name: "index_comments_on_commentable_type", using: :btree
-  add_index "comments", ["user_id"], name: "index_comments_on_user_id", using: :btree
+  create_table "favorites", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "object_type"
+    t.integer "object_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["object_id", "object_type"], name: "index_favorites_on_object_id_and_object_type"
+    t.index ["object_id", "object_type"], name: "index_on_object_id_and_object_type"
+  end
 
-  create_table "favorites", force: :cascade do |t|
-    t.integer  "user_id",     limit: 4
-    t.string   "object_type", limit: 255
-    t.integer  "object_id",   limit: 4
+  create_table "likes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "object_id"
+    t.string "object_type"
+    t.integer "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "favorites", ["object_id", "object_type"], name: "index_favorites_on_object_id_and_object_type", using: :btree
-  add_index "favorites", ["object_id", "object_type"], name: "index_on_object_id_and_object_type", using: :btree
-
-  create_table "likes", force: :cascade do |t|
-    t.integer  "object_id",   limit: 4
-    t.string   "object_type", limit: 255
-    t.integer  "user_id",     limit: 4
+  create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "subject_id"
+    t.string "subject_type"
+    t.string "verb"
+    t.integer "user_id"
+    t.integer "supplement_id"
+    t.string "supplement_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
-  create_table "notifications", force: :cascade do |t|
-    t.string   "subject_id",      limit: 255
-    t.string   "subject_type",    limit: 255
-    t.string   "verb",            limit: 255
-    t.integer  "user_id",         limit: 4
-    t.integer  "supplement_id",   limit: 4
-    t.string   "supplement_type", limit: 255
+  create_table "tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "title"
+    t.string "slug"
+    t.integer "comment_count"
+    t.integer "likes_count"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id", using: :btree
-
-  create_table "tags", force: :cascade do |t|
-    t.integer  "user_id",            limit: 4
-    t.string   "title",              limit: 255
-    t.string   "slug",               limit: 255
-    t.integer  "comment_count",      limit: 4
-    t.integer  "likes_count",        limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "location",           limit: 255
-    t.string   "application",        limit: 255
-    t.string   "author",             limit: 255
-    t.string   "cached_tag_list",    limit: 255
-    t.string   "image_file_name",    limit: 255
-    t.string   "image_content_type", limit: 255
-    t.integer  "image_file_size",    limit: 4
+    t.string "location"
+    t.string "application"
+    t.string "author"
+    t.string "cached_tag_list"
+    t.string "image_file_name"
+    t.string "image_content_type"
+    t.integer "image_file_size"
     t.datetime "image_updated_at"
-    t.string   "uuid",               limit: 255
-    t.string   "ip",                 limit: 255
-    t.text     "description",        limit: 65535
-    t.string   "remote_image",       limit: 255
-    t.string   "remote_secret",      limit: 255
-    t.string   "gml_application",    limit: 255
-    t.string   "gml_version",        limit: 255
-    t.string   "gml_username",       limit: 255
-    t.string   "gml_uniquekey",      limit: 255
-    t.string   "gml_uniquekey_hash", limit: 255
-    t.string   "gml_keywords",       limit: 255
-    t.integer  "size",               limit: 4
-    t.string   "ipfs_hash",          limit: 255
+    t.string "uuid"
+    t.string "ip"
+    t.text "description"
+    t.string "remote_image"
+    t.string "remote_secret"
+    t.string "gml_application"
+    t.string "gml_version"
+    t.string "gml_username"
+    t.string "gml_uniquekey"
+    t.string "gml_uniquekey_hash"
+    t.string "gml_keywords"
+    t.integer "size"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "login",              limit: 255,                null: false
-    t.string   "email",              limit: 255,   default: "", null: false
-    t.string   "crypted_password",   limit: 255,                null: false
-    t.string   "password_salt",      limit: 255,                null: false
-    t.string   "persistence_token",  limit: 255,                null: false
-    t.string   "perishable_token",   limit: 255,   default: "", null: false
-    t.integer  "login_count",        limit: 4,     default: 0,  null: false
+    t.string "login", null: false
+    t.string "email", default: "", null: false
+    t.string "crypted_password", null: false
+    t.string "password_salt", null: false
+    t.string "persistence_token", null: false
+    t.string "perishable_token", default: "", null: false
+    t.integer "login_count", default: 0, null: false
     t.datetime "last_request_at"
     t.datetime "last_login_at"
     t.datetime "current_login_at"
-    t.string   "last_login_ip",      limit: 255
-    t.string   "current_login_ip",   limit: 255
-    t.boolean  "admin"
-    t.string   "photo_file_name",    limit: 255
-    t.string   "photo_content_type", limit: 255
-    t.integer  "photo_file_size",    limit: 4
+    t.string "last_login_ip"
+    t.string "current_login_ip"
+    t.boolean "admin"
+    t.string "photo_file_name"
+    t.string "photo_content_type"
+    t.integer "photo_file_size"
     t.datetime "photo_updated_at"
-    t.string   "website",            limit: 255
-    t.string   "tagline",            limit: 255
-    t.text     "about",              limit: 65535
-    t.string   "location",           limit: 255
-    t.string   "slug",               limit: 255
-    t.string   "name",               limit: 255
-    t.string   "iphone_uniquekey",   limit: 255
+    t.string "website"
+    t.string "tagline"
+    t.text "about"
+    t.string "location"
+    t.string "slug"
+    t.string "name"
+    t.string "iphone_uniquekey"
+    t.index ["email"], name: "index_users_on_email"
+    t.index ["iphone_uniquekey"], name: "index_users_on_iphone_uniquekey"
+    t.index ["last_request_at"], name: "index_users_on_last_request_at"
+    t.index ["login"], name: "index_users_on_login"
+    t.index ["perishable_token"], name: "index_users_on_perishable_token"
+    t.index ["persistence_token"], name: "index_users_on_persistence_token"
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", using: :btree
-  add_index "users", ["iphone_uniquekey"], name: "index_users_on_iphone_uniquekey", using: :btree
-  add_index "users", ["last_request_at"], name: "index_users_on_last_request_at", using: :btree
-  add_index "users", ["login"], name: "index_users_on_login", using: :btree
-  add_index "users", ["perishable_token"], name: "index_users_on_perishable_token", using: :btree
-  add_index "users", ["persistence_token"], name: "index_users_on_persistence_token", using: :btree
-
-  create_table "visualizations", force: :cascade do |t|
-    t.integer  "user_id",            limit: 4
-    t.string   "name",               limit: 255
-    t.string   "slug",               limit: 255
-    t.string   "website",            limit: 255
-    t.string   "download",           limit: 255
-    t.string   "version",            limit: 255
-    t.text     "description",        limit: 65535
-    t.string   "authors",            limit: 255
-    t.string   "kind",               limit: 255,   default: ""
-    t.boolean  "is_embeddable",                    default: false
-    t.string   "embed_url",          limit: 255
-    t.string   "embed_callback",     limit: 255
-    t.string   "embed_params",       limit: 255
-    t.text     "embed_code",         limit: 65535
+  create_table "visualizations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "name"
+    t.string "slug"
+    t.string "website"
+    t.string "download"
+    t.string "version"
+    t.text "description"
+    t.string "authors"
+    t.string "kind", default: ""
+    t.boolean "is_embeddable", default: false
+    t.string "embed_url"
+    t.string "embed_callback"
+    t.string "embed_params"
+    t.text "embed_code"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "approved_at"
-    t.integer  "approved_by",        limit: 4
-    t.string   "image_file_name",    limit: 255
-    t.string   "image_content_type", limit: 255
-    t.integer  "image_file_size",    limit: 4
+    t.integer "approved_by"
+    t.string "image_file_name"
+    t.string "image_content_type"
+    t.integer "image_file_size"
   end
 
 end

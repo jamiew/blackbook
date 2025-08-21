@@ -89,37 +89,6 @@ RSpec.describe GmlObject, type: :model do
     it "works"
   end
 
-  describe "#store_on_ipfs" do
-    it "works if IPFS daemon is running" do
-      if `pidof ipfs`.blank?
-        skip "daemon not running, can't test"
-      end
-
-      tag = FactoryBot.create(:tag, id: 1)
-      gml = FactoryBot.build(:gml_object, tag_id: tag.id)
-      result = gml.store_on_ipfs
-      # hash of the current public/data/1.gml file =>
-      expect(result).to eq("QmbQJhosiiUUTXk12ueQM79iuWpDohu9WRiige61HqkqtS")
-    end
-
-    it "fails if no IPFS daemon available" do
-      # `pkill ipfs && sleep 1` # god forgive me
-      # `ps aux | grep ipfs`.should be_blank
-      # gml = FactoryBot.build(:gml_object, tag_id: 1)
-      # gml_store_on_ipfs
-      skip
-    end
-
-    it "handles JSON parser errors" do
-      # TODO simulate JSON::ParserError
-      skip
-    end
-  end
-
-  describe "#read_from_ipfs" do
-    it "works if IPFS daemon is running"
-    it "fails if IPFS daemon is not running"
-  end
 
   describe "#tag" do
     it "loads a Tag" do

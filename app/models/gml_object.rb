@@ -33,9 +33,6 @@ class GmlObject
     "gml/#{tag_id}.gml"
   end
 
-  # TODO do we want to partition IPFS folders based on id, like we do locally?
-  # e.g. id 501404 becomes approximately dir/501/404
-  IPFS_FOLDER_NAME = "000000book_dev"
 
   def data
     # Rails.logger.debug "*** GmlObject #data..."
@@ -85,7 +82,6 @@ class GmlObject
     # raise "Oh no you called GmlObject#save!"
     store_on_disk
     # store_on_s3
-    # store_on_ipfs
   end
 
   def exists_on_disk?
@@ -156,53 +152,8 @@ class GmlObject
     file.body.read
   end
 
-  # TODO test that daemon is running or use infura node as fallback ^_^
-  def ipfs
-    @ipfs ||= IPFS::Client.default
-  end
-
-  def self.ensure_ipfs_is_running!
-    # FIXME this won't scale
-    res = `pidof ipfs`
-    raise "Cannot connect to IPFS daemon" if res.blank?
-  end
-
-  def ipfs_hash
-    tag.ipfs_hash
-  end
-
   def size
     tag.data.length || 0
-  end
-
-  def store_on_ipfs
-    # Rails.logger.debug "store_on_ipfs, filename=#{filename.inspect}"
-    ret = ipfs.add File.open(filename)
-    added_file_hash = ret.hashcode
-
-    Rails.logger.debug "GmlObject.store_on_ipfs(tag_id=#{self.tag_id}): added Tag ##{self.tag_id} to IPFS (ipfs_size=#{ret.size}b, self.size=#{self.size}b) => #{added_file_hash}"
-
-    self.tag.ipfs_hash = added_file_hash
-    self.tag.size = ret.size # FIXME should be setting on-create and treating as immutable
-    self.tag.save!
-
-    added_file_hash
-  rescue HTTP::ConnectionError
-    Rails.logger.warn "GmlObject.store_on_ipfs: failed, can't connect to IPFS daemon"
-    nil
-  rescue JSON::ParserError
-    Rails.logger.warn "GmlObject.store_on_ipfs: failed, json parser error: #{$!}"
-    nil
-  end
-
-  def open_ipfs_file
-    return if self.ipfs_hash.blank?
-    `open http://ipfs.io/ipfs/#{self.ipfs_hash}`
-  end
-
-  def read_from_ipfs
-    raise "No ipfs_hash for this Tag #{self.tag_id}" if self.ipfs_hash.blank?
-    ipfs.cat(self.ipfs_hash)
   end
 
 end

@@ -127,8 +127,6 @@ The application stores data in two places:
 # Save all GmlObjects to disk
 bin/rails gml_objects:save_to_disk
 
-# Store GmlObjects on IPFS
-bin/rails gml_objects:save_to_ipfs
 
 # Fix missing GmlObjects
 bin/rails gml_objects:fix_missing

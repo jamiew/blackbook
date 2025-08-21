@@ -17,7 +17,6 @@ gem 'kt-paperclip'
 gem 'htmlentities'
 gem 'will_paginate'
 gem 'aws-sdk-s3', '~> 1.0'
-gem 'ipfs', require: 'ipfs/client'
 gem 'rails_12factor'
 gem 'dotenv-rails', groups: [:development, :test]
 gem 'lograge'

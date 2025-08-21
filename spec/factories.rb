@@ -45,7 +45,6 @@ FactoryBot.define do
     # t.gml_object {|a| a.association(:gml_object) }
     t.data { DEFAULT_GML }
     t.size { 12345 }
-    t.ipfs_hash { "Qmd3ADB33FBeeFbEeFlol" }
 
   end
 

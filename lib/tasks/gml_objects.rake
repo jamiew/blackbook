@@ -9,16 +9,6 @@ namespace :gml_objects do
     end
   end
 
-  desc "Store all GmlObjects on IPFS"
-  task :save_to_ipfs => :environment do
-    GmlObject.ensure_ipfs_is_running!
-    Tag.find_each do |tag|
-      obj = tag.gml_object
-      res = obj.store_on_ipfs
-      puts "Tag #{tag.id} (#{tag.size} bytes): #{res.inspect} => #{tag.ipfs_hash.inspect}"
-      sleep 1
-    end
-  end
 
   desc "Generate empty GmlObjects for all Tags that don't have them"
   task :fix_missing => :environment do
