@@ -69,7 +69,16 @@ RSpec.describe GmlObject, type: :model do
   end
 
   describe '#read_from_disk' do
-    it 'works'
+    it 'works' do
+      gml = FactoryBot.create(:gml_object)
+      # Store something on disk first
+      gml.store_on_disk
+      
+      # Create a new object and read from disk
+      new_gml = GmlObject.new(tag_id: gml.tag_id)
+      expect(new_gml.read_from_disk).to eq(gml.data)
+      expect(new_gml.read_from_disk).to include('<gml>')
+    end
 
     it "returns nothing if file is missing" do
       # id=1 should always be an invalid "not in production GML" id

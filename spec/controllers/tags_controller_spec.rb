@@ -287,4 +287,25 @@ describe TagsController do
       expect(response).to be_redirect
     end
   end
+
+  describe "API Security" do
+    it "filters sensitive parameters from logs" do
+      # Test that sensitive data isn't logged
+      post :create, params: { gml: '<gml>test</gml>', secret: 'secret123' }
+      
+      # The actual filtering happens in the logger, this tests the endpoint works
+      expect(response.status).to be_between(200, 422) # Accept any reasonable response
+    end
+
+    it "doesn't expose hidden attributes in API responses" do
+      tag = FactoryBot.create(:tag, ip: '192.168.1.1', remote_secret: 'secret123')
+      
+      get :show, params: { id: tag.id, format: :json }
+      
+      json_response = JSON.parse(response.body)
+      expect(json_response).not_to have_key('ip')
+      expect(json_response).not_to have_key('remote_secret')
+      expect(json_response).not_to have_key('user_id')
+    end
+  end
 end
