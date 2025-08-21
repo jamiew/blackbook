@@ -90,13 +90,6 @@ RSpec.describe GmlObject, type: :model do
     end
   end
 
-  describe "#store_on_s3" do
-    it "works"
-  end
-
-  describe "#read_from_s3" do
-    it "works"
-  end
 
 
   describe "#tag" do

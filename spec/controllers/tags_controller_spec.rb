@@ -11,8 +11,6 @@ describe TagsController do
   end
 
   describe "POST #create" do
-    it "routes from POST /tags"
-    it "routes from POST /data"
 
     it "should create given params[:gml]" do
       post :create, params: { gml: @gml }
@@ -55,24 +53,6 @@ describe TagsController do
 
     end
 
-    describe "cache expiry" do
-      it "should expire Home#index.html" do
-        pending "TODO"
-        fail
-        route = {controller: 'home', method: 'index'}
-        # lambda { post :create, gml: @gml }.should expire_fragment(route)
-      end
-
-      it "should expire Tags#index, all formats" do
-        pending "TODO"
-        fail
-      end
-
-      it "should expire Tags#show, all formats" do
-        pending "TODO"
-        fail
-      end
-    end
   end
 
   describe "GET #index" do

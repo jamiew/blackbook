@@ -6,7 +6,8 @@ class Tag < ActiveRecord::Base
 
   belongs_to :user, optional: true
   has_many :comments, as: :commentable
-  has_many :likes
+  has_many :likes, as: :object
+  has_many :favorites, as: :object
 
   # delegate :data, to: :gml_object
 

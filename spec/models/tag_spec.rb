@@ -210,4 +210,50 @@ RSpec.describe Tag, type: :model do
       expect(tag.gml_object.size).to eq(valid_gml.length)
     end
   end
+
+  describe "Associations" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:tag) { FactoryBot.create(:tag, user: user) }
+
+    it "belongs to a user" do
+      expect(tag.user).to eq(user)
+    end
+
+    it "has many comments" do
+      comment = Comment.create!(commentable: tag, user: user, text: 'Test comment')
+      expect(tag.comments).to include(comment)
+    end
+
+    it "has many likes" do
+      like = Like.create!(object: tag, user: user)
+      expect(tag.likes).to include(like)
+    end
+
+    it "can be favorited" do
+      favorite = Favorite.create!(object: tag, user: user)
+      expect(tag.favorites).to include(favorite)
+    end
+  end
+
+  describe "Scopes" do
+    it "finds device tags" do
+      device_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123')
+      regular_tag = FactoryBot.create(:tag, gml_uniquekey: nil)
+      
+      expect(Tag.from_device).to include(device_tag)
+      expect(Tag.from_device).not_to include(regular_tag)
+    end
+
+    it "distinguishes claimed vs unclaimed tags" do
+      user = FactoryBot.create(:user)
+      claimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123', user: user)
+      unclaimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device456', user: nil)
+      
+      expect(Tag.claimed).to include(claimed_tag)
+      expect(Tag.claimed).not_to include(unclaimed_tag)
+      
+      expect(Tag.unclaimed).to include(unclaimed_tag)
+      expect(Tag.unclaimed).not_to include(claimed_tag)
+    end
+  end
 end
