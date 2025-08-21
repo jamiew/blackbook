@@ -29,7 +29,6 @@ class Visualization < ActiveRecord::Base
   validates_presence_of :embed_url, on: :create, message: "can't be blank", if: :is_embeddable
   validate :reject_if_any_html
 
-  attr_protected :user_id, :slug
 
   scope :approved, -> { where('approved_at < ?', Time.now) }
   scope :pending, -> { where('approved_at IS NULL OR approved_at > ?', Time.now) }

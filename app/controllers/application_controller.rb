@@ -15,8 +15,8 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password, :password_confirmation, :gml, :data
   # protect_from_forgery
 
-  # before_filter :activate_authlogic
-  before_filter :set_format
+  # before_action :activate_authlogic
+  before_action :set_format
 
   rescue_from NoPermissionError, with: :permission_denied
 

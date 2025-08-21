@@ -13,7 +13,6 @@ class User < ActiveRecord::Base
   has_many :visualizations
   has_many :notifications
 
-  attr_protected :admin
 
   validates_presence_of :login, on: :create, message: "can't be blank"
   validates_uniqueness_of :login, on: :create, message: "is already taken by another user; try a different one."

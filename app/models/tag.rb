@@ -21,7 +21,6 @@ class Tag < ActiveRecord::Base
   after_create  :save_gml_object
   after_create  :create_notification
 
-  attr_protected :user_id
 
   scope :from_device, -> { where('gml_uniquekey IS NOT NULL') }
   scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
