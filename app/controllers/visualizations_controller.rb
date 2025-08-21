@@ -1,9 +1,9 @@
 class VisualizationsController < ApplicationController
 
-  before_filter :get_visualization, only: [:show, :edit, :update, :destroy, :approve, :unapprove]
-  before_filter :require_admin, only: [:approve, :unapprove]
-  before_filter :require_owner, only: [:edit, :update, :destroy]
-  before_filter :require_user, only: [:new, :create]
+  before_action :get_visualization, only: [:show, :edit, :update, :destroy, :approve, :unapprove]
+  before_action :require_admin, only: [:approve, :unapprove]
+  before_action :require_owner, only: [:edit, :update, :destroy]
+  before_action :require_user, only: [:new, :create]
 
   respond_to :html, :js, :xml, :json
 
@@ -27,7 +27,7 @@ class VisualizationsController < ApplicationController
   end
 
   def create
-    @visualization = current_user.visualizations.new(params[:visualization])
+    @visualization = current_user.visualizations.new(visualization_parameters)
     respond_with @visualization do |format|
       format.html do
         if @visualization.save
@@ -92,5 +92,11 @@ protected
 
   def require_owner
     raise NoPermissionError unless current_user && (@visualization.user == current_user || is_admin?)
+  end
+
+  private
+
+  def visualization_parameters
+    params.require(:visualization).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable, :image)
   end
 end

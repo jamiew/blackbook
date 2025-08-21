@@ -3,12 +3,12 @@ class Comment < ActiveRecord::Base
   belongs_to :commentable, polymorphic: true
   belongs_to :user
 
-  validates_presence_of :commentable_id, on: :create, message: "can't be blank"
-  validates_presence_of :commentable_type, on: :create, message: "can't be blank"
-  validates_associated  :commentable, on: :create
-  validates_presence_of :user_id, on: :create, message: "can't be blank"
-  validates_associated  :user, on: :create
-  validates_presence_of :text, on: :create, message: "can't be blank"
+  validates :commentable_id, presence: { message: "can't be blank" }, on: :create
+  validates :commentable_type, presence: { message: "can't be blank" }, on: :create
+  validates_associated :commentable, on: :create
+  validates :user_id, presence: { message: "can't be blank" }, on: :create
+  validates_associated :user, on: :create
+  validates :text, presence: { message: "can't be blank" }, on: :create
 
 
   scope :sorted, -> { order("created_at DESC") }

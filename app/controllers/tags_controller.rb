@@ -2,13 +2,13 @@ class TagsController < ApplicationController
 
   # We allow open access to API #create -- no authentication or forgery protection
   protect_from_forgery except: [:show, :latest, :random, :create, :thumbnail, :validate]
-  before_filter :get_tag, only: [:show, :edit, :update, :destroy, :thumbnail, :nominate]
-  before_filter :require_user, only: [:new, :edit, :update, :destroy, :nominate]
-  before_filter :require_owner, only: [:edit, :update, :destroy]
-  before_filter :convert_app_id_to_app_name, only: [:update, :create]
+  before_action :get_tag, only: [:show, :edit, :update, :destroy, :thumbnail, :nominate]
+  before_action :require_user, only: [:new, :edit, :update, :destroy, :nominate]
+  before_action :require_owner, only: [:edit, :update, :destroy]
+  before_action :convert_app_id_to_app_name, only: [:update, :create]
 
   # Basic caching for :index?page=1 and :show actions
-  after_filter :expire_caches, only: [:update, :create, :destroy]
+  after_action :expire_caches, only: [:update, :create, :destroy]
   # caches_action :index, expires_in: 30.minutes, if: :cache_request?
   # caches_action :show,  expires_in: 30.minutes, if: :cache_request?
 
@@ -38,7 +38,7 @@ class TagsController < ApplicationController
 
     @per_page = 15
     @tags ||= Tag.order('tags.created_at DESC').includes(:user).where(@search_context && @search_context[:conditions]).paginate(page: @page, per_page: @per_page)
-    @applications ||= Visualization.find_by_sql("SELECT DISTINCT application AS name FROM tags ORDER BY name")
+    @applications ||= Tag.select("DISTINCT application AS name").order("name").where.not(application: [nil, ""]).map { |t| OpenStruct.new(name: t.application) }
     @applications.reject! { |app| app.name.blank? }
 
     set_page_title "GML Tags"+(@search_context ? ": #{@search_context[:key]}=#{@search_context[:value].inspect} " : '')
@@ -59,8 +59,8 @@ class TagsController < ApplicationController
 
     # We only need these instance variables when rendering HTML (aka ghetto interlok)
      if params[:format] == 'html' || params[:format] == nil
-      @prev = Tag.where("id < #{@tag.id}").last
-      @next = Tag.where("id > #{@tag.id}").first
+      @prev = Tag.where("id < ?", @tag.id).last
+      @next = Tag.find_by("id > ?", @tag.id)
 
       @user = User.find_by_param(params[:user_id]) if params[:user_id]
       @user ||= @tag.user
@@ -140,7 +140,7 @@ class TagsController < ApplicationController
       # Otherwise error out, without displaying any sensitive or internal params
       error_text = "Error, could not create tag from your parameters: #{clean_params.inspect}"
       logger.warn error_text
-      render text: error_text, status: 422 #Unprocessable Entity
+      render plain: error_text, status: 422 #Unprocessable Entity
       return
     end
 
@@ -148,7 +148,7 @@ class TagsController < ApplicationController
   end
 
   def update
-    @tag.update_attributes(params[:tag])
+    @tag.update(params[:tag].permit(:gml, :gml_file, :application, :description, :location, :image, :existing_application_id))
     if @tag.save
       flash[:notice] = "Tag ##{@tag.id} updated"
       redirect_to tag_path(@tag)
@@ -166,20 +166,20 @@ class TagsController < ApplicationController
       flash[:error] = "Could not destroy tag: #{$!}"
     end
     # redirect_to(tags_path)
-    redirect_to :back
+    redirect_back(fallback_location: root_path)
   end
 
   # Upload an image for a tag if one doesn't already exist (for GMLImageRenderer)
   def thumbnail
     if @tag.image.exists?
-      render text: 'thumbnail already exists', status: 409 and return
+      render plain: 'thumbnail already exists', status: 409 and return
     end
     @tag.image = params[:image]
     @tag.save!
-    render text: "OK", status: 200, layout: false
+    render plain: "OK", status: 200, layout: false
   rescue
     logger.error $!
-    render text: "Error: #{$!}", status: 500
+    render plain: "Error: #{$!}", status: 500
   end
 
   # Interactive GML Syntax Validator
@@ -189,7 +189,7 @@ class TagsController < ApplicationController
     elsif params[:tag] && params[:tag][:id]
       @tag = Tag.find(params[:tag][:id])
     else
-      @tag = Tag.new(params[:tag])
+      @tag = Tag.new(params[:tag].permit(:gml, :gml_file, :application, :description, :location, :image, :existing_application_id) || {})
       @tag.gml = params[:gml] if @tag.gml.blank? && params[:gml]
     end
     @tag.validate_gml
@@ -200,7 +200,7 @@ class TagsController < ApplicationController
     respond_to do |wants|
       wants.html {
         if request.xhr?
-          render text: @tag..validation_results.inspect
+          render plain: @tag..validation_results.inspect
         else
           render 'validator'
         end
@@ -209,8 +209,8 @@ class TagsController < ApplicationController
       joined_hash = Hash[@tag.validation_results.map { |k,v| [k, v.join(";\n")] }]
       wants.xml   { render xml: joined_hash.to_xml(dasherize: false, skip_types: true) }
       wants.json  { render json: @tag.validation_results.to_json(callback: params[:callback]) }
-      wants.xhr   { render text: @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
-      wants.text  { render text: @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
+      wants.xhr   { render plain: @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
+      wants.text  { render plain: @tag.validation_results.map{|k,v| "#{k}=#{v.join(',') || 'none'}"}.join("\n") }
     end
   end
 
@@ -251,11 +251,11 @@ protected
       elsif !params[:redirect_to].blank?
         redirect_to(params[:redirect_to]) and return
       else
-        render text: @tag.id, status: 200 #OK
+        render plain: @tag.id, status: 200 #OK
       end
     else
       logger.error "Could not create tag from API... Tag: #{@tag.errors.full_messages.inspect}\nGMLObject#{@tag.gml_object.inspect}"
-      render text: "ERROR: #{@tag.errors.inspect}", status: 422 # Unprocessable Entity
+      render plain: "ERROR: #{@tag.errors.inspect}", status: 422 # Unprocessable Entity
     end
   end
 
@@ -273,8 +273,8 @@ protected
       params[:tag][:gml] = file.read
     end
 
-    # Build object
-    @tag = Tag.new(params[:tag])
+    # Build object with permitted params
+    @tag = Tag.new(params[:tag].permit(:gml, :gml_file, :application, :description, :location, :image, :existing_application_id, :user))
 
     # GML data of some kind is required -- catching this ourselves due to GmlObject complexity...
     # Allowing screenshot-only's for now... delete later.
@@ -320,6 +320,12 @@ protected
     # Home#index -- FIXME which of these is correct?!
     expire_fragment(controller: 'home', action: 'index')
     expire_fragment('home/index')
+  end
+
+  private
+
+  def tag_parameters
+    params.require(:tag).permit(:gml, :gml_file, :application, :description, :location, :image, :existing_application_id)
   end
 
 end
