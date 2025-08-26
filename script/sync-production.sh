@@ -91,14 +91,14 @@ fi
 
 # 2. Sync uploaded files
 if [[ -z "$SKIP_FILES" ]]; then
-  echo "🖼️  Syncing files..."
+  echo "📁  Syncing files..."
   mkdir -p public/system data
 
-  echo "Syncing GML data..."
+  echo "🎨  Syncing GML data..."
   rsync -avz --progress --stats --human-readable --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/data/" "./data/"
   echo "✅ GML data sync complete!"
 
-  echo "Syncing images..."
+  echo "🖼️  Syncing images..."
   rsync -avz --progress --stats --human-readable --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/public/system/" "./public/system/"
   echo "✅ Images sync complete!"
 else
