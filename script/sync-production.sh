@@ -94,13 +94,13 @@ if [[ -z "$SKIP_FILES" ]]; then
   echo "🖼️  Syncing files..."
   mkdir -p public/system data
 
-  echo "Syncing images..."
-  rsync -avz --progress --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/public/system/" "./public/system/"
-  echo "✅ Images sync complete!"
-
   echo "Syncing GML data..."
-  rsync -avz --progress --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/data/" "./data/"
+  rsync -avz --progress --stats --human-readable --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/data/" "./data/"
   echo "✅ GML data sync complete!"
+
+  echo "Syncing images..."
+  rsync -avz --progress --stats --human-readable --delete "$PROD_USER@$PROD_HOST:$PROD_APP_PATH/public/system/" "./public/system/"
+  echo "✅ Images sync complete!"
 else
   echo "⏭️  Skipping files sync (SKIP_FILES=1)"
 fi
