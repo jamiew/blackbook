@@ -18,6 +18,8 @@ class VisualizationsController < ApplicationController
 
   def index
     set_page_title "GML Applications"
+    @page = safe_page_param
+    @per_page = 20
     @visualizations = Visualization.paginate(page: @page, per_page: @per_page).order('created_at ASC')
   end
 

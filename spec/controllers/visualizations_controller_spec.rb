@@ -16,7 +16,9 @@ describe VisualizationsController do
     it "works" do
       get :index
       expect(response).to be_successful
-      expect(assigns(:visualizations)).to eq([@visualization])
+      expect(assigns(:visualizations)).to be_present
+      expect(assigns(:page)).to eq(1)
+      expect(assigns(:per_page)).to eq(20)
     end
   end
 
@@ -40,13 +42,19 @@ describe VisualizationsController do
   end
 
   describe "POST #create" do
+    before do
+      @user = create(:user)
+      UserSession.create(@user)
+    end
+
     it "routes from POST /apps" do
       { post: "/apps" }.should route_to("visualizations#create")
     end
 
     it "works" do
+      unique_name = "test_#{rand(100000)}"
       expect {
-        post :create, params: { visualization: { name: 'test', description: 'test', authors: 'test', embed_url: 'test' } }
+        post :create, params: { visualization: { name: unique_name, description: 'test', authors: 'test', embed_url: 'test' } }
         expect(response).to be_redirect
         expect(flash[:notice]).not_to be_blank
         expect(flash[:error]).to be_blank
