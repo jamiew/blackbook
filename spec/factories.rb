@@ -43,7 +43,6 @@ FactoryBot.define do
     author { 'JDUBS' }
     # gml_object { association(:gml_object) }
     data { DEFAULT_GML }
-    size { 12345 }
   end
 
   # A tag sent via the API is slightly different than through the site

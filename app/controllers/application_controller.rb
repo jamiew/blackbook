@@ -29,6 +29,11 @@ class ApplicationController < ActionController::Base
 
   protected
 
+  # Safe pagination parameter handling
+  def safe_page_param(page_param = params[:page], default_page = 1)
+    [page_param.to_i, default_page].max
+  end
+
   # Modify the global page title -- could also use @page_title
   # TODO change to page_title= (or just use @page_title/@title directly)
   def set_page_title(title, suffix = true)

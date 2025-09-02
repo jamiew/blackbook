@@ -3,7 +3,8 @@ class FavoritesController < ApplicationController
 
   def index
     @user = current_user
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 10 # FIXME align with Tags.index...
+    @page = safe_page_param
+    @per_page = 10 # FIXME align with Tags.index...
 
     # Goofy association-association loading for compat with will_paginate
     # Using double paginate as a 'ghetto limit'. doesn't cause trouble (??)

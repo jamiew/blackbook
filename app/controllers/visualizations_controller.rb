@@ -72,7 +72,7 @@ protected
 
   # FIXME these date back to using some magic super controller class magic
   def current_objects
-    @page = params[:page] && params[:page].to_i || 1
+    @page = safe_page_param
     @per_page = 20
     which = is_admin? ? current_model : current_model.approved
     if params[:user_id]

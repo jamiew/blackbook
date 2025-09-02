@@ -8,7 +8,8 @@ class UsersController < ApplicationController
 
   # Show all users
   def index
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 28
+    @page = safe_page_param
+    @per_page = 28
     @users = User.paginate(page: @page, per_page: @per_page)
     set_page_title "Users"
     # default_respond_to(@users, layout: true, exclude: [:email,:password,:crypted_password,:persistence_token])
@@ -18,7 +19,8 @@ class UsersController < ApplicationController
   def show
     @user = User.find_by_param(params[:id])
     raise ActiveRecord::RecordNotFound if @user.nil?
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 10
+    @page = safe_page_param
+    @per_page = 10
 
     @tags = @user.tags.order('created_at DESC').includes(:user).paginate(page: @page, per_page: @per_page)
     @wall_posts = @user.wall_posts.includes(:user).order('created_at DESC').paginate(page: 1, per_page: 10)
