@@ -1,4 +1,4 @@
-class Mailer < ActionMailer::Base
+class Mailer < ApplicationMailer
   default_url_options[:host] = '000000book.com'
   default from: '000000book <no-reply@000book.com>'
 
@@ -13,5 +13,4 @@ class Mailer < ActionMailer::Base
     @profile_url = user_url(user)
     mail(to: user.email, subject: "Your account registration info")
   end
-
 end

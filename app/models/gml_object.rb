@@ -1,19 +1,18 @@
 class GmlObject
-
   attr_accessor :tag_id
 
   def initialize(**opts)
     # Rails.logger.debug "GmlObject.new opts=#{opts.inspect}"
     self.tag_id = opts[:tag_id]
-    self.tag_id ||= opts[:tag] && opts[:tag].try(:id)
+    self.tag_id ||= opts[:tag]&.try(:id)
 
     # use data if passed explicitly; otherwise read from disk
     # right?
-    if opts.key?(:data)
-      self.data = opts[:data]
-    else
-      self.data = read_from_disk
-    end
+    self.data = if opts.key?(:data)
+                  opts[:data]
+                else
+                  read_from_disk
+                end
   end
 
   def tag
@@ -21,18 +20,18 @@ class GmlObject
   end
 
   def self.file_dir
-    "#{Rails.root}/data"
+    Rails.root.join("data").to_s
   end
 
   def filename
     return nil if tag_id.blank?
+
     "#{self.class.file_dir}/#{tag_id}.gml"
   end
 
   def s3_file_key
     "gml/#{tag_id}.gml"
   end
-
 
   def data
     # Rails.logger.debug "*** GmlObject #data..."
@@ -44,7 +43,7 @@ class GmlObject
     @_data = args
   end
 
-  # FIXME I don't like this pseudo-ActiveRecord stuff anymore
+  # FIXME: I don't like this pseudo-ActiveRecord stuff anymore
   def tag=(_tag)
     self.tag_id = _tag.id
   end
@@ -56,18 +55,18 @@ class GmlObject
 
   def self.read_all_cached_gml
     Dir.glob("#{file_dir}/*.gml").each do |path|
-      id = path.match(/.+\/(.+)\.gml/)[1]
-      tag = Tag.find_by_id(id)
+      id = path.match(%r{.+/(.+)\.gml})[1]
+      tag = Tag.find_by(id: id)
       if tag.nil?
         Rails.logger.warn "Could not find Tag #{id} for path=#{path.inspect}, skipping"
         next
       end
 
-      if tag.gml_object.blank?
-        Rails.logger.debug "No GmlObject for Tag #{id}, creating"
-        tag.send(:build_gml_object) # sorry
-        tag.send(:save_gml_object) # really I mean it
-      end
+      next if tag.gml_object.present?
+
+      Rails.logger.debug { "No GmlObject for Tag #{id}, creating" }
+      tag.send(:build_gml_object) # sorry
+      tag.send(:save_gml_object) # really I mean it
     end
   end
 
@@ -96,32 +95,30 @@ class GmlObject
       raise "Filename is blank, cannot store on disk"
     end
 
-    unless Dir.exist?(self.class.file_dir)
-      FileUtils.mkdir(self.class.file_dir)
-    end
+    FileUtils.mkdir_p(self.class.file_dir)
 
-    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
+    Rails.logger.debug { "GmlObject(tag_id=#{tag_id}).store_on_disk filename=#{filename} ..." }
 
-    File.open(filename, 'w+') do |file|
-      file.write(data)
-    end
-    return true
+    File.write(filename, data)
+    true
   end
 
   def read_from_disk
     return nil if filename.blank?
     return nil unless File.exist?(filename)
+
     data = File.read(filename)
-    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
-    return data
+    Rails.logger.debug { "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes" }
+    data
   end
 
   def s3_bucket_name
-    ENV['S3_BUCKET']
+    ENV.fetch('S3_BUCKET', nil)
   end
 
   def s3
     raise "No S3_BUCKET defined" if s3_bucket_name.blank?
+
     @s3 ||= Aws::S3::Resource.new
   end
 
@@ -133,18 +130,18 @@ class GmlObject
     raise "No local GML file to upload (#{filename})" if filename.blank?
     raise "Local GML file is empty, not uploading" if read_from_disk.blank?
 
-		# directly upload from disk...
-		# assumes we have stored on this local disk
-		# obj.write()
+    # directly upload from disk...
+    # assumes we have stored on this local disk
+    # obj.write()
     s3_object.upload_file(filename)
 
-		# # string data
-		# obj.put(body: 'Hello World!')
+    # # string data
+    # obj.put(body: 'Hello World!')
 
-		# # IO object
-		# File.open('source', 'rb') do |file|
-	 	#		obj.put(body: file)
-		# end
+    # # IO object
+    # File.open('source', 'rb') do |file|
+    #		obj.put(body: file)
+    # end
   end
 
   def read_from_s3
@@ -155,6 +152,4 @@ class GmlObject
   def size
     tag.data.length || 0
   end
-
-
 end

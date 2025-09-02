@@ -1,9 +1,9 @@
 class UsersController < ApplicationController
-  before_action :require_no_user, only: [:new, :create]
-  before_action :require_user, only: [:edit, :change_password, :update]
-  before_action :set_user_from_current_user, only: [:edit, :change_password, :update]
+  before_action :require_no_user, only: %i[new create]
+  before_action :require_user, only: %i[edit change_password update]
+  before_action :set_user_from_current_user, only: %i[edit change_password update]
 
-  # FIXME would love a smarter way to avoid test failures using this
+  # FIXME: would love a smarter way to avoid test failures using this
   invisible_captcha only: [:create]
 
   # Show all users
@@ -16,13 +16,15 @@ class UsersController < ApplicationController
 
   # Show one user
   def show
-    @user = User.find_by_param(params[:id])
+    @user = User.find_by(param: params[:id])
     raise ActiveRecord::RecordNotFound if @user.nil?
+
     @page, @per_page = pagination_params(per_page: 10)
 
-    @tags = @user.tags.order('created_at DESC').includes(:user).paginate(page: @page, per_page: @per_page)
-    @wall_posts = @user.wall_posts.includes(:user).order('created_at DESC').paginate(page: 1, per_page: 10)
-    @notifications = @user.notifications.includes(:subject, :user).order('created_at DESC').paginate(page: 1, per_page: 15)
+    @tags = @user.tags.order(created_at: :desc).includes(:user).paginate(page: @page, per_page: @per_page)
+    @wall_posts = @user.wall_posts.includes(:user).order(created_at: :desc).paginate(page: 1, per_page: 10)
+    @notifications = @user.notifications.includes(:subject, :user).order(created_at: :desc).paginate(page: 1,
+                                                                                                     per_page: 15)
 
     set_page_title @user.name || @user.login
 
@@ -33,6 +35,10 @@ class UsersController < ApplicationController
 
   def new
     @user = User.new
+  end
+
+  def edit
+    set_page_title "Your Settings"
   end
 
   def create
@@ -48,10 +54,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def edit
-    set_page_title "Your Settings"
-  end
-
   def update
     if @user.update(user_parameters)
       flash[:notice] = "Settings updated! "
@@ -62,17 +64,15 @@ class UsersController < ApplicationController
     end
   end
 
-
-private
+  private
 
   def user_parameters
-    params.require(:user).permit(:login, :email, :password, :password_confirmation, :name, :iphone_uniquekey, :photo)
+    params.expect(user: %i[login email password password_confirmation name iphone_uniquekey photo])
   end
 
-protected
+  protected
 
   def set_user_from_current_user
-    @user = @current_user  # makes our views "cleaner" and more consistent
+    @user = @current_user # makes our views "cleaner" and more consistent
   end
-
 end

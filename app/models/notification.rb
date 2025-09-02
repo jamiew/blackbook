@@ -1,6 +1,5 @@
-class Notification < ActiveRecord::Base
-
-  scope :latest, -> { order('created_at DESC').limit(20) }
+class Notification < ApplicationRecord
+  scope :latest, -> { order(created_at: :desc).limit(20) }
 
   validates :subject_id, presence: { message: "can't be blank" }, on: :create
   validates :subject_type, presence: { message: "can't be blank" }, on: :create
@@ -10,5 +9,4 @@ class Notification < ActiveRecord::Base
 
   belongs_to :subject, polymorphic: true, optional: true
   belongs_to :user, optional: true
-
 end

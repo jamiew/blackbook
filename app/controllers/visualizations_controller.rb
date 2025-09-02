@@ -1,11 +1,16 @@
 class VisualizationsController < ApplicationController
-
-  before_action :get_visualization, only: [:show, :edit, :update, :destroy, :approve, :unapprove]
-  before_action :require_admin, only: [:approve, :unapprove]
-  before_action :require_owner, only: [:edit, :update, :destroy]
-  before_action :require_user, only: [:new, :create]
+  before_action :get_visualization, only: %i[show edit update destroy approve unapprove]
+  before_action :require_admin, only: %i[approve unapprove]
+  before_action :require_owner, only: %i[edit update destroy]
+  before_action :require_user, only: %i[new create]
 
   respond_to :html, :js, :xml, :json
+
+  def index
+    set_page_title "GML Applications"
+    @page, @per_page = pagination_params
+    @visualizations = Visualization.paginate(page: @page, per_page: @per_page).order(:created_at)
+  end
 
   def show
     set_page_title @visualization.name
@@ -16,15 +21,14 @@ class VisualizationsController < ApplicationController
     end
   end
 
-  def index
-    set_page_title "GML Applications"
-    @page, @per_page = pagination_params
-    @visualizations = Visualization.paginate(page: @page, per_page: @per_page).order('created_at ASC')
-  end
-
   def new
     set_page_title "Creating new application"
     @visualization = Visualization.new
+  end
+
+  def edit
+    @visualization = Visualization.find(params[:id])
+    set_page_title "Editing app #{@visualization.id}"
   end
 
   def create
@@ -40,11 +44,6 @@ class VisualizationsController < ApplicationController
         end
       end
     end
-  end
-
-  def edit
-    @visualization = Visualization.find(params[:id])
-    set_page_title "Editing app #{@visualization.id}"
   end
 
   def update
@@ -65,27 +64,28 @@ class VisualizationsController < ApplicationController
     redirect_back_or_default(@visualization)
   end
 
-protected
+  protected
 
   def get_visualization
     @visualization = Visualization.find(params[:id])
   end
 
-  # FIXME these date back to using some magic super controller class magic
+  # FIXME: these date back to using some magic super controller class magic
   def current_objects
     @page, @per_page = pagination_params
     which = is_admin? ? current_model : current_model.approved
     if params[:user_id]
-      @user = User.find_by_param(params[:user_id])
+      @user = User.find_by(param: params[:user_id])
       which = which.by_user(@user.id)
-      #TODO: set page_title etc. Also handle all this logic less if/elsify
+      # TODO: set page_title etc. Also handle all this logic less if/elsify
     end
-    @visualizations ||= which.paginate(page: @page, per_page: @per_page, include: [:user], order: 'approved_at DESC, name ASC')
+    @current_objects ||= which.paginate(page: @page, per_page: @per_page, include: [:user],
+                                        order: 'approved_at DESC, name ASC')
   end
 
   def update_approval_state(obj, enabled)
     logger.debug "hi from update_approval_state obj=#{obj.inspect}"
-    obj.approved_at = (enabled ? Time.now : nil)
+    obj.approved_at = (enabled ? Time.zone.now : nil)
     obj.approved_by = (enabled ? current_user.id : nil)
     obj.save!
   end
@@ -97,6 +97,7 @@ protected
   private
 
   def visualization_parameters
-    params.fetch(:visualization, {}).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable, :image)
+    params.fetch(:visualization, {}).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable,
+                                            :image)
   end
 end
