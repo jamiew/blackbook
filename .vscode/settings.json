@@ -1,0 +1,12 @@
+{
+  // Ruby formatting with RuboCop
+  "ruby.formatter": "rubocop",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.rubocop": "explicit"
+  },
+  
+  // Clean up files
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}
