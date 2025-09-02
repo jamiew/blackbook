@@ -3,12 +3,12 @@ require 'rails_helper'
 describe ApplicationController do
   controller do
     def index
-      @page = safe_page_param(params[:page])
-      render plain: "page: #{@page}"
+      @page, @per_page = pagination_params
+      render plain: "page: #{@page}, per_page: #{@per_page}"
     end
   end
 
-  describe "#safe_page_param" do
+  describe "#pagination_params" do
     it "returns 1 for malicious strings" do
       get :index, params: { page: "'" }
       expect(assigns(:page)).to eq(1)
@@ -42,16 +42,36 @@ describe ApplicationController do
       expect(assigns(:page)).to eq(1)
     end
 
-    it "supports custom default page" do
+    it "supports custom per_page values" do
       controller.instance_eval do
         def index
-          @page = safe_page_param(params[:page], 10)
-          render plain: "page: #{@page}"
+          @page, @per_page = pagination_params(per_page: 50)
+          render plain: "page: #{@page}, per_page: #{@per_page}"
         end
       end
 
       get :index
-      expect(assigns(:page)).to eq(10)
+      expect(assigns(:per_page)).to eq(50)
+    end
+
+    it "validates per_page parameter" do
+      get :index
+      expect(assigns(:per_page)).to eq(20)  # default
+    end
+
+    it "accepts valid per_page from params" do
+      get :index, params: { per_page: "10" }
+      expect(assigns(:per_page)).to eq(10)
+    end
+
+    it "enforces max_per_page limit" do
+      get :index, params: { per_page: "1000" }
+      expect(assigns(:per_page)).to eq(100)  # capped at max_per_page
+    end
+
+    it "handles malicious per_page values" do
+      get :index, params: { per_page: "'; DROP TABLE users; --" }
+      expect(assigns(:per_page)).to eq(20)  # falls back to default
     end
   end
 end

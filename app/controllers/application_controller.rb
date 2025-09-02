@@ -29,12 +29,19 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # Safe pagination parameter handling with customizable defaults
-  def pagination_params(page: nil, per_page: 20)
-    {
-      page: [page || params[:page].to_i, 1].max,
-      per_page: [per_page.to_i, 1].max
-    }
+  # Safe pagination parameter handling with customizable defaults  
+  def pagination_params(page: nil, per_page: 20, max_per_page: 100)
+    requested_per_page = params[:per_page]&.to_i
+    safe_per_page = if requested_per_page && requested_per_page > 0
+                     [requested_per_page, max_per_page].min
+                   else
+                     per_page
+                   end
+
+    [
+      [page || params[:page].to_i, 1].max,  # page
+      safe_per_page                         # per_page
+    ]
   end
 
   # Modify the global page title -- could also use @page_title
