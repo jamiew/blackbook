@@ -44,7 +44,7 @@ describe UserSessionsController do
   end
 
   describe "POST :create" do
-    let!(:username) { 'jamiew' }
+    let!(:username) { "jamiew_#{rand(100000)}" }
     let!(:password) { 'password' }
 
     before do

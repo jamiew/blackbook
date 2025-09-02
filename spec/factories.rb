@@ -7,11 +7,11 @@ include FactoryBot::Syntax::Methods
 
 FactoryBot.define do
   sequence :login do |i|
-    "user#{i}"
+    "user#{i}_#{rand(100000)}"
   end
 
   sequence :email do |i|
-    "user#{i}@000book.com"
+    "user#{i}_#{rand(100000)}@000book.com"
   end
 
   sequence :device_id do |i|
@@ -68,7 +68,7 @@ FactoryBot.define do
   # A GML application
   factory :visualization do
     association :user
-    name { "TestTagger" }
+    name { "TestTagger_#{rand(100000)}" }
     description { "A really cool app with which you can draw tags"}
     website { "http://jamiedubs.com/testtagger" }
     authors { "jamiedubs" }

@@ -42,7 +42,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "Password validation" do
-    let(:user) { FactoryBot.create(:user, login: 'testuser', email: 'test@example.com', password: 'password123') }
+    let(:user) { FactoryBot.create(:user, login: "testuser_#{rand(100000)}", email: "test_#{rand(100000)}@example.com", password: 'password123') }
 
     it "requires matching password confirmation when password is set" do
       user.password = 'newpassword'
