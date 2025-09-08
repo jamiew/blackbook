@@ -243,6 +243,8 @@ describe TagsController do
 
   describe "GET #latest" do
     it ".html redirects to the latest" do
+      # Clear any existing tags to ensure our test tag is the latest
+      Tag.delete_all
       tag = FactoryBot.create(:tag)
       get :latest
       path = tag_path(tag)
@@ -250,6 +252,8 @@ describe TagsController do
     end
 
     it ".json returns latest" do
+      # Clear any existing tags to ensure our test tag is the latest
+      Tag.delete_all
       tag = FactoryBot.create(:tag)
       get :latest, params: { format: 'json' }
       expect(assigns(:tag)).to eq(tag)
