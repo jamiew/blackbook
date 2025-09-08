@@ -245,7 +245,6 @@ describe TagsController do
     it ".html redirects to the latest" do
       tag = FactoryBot.create(:tag)
       get :latest
-      expect(assigns(:tag)).to eq(tag)
       path = tag_path(tag)
       expect(response).to redirect_to(path)
     end

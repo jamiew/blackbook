@@ -202,7 +202,7 @@ class TagsController < ApplicationController
     respond_to do |wants|
       wants.html {
         if request.xhr?
-          render plain: @tag..validation_results.inspect
+          render plain: @tag.validation_results.inspect
         else
           render 'validator'
         end
