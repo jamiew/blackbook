@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_21_231341) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_19_154715) do
   create_table "comments", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
     t.string "title", limit: 50, default: ""
     t.text "text", size: :medium
@@ -34,6 +34,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_231341) do
     t.datetime "updated_at", precision: nil
     t.index ["object_id", "object_type"], name: "index_favorites_on_object_id_and_object_type"
     t.index ["object_id", "object_type"], name: "index_on_object_id_and_object_type"
+    t.index ["user_id", "object_id", "object_type"], name: "index_favorites_on_user_and_object", unique: true
   end
 
   create_table "likes", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
@@ -42,6 +43,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_231341) do
     t.integer "user_id"
     t.datetime "created_at", precision: nil
     t.datetime "updated_at", precision: nil
+    t.index ["user_id", "object_id", "object_type"], name: "index_likes_on_user_and_object", unique: true
   end
 
   create_table "notifications", id: :integer, charset: "utf8mb3", options: "ENGINE=MyISAM", force: :cascade do |t|
@@ -142,5 +144,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_231341) do
     t.string "image_file_name"
     t.string "image_content_type"
     t.integer "image_file_size"
+    t.index ["name"], name: "index_visualizations_on_name", unique: true
   end
 end
