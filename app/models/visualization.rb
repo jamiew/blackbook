@@ -1,4 +1,4 @@
-class Visualization < ActiveRecord::Base
+class Visualization < ApplicationRecord
 
   # supported application types; stored as an Array to maintain order pre-ruby 1.9
   # possibly rename to 'language'? Not sure. Little distinction atm
