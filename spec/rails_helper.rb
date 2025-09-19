@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 # Try to be sure we are running in RAILS_ENV=test
 ENV['Rails.env'] = 'test'
 ENV['RAILS_ENV'] = 'test'
 
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
-abort("The Rails environment is running in development mode!") if Rails.env.development?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
+abort('The Rails environment is running in development mode!') if Rails.env.development?
 
 require 'spec_helper'
 
