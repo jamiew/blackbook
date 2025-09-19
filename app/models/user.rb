@@ -1,4 +1,4 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
 
   acts_as_authentic do |c|
     c.crypto_provider = ::Authlogic::CryptoProviders::SCrypt
@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
 
   def deliver_password_reset_instructions!
     reset_perishable_token!
-    Mailer.password_reset_instructions(self).deliver_now
+    UserMailer.password_reset_instructions(self).deliver_now
   end
 
   # Unclaimed tags matching this user's uniqueKey
