@@ -1,10 +1,10 @@
 class CommentsController < ApplicationController
 
-  before_filter :require_user, only: [:new, :create, :edit, :update, :destroy]
-  before_filter :setup
+  before_action :require_user, only: [:new, :create, :edit, :update, :destroy]
+  before_action :setup
 
   def create
-    @comment = Comment.new(params[:comment])
+    @comment = Comment.new(comment_parameters)
     @comment.user = current_user
     @comment.commentable = @commentable
     @comment.ip_address = request.remote_addr
@@ -20,11 +20,11 @@ class CommentsController < ApplicationController
   end
 
   def edit
-    render text: "TODO", status: 420
+    render plain: "TODO", status: 420
   end
 
   def update
-    render text: "TODO", status: 420
+    render plain: "TODO", status: 420
   end
 
   def destroy
@@ -35,6 +35,12 @@ class CommentsController < ApplicationController
     redirect_back_or_default(comments_path(@commentable))
   end
 
+
+  private
+
+  def comment_parameters
+    params.require(:comment).permit(:text)
+  end
 
   protected
 

@@ -155,4 +155,105 @@ RSpec.describe Tag, type: :model do
     return FactoryBot.create(:tag, gml: merged.to_xml)
   end
 
+  describe "GML validation and processing" do
+    let(:valid_gml) { '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>' }
+
+    it "accepts valid GML" do
+      tag = Tag.new(data: valid_gml)
+      tag.validate_gml
+      
+      expect(tag.validation_results).to be_present
+      # Should have some validation results
+    end
+
+    it "handles malformed XML gracefully" do
+      tag = Tag.new(data: '<gml><unclosed_tag>')
+      
+      expect { tag.validate_gml }.not_to raise_error
+    end
+
+    it "extracts GML header information" do
+      tag = Tag.new(data: valid_gml)
+      header = tag.gml_header
+      
+      expect(header).to be_a(Hash)
+      # GML header extraction returns basic info
+      expect(header).to be_present
+    end
+  end
+
+  describe "XML output filtering" do
+    it "excludes blank attributes from XML output" do
+      tag = FactoryBot.create(:tag, title: 'Test', description: nil, location: '')
+      xml_output = tag.to_xml
+      
+      expect(xml_output).to include('title')
+      expect(xml_output).not_to include('description')
+      expect(xml_output).not_to include('location')
+    end
+
+    it "excludes hidden attributes from API output" do
+      tag = FactoryBot.create(:tag, ip: '192.168.1.1', remote_secret: 'secret')
+      json_output = tag.to_json(except: Tag::HIDDEN_ATTRIBUTES)
+      
+      expect(json_output).not_to include('192.168.1.1')
+      expect(json_output).not_to include('secret')
+    end
+  end
+
+  describe "Size calculation" do
+    let(:valid_gml) { '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>' }
+
+    it "calculates size from GML data" do
+      tag = FactoryBot.create(:tag, data: valid_gml)
+      
+      expect(tag.gml_object.size).to eq(valid_gml.length)
+    end
+  end
+
+  describe "Associations" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:tag) { FactoryBot.create(:tag, user: user) }
+
+    it "belongs to a user" do
+      expect(tag.user).to eq(user)
+    end
+
+    it "has many comments" do
+      comment = Comment.create!(commentable: tag, user: user, text: 'Test comment')
+      expect(tag.comments).to include(comment)
+    end
+
+    it "has many likes" do
+      like = Like.create!(object: tag, user: user)
+      expect(tag.likes).to include(like)
+    end
+
+    it "can be favorited" do
+      favorite = Favorite.create!(object: tag, user: user)
+      expect(tag.favorites).to include(favorite)
+    end
+  end
+
+  describe "Scopes" do
+    it "finds device tags" do
+      device_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123')
+      regular_tag = FactoryBot.create(:tag, gml_uniquekey: nil)
+      
+      expect(Tag.from_device).to include(device_tag)
+      expect(Tag.from_device).not_to include(regular_tag)
+    end
+
+    it "distinguishes claimed vs unclaimed tags" do
+      user = FactoryBot.create(:user)
+      claimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123', user: user)
+      unclaimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device456', user: nil)
+      
+      expect(Tag.claimed).to include(claimed_tag)
+      expect(Tag.claimed).not_to include(unclaimed_tag)
+      
+      expect(Tag.unclaimed).to include(unclaimed_tag)
+      expect(Tag.unclaimed).not_to include(claimed_tag)
+    end
+  end
 end

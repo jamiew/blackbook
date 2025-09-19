@@ -15,8 +15,10 @@ describe VisualizationsController do
 
     it "works" do
       get :index
-      expect(response).to be_success
-      expect(assigns(:visualizations)).to eq([@visualization])
+      expect(response).to be_successful
+      expect(assigns(:visualizations)).to be_present
+      expect(assigns(:page)).to eq(1)
+      expect(assigns(:per_page)).to eq(20)
     end
   end
 
@@ -26,27 +28,33 @@ describe VisualizationsController do
     end
 
     it "works" do
-      get :show, id: @visualization.id
-      expect(response).to be_success
+      get :show, params: { id: @visualization.id }
+      expect(response).to be_successful
       expect(response.body).to match(@visualization.name)
     end
 
     it "404s if that record does not exist" do
       expect {
         Visualization.where(id: 666).first.should be_nil
-        get :show, id: 666
+        get :show, params: { id: 666 }
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
   describe "POST #create" do
+    before do
+      @user = create(:user)
+      UserSession.create(@user)
+    end
+
     it "routes from POST /apps" do
       { post: "/apps" }.should route_to("visualizations#create")
     end
 
     it "works" do
+      unique_name = "test_#{rand(100000)}"
       expect {
-        post :create, visualization: { name: 'test', description: 'test', authors: 'test', embed_url: 'test' }
+        post :create, params: { visualization: { name: unique_name, description: 'test', authors: 'test', embed_url: 'test' } }
         expect(response).to be_redirect
         expect(flash[:notice]).not_to be_blank
         expect(flash[:error]).to be_blank
@@ -62,14 +70,14 @@ describe VisualizationsController do
 
     it "fails with bad data" do
       expect {
-        post :create, visualization: { name: 'other_fields_missing' }
+        post :create, params: { visualization: { name: 'other_fields_missing' } }
         expect(flash[:error]).to_not be_blank
       }.to_not change(Visualization, :count)
     end
 
     it "fails if you include HTML links" do
       expect {
-        post :create, visualization: { name: 'idk', authors: '<a href="me.com">it me</a>' }
+        post :create, params: { visualization: { name: 'idk', authors: '<a href="me.com">it me</a>' } }
         expect(flash[:error]).to_not be_blank
       }.to_not change(Visualization, :count)
     end

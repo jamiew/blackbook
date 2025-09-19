@@ -1,9 +1,9 @@
 class VisualizationsController < ApplicationController
 
-  before_filter :get_visualization, only: [:show, :edit, :update, :destroy, :approve, :unapprove]
-  before_filter :require_admin, only: [:approve, :unapprove]
-  before_filter :require_owner, only: [:edit, :update, :destroy]
-  before_filter :require_user, only: [:new, :create]
+  before_action :get_visualization, only: [:show, :edit, :update, :destroy, :approve, :unapprove]
+  before_action :require_admin, only: [:approve, :unapprove]
+  before_action :require_owner, only: [:edit, :update, :destroy]
+  before_action :require_user, only: [:new, :create]
 
   respond_to :html, :js, :xml, :json
 
@@ -18,6 +18,7 @@ class VisualizationsController < ApplicationController
 
   def index
     set_page_title "GML Applications"
+    @page, @per_page = pagination_params
     @visualizations = Visualization.paginate(page: @page, per_page: @per_page).order('created_at ASC')
   end
 
@@ -27,7 +28,7 @@ class VisualizationsController < ApplicationController
   end
 
   def create
-    @visualization = current_user.visualizations.new(params[:visualization])
+    @visualization = current_user.visualizations.new(visualization_parameters)
     respond_with @visualization do |format|
       format.html do
         if @visualization.save
@@ -72,8 +73,7 @@ protected
 
   # FIXME these date back to using some magic super controller class magic
   def current_objects
-    @page = params[:page] && params[:page].to_i || 1
-    @per_page = 20
+    @page, @per_page = pagination_params
     which = is_admin? ? current_model : current_model.approved
     if params[:user_id]
       @user = User.find_by_param(params[:user_id])
@@ -92,5 +92,11 @@ protected
 
   def require_owner
     raise NoPermissionError unless current_user && (@visualization.user == current_user || is_admin?)
+  end
+
+  private
+
+  def visualization_parameters
+    params.fetch(:visualization, {}).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable, :image)
   end
 end

@@ -41,4 +41,54 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "Password validation" do
+    let(:user) { FactoryBot.create(:user, login: "testuser_#{rand(100000)}", email: "test_#{rand(100000)}@example.com", password: 'password123') }
+
+    it "requires matching password confirmation when password is set" do
+      user.password = 'newpassword'
+      user.password_confirmation = 'different'
+      
+      expect(user).not_to be_valid
+      expect(user.errors[:password_confirmation]).to be_present
+    end
+
+    it "allows password change with matching confirmation" do
+      user.password = 'newpassword'
+      user.password_confirmation = 'newpassword'
+      
+      expect(user).to be_valid
+    end
+
+    it "doesn't require confirmation when password isn't changed" do
+      user.name = 'New Name'
+      user.password_confirmation = nil
+      
+      expect(user).to be_valid
+    end
+  end
+
+  describe "Unique constraints" do
+    let(:user) { FactoryBot.create(:user) }
+
+    it "prevents duplicate logins" do
+      duplicate_user = FactoryBot.build(:user, login: user.login)
+      expect(duplicate_user).not_to be_valid
+      expect(duplicate_user.errors[:login]).to include("is already taken by another user; try a different one.")
+    end
+
+    it "prevents duplicate emails" do
+      duplicate_user = FactoryBot.build(:user, email: user.email)
+      expect(duplicate_user).not_to be_valid
+      expect(duplicate_user.errors[:email]).to include("already exists in our system; an email address can only be used once.")
+    end
+
+    it "allows blank device keys" do
+      user.iphone_uniquekey = nil
+      expect(user).to be_valid
+      
+      user.iphone_uniquekey = ''
+      expect(user).to be_valid
+    end
+  end
+
 end

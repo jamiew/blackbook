@@ -1,9 +1,9 @@
 class FavoritesController < ApplicationController
-  before_filter :require_user, only: [:create, :update, :destroy]
+  before_action :require_user, only: [:create, :update, :destroy]
 
   def index
     @user = current_user
-    @page, @per_page = params[:page] && params[:page].to_i || 1, 10 # FIXME align with Tags.index...
+    @page, @per_page = pagination_params(per_page: 10)
 
     # Goofy association-association loading for compat with will_paginate
     # Using double paginate as a 'ghetto limit'. doesn't cause trouble (??)
@@ -24,7 +24,7 @@ class FavoritesController < ApplicationController
     raise "tag_id only!" if params[:tag_id].blank?
     attrs = { object_id: params[:tag_id], object_type: 'Tag' }
 
-    fave = current_user.favorites.where(attrs).first
+    fave = current_user.favorites.find_by(attrs)
     if fave
       fave.destroy
       flash[:notice] = "Unfavorited..."
@@ -32,7 +32,7 @@ class FavoritesController < ApplicationController
       current_user.favorites.create!(attrs)
       flash[:notice] = "Favorited!"
     end
-    redirect_to :back and return
+    redirect_back(fallback_location: root_path) and return
   end
 
 end

@@ -57,7 +57,7 @@ describe UsersController do
     it "works, creating a new, valid user record" do
       pending 'USER SIGNUPS DISABLED'
       expect {
-        post :create, valid_user_params
+        post :create, params: valid_user_params
       }.to change(User, :count).by(1)
     end
 
@@ -73,7 +73,7 @@ describe UsersController do
     it "sends an email" do
       pending 'USER SIGNUPS DISABLED'
       expect {
-        post :create, valid_user_params
+        post :create, params: valid_user_params
       }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
@@ -93,14 +93,14 @@ describe UsersController do
 
     it "should redirect back to settings page on :update" do
       pending 'USER SIGNUPS DISABLED'
-      post :update, user: { email: 'my@newemail.com' }
+      post :update, params: { user: { email: 'my@newemail.com' } }
       expect(response).to redirect_to(settings_path)
       expect(flash[:notice]).to be_present
     end
 
     it "should not redirect to account on failed :update" do
       pending 'USER SIGNUPS DISABLED'
-      post :update, user: { email: 'not_a_valid_email' }
+      post :update, params: { user: { email: 'not_a_valid_email' } }
       expect(response).not_to be_redirect
       expect(assigns(:user).errors).to be_present
       # flash[:error].should be_present
@@ -110,40 +110,40 @@ describe UsersController do
   describe '#show' do
     let(:default_user){ FactoryBot.create(:user) }
     it 'works with user id' do
-      get :show, id: default_user.id
-      expect(response).to be_success
+      get :show, params: { id: default_user.id }
+      expect(response).to be_successful
       expect(assigns(:user)).to eq(default_user)
     end
 
     it 'works with user login' do
       expect(default_user.login).not_to eq(default_user.id)
-      get :show, id: default_user.login
-      expect(response).to be_success
+      get :show, params: { id: default_user.login }
+      expect(response).to be_successful
       expect(assigns(:user)).to eq(default_user)
     end
 
     it 'works if you are logged-in' do
       activate_authlogic
-      get :show, id: default_user.login
-      expect(response).to be_success
+      get :show, params: { id: default_user.login }
+      expect(response).to be_successful
     end
 
     it 'returns 404 if user does not exist' do
       expect(User.find_by_id(666)).to be_nil
       expect {
-        get :show, id: 666
+        get :show, params: { id: 666 }
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it ".json does NOT work" do
       expect {
-        get :show, id: default_user.to_param, format: :json
+        get :show, params: { id: default_user.to_param, format: :json }
       }.to raise_error(ActionController::UnknownFormat)
     end
 
     it ".xml does NOT work" do
       expect {
-        get :show, id: default_user.to_param, format: :xml
+        get :show, params: { id: default_user.to_param, format: :xml }
       }.to raise_error(ActionController::UnknownFormat)
     end
 

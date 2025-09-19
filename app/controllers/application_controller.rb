@@ -15,8 +15,8 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password, :password_confirmation, :gml, :data
   # protect_from_forgery
 
-  # before_filter :activate_authlogic
-  before_filter :set_format
+  # before_action :activate_authlogic
+  before_action :set_format
 
   rescue_from NoPermissionError, with: :permission_denied
 
@@ -28,6 +28,21 @@ class ApplicationController < ActionController::Base
 
 
   protected
+
+  # Safe pagination parameter handling with customizable defaults  
+  def pagination_params(page: nil, per_page: 20, max_per_page: 100)
+    requested_per_page = params[:per_page]&.to_i
+    safe_per_page = if requested_per_page && requested_per_page > 0
+                     [requested_per_page, max_per_page].min
+                   else
+                     per_page
+                   end
+
+    [
+      [page || params[:page].to_i, 1].max,  # page
+      safe_per_page                         # per_page
+    ]
+  end
 
   # Modify the global page title -- could also use @page_title
   # TODO change to page_title= (or just use @page_title/@title directly)
@@ -48,12 +63,12 @@ class ApplicationController < ActionController::Base
   # Catch-all render for no-permission errors
   def permission_denied
     flash[:error] = "You don't have permission to do that"
-    render text: flash[:error], status: 403
+    render plain: flash[:error], status: 403
   end
 
   # Automatically respond with 404 for ActiveRecord::RecordNotFound
   def record_not_found
-    render file: File.join(RAILS_ROOT, 'public', '404.html'), status: 404
+    render file: File.join(Rails.root, 'public', '404.html'), status: 404
   end
 
   # Render a partial into a string
@@ -179,13 +194,13 @@ class ApplicationController < ActionController::Base
         if request.xhr? && !opts[:html_partial].blank?
           render partial: opts[:html_partial], object: object
         else
-          render text: object.to_html(exclude: opts[:exclude]), layout: which_layout
+          render plain: object.to_html(exclude: opts[:exclude]), layout: which_layout
         end
       }
 
-      format.xml  { render text: object.to_xml }
-      format.json { render text: object.to_json }
-      format.yaml { render text: object.to_yaml }
+      format.xml  { render plain: object.to_xml }
+      format.json { render plain: object.to_json }
+      format.yaml { render plain: object.to_yaml }
       # TODO: js, txt, rss, atom
     end and return
   end

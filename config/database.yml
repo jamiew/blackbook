@@ -7,13 +7,14 @@ default: &default
 development:
   <<: *default
   database: blackbook_dev
-
-production:
-  <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
+  username: root
 
 test:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
-  # FIXME do we need to alternate using ENV['CI']?
   database: blackbook_test
+  username: root
+
+production:
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>
