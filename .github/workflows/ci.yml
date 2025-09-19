@@ -66,6 +66,6 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: mysql2://127.0.0.1:${{ job.services.mysql.ports[3306] }}/blackbook_test
         run: |
-          bin/rake db:create
-          bin/rake db:schema:load --trace
-          bin/rake spec
+          bundle exec rake db:create
+          bundle exec rake db:schema:load --trace
+          bundle exec rspec

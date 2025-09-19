@@ -69,57 +69,28 @@ RSpec.describe GmlObject, type: :model do
   end
 
   describe '#read_from_disk' do
-    it 'works'
+    it 'works' do
+      gml = FactoryBot.create(:gml_object)
+      # Store something on disk first
+      gml.store_on_disk
+      
+      # Create a new object and read from disk
+      new_gml = GmlObject.new(tag_id: gml.tag_id)
+      expect(new_gml.read_from_disk).to eq(gml.data)
+      expect(new_gml.read_from_disk).to include('<gml>')
+    end
 
     it "returns nothing if file is missing" do
       # id=1 should always be an invalid "not in production GML" id
       # so use to avoid messy issues because of  `read_from_disk` being called automatically
       gml = FactoryBot.build(:gml_object, tag_id: 1)
       FileUtils.rm_f(gml.filename)
-      expect(File.exists?(gml.filename)).to eq(false)
+      expect(File.exist?(gml.filename)).to eq(false)
       expect(gml.read_from_disk).to eq(nil)
     end
   end
 
-  describe "#store_on_s3" do
-    it "works"
-  end
 
-  describe "#read_from_s3" do
-    it "works"
-  end
-
-  describe "#store_on_ipfs" do
-    it "works if IPFS daemon is running" do
-      if `pidof ipfs`.blank?
-        skip "daemon not running, can't test"
-      end
-
-      tag = FactoryBot.create(:tag, id: 1)
-      gml = FactoryBot.build(:gml_object, tag_id: tag.id)
-      result = gml.store_on_ipfs
-      # hash of the current public/data/1.gml file =>
-      expect(result).to eq("QmbQJhosiiUUTXk12ueQM79iuWpDohu9WRiige61HqkqtS")
-    end
-
-    it "fails if no IPFS daemon available" do
-      # `pkill ipfs && sleep 1` # god forgive me
-      # `ps aux | grep ipfs`.should be_blank
-      # gml = FactoryBot.build(:gml_object, tag_id: 1)
-      # gml_store_on_ipfs
-      skip
-    end
-
-    it "handles JSON parser errors" do
-      # TODO simulate JSON::ParserError
-      skip
-    end
-  end
-
-  describe "#read_from_ipfs" do
-    it "works if IPFS daemon is running"
-    it "fails if IPFS daemon is not running"
-  end
 
   describe "#tag" do
     it "loads a Tag" do

@@ -4,9 +4,10 @@ class Tag < ActiveRecord::Base
   # TODO convert to a whitelisted approach...
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :comments, as: :commentable
-  has_many :likes
+  has_many :likes, as: :object
+  has_many :favorites, as: :object
 
   # delegate :data, to: :gml_object
 
@@ -21,7 +22,6 @@ class Tag < ActiveRecord::Base
   after_create  :save_gml_object
   after_create  :create_notification
 
-  attr_protected :user_id
 
   scope :from_device, -> { where('gml_uniquekey IS NOT NULL') }
   scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
@@ -162,7 +162,7 @@ class Tag < ActiveRecord::Base
     # Rails.logger.debug "Tag #{id}: to_xml"
     options[:except] ||= []
     options[:except] += self.attributes.map {|k,v| k if v.blank? }.compact
-    super(options)
+    self.attributes.except(*options[:except]).to_xml(options)
   end
 
   # GML as a Nokogiri object...

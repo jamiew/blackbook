@@ -7,82 +7,77 @@ include FactoryBot::Syntax::Methods
 
 FactoryBot.define do
   sequence :login do |i|
-    "user#{i}"
+    "user#{i}_#{rand(100000)}"
   end
 
   sequence :email do |i|
-    "user#{i}@000book.com"
+    "user#{i}_#{rand(100000)}@000book.com"
   end
 
   sequence :device_id do |i|
     Digest::SHA1.hexdigest(i.to_s)
   end
 
-  factory :user do |t|
-    t.login { FactoryBot.generate(:login) }
-    t.name { 'Test User' }
-    t.email  { FactoryBot.generate(:email) }
-    t.password { 'topsecret123' }
-    t.password_confirmation { 'topsecret123' }
-    t.website { 'http://fffff.at' }
-    t.tagline { 'I did it for the famo' }
-    t.about { 'Blah blah blah, http://jamiedubs.com, even some <b>BOLD TEXT</b> or <a href="http://fffff.at">custom link</a>' }
-    t.iphone_uniquekey  { FactoryBot.generate(:device_id) }
+  factory :user do
+    login { FactoryBot.generate(:login) }
+    name { 'Test User' }
+    email  { FactoryBot.generate(:email) }
+    password { 'topsecret123' }
+    website { 'http://fffff.at' }
+    tagline { 'I did it for the famo' }
+    about { 'Blah blah blah, http://jamiedubs.com, even some <b>BOLD TEXT</b> or <a href="http://fffff.at">custom link</a>' }
+    iphone_uniquekey  { FactoryBot.generate(:device_id) }
   end
 
-  factory :admin, parent: :user do |t|
-    t.login { 'admin' }
-    t.name { 'Admin User' }
-    t.admin { true }
+  factory :admin, parent: :user do
+    login { 'admin' }
+    name { 'Admin User' }
+    admin { true }
   end
 
   # A minimum GML tag
-  factory :tag do |t|
-    t.user {|a| a.association(:user) }
-    t.application { 'TestApp' }
-    t.gml_application { 'testing_app_maybe' }
-    t.author { 'JDUBS' }
-    # t.gml_object {|a| a.association(:gml_object) }
-    t.data { DEFAULT_GML }
-    t.size { 12345 }
-    t.ipfs_hash { "Qmd3ADB33FBeeFbEeFlol" }
-
+  factory :tag do
+    association :user
+    application { 'TestApp' }
+    gml_application { 'testing_app_maybe' }
+    author { 'JDUBS' }
+    # gml_object { association(:gml_object) }
+    data { DEFAULT_GML }
   end
 
   # A tag sent via the API is slightly different than through the site
   # No thumbnail required & application *is* required
-  factory :tag_from_api, parent: :tag do |t|
-    t.remote_image { 'http://fffff.at/fuckflickr/...' }
-    t.remote_secret { '' }
+  factory :tag_from_api, parent: :tag do
+    remote_image { 'http://fffff.at/fuckflickr/...' }
+    remote_secret { '' }
   end
 
   # A sample tag from Tempt1's EyeWriter.
   # He can't upgrade or diagnose issues, so we *must* maintain backwards compatibility
-  factory :tag_from_tempt1, parent: :tag do |t|
-    t.remote_secret { '123456789' }
-    t.gml { "<gml>yo i am some sample tempt graffiti... should use a fixture to store this</gml>" }
+  factory :tag_from_tempt1, parent: :tag do
+    remote_secret { '123456789' }
+    gml { "<gml>yo i am some sample tempt graffiti... should use a fixture to store this</gml>" }
   end
 
   # Stores the actual GML
-  factory :gml_object do |t|
-    t.tag_id { 1 }
-    t.data { DEFAULT_GML }
+  factory :gml_object do
+    tag_id { 1 }
+    data { DEFAULT_GML }
   end
 
   # A GML application
-  factory :visualization do |t|
-    t.user {|a| a.association(:user) }
-    t.name { "TestTagger" }
-    t.description { "A really cool app with which you can draw tags"}
-    t.website { "http://jamiedubs.com/testtagger" }
-    t.authors { "jamiedubs" }
-    t.kind { "javascript" }
-
+  factory :visualization do
+    association :user
+    name { "TestTagger_#{rand(100000)}" }
+    description { "A really cool app with which you can draw tags"}
+    website { "http://jamiedubs.com/testtagger" }
+    authors { "jamiedubs" }
+    kind { "javascript" }
   end
 
-  factory :favorite do |t|
-    t.user {|a| a.association(:user) }
-    t.object {|a| a.association(:tag) }
+  factory :favorite do
+    association :user
+    association :object, factory: :tag
   end
 
   factory :comment do

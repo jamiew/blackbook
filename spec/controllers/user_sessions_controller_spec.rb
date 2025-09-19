@@ -44,7 +44,7 @@ describe UserSessionsController do
   end
 
   describe "POST :create" do
-    let!(:username) { 'jamiew' }
+    let!(:username) { "jamiew_#{rand(100000)}" }
     let!(:password) { 'password' }
 
     before do
@@ -54,21 +54,21 @@ describe UserSessionsController do
     it "should work and redirect to the account page" do
       user = User.find_by_login(username)
       expect(user).not_to be_nil # sanity-check our setup
-      post :create, user_session: { login: username, password: password }
+      post :create, params: { user_session: { login: username, password: password } }
       expect(flash[:notice]).to match(/Login successful/)
       expect(current_user).to eq(@user)
       expect(response).to redirect_to(user_path(user))
     end
 
     it "should fail if credentials are missing" do
-      post :create, some_random_stuff: { login: nil }
+      post :create, params: { some_random_stuff: { login: nil } }
       expect(flash[:error]).to match(/Failed to authenticate/)
       expect(current_user).to be_nil
       expect(response).to be_unauthorized
     end
 
     it "should fail if credentials are incorrect" do
-      post :create, user_session: { login: username, password: 'idkman' }
+      post :create, params: { user_session: { login: username, password: 'idkman' } }
       expect(flash[:error]).to match(/Failed to authenticate/)
       expect(current_user).to be_nil
       expect(response).to be_unauthorized
