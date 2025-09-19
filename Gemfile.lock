@@ -212,6 +212,10 @@ GEM
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
+    propshaft (1.2.1)
+      actionpack (>= 7.0.0)
+      activesupport (>= 7.0.0)
+      rack
     psych (5.2.6)
       date
       stringio
@@ -297,25 +301,17 @@ GEM
       ffi-compiler (>= 1.0, < 2.0)
       rake (~> 13)
     securerandom (0.4.1)
-    sprockets (4.2.2)
-      concurrent-ruby (~> 1.0)
-      logger
-      rack (>= 2.2.4, < 4)
-    sprockets-rails (3.5.2)
-      actionpack (>= 6.1)
-      activesupport (>= 6.1)
-      sprockets (>= 3.0.0)
     stringio (3.1.7)
     temple (0.10.4)
     terrapin (1.1.1)
       climate_control
+    terser (1.2.6)
+      execjs (>= 0.3.0, < 3)
     thor (1.4.0)
     tilt (2.6.1)
     timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uglifier (4.2.1)
-      execjs (>= 0.3.0, < 3)
     uri (1.0.3)
     useragent (0.16.11)
     websocket-driver (0.8.0)
@@ -352,6 +348,7 @@ DEPENDENCIES
   mysql2 (~> 0.5.6)
   nokogiri (~> 1.15)
   ostruct
+  propshaft
   puma
   rails (~> 8.0.2)
   rails-controller-testing
@@ -360,8 +357,7 @@ DEPENDENCIES
   rexml
   rspec-rails (~> 8.0)
   scrypt (~> 3.0)
-  sprockets-rails
-  uglifier
+  terser
   will_paginate
 
 RUBY VERSION

@@ -22,14 +22,7 @@ Rails.application.configure do
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
-  # Debug mode disables concatenation and preprocessing of assets.
-  # This option may cause significant delays in view rendering with a large
-  # number of complex assets.
-  config.assets.debug = true
-
-  # Asset digests allow you to set far-future HTTP expiration dates on all assets,
-  # yet still be able to expire them through the digest params.
-  config.assets.digest = true
+  # Propshaft serves assets in development without preprocessing
 
   # Enable server timing
   config.server_timing = true
@@ -45,7 +38,6 @@ Rails.application.configure do
   # logger.formatter = config.log_formatter
   # config.logger    = ActiveSupport::TaggedLogging.new(logger)
 
-  # Updated for Rails 7
-  config.assets.check_precompiled_asset = false
+  # Propshaft doesn't need precompiled asset checking
 
 end

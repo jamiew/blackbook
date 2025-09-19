@@ -5,8 +5,8 @@ gem 'rails', '~> 8.0.2'
 gem 'mysql2', '~> 0.5.6'
 gem 'puma', groups: [:development, :production]
 
-gem 'uglifier'
-gem 'sprockets-rails'
+gem 'propshaft'
+gem 'terser'
 gem 'bootsnap', require: false
 gem 'jquery-rails'
 gem 'responders', '~> 3.0'

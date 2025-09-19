@@ -32,13 +32,11 @@ class TagsController < ApplicationController
       @search_context = {key: :user, value: @user.login, conditions: ["user_id = ?",@user.id]}
     end
 
-    @page = params[:page] && params[:page].to_i || 1
+    @page, @per_page = pagination_params(per_page: 15)
     if @page < 1
       flash[:error] = "Invalid page number specified"
       redirect_to tags_path and return
     end
-
-    @per_page = 15
     @tags ||= Tag.order('tags.created_at DESC').includes(:user).where(@search_context && @search_context[:conditions]).paginate(page: @page, per_page: @per_page)
     @applications ||= Tag.select("DISTINCT application AS name").order("name").where.not(application: [nil, ""]).map { |t| OpenStruct.new(name: t.name) }
     @applications.reject! { |app| app.name.blank? }

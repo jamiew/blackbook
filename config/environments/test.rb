@@ -49,5 +49,5 @@ Rails.application.configure do
 
   # Hack fix to silence asset pipeline precompilation issues
   # I believe pipeline is compiling dynamically, as expected
-  config.assets.check_precompiled_asset = false
+  # Propshaft handles assets in test
 end
