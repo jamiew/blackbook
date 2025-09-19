@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-
 require 'English'
+
 class Tag < ApplicationRecord
   # Blacklisted attributes, do not show in the API
   # TODO convert to a whitelisted approach...

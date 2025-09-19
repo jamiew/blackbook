@@ -48,8 +48,8 @@ class UsersController < ApplicationController
     user_params[:password_confirmation] = user_params[:password] if user_params
     @user = User.new(user_params)
     if @user.save
-      flash[:notice] = 'Account registered!'
-      Mailer.signup_notification(@user).deliver_now
+      flash[:notice] = "Account registered!"
+      UserMailer.signup_notification(@user).deliver_now
       redirect_back_or_default(user_path(@user))
     else
       render action: :new

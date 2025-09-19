@@ -52,7 +52,7 @@ class User < ApplicationRecord
 
   def deliver_password_reset_instructions!
     reset_perishable_token!
-    Mailer.password_reset_instructions(self).deliver_now
+    UserMailer.password_reset_instructions(self).deliver_now
   end
 
   # Unclaimed tags matching this user's uniqueKey
