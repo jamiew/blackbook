@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Auto-format Ruby code using RuboCop
+set -e
+
+echo "🎨 Formatting Ruby code with RuboCop..."
+
+if [ $# -eq 0 ]; then
+    # Format all Ruby files
+    bundle exec rubocop --autocorrect-all --format simple
+else
+    # Format specific files
+    bundle exec rubocop --autocorrect-all --format simple "$@"
+fi
+
+echo "✅ Code formatting complete!"

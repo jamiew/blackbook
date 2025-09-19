@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Ruby linting script
+set -e
+
+echo "🔍 Running RuboCop linter..."
+bundle exec rubocop --format simple --fail-level warning
+
+echo "✅ Linting passed!"

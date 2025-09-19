@@ -31,6 +31,13 @@ group :development, :test do
   gem 'rspec-rails', '~> 8.0'
   gem 'factory_bot'
   gem 'rails-controller-testing'
+  gem 'rubocop', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rspec', require: false
+end
+
+group :development do
+  gem 'ruby-lsp', require: false
 end
 
 group :development do
