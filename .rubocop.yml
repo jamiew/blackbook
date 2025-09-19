@@ -1,4 +1,4 @@
-plugins:
+require:
   - rubocop-rails
   - rubocop-rspec
 
@@ -7,51 +7,12 @@ AllCops:
   NewCops: enable
   Exclude:
     - 'bin/**/*'
-    - 'vendor/**/*' 
+    - 'vendor/**/*'
     - 'node_modules/**/*'
     - 'db/migrate/**/*'
     - 'db/schema.rb'
     - 'config/**/*'
     - 'Rakefile'
     - 'Gemfile'
-    - 'spec/**/*'  # Skip spec files for now
-
-# Relax some common rules for existing codebase
-Layout/LineLength:
-  Max: 120
-
-Style/Documentation:
-  Enabled: false
-
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
-Style/StringLiterals:
-  Enabled: false  # Too many to fix right now
-
-Metrics/MethodLength:
-  Max: 30
-
-Metrics/ClassLength:
-  Max: 200  # ApplicationController is large
-
-Metrics/AbcSize:
-  Max: 30
-
-# Naming conventions - existing code patterns
-Naming/PredicatePrefix:
-  Enabled: false
-
-# Rails specific
-Rails/I18nLocaleTexts:
-  Enabled: false
-
-Rails/OutputSafety:
-  Enabled: false
-
-# RSpec specific
-RSpec/ExampleLength:
-  Max: 20
-
-RSpec/MultipleExpectations:
-  Max: 5
+    - 'tmp/**/*'
+    - 'log/**/*'

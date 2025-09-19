@@ -1,5 +1,6 @@
-class Favorite < ActiveRecord::Base
+# frozen_string_literal: true
 
+class Favorite < ApplicationRecord
   belongs_to :object, polymorphic: true
   belongs_to :user
 
@@ -7,17 +8,17 @@ class Favorite < ActiveRecord::Base
   validates :object_type, presence: { message: "can't be blank" }, on: :create
   validates_associated :object, on: :create
 
-  validates :user_id, presence: { message: "can't be blank" }, uniqueness: { scope: [:object_id, :object_type], message: "must be unique" }, on: :create
+  validates :user_id, presence: { message: "can't be blank" },
+                      uniqueness: { scope: %i[object_id object_type], message: 'must be unique' }, on: :create
   validates_associated :user, on: :create
 
   after_create :create_notification
 
-  scope :tags, -> { where('object_type = ?', 'Tag') }
+  scope :tags, -> { where(object_type: 'Tag') }
 
-protected
+  protected
 
   def create_notification
-    Notification.create(subject: self, verb: 'created', user: self.user)
+    Notification.create(subject: self, verb: 'created', user: user)
   end
-
 end

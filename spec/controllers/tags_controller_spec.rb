@@ -1,5 +1,6 @@
-require 'rails_helper'
+# frozen_string_literal: true
 
+require 'rails_helper'
 
 describe TagsController do
   render_views
@@ -10,52 +11,49 @@ describe TagsController do
     allow_any_instance_of(GmlObject).to receive(:data).and_return(DEFAULT_GML)
   end
 
-  describe "POST #create" do
-
-    it "should create given params[:gml]" do
+  describe 'POST #create' do
+    it 'creates given params[:gml]' do
       post :create, params: { gml: @gml }
       expect(assigns[:tag]).to be_valid
       expect(response).to be_successful
       expect(response.body).to match(/\d+/)
     end
 
-    it "should fail without params[:gml]" do
+    it 'fails without params[:gml]' do
       post :create, params: {}
       expect(response.status).to eq(422) # Unprocessible Entity
       expect(response.body).to match(/Error/)
     end
 
-    it "should create and assign to tempt1 given the correct secret" do
+    it 'creates and assign to tempt1 given the correct secret' do
       skip 'TODO'
       @tag = FactoryBot.create(:tag_from_tempt1)
       # ...
     end
 
-    describe "redirection" do
-      it "params[:redirect]=1 should redirect to the tag page" do
-        Tag.destroy_all # FIXME not sure why we're ending up w/ dupe objs??
+    describe 'redirection' do
+      it 'params[:redirect]=1 should redirect to the tag page' do
+        Tag.destroy_all # FIXME: not sure why we're ending up w/ dupe objs??
         post :create, params: { gml: @gml, redirect: 1 }
         expect(assigns[:tag]).to be_valid
         expect(response).to redirect_to(tag_path(assigns[:tag]))
       end
 
       it "params[:redirect_to]='http://google.com' should redirect there" do
-        url = "http://google.com"
+        url = 'http://google.com'
         post :create, params: { gml: @gml, redirect_to: url }
         expect(response).to redirect_to(url)
       end
 
-      it "params[:redirect_back]=1 should redirect to the HTTP_REFERER" do
-        request.env['HTTP_REFERER'] = "http://fffff.at"
+      it 'params[:redirect_back]=1 should redirect to the HTTP_REFERER' do
+        request.env['HTTP_REFERER'] = 'http://fffff.at'
         post :create, params: { gml: @gml, redirect_back: 1 }
-        expect(response).to redirect_to("http://fffff.at")
+        expect(response).to redirect_to('http://fffff.at')
       end
-
     end
-
   end
 
-  describe "GET #index" do
+  describe 'GET #index' do
     before do
       @default_tag = FactoryBot.create(:tag)
       @should_mention_application = lambda { |matchable|
@@ -66,173 +64,173 @@ describe TagsController do
       }
     end
 
-    it "should work" do
+    it 'works' do
       get :index
       expect(response).to be_successful
       expect(response.body).to match(/'application'/)
     end
 
-    it "should not raise exception if invalid ?page= param is passed" do
+    it 'does not raise exception if invalid ?page= param is passed' do
       get :index, params: { page: "-3242' UNION ALL SELECT 70,70,70,70#" }
       expect(flash[:error]).to match(/Invalid page number/)
       expect(response).to redirect_to(tags_path)
     end
 
-    it "should filter on keywords" do
+    it 'filters on keywords' do
       FactoryBot.create(:tag, application: 'mfcc_test_app', gml_keywords: 'mfcc')
       get :index, params: { keywords: 'mfcc' }
       @should_mention_application.call(/mfcc_test_app/)
     end
 
-    it "should filter on location" do
+    it 'filters on location' do
       FactoryBot.create(:tag, application: 'location_test', location: 'San Francisco')
       get :index, params: { location: 'San Francisco' }
       @should_mention_application.call(/location_test/)
     end
 
-    it "should filter on application (using 'application')" do
+    it "filters on application (using 'application')" do
       FactoryBot.create(:tag, application: 'app_test')
       get :index, params: { application: 'mfcc' }
       # @should_mention_application.call(/app_test/)
     end
 
-    it "should filter on application (using 'gml_application')" do
+    it "filters on application (using 'gml_application')" do
       FactoryBot.create(:tag, application: 'displayed_name', gml_application: 'real_test_string')
       get :index, params: { application: 'real_test_string' }
       # @should_mention_application.call(/displayed_name/)
     end
 
-    it "should filter on user (using last 5 characters of gml_uniquekey_hash)" do
+    it 'filters on user (using last 5 characters of gml_uniquekey_hash)' do
       tag = FactoryBot.create(:tag, application: 'user_test', gml_uniquekey: 'lol')
-      get :index, params: { user: tag.secret_username } # TODO rename this method, it is undescriptive
+      get :index, params: { user: tag.secret_username } # TODO: rename this method, it is undescriptive
       # @should_mention_application.call(/user_test/)
     end
 
-    it "should work for a valid user" do
+    it 'works for a valid user' do
       user = FactoryBot.create(:user)
       get :index, params: { user_id: user.login }
       expect(assigns(:user)).to eq(user)
       expect(response).to be_successful
     end
 
-    it "should 404 for a missing user" do
-      expect {
+    it '404S for a missing user' do
+      expect do
         get :index, params: { user_id: 'asfdasadfasdf' }
         expect(assigns(:user)).to be_blank
-      }.to raise_error(ActiveRecord::RecordNotFound)
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
-  describe "GET #show" do
+  describe 'GET #show' do
     before do
       @tag = FactoryBot.create(:tag,
-        description: "An <b>html</b> description which might contain XSS!",
-        location: "http://locationURL.com",
-        gml_application: "Some Application name",
-        gml_keywords: "some,gml,keywords")
+                               description: 'An <b>html</b> description which might contain XSS!',
+                               location: 'http://locationURL.com',
+                               gml_application: 'Some Application name',
+                               gml_keywords: 'some,gml,keywords')
     end
 
-    it ".html (default)" do
+    it '.html (default)' do
       get :show, params: { id: @tag.to_param }
       expect(response).to be_successful
       expect(response.body).to match(/Tag ##{@tag.id}/)
     end
 
-    it ".gml" do
+    it '.gml' do
       get :show, params: { id: @tag.to_param, format: 'gml' }
       expect(response).to be_successful
-      expect(response.body).to match("<gml><tag><header>")
+      expect(response.body).to match('<gml><tag><header>')
     end
 
-    it ".xml" do
+    it '.xml' do
       get :show, params: { id: @tag.to_param, format: 'xml' }
       expect(response).to be_successful
-      expect(response.body).to match("<id>")
+      expect(response.body).to match('<id>')
     end
 
-    describe ".json" do
-      it "should work" do
+    describe '.json' do
+      it 'works' do
         get :show, params: { id: @tag.to_param, format: 'json' }
         expect(response).to be_successful
         expect(response.body).to match("\"id\":#{@tag.id}")
       end
 
-      it "should include GML data (GSON)" do
+      it 'includes GML data (GSON)' do
         get :show, params: { id: @tag.to_param, format: 'json' }
-        expect(response.body).to match("\"gml\":")
+        expect(response.body).to match('"gml":')
       end
 
-      it "should have CORS header set permissively" do
+      it 'has CORS header set permissively' do
         get :show, params: { id: @tag.to_param, format: 'json' }
         expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
         expect(response.headers['Access-Control-Allow-Methods']).to eq('GET, OPTIONS')
-        expect(response.headers['Access-Control-Max-Age']).to eq("1728000")
+        expect(response.headers['Access-Control-Max-Age']).to eq('1728000')
       end
     end
 
-    it ".gml should fail gracefully if GML data file is missing" do
-      tag = FactoryBot.create(:tag)
+    it '.gml should fail gracefully if GML data file is missing' do
+      FactoryBot.create(:tag)
       allow_any_instance_of(Tag).to receive(:gml).and_return(nil)
-      expect {
+      expect do
         get :show, params: { id: @tag.to_param, format: 'gml' }
         puts response.body.inspect
         expect(response).to be_successful
-      }.to raise_error(MissingDataError)
+      end.to raise_error(MissingDataError)
     end
   end
 
-  describe "GET #validate" do
-    it "should not route, we want you to use POST only now" do
-      expect({ get: "/validate" }).not_to be_routable
+  describe 'GET #validate' do
+    it 'does not route, we want you to use POST only now' do
+      expect({ get: '/validate' }).not_to be_routable
     end
   end
 
-  describe "POST #validate" do
-    it "should route" do
-      expect({ post: "/validate" }).to route_to("tags#validate")
+  describe 'POST #validate' do
+    it 'routes' do
+      expect({ post: '/validate' }).to route_to('tags#validate')
     end
 
-    it "should work given an existing tag_id (via tag[id])" do
+    it 'works given an existing tag_id (via tag[id])' do
       @tag = FactoryBot.create(:tag)
-      post :validate, params: { tag: {id: @tag.id} }
+      post :validate, params: { tag: { id: @tag.id } }
       expect(response).to be_successful
       expect(response.body).to match(/Validating Tag ##{@tag.id}/)
     end
 
-    it "should present form for submitting GML if no tag data" do
+    it 'presents form for submitting GML if no tag data' do
       post :validate
       expect(response).to be_successful
       expect(response.body).to match(/GML Syntax Validator/)
     end
 
-    it "should work with raw :tag data" do
-      post :validate, params: { tag: {gml: "<gml>...</gml>"} }
+    it 'works with raw :tag data' do
+      post :validate, params: { tag: { gml: '<gml>...</gml>' } }
       expect(response).to be_successful
       expect(response.body).to match(/Validating Your Uploaded GML.../)
     end
 
-    it "should return XML" do
+    it 'returns XML' do
       @tag = FactoryBot.create(:tag)
       post :validate, params: { id: @tag.id, format: 'xml' }
       expect(response).to be_successful
       expect(response.body).to match('<warnings>')
     end
 
-    it "should return JSON" do
+    it 'returns JSON' do
       @tag = FactoryBot.create(:tag)
       post :validate, params: { id: @tag.id, format: 'json' }
       expect(response).to be_successful
       expect(response.body).to match('"warnings":')
     end
 
-    it "should return text" do
+    it 'returns text' do
       @tag = FactoryBot.create(:tag)
       post :validate, params: { id: @tag.id, format: 'text' }
       expect(response).to be_successful
       expect(response.body).to match('warnings=')
     end
 
-    it "should return text via XMLHttpRequest" do
+    it 'returns text via XMLHttpRequest' do
       @tag = FactoryBot.create(:tag)
       request.env['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
       post :validate, params: { id: @tag.id }
@@ -241,8 +239,8 @@ describe TagsController do
     end
   end
 
-  describe "GET #latest" do
-    it ".html redirects to the latest" do
+  describe 'GET #latest' do
+    it '.html redirects to the latest' do
       # Clear any existing tags to ensure our test tag is the latest
       Tag.delete_all
       tag = FactoryBot.create(:tag)
@@ -251,19 +249,19 @@ describe TagsController do
       expect(response).to redirect_to(path)
     end
 
-    it ".json returns latest" do
+    it '.json returns latest' do
       # Clear any existing tags to ensure our test tag is the latest
       Tag.delete_all
       tag = FactoryBot.create(:tag)
       get :latest, params: { format: 'json' }
       expect(assigns(:tag)).to eq(tag)
       expect(response).to be_successful
-      expect(JSON.parse(response.body)['id']).to eq(tag.id)
+      expect(response.parsed_body['id']).to eq(tag.id)
     end
   end
 
-  describe "GET #random" do
-    it "works" do
+  describe 'GET #random' do
+    it 'works' do
       FactoryBot.create(:tag)
       get :random
       expect(assigns(:tag)).not_to be_nil
@@ -271,21 +269,21 @@ describe TagsController do
     end
   end
 
-  describe "API Security" do
-    it "filters sensitive parameters from logs" do
+  describe 'API Security' do
+    it 'filters sensitive parameters from logs' do
       # Test that sensitive data isn't logged
       post :create, params: { gml: '<gml>test</gml>', secret: 'secret123' }
-      
+
       # The actual filtering happens in the logger, this tests the endpoint works
       expect(response.status).to be_between(200, 422) # Accept any reasonable response
     end
 
     it "doesn't expose hidden attributes in API responses" do
       tag = FactoryBot.create(:tag, ip: '192.168.1.1', remote_secret: 'secret123')
-      
+
       get :show, params: { id: tag.id, format: :json }
-      
-      json_response = JSON.parse(response.body)
+
+      json_response = response.parsed_body
       expect(json_response).not_to have_key('ip')
       expect(json_response).not_to have_key('remote_secret')
       expect(json_response).not_to have_key('user_id')

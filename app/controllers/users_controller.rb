@@ -1,28 +1,32 @@
-class UsersController < ApplicationController
-  before_action :require_no_user, only: [:new, :create]
-  before_action :require_user, only: [:edit, :change_password, :update]
-  before_action :set_user_from_current_user, only: [:edit, :change_password, :update]
+# frozen_string_literal: true
 
-  # FIXME would love a smarter way to avoid test failures using this
+class UsersController < ApplicationController
+  before_action :require_no_user, only: %i[new create]
+  before_action :require_user, only: %i[edit change_password update]
+  before_action :set_user_from_current_user, only: %i[edit change_password update]
+
+  # FIXME: would love a smarter way to avoid test failures using this
   invisible_captcha only: [:create]
 
   # Show all users
   def index
     @page, @per_page = pagination_params(per_page: 28)
     @users = User.paginate(page: @page, per_page: @per_page)
-    set_page_title "Users"
+    set_page_title 'Users'
     # default_respond_to(@users, layout: true, exclude: [:email,:password,:crypted_password,:persistence_token])
   end
 
   # Show one user
   def show
-    @user = User.find_by_param(params[:id])
+    @user = User.find_by(param: params[:id])
     raise ActiveRecord::RecordNotFound if @user.nil?
+
     @page, @per_page = pagination_params(per_page: 10)
 
-    @tags = @user.tags.order('created_at DESC').includes(:user).paginate(page: @page, per_page: @per_page)
-    @wall_posts = @user.wall_posts.includes(:user).order('created_at DESC').paginate(page: 1, per_page: 10)
-    @notifications = @user.notifications.includes(:subject, :user).order('created_at DESC').paginate(page: 1, per_page: 15)
+    @tags = @user.tags.order(created_at: :desc).includes(:user).paginate(page: @page, per_page: @per_page)
+    @wall_posts = @user.wall_posts.includes(:user).order(created_at: :desc).paginate(page: 1, per_page: 10)
+    @notifications = @user.notifications.includes(:subject, :user).order(created_at: :desc).paginate(page: 1,
+                                                                                                     per_page: 15)
 
     set_page_title @user.name || @user.login
 
@@ -35,12 +39,16 @@ class UsersController < ApplicationController
     @user = User.new
   end
 
+  def edit
+    set_page_title 'Your Settings'
+  end
+
   def create
     user_params = user_parameters
     user_params[:password_confirmation] = user_params[:password] if user_params
     @user = User.new(user_params)
     if @user.save
-      flash[:notice] = "Account registered!"
+      flash[:notice] = 'Account registered!'
       Mailer.signup_notification(@user).deliver_now
       redirect_back_or_default(user_path(@user))
     else
@@ -48,13 +56,9 @@ class UsersController < ApplicationController
     end
   end
 
-  def edit
-    set_page_title "Your Settings"
-  end
-
   def update
     if @user.update(user_parameters)
-      flash[:notice] = "Settings updated! "
+      flash[:notice] = 'Settings updated! '
       redirect_to(settings_path)
     else
       # Errors printed to form
@@ -62,17 +66,15 @@ class UsersController < ApplicationController
     end
   end
 
-
-private
+  private
 
   def user_parameters
-    params.require(:user).permit(:login, :email, :password, :password_confirmation, :name, :iphone_uniquekey, :photo)
+    params.expect(user: %i[login email password password_confirmation name iphone_uniquekey photo])
   end
 
-protected
+  protected
 
   def set_user_from_current_user
-    @user = @current_user  # makes our views "cleaner" and more consistent
+    @user = @current_user # makes our views "cleaner" and more consistent
   end
-
 end

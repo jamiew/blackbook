@@ -1,4 +1,3 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+# frozen_string_literal: true
 
-describe FavoritesHelper do # Helper methods can be called directly in the examples (it blocks)
-end
+require "#{File.dirname(__FILE__)}/../spec_helper"

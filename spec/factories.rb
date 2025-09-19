@@ -1,17 +1,19 @@
+# frozen_string_literal: true
+
 require 'factory_bot'
 
-# FIXME should not be a constant
-DEFAULT_GML = "<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
+# FIXME: should not be a constant
+DEFAULT_GML = '<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>'
 
 include FactoryBot::Syntax::Methods
 
 FactoryBot.define do
   sequence :login do |i|
-    "user#{i}_#{rand(100000)}"
+    "user#{i}_#{rand(100_000)}"
   end
 
   sequence :email do |i|
-    "user#{i}_#{rand(100000)}@000book.com"
+    "user#{i}_#{rand(100_000)}@000book.com"
   end
 
   sequence :device_id do |i|
@@ -26,7 +28,7 @@ FactoryBot.define do
     website { 'http://fffff.at' }
     tagline { 'I did it for the famo' }
     about { 'Blah blah blah, http://jamiedubs.com, even some <b>BOLD TEXT</b> or <a href="http://fffff.at">custom link</a>' }
-    iphone_uniquekey  { FactoryBot.generate(:device_id) }
+    iphone_uniquekey { FactoryBot.generate(:device_id) }
   end
 
   factory :admin, parent: :user do
@@ -56,7 +58,7 @@ FactoryBot.define do
   # He can't upgrade or diagnose issues, so we *must* maintain backwards compatibility
   factory :tag_from_tempt1, parent: :tag do
     remote_secret { '123456789' }
-    gml { "<gml>yo i am some sample tempt graffiti... should use a fixture to store this</gml>" }
+    gml { '<gml>yo i am some sample tempt graffiti... should use a fixture to store this</gml>' }
   end
 
   # Stores the actual GML
@@ -68,11 +70,11 @@ FactoryBot.define do
   # A GML application
   factory :visualization do
     association :user
-    name { "TestTagger_#{rand(100000)}" }
-    description { "A really cool app with which you can draw tags"}
-    website { "http://jamiedubs.com/testtagger" }
-    authors { "jamiedubs" }
-    kind { "javascript" }
+    name { "TestTagger_#{rand(100_000)}" }
+    description { 'A really cool app with which you can draw tags' }
+    website { 'http://jamiedubs.com/testtagger' }
+    authors { 'jamiedubs' }
+    kind { 'javascript' }
   end
 
   factory :favorite do
@@ -85,5 +87,4 @@ FactoryBot.define do
     association :commentable, factory: :tag
     text { 'Default comment yo' }
   end
-
 end
