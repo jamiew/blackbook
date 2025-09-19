@@ -53,6 +53,4 @@ jobs:
           claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
 
           use_sticky_comment: true # Just update the same comment on each new commit in a PR instead of making a new one
-          sticky_comment: true # Docs are unclear about which of these var names is current as of v1, let's try both
-          continue-on-error: true # Make this job non-fatal - failed reviews won't block merges
 
