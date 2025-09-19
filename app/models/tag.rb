@@ -1,4 +1,4 @@
-class Tag < ActiveRecord::Base
+class Tag < ApplicationRecord
 
   # Blacklisted attributes, do not show in the API
   # TODO convert to a whitelisted approach...

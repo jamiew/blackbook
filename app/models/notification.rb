@@ -1,4 +1,4 @@
-class Notification < ActiveRecord::Base
+class Notification < ApplicationRecord
 
   scope :latest, -> { order('created_at DESC').limit(20) }
 
