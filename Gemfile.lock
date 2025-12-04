@@ -122,7 +122,6 @@ GEM
       temple (>= 0.8.2)
       thor
       tilt
-    htmlentities (4.4.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     invisible_captcha (2.3.0)
@@ -365,7 +364,6 @@ DEPENDENCIES
   exception_notification
   factory_bot
   haml
-  htmlentities
   invisible_captcha
   jquery-rails
   kt-paperclip

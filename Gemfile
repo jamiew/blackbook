@@ -28,7 +28,6 @@ gem 'kt-paperclip'
 
 # Utilities
 gem 'nokogiri', '~> 1.15'
-gem 'htmlentities'
 gem 'will_paginate'
 
 # Operations

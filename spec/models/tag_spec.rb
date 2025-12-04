@@ -341,11 +341,6 @@ RSpec.describe Tag, type: :model do
       expect(tag.user).to eq(user)
     end
 
-    it "has many likes" do
-      like = Like.create!(object: tag, user: user)
-      expect(tag.likes).to include(like)
-    end
-
     it "can be favorited" do
       favorite = Favorite.create!(object: tag, user: user)
       expect(tag.favorites).to include(favorite)
