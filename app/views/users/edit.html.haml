@@ -1,6 +1,6 @@
 
 %h2 Your Settings
-= form_for @user, url: user_path(@user), html: { multipart: true } do |form|
+= form_for @user, url: settings_path, html: { multipart: true } do |form|
 
   = render "layouts/error_messages", target: @user
 

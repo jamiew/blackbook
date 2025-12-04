@@ -7,11 +7,9 @@ Rails.application.routes.draw do
   get '/tags/temp.png', controller: 'home', action: 'discard', as: 'discard_tags_temp_png'
 
   # Users/authentication via authlogic
-  resources :users, only: [:show] do # RIP create, new
+  resources :users, only: [:index, :show] do
     resources :tags
   end
-  # resource :account, controller: "users" # FIXME needed for password resets
-  # get '/account/change_password' => 'users#change_password', as: 'change_password_user'
   resource  :user_session
   resources :password_reset
   get '/signup', controller: 'users', action: 'new', as: 'signup'
@@ -19,6 +17,8 @@ Rails.application.routes.draw do
   get '/logout', controller: 'user_sessions', action: 'destroy', as: 'logout'
   get '/forgot_password', controller: 'password_reset', action: 'new', as: 'forgot_password'
   get '/settings', controller: 'users', action: 'edit', as: 'settings'
+  patch '/settings', controller: 'users', action: 'update'
+  put '/settings', controller: 'users', action: 'update'
 
   # Tags/data
   resources :tags, path: 'data' do

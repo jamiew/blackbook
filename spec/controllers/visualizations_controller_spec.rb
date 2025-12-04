@@ -14,6 +14,7 @@ describe VisualizationsController do
     end
 
     it "works" do
+      @visualization.update!(approved_at: Time.current)
       get :index
       expect(response).to be_successful
       expect(assigns(:visualizations)).to be_present

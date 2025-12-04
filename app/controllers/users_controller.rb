@@ -66,7 +66,7 @@ class UsersController < ApplicationController
 private
 
   def user_parameters
-    params.require(:user).permit(:login, :email, :password, :password_confirmation, :name, :iphone_uniquekey, :photo)
+    params.require(:user).permit(:login, :email, :password, :password_confirmation, :name, :iphone_uniquekey, :photo, :location, :website, :about)
   end
 
 protected

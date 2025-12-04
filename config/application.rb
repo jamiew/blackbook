@@ -29,10 +29,6 @@ module Blackbook4
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    # Rails 8 configuration
     config.load_defaults 8.0
-    
-    # Fix timezone deprecation warning
-    config.active_support.to_time_preserves_timezone = :zone
   end
 end
