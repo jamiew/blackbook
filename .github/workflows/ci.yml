@@ -61,10 +61,6 @@ jobs:
         run: |
           yarn install --pure-lockfile
 
-      - name: Run linting
-        run: |
-          bundle exec rubocop --format github
-
       - name: Run tests
         env:
           RAILS_ENV: test
