@@ -3,13 +3,12 @@ require 'rails_helper'
 RSpec.describe Notification, type: :model do
 
   before(:each) do
+    @user = FactoryBot.create(:user)
+    @tag = FactoryBot.create(:tag, user: @user)
     @valid_attributes = {
-      subject_id: 1,
-      subject_type: "Comment",
+      subject: @tag,
       verb: "created",
-      user_id: 1,
-      supplement_id: 1,
-      supplement_type: "Video"
+      user: @user
     }
   end
 

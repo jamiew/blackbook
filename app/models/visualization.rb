@@ -16,7 +16,6 @@ class Visualization < ApplicationRecord
     ]
 
   belongs_to :user, optional: true
-  has_many :comments, as: :commentable
   belongs_to :approver, class_name: 'User', foreign_key: :approved_by, optional: true
 
   validates :user_id, presence: { message: "can't be blank" }, on: :create

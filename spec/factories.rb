@@ -52,13 +52,6 @@ FactoryBot.define do
     remote_secret { '' }
   end
 
-  # A sample tag from Tempt1's EyeWriter.
-  # He can't upgrade or diagnose issues, so we *must* maintain backwards compatibility
-  factory :tag_from_tempt1, parent: :tag do
-    remote_secret { '123456789' }
-    gml { "<gml>yo i am some sample tempt graffiti... should use a fixture to store this</gml>" }
-  end
-
   # Stores the actual GML
   factory :gml_object do
     tag_id { 1 }
@@ -78,12 +71,6 @@ FactoryBot.define do
   factory :favorite do
     association :user
     association :object, factory: :tag
-  end
-
-  factory :comment do
-    association :user
-    association :commentable, factory: :tag
-    text { 'Default comment yo' }
   end
 
 end

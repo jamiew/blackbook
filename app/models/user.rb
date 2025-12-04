@@ -12,8 +12,6 @@ class User < ApplicationRecord
   # should we just use friendly_id?
   # has_slug :login
 
-  has_many :comments # Owns/has made
-  has_many :wall_posts, class_name: 'Comment', as: :commentable # Comments *on* this user
   has_many :favorites
   has_many :tags
   has_many :visualizations

@@ -4,8 +4,7 @@
 - else
   %table.notifications
     - notifications.each do |notif|
-      - next if notif.nil? || notif.subject.nil? 
-      - next if notif.subject.class == Comment
+      - next if notif.nil? || notif.subject.nil?
 
       %tr
         %td.timeago
@@ -50,15 +49,6 @@
               = obj.class.to_s.downcase
               -#FIXME use tag_title -- make that part of Tag proper perhaps? hmm
               == #{link_to obj.title || "##{obj.id}", url_for(obj)}
-          - when Comment
-            - comment = notif.subject
-            - commentable = comment.commentable
-            %td{colspan: 3}
-              %br
-              = link_to notif.user.login, user_path(notif.user)
-              commented on
-              == #{link_to commentable_name(commentable), url_for(commentable)}:
-              .text.graytext{style: 'margin-top: 3px; margin-left: 1px; padding: 4px 0 4px 8px; border-left: 4px solid #333;'}= comment.text
           - else
             %td{colspan: 3}
               %em== No support for #{notif.subject.class.to_s} notification yet.
