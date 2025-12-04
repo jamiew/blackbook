@@ -41,11 +41,9 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  # Prevents from writing logs on `log/test.log`
+  # Silence logs during tests - write to log/test.log instead of STDOUT
   config.log_level = :warn
-  logger           = ActiveSupport::Logger.new(STDOUT)
-  logger.formatter = config.log_formatter
-  config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  config.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/test.log"))
 
   # Hack fix to silence asset pipeline precompilation issues
   # I believe pipeline is compiling dynamically, as expected
