@@ -21,7 +21,6 @@ class UsersController < ApplicationController
     @page, @per_page = pagination_params(per_page: 10)
 
     @tags = @user.tags.order('created_at DESC').includes(:user).paginate(page: @page, per_page: @per_page)
-    @wall_posts = @user.wall_posts.includes(:user).order('created_at DESC').paginate(page: 1, per_page: 10)
     @notifications = @user.notifications.includes(:subject, :user).order('created_at DESC').paginate(page: 1, per_page: 15)
 
     set_page_title @user.name || @user.login

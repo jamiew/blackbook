@@ -67,9 +67,6 @@ class TagsController < ApplicationController
       @user = User.find_by_param(params[:user_id]) if params[:user_id]
       @user ||= @tag.user
 
-      # No real comment pagination yet
-      @comments = @tag.comments.visible.paginate(page: params[:comments_page] || 1, per_page: 10)
-
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
       # FIXME wow. just wow.
       @tag.gml && @tag.gml.gsub!(/\<uniqueKey\>.*\<\/uniqueKey>/,'')

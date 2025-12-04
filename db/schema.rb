@@ -10,22 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_04_000001) do
-  create_table "comments", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.integer "commentable_id"
-    t.string "commentable_type"
-    t.datetime "created_at", precision: nil
-    t.datetime "hidden_at", precision: nil
-    t.string "ip_address"
-    t.text "text", size: :medium
-    t.string "title", limit: 50, default: ""
-    t.datetime "updated_at", precision: nil
-    t.integer "user_id"
-    t.index ["commentable_id"], name: "index_comments_on_commentable_id"
-    t.index ["commentable_type"], name: "index_comments_on_commentable_type"
-    t.index ["user_id"], name: "index_comments_on_user_id"
-  end
-
+ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
   create_table "favorites", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "object_id"
