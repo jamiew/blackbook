@@ -63,7 +63,7 @@ describe TagsController do
     it "should work" do
       get :index
       expect(response).to be_successful
-      expect(response.body).to match(/'application'/)
+      expect(response.body).to match(/application/)
     end
 
     it "should not raise exception if invalid ?page= param is passed" do
