@@ -25,12 +25,6 @@ describe TagsController do
       expect(response.body).to match(/Error/)
     end
 
-    it "should create and assign to tempt1 given the correct secret" do
-      skip 'TODO'
-      @tag = FactoryBot.create(:tag_from_tempt1)
-      # ...
-    end
-
     describe "redirection" do
       it "params[:redirect]=1 should redirect to the tag page" do
         Tag.destroy_all # FIXME not sure why we're ending up w/ dupe objs??

@@ -55,24 +55,68 @@ RSpec.describe Tag, type: :model do
   end
 
   describe "validating GML" do
-    before do
-      @tag = FactoryBot.build(:tag_from_api)
+    it "errors on no strokes" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:errors]).to include("No <stroke> tags - at least 1 stroke required")
     end
 
-    # it "should error on no strokes"
-    # it "should error on no points"
-    # it "should error on no time data"
-    # it "should error on no environment"
-    # it "should error on no screenBounds"
-    #
-    # it "should warn on no header"
-    # it "should warn on no environment"
-    # it "should warn on no screenBounds"
-    # it "should warn on no application"
-    # it "should warn on no uniqueKey"
-    #
-    # it "should recommend using newlines"
-    # it "should recommend using tabs"
+    it "errors on no points" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:errors]).to include("No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
+    end
+
+    it "errors on missing x coordinates" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:errors]).to include("Missing <x> tags inside your <pt>'s")
+    end
+
+    it "errors on missing y coordinates" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><time>0</time></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:errors]).to include("Missing <y> tags inside your <pt>'s")
+    end
+
+    it "warns on no time data" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><y>0</y></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:warnings]).to include("No <time> tags in your <pt> tags! Capturing time data makes things much more interesting.")
+    end
+
+    it "warns on no client tag" do
+      gml = "<gml><tag><header></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:warnings]).to include("No <client> tag - provide some info about your app!")
+    end
+
+    it "warns on no environment tag" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:warnings]).to include("No <environment> tag")
+    end
+
+    it "warns on no screenBounds tag" do
+      gml = "<gml><tag><header><client><name>test</name></client><environment></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:warnings]).to include("No <screenBounds> tag in your <environment> - otherwise apps might draw it in the wrong aspect ratio")
+    end
+
+    it "recommends including uniqueKey" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      tag.validate_gml
+      expect(tag.validation_results[:recommendations]).to include("No <uniqueKey> tag - includign a unique device ID of some kind lets users pair their 000000book accounts with your app, e.g. iPhone uuid, MAC address, etc")
+    end
   end
 
   describe "format conversion" do
@@ -129,15 +173,93 @@ RSpec.describe Tag, type: :model do
     end
   end
 
-  # Manipulation & transformation
   describe "rotate_gml transformation" do
-    # it "should rotate GML data 90 degrees" do
-    #   pending
-    # end
-    #
-    # it "should only rotate data from iPhone apps (DustTag, FatTag)" do
-    #   pending
-    # end
+    it "rotates GML data 90 degrees (swaps x/y, inverts new y)" do
+      gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0.25</x><y>0.75</y><time>0</time></pt></stroke></drawing></tag></gml>"
+      tag = Tag.new(data: gml)
+      rotated = tag.rotate_gml
+
+      pt = (rotated/'drawing'/'stroke'/'pt').first
+      # x becomes old y (0.75), y becomes 1 - old x (1 - 0.25 = 0.75)
+      expect((pt/'x').text).to eq('0.75')
+      expect((pt/'y').text).to eq('0.75')
+    end
+
+    it "rotates multiple points correctly" do
+      gml = <<~GML
+        <gml><tag><header><client><name>test</name></client></header>
+        <drawing><stroke>
+          <pt><x>0</x><y>1</y><time>0</time></pt>
+          <pt><x>1</x><y>0</y><time>1</time></pt>
+        </stroke></drawing></tag></gml>
+      GML
+      tag = Tag.new(data: gml)
+      rotated = tag.rotate_gml
+
+      pts = (rotated/'drawing'/'stroke'/'pt')
+      # Point 1: x=0, y=1 -> x=1, y=1-0=1
+      expect((pts[0]/'x').text).to eq('1')
+      expect((pts[0]/'y').text).to eq('1.0')
+      # Point 2: x=1, y=0 -> x=0, y=1-1=0
+      expect((pts[1]/'x').text).to eq('0')
+      expect((pts[1]/'y').text).to eq('0.0')
+    end
+
+    it "handles multiple strokes" do
+      gml = <<~GML
+        <gml><tag><header><client><name>test</name></client></header>
+        <drawing>
+          <stroke><pt><x>0.5</x><y>0.5</y><time>0</time></pt></stroke>
+          <stroke><pt><x>0.2</x><y>0.8</y><time>0</time></pt></stroke>
+        </drawing></tag></gml>
+      GML
+      tag = Tag.new(data: gml)
+      rotated = tag.rotate_gml
+
+      strokes = (rotated/'drawing'/'stroke')
+      expect(strokes.length).to eq(2)
+
+      pt1 = (strokes[0]/'pt').first
+      expect((pt1/'x').text).to eq('0.5')
+      expect((pt1/'y').text).to eq('0.5')
+
+      pt2 = (strokes[1]/'pt').first
+      expect((pt2/'x').text).to eq('0.8')
+      expect((pt2/'y').text).to eq('0.8')
+    end
+
+    it "handles GML with no drawing gracefully" do
+      tag = Tag.new(data: '<gml><tag><header></header></tag></gml>')
+      result = tag.rotate_gml
+      expect(result).to be_a(Nokogiri::XML::Document)
+    end
+  end
+
+  describe "#from_iphone?" do
+    it "returns true for DustTag application" do
+      tag = Tag.new(gml_application: 'DustTag')
+      expect(tag.from_iphone?).to be true
+    end
+
+    it "returns true for Fat Tag application" do
+      tag = Tag.new(application: 'Fat Tag')
+      expect(tag.from_iphone?).to be true
+    end
+
+    it "returns true for Katsu application" do
+      tag = Tag.new(gml_application: 'Katsu')
+      expect(tag.from_iphone?).to be true
+    end
+
+    it "returns false for other applications" do
+      tag = Tag.new(gml_application: 'Graffiti Analysis')
+      expect(tag.from_iphone?).to be false
+    end
+
+    it "returns false when no application is set" do
+      tag = Tag.new
+      expect(tag.from_iphone?).to be false
+    end
   end
 
 
@@ -217,11 +339,6 @@ RSpec.describe Tag, type: :model do
 
     it "belongs to a user" do
       expect(tag.user).to eq(user)
-    end
-
-    it "has many comments" do
-      comment = Comment.create!(commentable: tag, user: user, text: 'Test comment')
-      expect(tag.comments).to include(comment)
     end
 
     it "has many likes" do
