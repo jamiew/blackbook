@@ -29,11 +29,6 @@ class GmlObject
     "#{self.class.file_dir}/#{tag_id}.gml"
   end
 
-  def s3_file_key
-    "gml/#{tag_id}.gml"
-  end
-
-
   def data
     # Rails.logger.debug "*** GmlObject #data..."
     @_data
@@ -76,12 +71,8 @@ class GmlObject
   end
 
   def save!
-    # Rails.logger.debug "GmlObject.save! here"
     raise "invalid GmlObject, not saving" unless valid?
-
-    # raise "Oh no you called GmlObject#save!"
     store_on_disk
-    # store_on_s3
   end
 
   def exists_on_disk?
@@ -114,42 +105,6 @@ class GmlObject
     data = File.read(filename)
     Rails.logger.debug "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
     return data
-  end
-
-  def s3_bucket_name
-    ENV['S3_BUCKET']
-  end
-
-  def s3
-    raise "No S3_BUCKET defined" if s3_bucket_name.blank?
-    @s3 ||= Aws::S3::Resource.new
-  end
-
-  def s3_object
-    @s3_object ||= S3_BUCKET.object(s3_file_key)
-  end
-
-  def store_on_s3
-    raise "No local GML file to upload (#{filename})" if filename.blank?
-    raise "Local GML file is empty, not uploading" if read_from_disk.blank?
-
-		# directly upload from disk...
-		# assumes we have stored on this local disk
-		# obj.write()
-    s3_object.upload_file(filename)
-
-		# # string data
-		# obj.put(body: 'Hello World!')
-
-		# # IO object
-		# File.open('source', 'rb') do |file|
-	 	#		obj.put(body: file)
-		# end
-  end
-
-  def read_from_s3
-    file = s3_object.get
-    file.body.read
   end
 
   def size
