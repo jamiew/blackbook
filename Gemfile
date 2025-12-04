@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby File.open(File.dirname(__FILE__)+'/.ruby-version', 'rb') { |f| f.read.chomp }
 
 gem 'rails', '~> 8.1.0'
-gem 'mysql2', '~> 0.5.6'
+gem 'mysql2'
 gem 'puma'
 
 # Assets
@@ -25,7 +25,6 @@ gem 'responders', '~> 3.0'
 
 # File uploads
 gem 'kt-paperclip'
-gem 'aws-sdk-s3', '~> 1.0'
 
 # Utilities
 gem 'nokogiri', '~> 1.15'
