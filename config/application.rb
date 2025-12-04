@@ -30,5 +30,10 @@ module Blackbook4
     # config.i18n.default_locale = :de
 
     config.load_defaults 8.0
+
+    # Use RSpec for generators
+    config.generators do |g|
+      g.test_framework :rspec
+    end
   end
 end

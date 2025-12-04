@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
-# Test runner script that properly sets up the environment
-set -e
+#!/usr/bin/env ruby
+APP_PATH = File.expand_path('../config/application', __dir__)
+require_relative '../config/boot'
 
-echo "Running tests..."
-bundle exec rspec "$@"
+# Run RSpec instead of Minitest
+exec 'bundle', 'exec', 'rspec', *ARGV
