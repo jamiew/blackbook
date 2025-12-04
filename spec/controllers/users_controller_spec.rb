@@ -23,7 +23,6 @@ describe UsersController do
     let!(:user){ FactoryBot.create(:user) }
 
     it "should not redirect for a non-logged in user on :new" do
-      pending 'USER SIGNUPS DISABLED'
       get :new
       expect(response).not_to be_redirect
     end
@@ -92,18 +91,15 @@ describe UsersController do
     end
 
     it "should redirect back to settings page on :update" do
-      pending 'USER SIGNUPS DISABLED'
-      post :update, params: { user: { email: 'my@newemail.com' } }
+      patch :update, params: { user: { email: 'my@newemail.com' } }
       expect(response).to redirect_to(settings_path)
       expect(flash[:notice]).to be_present
     end
 
-    it "should not redirect to account on failed :update" do
-      pending 'USER SIGNUPS DISABLED'
-      post :update, params: { user: { email: 'not_a_valid_email' } }
-      expect(response).not_to be_redirect
+    it "should re-render edit on failed :update with mismatched passwords" do
+      patch :update, params: { user: { password: 'newpassword', password_confirmation: 'different' } }
+      expect(response).to render_template(:edit)
       expect(assigns(:user).errors).to be_present
-      # flash[:error].should be_present
     end
   end
 

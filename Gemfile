@@ -1,29 +1,45 @@
 source 'https://rubygems.org'
 ruby File.open(File.dirname(__FILE__)+'/.ruby-version', 'rb') { |f| f.read.chomp }
 
-gem 'rails', '~> 8.0.2'
+gem 'rails', '~> 8.1.0'
 gem 'mysql2', '~> 0.5.6'
-gem 'puma', groups: [:development, :production]
+gem 'puma'
 
+# Assets
 gem 'propshaft'
 gem 'terser'
+
+# Performance
 gem 'bootsnap', require: false
+
+# Frontend
 gem 'jquery-rails'
-gem 'responders', '~> 3.0'
 gem 'haml'
+
+# Auth
 gem 'authlogic'
 gem 'scrypt', '~> 3.0'
-gem 'nokogiri', '~> 1.15'
+
+# API/Controllers
+gem 'responders', '~> 3.0'
+
+# File uploads
 gem 'kt-paperclip'
+gem 'aws-sdk-s3', '~> 1.0'
+
+# Utilities
+gem 'nokogiri', '~> 1.15'
 gem 'htmlentities'
 gem 'will_paginate'
-gem 'aws-sdk-s3', '~> 1.0'
-gem 'rails_12factor'
+
+# Operations
 gem 'dotenv-rails', groups: [:development, :test]
 gem 'lograge'
 gem 'invisible_captcha'
 gem 'exception_notification'
-gem 'bigdecimal', '~> 3.1'
+
+# Ruby 3.4+ stdlib gems now need to be explicit
+gem 'bigdecimal'
 gem 'rexml'
 gem 'ostruct'
 
@@ -39,10 +55,3 @@ end
 group :development do
   gem 'ruby-lsp', require: false
 end
-
-group :development do
-  # gem 'spring'
-  # gem 'spring-commands-rspec'
-  # gem 'disable_assets_logger'
-end
-

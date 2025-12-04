@@ -47,7 +47,13 @@ class VisualizationsController < ApplicationController
   end
 
   def update
-    raise 'TODO'
+    if @visualization.update(visualization_parameters)
+      flash[:notice] = "Application updated"
+      redirect_to visualization_path(@visualization)
+    else
+      flash[:error] = "Errors updating application"
+      render :edit
+    end
   end
 
   # Approve/reject an entry
@@ -78,7 +84,7 @@ protected
       which = which.where(user_id: @user.id)
       #TODO: set page_title etc. Also handle all this logic less if/elsify
     end
-    @visualizations ||= which.paginate(page: @page, per_page: @per_page, include: [:user], order: 'approved_at DESC, name ASC')
+    @visualizations ||= which.includes(:user).order('approved_at DESC, name ASC').paginate(page: @page, per_page: @per_page)
   end
 
   def update_approval_state(obj, enabled)

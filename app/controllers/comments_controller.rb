@@ -20,11 +20,11 @@ class CommentsController < ApplicationController
   end
 
   def edit
-    render plain: "TODO", status: 420
+    raise ActionController::RoutingError, "Not implemented"
   end
 
   def update
-    render plain: "TODO", status: 420
+    raise ActionController::RoutingError, "Not implemented"
   end
 
   def destroy
