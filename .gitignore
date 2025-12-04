@@ -5,6 +5,7 @@
 .bundle
 .env
 config/database.yml
+config/master.key
 coverage
 data
 data2
@@ -12,4 +13,5 @@ db/*.sqlite3
 log/*
 !log/.keep
 tmp
+public/assets
 public/system
