@@ -5,7 +5,6 @@ class Tag < ApplicationRecord
   HIDDEN_ATTRIBUTES = [:ip, :user_id, :remote_secret, :cached_tag_list, :uniquekey_hash]
 
   belongs_to :user, optional: true
-  has_many :likes, as: :object
   has_many :favorites, as: :object
 
   # delegate :data, to: :gml_object

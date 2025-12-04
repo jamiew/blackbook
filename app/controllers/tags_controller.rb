@@ -4,8 +4,8 @@ class TagsController < ApplicationController
 
   # We allow open access to API #create -- no authentication or forgery protection
   protect_from_forgery except: [:show, :latest, :random, :create, :thumbnail, :validate]
-  before_action :get_tag, only: [:show, :edit, :update, :destroy, :thumbnail, :nominate]
-  before_action :require_user, only: [:new, :edit, :update, :destroy, :nominate]
+  before_action :get_tag, only: [:show, :edit, :update, :destroy, :thumbnail]
+  before_action :require_user, only: [:new, :edit, :update, :destroy]
   before_action :require_owner, only: [:edit, :update, :destroy]
   before_action :convert_app_id_to_app_name, only: [:update, :create]
 

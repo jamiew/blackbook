@@ -22,7 +22,7 @@ Rails.application.routes.draw do
 
   # Tags/data
   resources :tags, path: 'data' do
-    resources :favorites, only: [:create, :destroy]
+    resources :favorites, only: [:create]
 
     collection do
       get :latest
@@ -30,11 +30,8 @@ Rails.application.routes.draw do
     end
 
     member do
-      get :flipped
-      post :nominate
       post :thumbnail
       put :thumbnail
-      # get :validate
     end
   end
   post '/tags' => 'tags#create' # backwards-compatibility
@@ -54,9 +51,8 @@ Rails.application.routes.draw do
     end
   end
 
-  # Everything else
-  # FIXME restrict this some more too
-  resources :favorites
+  # Favorites index (user's favorites list)
+  resources :favorites, only: [:index]
 
   get '/activity' => 'home#activity', as: 'activity'
 
