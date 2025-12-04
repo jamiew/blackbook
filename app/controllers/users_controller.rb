@@ -34,10 +34,16 @@ class UsersController < ApplicationController
   end
 
   def new
+    # emergency 404 to stop spammers
+    raise ActiveRecord::RecordNotFound
+
     @user = User.new
   end
 
   def create
+    # emergency 404 to stop spammers
+    raise ActiveRecord::RecordNotFound
+
     params[:user][:password_confirmation] = params[:user][:password] if params[:user]
     @user = User.new(params[:user])
     if @user.save
