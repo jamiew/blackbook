@@ -64,6 +64,7 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
+          MYSQL_PASSWORD: ""
           DATABASE_URL: mysql2://127.0.0.1:${{ job.services.mysql.ports[3306] }}/blackbook_test
         run: |
           bundle exec rake db:create

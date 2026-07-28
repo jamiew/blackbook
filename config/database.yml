@@ -8,14 +8,16 @@ development:
   <<: *default
   database: blackbook_dev
   username: root
-  password: root
+  password: <%= ENV.fetch('MYSQL_PASSWORD', 'root') %>
 
 test:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
   database: blackbook_test
   username: root
-  password: root
+  # An explicit password: here overrides the one in DATABASE_URL, so CI (empty-password
+  # MySQL) sets MYSQL_PASSWORD="" to opt out rather than inheriting the local default.
+  password: <%= ENV.fetch('MYSQL_PASSWORD', 'root') %>
 
 production:
   <<: *default
