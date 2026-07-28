@@ -14,6 +14,7 @@ test:
   url: <%= ENV['DATABASE_URL'] %>
   database: blackbook_test
   username: root
+  password: root
 
 production:
   <<: *default
