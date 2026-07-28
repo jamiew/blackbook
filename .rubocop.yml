@@ -44,7 +44,23 @@ Metrics/AbcSize:
 Naming/PredicatePrefix:
   Enabled: false
 
+# Controllers memoize into view-facing ivars (@visualizations, @tags) from methods
+# named `current_objects`. Renaming the ivar to match the method silently breaks views.
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+
 # Rails specific
+# Rewriting `where('approved_at < ?', ...)` to a beginless range changed which rows
+# the `approved` scope returned. Not worth re-deriving query semantics for style.
+Rails/WhereRange:
+  Enabled: false
+
+# `User.find_by_param` is a real class method, not a dynamic finder — rewriting it
+# to `find_by(param:)` queries a column that doesn't exist.
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_param
+
 Rails/I18nLocaleTexts:
   Enabled: false
 

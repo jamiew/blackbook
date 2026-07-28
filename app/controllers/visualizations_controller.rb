@@ -79,12 +79,13 @@ class VisualizationsController < ApplicationController
     @page, @per_page = pagination_params
     which = is_admin? ? Visualization : Visualization.approved
     if params[:user_id]
-      @user = User.find_by(param: params[:user_id])
+      @user = User.find_by_param(params[:user_id])
       which = which.where(user_id: @user.id)
       # TODO: set page_title etc. Also handle all this logic less if/elsify
     end
-    @current_objects ||= which.includes(:user).order(approved_at: :desc, name: :asc).paginate(page: @page,
-                                                                                              per_page: @per_page)
+    @visualizations ||= which.includes(:user)
+                             .order(approved_at: :desc, name: :asc)
+                             .paginate(page: @page, per_page: @per_page)
   end
 
   def update_approval_state(obj, enabled)
