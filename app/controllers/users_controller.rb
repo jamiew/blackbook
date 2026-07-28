@@ -16,7 +16,7 @@ class UsersController < ApplicationController
 
   # Show one user
   def show
-    @user = User.find_by(param: params[:id])
+    @user = User.find_by_param(params[:id])
     raise ActiveRecord::RecordNotFound if @user.nil?
 
     @page, @per_page = pagination_params(per_page: 10)
