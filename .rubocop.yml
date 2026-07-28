@@ -44,6 +44,11 @@ Metrics/AbcSize:
 Naming/PredicatePrefix:
   Enabled: false
 
+# Controllers memoize into view-facing ivars (@visualizations, @tags) from methods
+# named `current_objects`. Renaming the ivar to match the method silently breaks views.
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+
 # Rails specific
 Rails/I18nLocaleTexts:
   Enabled: false

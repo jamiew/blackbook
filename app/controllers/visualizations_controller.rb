@@ -83,8 +83,9 @@ class VisualizationsController < ApplicationController
       which = which.where(user_id: @user.id)
       # TODO: set page_title etc. Also handle all this logic less if/elsify
     end
-    @current_objects ||= which.includes(:user).order(approved_at: :desc, name: :asc).paginate(page: @page,
-                                                                                              per_page: @per_page)
+    @visualizations ||= which.includes(:user)
+                             .order(approved_at: :desc, name: :asc)
+                             .paginate(page: @page, per_page: @per_page)
   end
 
   def update_approval_state(obj, enabled)
