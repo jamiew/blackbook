@@ -50,6 +50,12 @@ Naming/MemoizedInstanceVariableName:
   Enabled: false
 
 # Rails specific
+# `User.find_by_param` is a real class method, not a dynamic finder — rewriting it
+# to `find_by(param:)` queries a column that doesn't exist.
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_param
+
 Rails/I18nLocaleTexts:
   Enabled: false
 
