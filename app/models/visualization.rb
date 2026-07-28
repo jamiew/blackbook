@@ -27,7 +27,7 @@ class Visualization < ApplicationRecord
   validates :embed_url, presence: { message: "can't be blank" }, on: :create, if: :is_embeddable
   validate :reject_if_any_html
 
-  scope :approved, -> { where(approved_at: ...Time.zone.now) }
+  scope :approved, -> { where('approved_at < ?', Time.zone.now) }
   scope :pending, -> { where('approved_at IS NULL OR approved_at > ?', Time.zone.now) }
 
   after_create :create_notification
