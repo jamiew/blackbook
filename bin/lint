@@ -3,6 +3,8 @@
 set -e
 
 echo "🔍 Running RuboCop linter..."
-bundle exec rubocop --format simple --fail-level warning
+# No --fail-level: match CI (.github/workflows/rubocop.yml), which fails on
+# convention offenses too. A weaker local gate hides CI failures.
+bundle exec rubocop --format simple
 
 echo "✅ Linting passed!"

@@ -1,5 +1,4 @@
 module ApplicationHelper
-
   def html_attrs(lang = 'en-US')
     { xmlns: "http://www.w3.org/1999/xhtml", 'xml:lang' => lang, lang: lang }
   end
@@ -10,7 +9,7 @@ module ApplicationHelper
 
   def flash_messages
     messages = []
-    %w(notice warning error).each do |msg|
+    %w[notice warning error].each do |msg|
       if flash[msg.to_sym].present?
         messages << content_tag(:div, html_escape(flash[msg.to_sym]), id: "flash-#{msg}").html_safe
       end
@@ -29,5 +28,4 @@ module ApplicationHelper
   def redstar
     '<span style="color: #f55">*</span>'.html_safe
   end
-
 end
