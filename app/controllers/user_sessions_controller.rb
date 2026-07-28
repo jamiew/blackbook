@@ -1,5 +1,5 @@
 class UserSessionsController < ApplicationController
-  before_action :require_no_user, only: [:new, :create]
+  before_action :require_no_user, only: %i[new create]
   before_action :require_user, only: :destroy
 
   def new
@@ -17,7 +17,7 @@ class UserSessionsController < ApplicationController
     else
       flash[:error] = "Failed to authenticate. Why don't you try that again?"
       logger.debug @user_session.errors.inspect
-      render action: :new, status: 401
+      render action: :new, status: :unauthorized
     end
   end
 

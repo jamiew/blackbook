@@ -1,19 +1,18 @@
 class GmlObject
-
   attr_accessor :tag_id
 
   def initialize(**opts)
     # Rails.logger.debug "GmlObject.new opts=#{opts.inspect}"
     self.tag_id = opts[:tag_id]
-    self.tag_id ||= opts[:tag] && opts[:tag].try(:id)
+    self.tag_id ||= opts[:tag]&.try(:id)
 
     # use data if passed explicitly; otherwise read from disk
     # right?
-    if opts.key?(:data)
-      self.data = opts[:data]
-    else
-      self.data = read_from_disk
-    end
+    self.data = if opts.key?(:data)
+                  opts[:data]
+                else
+                  read_from_disk
+                end
   end
 
   def tag
@@ -21,11 +20,12 @@ class GmlObject
   end
 
   def self.file_dir
-    "#{Rails.root}/data"
+    Rails.root.join("data").to_s
   end
 
   def filename
     return nil if tag_id.blank?
+
     "#{self.class.file_dir}/#{tag_id}.gml"
   end
 
@@ -39,7 +39,7 @@ class GmlObject
     @_data = args
   end
 
-  # FIXME I don't like this pseudo-ActiveRecord stuff anymore
+  # FIXME: I don't like this pseudo-ActiveRecord stuff anymore
   def tag=(_tag)
     self.tag_id = _tag.id
   end
@@ -51,18 +51,18 @@ class GmlObject
 
   def self.read_all_cached_gml
     Dir.glob("#{file_dir}/*.gml").each do |path|
-      id = path.match(/.+\/(.+)\.gml/)[1]
-      tag = Tag.find_by_id(id)
+      id = path.match(%r{.+/(.+)\.gml})[1]
+      tag = Tag.find_by(id: id)
       if tag.nil?
         Rails.logger.warn "Could not find Tag #{id} for path=#{path.inspect}, skipping"
         next
       end
 
-      if tag.gml_object.blank?
-        Rails.logger.debug "No GmlObject for Tag #{id}, creating"
-        tag.send(:build_gml_object) # sorry
-        tag.send(:save_gml_object) # really I mean it
-      end
+      next if tag.gml_object.present?
+
+      Rails.logger.debug { "No GmlObject for Tag #{id}, creating" }
+      tag.send(:build_gml_object) # sorry
+      tag.send(:save_gml_object) # really I mean it
     end
   end
 
@@ -72,6 +72,7 @@ class GmlObject
 
   def save!
     raise "invalid GmlObject, not saving" unless valid?
+
     store_on_disk
   end
 
@@ -87,29 +88,24 @@ class GmlObject
       raise "Filename is blank, cannot store on disk"
     end
 
-    unless Dir.exist?(self.class.file_dir)
-      FileUtils.mkdir(self.class.file_dir)
-    end
+    FileUtils.mkdir_p(self.class.file_dir)
 
-    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).store_on_disk filename=#{filename} ..."
+    Rails.logger.debug { "GmlObject(tag_id=#{tag_id}).store_on_disk filename=#{filename} ..." }
 
-    File.open(filename, 'w+') do |file|
-      file.write(data)
-    end
-    return true
+    File.write(filename, data)
+    true
   end
 
   def read_from_disk
     return nil if filename.blank?
     return nil unless File.exist?(filename)
+
     data = File.read(filename)
-    Rails.logger.debug "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes"
-    return data
+    Rails.logger.debug { "GmlObject(tag_id=#{tag_id}).read_from_disk filename=#{filename} => #{data.length} bytes" }
+    data
   end
 
   def size
     tag.data.length || 0
   end
-
-
 end
