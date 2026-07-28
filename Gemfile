@@ -3,7 +3,7 @@ ruby File.open(File.dirname(__FILE__)+'/.ruby-version', 'rb') { |f| f.read.chomp
 
 gem 'rails', '~> 8.1.0'
 gem 'mysql2'
-gem 'puma'
+gem 'puma', '~> 7.2'
 
 # Assets
 gem 'propshaft'
