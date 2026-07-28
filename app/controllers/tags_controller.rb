@@ -29,7 +29,7 @@ class TagsController < ApplicationController
       @search_context = { key: :keywords, value: params[:keywords],
                           conditions: ["gml_keywords LIKE ?", params[:keywords]] }
     elsif params[:user_id].present?
-      @user = User.find_by(param: params[:user_id])
+      @user = User.find_by_param(params[:user_id])
       raise ActiveRecord::RecordNotFound if @user.blank?
 
       @search_context = { key: :user, value: @user.login, conditions: ["user_id = ?", @user.id] }
@@ -72,7 +72,7 @@ class TagsController < ApplicationController
       @prev = Tag.where(id: ...@tag.id).last
       @next = Tag.find_by("id > ?", @tag.id)
 
-      @user = User.find_by(param: params[:user_id]) if params[:user_id]
+      @user = User.find_by_param(params[:user_id]) if params[:user_id]
       @user ||= @tag.user
 
       # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%

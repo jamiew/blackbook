@@ -79,7 +79,7 @@ class VisualizationsController < ApplicationController
     @page, @per_page = pagination_params
     which = is_admin? ? Visualization : Visualization.approved
     if params[:user_id]
-      @user = User.find_by(param: params[:user_id])
+      @user = User.find_by_param(params[:user_id])
       which = which.where(user_id: @user.id)
       # TODO: set page_title etc. Also handle all this logic less if/elsify
     end
