@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby File.open(File.dirname(__FILE__)+'/.ruby-version', 'rb') { |f| f.read.chomp }
 
-gem 'rails', '~> 8.1.0'
+gem 'rails', '~> 8.1.3'
 gem 'mysql2'
 gem 'puma', '~> 7.2'
 
