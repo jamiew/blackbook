@@ -39,7 +39,6 @@ gem 'exception_notification'
 # Ruby 3.4+ stdlib gems now need to be explicit
 gem 'bigdecimal'
 gem 'rexml'
-gem 'ostruct'
 
 group :development, :test do
   gem 'rspec-rails', '~> 8.0'

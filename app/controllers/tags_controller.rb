@@ -1,7 +1,8 @@
 require 'English'
-require 'ostruct'
 
 class TagsController < ApplicationController
+  TAG_ATTRIBUTES = %i[gml gml_file application description location image existing_application_id].freeze
+
   # We allow open access to API #create -- no authentication or forgery protection
   protect_from_forgery except: %i[show latest random create thumbnail validate]
   before_action :get_tag, only: %i[show edit update destroy thumbnail]
@@ -43,11 +44,10 @@ class TagsController < ApplicationController
     @tags ||= Tag.order('tags.created_at DESC').includes(:user).where(@search_context && @search_context[:conditions]).paginate(
       page: @page, per_page: @per_page
     )
-    @applications ||= Tag.select("DISTINCT application AS name").order(:name).where.not(application: [nil,
-                                                                                                      ""]).map do |t|
-      OpenStruct.new(name: t.name)
-    end
-    @applications.reject! { |app| app.name.blank? }
+    @applications ||= Tag.select("DISTINCT application AS name")
+                         .where.not(application: [nil, ""])
+                         .order(:name)
+                         .to_a
 
     set_page_title "GML Tags#{": #{@search_context[:key]}=#{@search_context[:value].inspect} " if @search_context}"
 
@@ -106,8 +106,7 @@ class TagsController < ApplicationController
 
   # Just a random tag -- redirect to canonical for HTML, but otherwise don't bother (API)
   def random
-    require 'activerecord_random' # FIXME: rails5 no longer autoloading the lib/ directory
-    @tag = Tag.random
+    @tag = Tag.in_random_order.first
     redirect_to(tag_path(@tag), status: :found) and return if [nil, 'html'].include?(params[:format])
 
     show
@@ -152,13 +151,11 @@ class TagsController < ApplicationController
   end
 
   def update
-    @tag.update(params[:tag].permit(:gml, :gml_file, :application, :description, :location, :image,
-                                    :existing_application_id))
-    if @tag.save
+    if @tag.update(tag_parameters)
       flash[:notice] = "Tag ##{@tag.id} updated"
       redirect_to tag_path(@tag)
     else
-      flash[:error] = "Could not update tag: #{$ERROR_INFO}"
+      flash[:error] = "Could not update tag: #{@tag.errors.full_messages.to_sentence}"
       render action: 'edit'
     end
   end
@@ -192,8 +189,7 @@ class TagsController < ApplicationController
     elsif params[:tag] && params[:tag][:id]
       @tag = Tag.find(params[:tag][:id])
     else
-      @tag = Tag.new(params[:tag]&.permit(:gml, :gml_file, :application, :description, :location, :image,
-                                          :existing_application_id) || {})
+      @tag = Tag.new(optional_tag_parameters)
       @tag.gml = params[:gml] if @tag.gml.blank? && params[:gml]
     end
     @tag.validate_gml
@@ -276,9 +272,6 @@ class TagsController < ApplicationController
   # construct & save a tag submitted manually, through the website
   # We do some strange field expansion right now that could be moved into filters or model accessors
   def create_from_form
-    # Translate/expand some params
-    params[:tag][:user] = current_user
-
     # Read the GML uploaded gml file and dump it into the GML field
     # GML file overrides anything in the textarea -- that was probably accidental input
     file = params[:tag][:gml_file]
@@ -287,9 +280,10 @@ class TagsController < ApplicationController
       params[:tag][:gml] = file.read
     end
 
-    # Build object with permitted params
-    @tag = Tag.new(params[:tag].permit(:gml, :gml_file, :application, :description, :location, :image,
-                                       :existing_application_id, :user))
+    # Build object with permitted params. The owner is assigned off the session, never
+    # mass-assigned: `permit` drops non-scalars, so a User in params silently vanished.
+    @tag = Tag.new(tag_parameters)
+    @tag.user = current_user
 
     # GML data of some kind is required -- catching this ourselves due to GmlObject complexity...
     # Allowing screenshot-only's for now... delete later.
@@ -344,7 +338,11 @@ class TagsController < ApplicationController
   private
 
   def tag_parameters
-    params.expect(tag: %i[gml gml_file application description location image
-                          existing_application_id])
+    params.expect(tag: TAG_ATTRIBUTES)
+  end
+
+  # The validator accepts a bare ?gml= with no :tag key at all
+  def optional_tag_parameters
+    params.fetch(:tag, {}).permit(TAG_ATTRIBUTES)
   end
 end

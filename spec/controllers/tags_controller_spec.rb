@@ -25,6 +25,13 @@ describe TagsController do
       expect(response.body).to match(/Error/)
     end
 
+    it "should assign the logged-in user when submitted via the form" do
+      user = FactoryBot.create(:user)
+      login_as_user(user)
+      post :create, params: { tag: { gml: @gml } }
+      expect(assigns[:tag].user).to eq(user)
+    end
+
     describe "redirection" do
       it "params[:redirect]=1 should redirect to the tag page" do
         Tag.destroy_all # FIXME not sure why we're ending up w/ dupe objs??
