@@ -32,23 +32,18 @@ Copyfree 2009-2023 F.A.T.<br />
 
 ---
 
-# Development Setup (Rails 7)
+# Development Setup (Rails 8)
 
-This application has been updated to **Rails 7.1.5** and **Ruby 3.4.5** for modern compatibility.
+This application has been updated to **Rails 8.1.3.1** and **Ruby 3.4.5** for modern compatibility.
 
 ## Prerequisites
 
-- **Ruby 3.0+** (recommended: 3.4.5 - see `.ruby-version`)
-- **Rails 7.1+** (currently 7.1.5)
-- **MySQL 5.7+** or **MySQL 8.0+** 
-- **Node.js 16+** (for asset compilation)
+- **Ruby 3.4+** (see `.ruby-version`)
+- **Rails 8.1+**
+- **MySQL 5.7+** or **MySQL 8.0+**
 - **Bundler 2.0+**
 
-### Version Compatibility
-This app is fully compatible with:
-- Ruby 3.0, 3.1, 3.2, 3.3, 3.4+
-- Rails 7.0, 7.1+
-- Modern deployment platforms (Heroku, Docker, etc.)
+Assets are served by Propshaft, so there is no Node.js or yarn build step.
 
 ## Getting Started
 
@@ -150,15 +145,16 @@ The application includes a deployment script at `./deploy` that:
 - Compiles assets
 - Restarts services
 
-## Rails 7 Migration Notes
+## Migration Notes
 
-This app was recently upgraded from Rails 4.2 to Rails 7.1. Major changes include:
+This app was upgraded from Rails 4.2 to Rails 8.1. Major changes include:
 
 - **Credentials**: Moved from `config/secrets.yml` to encrypted `config/credentials.yml.enc`
-- **Strong Parameters**: Added to all controllers
+- **Strong Parameters**: Added to all controllers, using `params.expect`
 - **Modern Validations**: Updated from `validates_presence_of` to `validates` syntax
-- **Asset Pipeline**: Updated for Rails 7 asset handling
-- **Turbo**: Replaced Turbolinks with Turbo (Rails 7 default)
+- **Asset Pipeline**: Sprockets replaced by Propshaft. Propshaft does not read `//= require`
+  directives, so every JS file is listed explicitly in `layouts/_template_header.html.haml`.
+- **Auth and uploads**: still Authlogic and kt-paperclip, not the Rails 8 built-ins
 
 ## Development Notes
 
@@ -180,8 +176,7 @@ This app was recently upgraded from Rails 4.2 to Rails 7.1. Major changes includ
 
 **Database Connection**
 ```bash
-# Check database configuration
-cp config/database.yml.example config/database.yml  # if needed
+# config/database.yml is checked in; it reads MYSQL_PASSWORD and DATABASE_URL from the env
 bin/rails db:create
 ```
 

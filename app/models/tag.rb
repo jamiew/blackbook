@@ -23,6 +23,8 @@ class Tag < ApplicationRecord
   scope :from_device, -> { where.not(gml_uniquekey: nil) }
   scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
   scope :unclaimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NULL') }
+  # RAND() is MySQL-specific; postgres/sqlite want RANDOM()
+  scope :in_random_order, -> { order(Arel.sql('RAND()')) }
 
   # validates_attachment_presence :image
   # validates_attachment :image, content_type: { content_type: ["image/jpg", "image/jpeg", "image/png", "image/gif"] }

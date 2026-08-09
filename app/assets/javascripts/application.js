@@ -4,9 +4,6 @@
 * (cc) Free Art & Technology Lab
 */
 
-//= require jquery
-//= require jquery_ujs
-
 $(document).ready(function(){
 
   // Flashes

@@ -61,6 +61,12 @@ Rails/DynamicFindBy:
   AllowedMethods:
     - find_by_param
 
+# All three mass-assignment sites now use `params.expect`. What's left is plain reads
+# (`Tag.find(params[:id])`, `params[:user].gsub(...)`) where `expect` would only swap a
+# nil for a ParameterMissing on routes that always supply the key.
+Rails/StrongParametersExpect:
+  Enabled: false
+
 Rails/I18nLocaleTexts:
   Enabled: false
 

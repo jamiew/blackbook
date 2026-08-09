@@ -1,0 +1,1 @@
+class MissingDataError < RuntimeError; end
