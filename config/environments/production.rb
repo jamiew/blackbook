@@ -2,7 +2,7 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
-  config.cache_classes = true
+  config.enable_reloading = false
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
@@ -23,12 +23,6 @@ Rails.application.configure do
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
-
-  # Propshaft handles assets in production
-  # Assets are served by the web server, not Rails
-  config.assets.compile = false
-
-  # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
@@ -80,12 +74,12 @@ Rails.application.configure do
   config.active_record.logger = nil
 
   # exception_notification
-  Rails.application.config.middleware.use ExceptionNotification::Rack,
+  config.middleware.use ExceptionNotification::Rack,
     ignore_exceptions: ['ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
-    :email => {
-      :email_prefix => "[blackbook-prod] ",
-      :sender_address => %{"000000book Errors" <no-reply@000book.com>},
-      :exception_recipients => %w{jamie@jamiedubs.com}
+    email: {
+      email_prefix: "[blackbook-prod] ",
+      sender_address: %{"000000book Errors" <no-reply@000book.com>},
+      exception_recipients: %w[jamie@jamiedubs.com]
     }
 
 end

@@ -1,6 +1,4 @@
 class HomeController < ApplicationController
-  # caches_action :index, cache_path: 'home/index', expires_in: 30.minutes, if: :cache_request?
-
   def index
     @tags = Tag.order(created_at: :desc).limit(30).includes(:user)
     @tag = (@tags.present? && @tags[0]) || nil
