@@ -51,7 +51,7 @@ class Tag < ApplicationRecord
 
   def gml_object
     self._gml_object ||= GmlObject.new(tag: self)
-    self._gml_object
+    _gml_object
   end
 
   def gml_object=(obj)
