@@ -7,7 +7,6 @@ gem 'puma', '~> 8.0'
 
 # Assets
 gem 'propshaft'
-gem 'terser'
 
 # Performance
 gem 'bootsnap', require: false
