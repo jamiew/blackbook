@@ -2,9 +2,6 @@
 * #000000book stylesheet
 * Jamie Wilkinson <http://jamiedubs.com>
 * (cc) Free Art & Technology Lab
-*
-*= require_tree .
-*= require_self
 */
 
 
@@ -59,7 +56,8 @@ hr {
 }
 
 table { border-collapse: collapse; border-spacing: 0; }
-table tr { }
+table tr:nth-child(odd)  { background-color: #000; }
+table tr:nth-child(even) { background-color: #111; }
 table th { font-family: serif; font-size: 1.2em; background-color: #333; padding: 5px; font-weight: bold; }
 table td { padding: 5px 5px; font-size: 0.9em; }
 

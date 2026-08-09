@@ -12,7 +12,6 @@ gem 'propshaft'
 gem 'bootsnap', require: false
 
 # Frontend
-gem 'jquery-rails'
 gem 'haml'
 
 # Auth
