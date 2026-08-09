@@ -11,8 +11,6 @@ class TagsController < ApplicationController
 
   # Basic caching for :index?page=1 and :show actions
   after_action :expire_caches, only: %i[update create destroy]
-  # caches_action :index, expires_in: 30.minutes, if: :cache_request?
-  # caches_action :show,  expires_in: 30.minutes, if: :cache_request?
 
   def index
     # Setup a search context for this tag: currently user or app
@@ -141,19 +139,16 @@ class TagsController < ApplicationController
 
     if params[:tag].present? # sent by the form
       logger.debug "sent by the form"
-      return create_from_form
+      create_from_form
     elsif params[:gml].present? # sent from an app!
       logger.debug "sent from an app"
-      return create_from_api
+      create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
       error_text = "Error, could not create tag from your parameters: #{clean_params.inspect}"
       logger.warn error_text
       render plain: error_text, status: :unprocessable_content # Unprocessable Entity
-      return
     end
-
-    expire_page(:index)
   end
 
   def update
@@ -169,11 +164,10 @@ class TagsController < ApplicationController
   end
 
   def destroy
-    @tag.destroy
     if @tag.destroy
       flash[:notice] = "Tag ##{@tag.id} destroyed"
     else
-      flash[:error] = "Could not destroy tag: #{$ERROR_INFO}"
+      flash[:error] = "Could not destroy tag: #{@tag.errors.full_messages.to_sentence}"
     end
     # redirect_to(tags_path)
     redirect_back_or_to(root_path)
