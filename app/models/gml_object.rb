@@ -84,7 +84,7 @@ class GmlObject
     # puts "GmlObject.store_on_disk data[0..100]=#{data[0..100]}"
 
     if filename.blank?
-      Rails.logger.error "Cannot store GmlObject(tag_id=#{tag_id}) on disk, invalid filename. tag_id=#{self.tag_id.inspect} filename=#{filename.inspect}"
+      Rails.logger.error "Cannot store GmlObject(tag_id=#{tag_id}) on disk, invalid filename. tag_id=#{tag_id.inspect} filename=#{filename.inspect}"
       raise "Filename is blank, cannot store on disk"
     end
 
