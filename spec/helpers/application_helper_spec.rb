@@ -1,5 +1,5 @@
 require 'rails_helper'
 
 describe ApplicationHelper do
-  include ApplicationHelper
+  include described_class
 end

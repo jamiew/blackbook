@@ -23,7 +23,7 @@ describe HomeController do
 
   describe "pagination parameter validation" do
     # Test the controller logic without hitting the views
-    controller HomeController do
+    controller described_class do
       def test_pagination_params
         @page, @per_page = pagination_params
         render plain: @page.to_s

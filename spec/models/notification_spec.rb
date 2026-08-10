@@ -12,6 +12,6 @@ RSpec.describe Notification, type: :model do
   end
 
   it "creates a new instance given valid attributes" do
-    Notification.create!(@valid_attributes)
+    described_class.create!(@valid_attributes)
   end
 end

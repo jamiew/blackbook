@@ -9,7 +9,7 @@ RSpec.describe Tag, type: :model do
 
   # Important: point at tempt1's tags correctly
   it 'is pointing at fffff.at/tempt1 for remote_images' do
-    expect(Tag.remote_image_prefix).to eq('http://fffff.at/tempt1/photos/data/eyetags')
+    expect(described_class.remote_image_prefix).to eq('http://fffff.at/tempt1/photos/data/eyetags')
   end
 
   # Map some GML headers to database columns
@@ -32,7 +32,7 @@ RSpec.describe Tag, type: :model do
     end
 
     it 'reads header/client/filename => remote_image' do
-      expect(create_tag_with_gml_header(filename: 'image007.jpg').remote_image).to eq(Tag.remote_image_prefix + '/image007.jpg')
+      expect(create_tag_with_gml_header(filename: 'image007.jpg').remote_image).to eq("#{described_class.remote_image_prefix}/image007.jpg")
     end
 
     it 'reads header/client/location => location' do
@@ -51,63 +51,63 @@ RSpec.describe Tag, type: :model do
   describe "validating GML" do
     it "errors on no strokes" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:errors]).to include("No <stroke> tags - at least 1 stroke required")
     end
 
     it "errors on no points" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:errors]).to include("No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
     end
 
     it "errors on missing x coordinates" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:errors]).to include("Missing <x> tags inside your <pt>'s")
     end
 
     it "errors on missing y coordinates" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><time>0</time></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:errors]).to include("Missing <y> tags inside your <pt>'s")
     end
 
     it "warns on no time data" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><y>0</y></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:warnings]).to include("No <time> tags in your <pt> tags! Capturing time data makes things much more interesting.")
     end
 
     it "warns on no client tag" do
       gml = "<gml><tag><header></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:warnings]).to include("No <client> tag - provide some info about your app!")
     end
 
     it "warns on no environment tag" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:warnings]).to include("No <environment> tag")
     end
 
     it "warns on no screenBounds tag" do
       gml = "<gml><tag><header><client><name>test</name></client><environment></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:warnings]).to include("No <screenBounds> tag in your <environment> - otherwise apps might draw it in the wrong aspect ratio")
     end
 
     it "recommends including uniqueKey" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       tag.validate_gml
       expect(tag.validation_results[:recommendations]).to include("No <uniqueKey> tag - includign a unique device ID of some kind lets users pair their 000000book accounts with your app, e.g. iPhone uuid, MAC address, etc")
     end
@@ -171,7 +171,7 @@ RSpec.describe Tag, type: :model do
   describe "rotate_gml transformation" do
     it "rotates GML data 90 degrees (swaps x/y, inverts new y)" do
       gml = "<gml><tag><header><client><name>test</name></client></header><drawing><stroke><pt><x>0.25</x><y>0.75</y><time>0</time></pt></stroke></drawing></tag></gml>"
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       rotated = tag.rotate_gml
 
       pt = (rotated / 'drawing' / 'stroke' / 'pt').first
@@ -188,7 +188,7 @@ RSpec.describe Tag, type: :model do
           <pt><x>1</x><y>0</y><time>1</time></pt>
         </stroke></drawing></tag></gml>
       GML
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       rotated = tag.rotate_gml
 
       pts = (rotated / 'drawing' / 'stroke' / 'pt')
@@ -208,7 +208,7 @@ RSpec.describe Tag, type: :model do
           <stroke><pt><x>0.2</x><y>0.8</y><time>0</time></pt></stroke>
         </drawing></tag></gml>
       GML
-      tag = Tag.new(data: gml)
+      tag = described_class.new(data: gml)
       rotated = tag.rotate_gml
 
       strokes = (rotated / 'drawing' / 'stroke')
@@ -224,7 +224,7 @@ RSpec.describe Tag, type: :model do
     end
 
     it "handles GML with no drawing gracefully" do
-      tag = Tag.new(data: '<gml><tag><header></header></tag></gml>')
+      tag = described_class.new(data: '<gml><tag><header></header></tag></gml>')
       result = tag.rotate_gml
       expect(result).to be_a(Nokogiri::XML::Document)
     end
@@ -232,27 +232,27 @@ RSpec.describe Tag, type: :model do
 
   describe "#from_iphone?" do
     it "returns true for DustTag application" do
-      tag = Tag.new(gml_application: 'DustTag')
+      tag = described_class.new(gml_application: 'DustTag')
       expect(tag.from_iphone?).to be true
     end
 
     it "returns true for Fat Tag application" do
-      tag = Tag.new(application: 'Fat Tag')
+      tag = described_class.new(application: 'Fat Tag')
       expect(tag.from_iphone?).to be true
     end
 
     it "returns true for Katsu application" do
-      tag = Tag.new(gml_application: 'Katsu')
+      tag = described_class.new(gml_application: 'Katsu')
       expect(tag.from_iphone?).to be true
     end
 
     it "returns false for other applications" do
-      tag = Tag.new(gml_application: 'Graffiti Analysis')
+      tag = described_class.new(gml_application: 'Graffiti Analysis')
       expect(tag.from_iphone?).to be false
     end
 
     it "returns false when no application is set" do
-      tag = Tag.new
+      tag = described_class.new
       expect(tag.from_iphone?).to be false
     end
   end
@@ -277,7 +277,7 @@ RSpec.describe Tag, type: :model do
     end
 
     it "accepts valid GML" do
-      tag = Tag.new(data: valid_gml)
+      tag = described_class.new(data: valid_gml)
       tag.validate_gml
 
       expect(tag.validation_results).to be_present
@@ -285,13 +285,13 @@ RSpec.describe Tag, type: :model do
     end
 
     it "handles malformed XML gracefully" do
-      tag = Tag.new(data: '<gml><unclosed_tag>')
+      tag = described_class.new(data: '<gml><unclosed_tag>')
 
       expect { tag.validate_gml }.not_to raise_error
     end
 
     it "extracts GML header information" do
-      tag = Tag.new(data: valid_gml)
+      tag = described_class.new(data: valid_gml)
       header = tag.gml_header
 
       expect(header).to be_a(Hash)
@@ -350,8 +350,8 @@ RSpec.describe Tag, type: :model do
       device_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123')
       regular_tag = FactoryBot.create(:tag, gml_uniquekey: nil)
 
-      expect(Tag.from_device).to include(device_tag)
-      expect(Tag.from_device).not_to include(regular_tag)
+      expect(described_class.from_device).to include(device_tag)
+      expect(described_class.from_device).not_to include(regular_tag)
     end
 
     it "distinguishes claimed vs unclaimed tags" do
@@ -359,11 +359,11 @@ RSpec.describe Tag, type: :model do
       claimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123', user: user)
       unclaimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device456', user: nil)
 
-      expect(Tag.claimed).to include(claimed_tag)
-      expect(Tag.claimed).not_to include(unclaimed_tag)
+      expect(described_class.claimed).to include(claimed_tag)
+      expect(described_class.claimed).not_to include(unclaimed_tag)
 
-      expect(Tag.unclaimed).to include(unclaimed_tag)
-      expect(Tag.unclaimed).not_to include(claimed_tag)
+      expect(described_class.unclaimed).to include(unclaimed_tag)
+      expect(described_class.unclaimed).not_to include(claimed_tag)
     end
   end
 end

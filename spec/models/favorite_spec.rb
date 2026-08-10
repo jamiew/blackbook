@@ -22,7 +22,7 @@ RSpec.describe Favorite, type: :model do
     @user = FactoryBot.create(:user)
     @tag = FactoryBot.create(:tag)
     expect do
-      Favorite.create!(user: @user, object: @tag)
+      described_class.create!(user: @user, object: @tag)
     end.to change(Notification, :count).by(1)
   end
 end

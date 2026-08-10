@@ -64,7 +64,7 @@ describe UsersController do
       pending 'USER SIGNUPS DISABLED'
       post :create, params: valid_user_params
       expect(flash[:notice]).not_to be_blank
-      found_user = User.find_by_login(valid_user_params[:user][:login])
+      found_user = User.find_by(login: valid_user_params[:user][:login])
       expect(found_user).not_to be_nil
       expect(response).to redirect_to(user_path(id: valid_user_params[:user][:login]))
     end
@@ -126,7 +126,7 @@ describe UsersController do
     end
 
     it 'returns 404 if user does not exist' do
-      expect(User.find_by_id(666)).to be_nil
+      expect(User.find_by(id: 666)).to be_nil
       expect do
         get :show, params: { id: 666 }
       end.to raise_error(ActiveRecord::RecordNotFound)

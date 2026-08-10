@@ -255,7 +255,7 @@ describe TagsController do
       get :latest, params: { format: 'json' }
       expect(assigns(:tag)).to eq(tag)
       expect(response).to be_successful
-      expect(JSON.parse(response.body)['id']).to eq(tag.id)
+      expect(response.parsed_body['id']).to eq(tag.id)
     end
   end
 
@@ -282,7 +282,7 @@ describe TagsController do
 
       get :show, params: { id: tag.id, format: :json }
 
-      json_response = JSON.parse(response.body)
+      json_response = response.parsed_body
       expect(json_response).not_to have_key('ip')
       expect(json_response).not_to have_key('remote_secret')
       expect(json_response).not_to have_key('user_id')

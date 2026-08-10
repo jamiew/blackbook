@@ -51,7 +51,7 @@ describe UserSessionsController do
     end
 
     it "works and redirect to the account page" do
-      user = User.find_by_login(username)
+      user = User.find_by(login: username)
       expect(user).not_to be_nil # sanity-check our setup
       post :create, params: { user_session: { login: username, password: password } }
       expect(flash[:notice]).to include('Login successful')
