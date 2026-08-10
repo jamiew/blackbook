@@ -197,20 +197,16 @@ class TagsController < ApplicationController
     set_page_title "GML Syntax Validator"
     @noindex = true if @tag.gml.present?
 
+    # Rails resolves a format-less XHR to :js; these callers want the plain-text report
+    request.format = :text if request.xhr? && params[:format].blank?
+
     respond_to do |wants|
-      wants.html do
-        if request.xhr?
-          render plain: @tag.validation_results.inspect
-        else
-          render 'validator'
-        end
-      end
+      wants.html { render 'validator' }
       # FIXME: to_xml does the fuckin' <hash> thing :(
       joined_hash = @tag.validation_results.transform_values { |v| v.join(";\n") }
       wants.xml   { render xml: joined_hash.to_xml(dasherize: false, skip_types: true) }
       wants.json  { render json: @tag.validation_results.to_json(callback: params[:callback]) }
-      wants.xhr   { render plain: @tag.validation_results.map { |k, v| "#{k}=#{v.join(',') || 'none'}" }.join("\n") }
-      wants.text  { render plain: @tag.validation_results.map { |k, v| "#{k}=#{v.join(',') || 'none'}" }.join("\n") }
+      wants.text  { render plain: validation_results_text }
     end
   end
 
@@ -339,6 +335,10 @@ class TagsController < ApplicationController
 
   def tag_parameters
     params.expect(tag: TAG_ATTRIBUTES)
+  end
+
+  def validation_results_text
+    @tag.validation_results.map { |k, v| "#{k}=#{v.join(',') || 'none'}" }.join("\n")
   end
 
   # The validator accepts a bare ?gml= with no :tag key at all
