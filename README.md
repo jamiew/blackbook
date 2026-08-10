@@ -127,6 +127,14 @@ bin/rails gml_objects:save_to_disk
 bin/rails gml_objects:fix_missing
 ```
 
+### Data Validation
+```bash
+# Read-only audit: missing GML files, orphan files, broken images, orphaned rows,
+# and duplicates that would abort a pending unique-index migration.
+# Exits non-zero on blockers, so it works as a deploy preflight.
+bin/rails data:validate
+```
+
 ### Data Cleanup
 ```bash
 # Find tags with missing data
@@ -136,14 +144,29 @@ bin/rails tags:find_missing_data
 bin/rails cleanup_spam
 ```
 
+`tags:delete_missing_data` permanently destroys tags and requires
+`CONFIRM_DELETE=yes-i-have-a-backup`. It reads "missing" from disk, so an
+unmounted `data/` makes every tag look empty. Run `data:validate` first.
+
 ## Deployment
 
-The application includes a deployment script at `./deploy` that:
-- Syncs code from git
-- Links production data directory
-- Runs migrations
-- Compiles assets
-- Restarts services
+`./deploy` ships code to the production server. It reads `PROD_HOST`, `PROD_USER` and `PROD_APP_PATH` from `.env`.
+
+```bash
+./deploy              # deploy origin/main
+./deploy <git-ref>    # deploy a specific branch, tag or SHA
+```
+
+It stops before changing anything if the server has uncommitted work, if the GML volume is not mounted, if `secret_key_base` is unavailable, or if the target needs a Ruby version rbenv does not have. After restarting it confirms the service is up and the site returns 200, then prints the previous SHA so you can roll back with `./deploy <sha>`.
+
+It does not run migrations. The currently pending set includes a `drop_table` on 301,076 comments, so migrating is a separate deliberate command. `./deploy` reports what is pending and stops there.
+
+### Auditing production
+
+```bash
+script/audit-production.sh    # read-only: what is deployed, what pending migrations will hit
+script/backup-production.sh   # verified dump, GML corpus, images, gitignored config
+```
 
 ## Migration Notes
 
