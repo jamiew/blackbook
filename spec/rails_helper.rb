@@ -16,6 +16,9 @@ require 'rspec/rails'
 
 ActiveRecord::Migration.maintain_test_schema!
 
+require 'authlogic'
+require 'authlogic/test_case'
+
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -42,8 +45,7 @@ RSpec.configure do |config|
 
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
-end
 
-require 'authlogic'
-require 'authlogic/test_case'
-include Authlogic::TestCase
+  config.include Authlogic::TestCase
+  config.include FactoryBot::Syntax::Methods
+end

@@ -42,7 +42,7 @@ describe FavoritesController do
       expect(flash[:error]).not_to be_blank
     end
 
-    it "works" do
+    it "redirects and flashes a notice when logged in" do
       login_as_user(@user)
       post :create, params: { tag_id: @tag.id }
       expect(response).to be_redirect

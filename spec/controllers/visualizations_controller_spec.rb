@@ -13,7 +13,7 @@ describe VisualizationsController do
       { get: "/apps" }.should route_to("visualizations#index")
     end
 
-    it "works" do
+    it "lists approved visualizations with pagination defaults" do
       @visualization.update!(approved_at: Time.current)
       get :index
       expect(response).to be_successful
@@ -28,7 +28,7 @@ describe VisualizationsController do
       { get: "/apps/1" }.should route_to("visualizations#show", id: "1")
     end
 
-    it "works" do
+    it "renders the visualization name" do
       get :show, params: { id: @visualization.id }
       expect(response).to be_successful
       expect(response.body).to match(@visualization.name)
@@ -52,7 +52,7 @@ describe VisualizationsController do
       { post: "/apps" }.should route_to("visualizations#create")
     end
 
-    it "works" do
+    it "creates the visualization and redirects" do
       unique_name = "test_#{rand(100_000)}"
       expect do
         post :create,

@@ -131,10 +131,8 @@ RSpec.describe Tag, type: :model do
       end
 
       it "is valid JSON" do
-        @json.class
-        Hash
+        expect(@json).to be_a(Hash)
         expect(@json.length).to be > 0
-        # Check for some fields?
       end
 
       it "contains GML data (GSON)" do

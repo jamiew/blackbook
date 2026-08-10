@@ -63,7 +63,7 @@ describe TagsController do
       }
     end
 
-    it "works" do
+    it "lists tags and the application menu" do
       get :index
       expect(response).to be_successful
       expect(response.body).to include('application')
@@ -148,7 +148,7 @@ describe TagsController do
     end
 
     describe ".json" do
-      it "works" do
+      it "renders the tag as JSON" do
         get :show, params: { id: @tag.to_param, format: 'json' }
         expect(response).to be_successful
         expect(response.body).to match("\"id\":#{@tag.id}")
@@ -172,7 +172,6 @@ describe TagsController do
       allow_any_instance_of(Tag).to receive(:gml).and_return(nil)
       expect do
         get :show, params: { id: @tag.to_param, format: 'gml' }
-        puts response.body.inspect
         expect(response).to be_successful
       end.to raise_error(MissingDataError)
     end
@@ -260,7 +259,7 @@ describe TagsController do
   end
 
   describe "GET #random" do
-    it "works" do
+    it "assigns a tag and redirects to it" do
       FactoryBot.create(:tag)
       get :random
       expect(assigns(:tag)).not_to be_nil

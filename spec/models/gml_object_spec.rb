@@ -48,11 +48,11 @@ RSpec.describe GmlObject, type: :model do
   describe "#store_on_disk" do
     it "fails if tag_id is blank" do
       gml = FactoryBot.build(:gml_object, tag_id: nil)
-      expect(gml.read_from_disk).to be(nil)
+      expect(gml.read_from_disk).to be_nil
       expect { gml.store_on_disk }.to raise_error
     end
 
-    it "works" do
+    it "writes the GML to disk and reads it back" do
       gml = FactoryBot.create(:gml_object)
       expect { gml.store_on_disk }.not_to raise_error
 
@@ -67,7 +67,7 @@ RSpec.describe GmlObject, type: :model do
   end
 
   describe '#read_from_disk' do
-    it 'works' do
+    it 'reads back what was stored' do
       gml = FactoryBot.create(:gml_object)
       # Store something on disk first
       gml.store_on_disk
@@ -84,7 +84,7 @@ RSpec.describe GmlObject, type: :model do
       gml = FactoryBot.build(:gml_object, tag_id: 1)
       FileUtils.rm_f(gml.filename)
       expect(File.exist?(gml.filename)).to be(false)
-      expect(gml.read_from_disk).to be(nil)
+      expect(gml.read_from_disk).to be_nil
     end
   end
 
