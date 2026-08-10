@@ -115,13 +115,22 @@ echo "zero-byte:   $(find data/ -maxdepth 1 -name '*.gml' -size 0 2>/dev/null | 
 echo "total size:  $(du -shL data/ 2>/dev/null | cut -f1)"
 echo
 echo "-- paperclip images --"
-echo "public/system files: $(find public/system -type f 2>/dev/null | wc -l)"
+# -L follows the symlink: public/system is usually a link to the block volume,
+# and plain `find` counts 0 files there while `du -L` reports the real size.
+echo "public/system files: $(find -L public/system -type f 2>/dev/null | wc -l)"
 echo "public/system size:  $(du -shL public/system 2>/dev/null | cut -f1)"
 
 section "DISK (InnoDB conversion needs ~2x the largest table free)"
+echo "-- app root and MySQL datadir --"
 df -h .
 echo
-echo "-- inodes (65k+ small GML files make these matter) --"
+echo "-- block volume(s) holding GML data and images --"
+for p in data public/system; do
+  real=$(readlink -f "$p" 2>/dev/null) || continue
+  [ -n "$real" ] && echo "$p -> $real" && df -h "$real"
+done
+echo
+echo "-- inodes (76k+ small GML files make these matter) --"
 df -ih .
 
 section "MYSQL"
