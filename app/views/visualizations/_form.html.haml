@@ -33,7 +33,7 @@
 
   %p.embed_toggle
     .left= f.check_box :is_embeddable, id: 'embeddable_toggle'
-    %label{for: 'visualization_is_embeddable', style: 'margin-left: 1em', onclick: "$('#embeddable_toggle').click();"}== Embeddable?
+    %label{for: 'embeddable_toggle', style: 'margin-left: 1em'}== Embeddable?
   .embed_details{class: @visualization.is_embeddable ? '' : 'disabled'}
     %label{for: "visualization_embed_url"}== #{required.html_safe} URL to .swf, .js, etc
     = f.text_field :embed_url
@@ -54,18 +54,17 @@
 
 
 :javascript
-  $(document).ready(function(){
-    $('#embeddable_toggle').click(function(){
-      var deets = $('.embed_details');
-      // $(this).is(':checked')
-      deets.find(':input').attr('disabled', !$(this).is(':checked'));
-      if(deets.hasClass('disabled')){
-        deets.removeClass('disabled');
-        deets.find(':input').attr('disabled', false);
-      }
-      else {
-        deets.addClass('disabled');
-        deets.find(':input').attr('disabled', true);
-      }
-    });
+  document.addEventListener('DOMContentLoaded', function () {
+    var toggle = document.getElementById('embeddable_toggle');
+    var details = document.querySelector('.embed_details');
+
+    function syncEmbedDetails() {
+      details.classList.toggle('disabled', !toggle.checked);
+      details.querySelectorAll('input, textarea, select').forEach(function (field) {
+        field.disabled = !toggle.checked;
+      });
+    }
+
+    toggle.addEventListener('change', syncEmbedDetails);
+    syncEmbedDetails();
   });

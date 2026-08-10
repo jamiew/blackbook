@@ -8,8 +8,8 @@
 
   = stylesheet_link_tag 'application', media: 'all'
   -# Propshaft doesn't read sprockets `//= require` directives, so each file is listed here.
-  -# `jquery` is still 1.12.4 and carries four known XSS advisories; `jquery3` is the maintained one.
-  = javascript_include_tag 'jquery3', 'jquery_ujs', 'application'
+  -# `rails-ujs` ships with actionview and drives data-method/data-confirm on links.
+  = javascript_include_tag 'rails-ujs', 'application'
   = csrf_meta_tags
 
   = yield :head

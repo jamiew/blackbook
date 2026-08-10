@@ -4,38 +4,37 @@
 * (cc) Free Art & Technology Lab
 */
 
-$(document).ready(function(){
+function selectTab(link) {
+  document.querySelectorAll('div.tabs ul.tab_navigation a.selected').forEach(function (selected) {
+    selected.classList.remove('selected');
+  });
+  link.classList.add('selected');
 
-  // Flashes
-  $('#flash-error, #flash-notice, #flash-warning').slideToggle('slow');
-  setTimeout(function(){
-    $('#flash-error, #flash-notice, #flash-warning').slideToggle('slow');
+  var target = document.querySelector(link.getAttribute('href'));
+  if (!target) return;
+  window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Flashes are display:none in CSS -- show them, then take them away again
+  var flashes = document.querySelectorAll('#flash-error, #flash-notice, #flash-warning');
+  flashes.forEach(function (flash) { flash.style.display = 'block'; });
+  setTimeout(function () {
+    flashes.forEach(function (flash) { flash.style.display = 'none'; });
   }, 2500);
 
-  // Zebrafy table rows
-  $("tr:even").css("background-color", "#000");
-  $("tr:odd").css("background-color", "#111");
-
   // Formerly tabs - now a slider control
-  var tabContainers = $('div.tabs > div');
-  $('div.tabs ul.tab_navigation a').click(function (){
-    $('div.tabs ul.tab_navigation a.selected').removeClass('selected');
-    $(this).addClass('selected');
-
-    var target = $(this).attr('href');
-    console.log(target);
-    var top = $(target).offset().top-100;
-		$('html, body').animate({scrollTop:top}, 500);;
-		return false;
+  var tabLinks = document.querySelectorAll('div.tabs ul.tab_navigation a');
+  tabLinks.forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      selectTab(link);
+    });
   });
 
   // Select ghettotab based on URL anchor; e.g. #vanderplayer
-  // This can be quirky due to the anchor name = element name
-  // See: http://stackoverflow.com/questions/1384500/activate-url-anchor-but-dont-scroll-to-it
-  $('div.tabs ul.tab_navigation li a').each(function(){
-    var pattern = $(this).attr('href');
-    if(window.location.href.match(pattern)) { $(this).click(); }
-    scroll(0,0); // Re-center the page
+  var fromAnchor = Array.from(tabLinks).find(function (link) {
+    return window.location.href.includes(link.getAttribute('href'));
   });
-
+  if (fromAnchor) selectTab(fromAnchor);
 });
