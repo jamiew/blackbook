@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-
 describe FavoritesController do
   render_views
 
@@ -16,13 +15,13 @@ describe FavoritesController do
       expect { get :index }.to raise_error
     end
 
-    it "should work with no user_id" do
+    it "works with no user_id" do
       get :index
       expect(response).to be_successful
       expect(assigns(:user)).to eq(current_user)
     end
 
-    it "should work with user_id but ignore it" do
+    it "works with user_id but ignore it" do
       get :index, params: { user_id: @user.id }
       expect(response).to be_successful
       expect(assigns(:user)).to eq(current_user)
@@ -33,17 +32,17 @@ describe FavoritesController do
     before do
       @user = FactoryBot.create(:user)
       request.env["HTTP_REFERER"] = tag_path(@tag)
-      # FIXME we're relying on redirect_to(:back) inside FavoritesController...
+      # FIXME: we're relying on redirect_to(:back) inside FavoritesController...
     end
 
-    it "should fail if not logged-in" do
+    it "fails if not logged-in" do
       current_user_session.destroy
       post :create, params: { tag_id: @tag.id }
       expect(response).not_to be_successful
       expect(flash[:error]).not_to be_blank
     end
 
-    it "should work" do
+    it "redirects and flashes a notice when logged in" do
       login_as_user(@user)
       post :create, params: { tag_id: @tag.id }
       expect(response).to be_redirect
@@ -58,12 +57,11 @@ describe FavoritesController do
 
     it "2nd time should delete the favorite (unfavorite)" do
       login_as_user(@user)
-      expect {
+      expect do
         post :create, params: { tag_id: @tag.id }
         post :create, params: { tag_id: @tag.id }
-      }.to change(@user.favorites, :count).by(0)
+      end.not_to change(@user.favorites, :count)
       expect(flash[:notice]).not_to be_blank
     end
   end
-
 end
