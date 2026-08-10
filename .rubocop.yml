@@ -39,6 +39,12 @@ Metrics/ClassLength:
 Metrics/AbcSize:
   Max: 30
 
+# A rake task is one linear `task ... do` block by nature. Splitting an audit
+# script into methods to satisfy a line count scatters it for no reader's benefit.
+Metrics/BlockLength:
+  Exclude:
+    - 'lib/tasks/**/*.rake'
+
 # Naming conventions - existing code patterns
 Naming/PredicatePrefix:
   Enabled: false
