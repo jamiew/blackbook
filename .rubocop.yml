@@ -16,7 +16,6 @@ AllCops:
     - 'config/**/*'
     - 'Rakefile'
     - 'Gemfile'
-    - 'spec/**/*'  # Skip spec files for now
 
 # Relax some common rules for existing codebase
 Layout/LineLength:

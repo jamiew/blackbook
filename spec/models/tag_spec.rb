@@ -1,47 +1,41 @@
 require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
-
-  before do
-    # FIXME DRY with TagsController specs...
-    # allow_any_instance_of(GmlObject).to receive(:data).and_return(DEFAULT_GML)
-  end
-
   describe 'create' do
-    it 'should succeed w/ valid GML' do
+    it 'succeeds w/ valid GML' do
       expect { FactoryBot.build(:tag, gml: base_gml.to_s) }.not_to raise_error
     end
   end
 
   # Important: point at tempt1's tags correctly
-  it 'should be pointing at fffff.at/tempt1 for remote_images' do
+  it 'is pointing at fffff.at/tempt1 for remote_images' do
     expect(Tag.remote_image_prefix).to eq('http://fffff.at/tempt1/photos/data/eyetags')
   end
 
   # Map some GML headers to database columns
   # Clashing field names are saved into a gml_* namespace
   describe 'reading GML header' do
-    it 'should read header/client/name => gml_application' do
+    it 'reads header/client/name => gml_application' do
       expect(create_tag_with_gml_header(name: 'jdubsatron').gml_application).to eq('jdubsatron')
     end
 
-    it 'should read header/client/username => gml_username' do
+    it 'reads header/client/username => gml_username' do
       expect(create_tag_with_gml_header(username: 'jamiew').gml_username).to eq('jamiew')
     end
 
-    it 'should read header/client/keywords => gml_keywords' do
+    it 'reads header/client/keywords => gml_keywords' do
       expect(create_tag_with_gml_header(keywords: 'tag,phat,fffffat').gml_keywords).to eq('tag,phat,fffffat')
     end
 
-    it 'should read header/client/uniqueKey => gml_uniquekey' do
+    it 'reads header/client/uniqueKey => gml_uniquekey' do
       expect(create_tag_with_gml_header(uniqueKey: '#ff00ff').gml_uniquekey).to eq('#ff00ff')
     end
 
-    it 'should read header/client/filename => remote_image' do
-      expect(create_tag_with_gml_header(filename: 'image007.jpg').remote_image).to eq(Tag.remote_image_prefix+'/image007.jpg')
+    it 'reads header/client/filename => remote_image' do
+      expect(create_tag_with_gml_header(filename: 'image007.jpg').remote_image).to eq(Tag.remote_image_prefix + '/image007.jpg')
     end
 
-    it 'should read header/client/location => location' do
+    it 'reads header/client/location => location' do
       expect(create_tag_with_gml_header(location: 'http://google.com').location).to eq('http://google.com')
     end
   end
@@ -131,18 +125,19 @@ RSpec.describe Tag, type: :model do
       end
 
       # I feel like this should actually return a hash >:|
-      it "should return a string" do
+      it "returns a string" do
         expect(@string.class).to eq(String)
         expect(@string).not_to be_blank
       end
 
-      it "should be valid JSON" do
-        @json.class == Hash
+      it "is valid JSON" do
+        @json.class
+        Hash
         expect(@json.length).to be > 0
         # Check for some fields?
       end
 
-      it "should contain GML data (GSON)" do
+      it "contains GML data (GSON)" do
         expect(@tag.gml_hash).not_to be_blank # Or else there won't be @json['gml']
         expect(@json['gml']).not_to be_blank
       end
@@ -152,22 +147,22 @@ RSpec.describe Tag, type: :model do
       saved_tag = FactoryBot.create(:tag_from_api)
       xml = saved_tag.to_xml
       expect(xml).not_to be_blank
-      expect(xml.to_s).to match(/id/)
+      expect(xml.to_s).to include('id')
     end
 
     it "gml_document should be a valid Nokogiri document" do
       tag = FactoryBot.build(:tag)
       # tag.gml.should_not be_blank
-      allow(tag).to receive(:gml).and_return(DEFAULT_GML) # FIXME use expect() syntax
+      allow(tag).to receive(:gml).and_return(DEFAULT_GML) # FIXME: use expect() syntax
       doc = tag.gml_document
       expect(doc.class).to eq(Nokogiri::XML::Document)
-      expect(doc/'header').not_to be_blank
+      expect(doc / 'header').not_to be_blank
     end
 
     it "gml_hash should output a valid Hash" do
       tag = FactoryBot.build(:tag)
       # tag.gml.should_not be_blank
-      allow(tag).to receive(:gml).and_return(DEFAULT_GML) # FIXME use expect() syntax
+      allow(tag).to receive(:gml).and_return(DEFAULT_GML) # FIXME: use expect() syntax
       expect(tag.gml_hash.class).to eq(Hash)
       expect(tag.gml_hash).not_to be_blank
     end
@@ -179,10 +174,10 @@ RSpec.describe Tag, type: :model do
       tag = Tag.new(data: gml)
       rotated = tag.rotate_gml
 
-      pt = (rotated/'drawing'/'stroke'/'pt').first
+      pt = (rotated / 'drawing' / 'stroke' / 'pt').first
       # x becomes old y (0.75), y becomes 1 - old x (1 - 0.25 = 0.75)
-      expect((pt/'x').text).to eq('0.75')
-      expect((pt/'y').text).to eq('0.75')
+      expect((pt / 'x').text).to eq('0.75')
+      expect((pt / 'y').text).to eq('0.75')
     end
 
     it "rotates multiple points correctly" do
@@ -196,13 +191,13 @@ RSpec.describe Tag, type: :model do
       tag = Tag.new(data: gml)
       rotated = tag.rotate_gml
 
-      pts = (rotated/'drawing'/'stroke'/'pt')
+      pts = (rotated / 'drawing' / 'stroke' / 'pt')
       # Point 1: x=0, y=1 -> x=1, y=1-0=1
-      expect((pts[0]/'x').text).to eq('1')
-      expect((pts[0]/'y').text).to eq('1.0')
+      expect((pts[0] / 'x').text).to eq('1')
+      expect((pts[0] / 'y').text).to eq('1.0')
       # Point 2: x=1, y=0 -> x=0, y=1-1=0
-      expect((pts[1]/'x').text).to eq('0')
-      expect((pts[1]/'y').text).to eq('0.0')
+      expect((pts[1] / 'x').text).to eq('0')
+      expect((pts[1] / 'y').text).to eq('0.0')
     end
 
     it "handles multiple strokes" do
@@ -216,16 +211,16 @@ RSpec.describe Tag, type: :model do
       tag = Tag.new(data: gml)
       rotated = tag.rotate_gml
 
-      strokes = (rotated/'drawing'/'stroke')
+      strokes = (rotated / 'drawing' / 'stroke')
       expect(strokes.length).to eq(2)
 
-      pt1 = (strokes[0]/'pt').first
-      expect((pt1/'x').text).to eq('0.5')
-      expect((pt1/'y').text).to eq('0.5')
+      pt1 = (strokes[0] / 'pt').first
+      expect((pt1 / 'x').text).to eq('0.5')
+      expect((pt1 / 'y').text).to eq('0.5')
 
-      pt2 = (strokes[1]/'pt').first
-      expect((pt2/'x').text).to eq('0.8')
-      expect((pt2/'y').text).to eq('0.8')
+      pt2 = (strokes[1] / 'pt').first
+      expect((pt2 / 'x').text).to eq('0.8')
+      expect((pt2 / 'y').text).to eq('0.8')
     end
 
     it "handles GML with no drawing gracefully" do
@@ -262,42 +257,43 @@ RSpec.describe Tag, type: :model do
     end
   end
 
-
   protected
 
   def base_gml
     {
-      header: {client: {name:'test'} },
-      drawing: { stroke: {pt: [{x:0,y:0,time:0}]} }
+      header: { client: { name: 'test' } },
+      drawing: { stroke: { pt: [{ x: 0, y: 0, time: 0 }] } }
     }
   end
 
   def create_tag_with_gml_header(attrs)
-    merged = base_gml.merge({header: {client: attrs}})
-    return FactoryBot.create(:tag, gml: merged.to_xml)
+    merged = base_gml.merge({ header: { client: attrs } })
+    FactoryBot.create(:tag, gml: merged.to_xml)
   end
 
   describe "GML validation and processing" do
-    let(:valid_gml) { '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>' }
+    let(:valid_gml) do
+      '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>'
+    end
 
     it "accepts valid GML" do
       tag = Tag.new(data: valid_gml)
       tag.validate_gml
-      
+
       expect(tag.validation_results).to be_present
       # Should have some validation results
     end
 
     it "handles malformed XML gracefully" do
       tag = Tag.new(data: '<gml><unclosed_tag>')
-      
+
       expect { tag.validate_gml }.not_to raise_error
     end
 
     it "extracts GML header information" do
       tag = Tag.new(data: valid_gml)
       header = tag.gml_header
-      
+
       expect(header).to be_a(Hash)
       # GML header extraction returns basic info
       expect(header).to be_present
@@ -308,7 +304,7 @@ RSpec.describe Tag, type: :model do
     it "excludes blank attributes from XML output" do
       tag = FactoryBot.create(:tag, title: 'Test', description: nil, location: '')
       xml_output = tag.to_xml
-      
+
       expect(xml_output).to include('title')
       expect(xml_output).not_to include('description')
       expect(xml_output).not_to include('location')
@@ -317,18 +313,20 @@ RSpec.describe Tag, type: :model do
     it "excludes hidden attributes from API output" do
       tag = FactoryBot.create(:tag, ip: '192.168.1.1', remote_secret: 'secret')
       json_output = tag.to_json(except: Tag::HIDDEN_ATTRIBUTES)
-      
+
       expect(json_output).not_to include('192.168.1.1')
       expect(json_output).not_to include('secret')
     end
   end
 
   describe "Size calculation" do
-    let(:valid_gml) { '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>' }
+    let(:valid_gml) do
+      '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>'
+    end
 
     it "calculates size from GML data" do
       tag = FactoryBot.create(:tag, data: valid_gml)
-      
+
       expect(tag.gml_object.size).to eq(valid_gml.length)
     end
   end
@@ -351,7 +349,7 @@ RSpec.describe Tag, type: :model do
     it "finds device tags" do
       device_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123')
       regular_tag = FactoryBot.create(:tag, gml_uniquekey: nil)
-      
+
       expect(Tag.from_device).to include(device_tag)
       expect(Tag.from_device).not_to include(regular_tag)
     end
@@ -360,10 +358,10 @@ RSpec.describe Tag, type: :model do
       user = FactoryBot.create(:user)
       claimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device123', user: user)
       unclaimed_tag = FactoryBot.create(:tag, gml_uniquekey: 'device456', user: nil)
-      
+
       expect(Tag.claimed).to include(claimed_tag)
       expect(Tag.claimed).not_to include(unclaimed_tag)
-      
+
       expect(Tag.unclaimed).to include(unclaimed_tag)
       expect(Tag.unclaimed).not_to include(claimed_tag)
     end

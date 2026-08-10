@@ -2,20 +2,22 @@ require 'rails_helper'
 
 RSpec.describe "Tag Workflow Integration", type: :request do
   let(:user) { FactoryBot.create(:user) }
-  let(:valid_gml) { '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>' }
+  let(:valid_gml) do
+    '<gml><tag><header><environment><name>test</name></environment></header><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>'
+  end
 
   describe "API tag creation workflow" do
     it "creates a tag via API with GML data" do
-      expect {
-        post '/data', params: { 
+      expect do
+        post '/data', params: {
           gml: valid_gml,
           application: 'TestApp',
           location: 'San Francisco'
         }
-      }.to change(Tag, :count).by(1)
-      
+      end.to change(Tag, :count).by(1)
+
       expect(response).to be_successful
-      
+
       tag = Tag.last
       expect(tag.application).to eq('TestApp')
       expect(tag.location).to eq('San Francisco')
@@ -24,7 +26,7 @@ RSpec.describe "Tag Workflow Integration", type: :request do
 
     it "handles API errors gracefully" do
       post '/data', params: { invalid: 'data' }
-      
+
       expect(response).to have_http_status(422)
       expect(response.body).to include('Error')
     end
@@ -37,8 +39,8 @@ RSpec.describe "Tag Workflow Integration", type: :request do
     end
 
     it "creates a tag via web form" do
-      expect {
-        post '/data', params: { 
+      expect do
+        post '/data', params: {
           tag: {
             gml: valid_gml,
             application: 'WebApp',
@@ -46,8 +48,8 @@ RSpec.describe "Tag Workflow Integration", type: :request do
             user: user
           }
         }
-      }.to change(Tag, :count).by(1)
-      
+      end.to change(Tag, :count).by(1)
+
       tag = Tag.last
       expect(tag.application).to eq('WebApp')
       expect(tag.description).to eq('Test tag from web')
@@ -60,24 +62,24 @@ RSpec.describe "Tag Workflow Integration", type: :request do
 
     it "shows tag in HTML format" do
       get "/data/#{tag.id}"
-      
+
       expect(response).to be_successful
       expect(response.content_type).to include('text/html')
     end
 
     it "shows tag in JSON format" do
       get "/data/#{tag.id}.json"
-      
+
       expect(response).to be_successful
       expect(response.content_type).to include('application/json')
-      
+
       json = JSON.parse(response.body)
       expect(json['id']).to eq(tag.id)
     end
 
     it "shows tag in GML format" do
       get "/data/#{tag.id}.gml"
-      
+
       expect(response).to be_successful
       expect(response.content_type).to include('application/xml')
       expect(response.body).to include('<gml>')
@@ -85,7 +87,7 @@ RSpec.describe "Tag Workflow Integration", type: :request do
 
     it "handles missing tags gracefully" do
       get "/data/999999"
-      
+
       expect(response).to have_http_status(404)
     end
   end
