@@ -45,7 +45,7 @@
     %p.controls
       = link_to 'Edit', edit_visualization_path
       |
-      = link_to 'Delete', visualization_path, confirm: 'Are you sure?', method: :delete
+      = link_to 'Delete', visualization_path, method: :delete, data: { confirm: 'Are you sure?' }
 
   - if is_admin?
     %p
@@ -54,7 +54,7 @@
         = link_to @visualization.approver.login, user_path(@visualization.approver)
         @
         = @visualization.approved_at
-        = link_to 'Unapprove', unapprove_visualization_path, confirm: 'Are you sure?', method: :put
+        = link_to 'Unapprove', unapprove_visualization_path, method: :put, data: { confirm: 'Are you sure?' }
       - else
         Unapproved.
         = link_to 'Approve', approve_visualization_path, method: :put

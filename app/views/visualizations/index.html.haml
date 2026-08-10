@@ -39,12 +39,12 @@
         %td.admin= app.approved? ? 'Approved' : 'Pending'
         %td.admin.controls
           - if app.approved?
-            = link_to 'unapprove', unapprove_visualization_path(app), method: :put, confirm: 'Are you sure?'
+            = link_to 'unapprove', unapprove_visualization_path(app), method: :put, data: { confirm: 'Are you sure?' }
           - else
-            = link_to 'approve', approve_visualization_path(app), method: :put, confirm: 'Are you sure?'
+            = link_to 'approve', approve_visualization_path(app), method: :put, data: { confirm: 'Are you sure?' }
           %br
           = link_to 'edit', edit_visualization_path(app)
-          = link_to 'delete', visualization_path(app), method: :delete, confirm: "Are you sure?", class: 'delete'
+          = link_to 'delete', visualization_path(app), method: :delete, class: 'delete', data: { confirm: "Are you sure?" }
 
 %p= pagination(@visualizations)
 
