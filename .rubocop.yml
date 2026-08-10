@@ -16,7 +16,6 @@ AllCops:
     - 'config/**/*'
     - 'Rakefile'
     - 'Gemfile'
-    - 'spec/**/*'  # Skip spec files for now
 
 # Relax some common rules for existing codebase
 Layout/LineLength:
@@ -74,6 +73,11 @@ Rails/OutputSafety:
   Enabled: false
 
 # RSpec specific
+# The suite consistently sets up in `before` blocks and reads @tag/@user/@json in the
+# examples. Converting ~77 of those to `let` is churn, not clarity.
+RSpec/InstanceVariable:
+  Enabled: false
+
 RSpec/ExampleLength:
   Max: 20
 

@@ -56,7 +56,7 @@ describe ApplicationController do
 
     it "validates per_page parameter" do
       get :index
-      expect(assigns(:per_page)).to eq(20)  # default
+      expect(assigns(:per_page)).to eq(20) # default
     end
 
     it "accepts valid per_page from params" do
@@ -66,12 +66,12 @@ describe ApplicationController do
 
     it "enforces max_per_page limit" do
       get :index, params: { per_page: "1000" }
-      expect(assigns(:per_page)).to eq(100)  # capped at max_per_page
+      expect(assigns(:per_page)).to eq(100) # capped at max_per_page
     end
 
     it "handles malicious per_page values" do
       get :index, params: { per_page: "'; DROP TABLE users; --" }
-      expect(assigns(:per_page)).to eq(20)  # falls back to default
+      expect(assigns(:per_page)).to eq(20) # falls back to default
     end
   end
 end
