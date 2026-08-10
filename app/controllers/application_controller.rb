@@ -8,7 +8,6 @@ class ApplicationController < ActionController::Base
   # protect_from_forgery
 
   # before_action :activate_authlogic
-  before_action :set_format
 
   rescue_from NoPermissionError, with: :permission_denied
 
@@ -133,26 +132,6 @@ class ApplicationController < ActionController::Base
       redirect_to(session[:return_to], opts)
       session[:return_to] = nil
     end
-  end
-
-  # Set XHR as a totally differnet response format than HTML
-  # We don't want to override .js, we use that for actual javascript
-  # FIXME probably no longer applies
-  def set_format
-    # @template.template_format = 'html'
-    request.format = :xhr if request.xhr?
-  end
-
-  # Render XHR without :layout by default
-  def render(*args)
-    if request.xhr?
-      if args.blank?
-        return super(layout: false)
-      elsif args.first.is_a?(Hash) && args.first[:layout].blank?
-        args.first[:layout] = false
-      end
-    end
-    super
   end
 
   # Request params stripped of internal route info

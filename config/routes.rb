@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     member do
       post :thumbnail
       put :thumbnail
+      get :validate
     end
   end
   post '/tags' => 'tags#create' # backwards-compatibility
