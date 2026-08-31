@@ -10,8 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
-  create_table "favorites", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_233000) do
+  create_table "favorites", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "object_id"
     t.string "object_type"
@@ -21,7 +21,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
     t.index ["user_id", "object_id", "object_type"], name: "index_favorites_unique_on_user_and_object", unique: true
   end
 
-  create_table "likes", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "likes", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "object_id"
     t.string "object_type"
@@ -30,7 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
     t.index ["user_id", "object_id", "object_type"], name: "index_likes_unique_on_user_and_object", unique: true
   end
 
-  create_table "notifications", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "notifications", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.string "subject_id"
     t.string "subject_type"
@@ -42,13 +42,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
-  create_table "tags", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "tags", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "application"
     t.string "author"
     t.string "cached_tag_list"
     t.integer "comment_count"
     t.datetime "created_at", precision: nil
-    t.text "description", size: :medium
+    t.text "description", size: :long
     t.string "gml_application"
     t.string "gml_keywords"
     t.string "gml_uniquekey"
@@ -71,8 +71,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
     t.string "uuid"
   end
 
-  create_table "users", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.text "about", size: :medium
+  create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.text "about", size: :long
     t.boolean "admin"
     t.datetime "created_at", precision: nil
     t.string "crypted_password", null: false
@@ -106,12 +106,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
     t.index ["persistence_token"], name: "index_users_on_persistence_token"
   end
 
-  create_table "visualizations", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "visualizations", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "approved_at", precision: nil
     t.integer "approved_by"
     t.string "authors"
     t.datetime "created_at", precision: nil
-    t.text "description", size: :medium
+    t.text "description", size: :long
     t.string "download"
     t.string "embed_callback"
     t.text "embed_code", size: :long

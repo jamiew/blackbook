@@ -1,6 +1,11 @@
 default: &default
   adapter: mysql2
-  encoding: utf8
+  # `utf8` is MySQL's alias for utf8mb3, which cannot carry 4-byte characters.
+  # Leaving it here would defeat the utf8mb4 tables: the connection itself
+  # would still refuse emoji. Collation is pinned so a freshly created dev or
+  # test database compares strings the same way production does.
+  encoding: utf8mb4
+  collation: utf8mb4_unicode_ci
   pool: 5
   host: 127.0.0.1
 
