@@ -27,3 +27,14 @@ test:
 production:
   <<: *default
   url: <%= ENV['DATABASE_URL'] %>
+  # MySQL 8.4 generates a self-signed certificate on install and offers TLS by
+  # default. The client library here is MariaDB's, because Debian ships no
+  # other, and it verifies that chain, so every connection was refused with
+  # "self-signed certificate in certificate chain". The app reaches MySQL on
+  # the same machine over Docker's own bridge, so this traffic never touches a
+  # network anyone else is on.
+  ssl_mode: disabled
+  # Keys the URL does not set survive the merge. Without a timeout an
+  # unreachable database hangs each request until the OS gives up, which reads
+  # as a slow app rather than as a database it cannot reach.
+  connect_timeout: 5
