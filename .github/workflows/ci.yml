@@ -204,10 +204,18 @@ jobs:
               echo "tcp reachable on 3306:"
               docker exec "$c" timeout 8 bash -c "cat < /dev/null > /dev/tcp/host.docker.internal/3306" \
                 && echo "  yes" || echo "  no"
-              echo "activerecord says:"
-              docker exec "$c" timeout 40 bin/rails runner \
-                "begin; puts ActiveRecord::Base.connection.select_value(%q{SELECT VERSION()}); \
-                 rescue => e; puts \"#{e.class}: #{e.message.lines.first}\"; end" 2>&1 | tail -3
+              # The Rails runner just hangs, which tells us nothing. The mysql
+              # client with an explicit connect timeout returns the actual
+              # error. Credentials come from DATABASE_URL inside the container
+              # and are never printed.
+              echo "mysql client says:"
+              docker exec "$c" bash -c '"'"'
+                eval "$(ruby -ruri -e "u=URI(ENV[%q{DATABASE_URL}]); \
+                  puts %Q{U=#{u.user}\nH=#{u.host}\nD=#{u.path.delete_prefix(%q{/})}\nP=#{u.password}}")"
+                echo "  connecting as $U to $H/$D"
+                MYSQL_PWD="$P" timeout 20 mysql --connect-timeout=5 -h "$H" -u "$U" -D "$D" \
+                  -e "SELECT VERSION()" 2>&1 | tail -3
+              '"'"'
             '
             echo "--- app logs ---"
             ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" \
