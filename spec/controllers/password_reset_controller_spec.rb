@@ -42,7 +42,7 @@ describe PasswordResetController do
         @user.reload
       end.to change(@user, :password_digest)
       expect(flash[:notice]).not_to be_blank
-      expect(response).to redirect_to(user_path)
+      expect(response).to redirect_to("/login")
     end
 
     it "does not change password given a valid token and non-matching passwords" do
@@ -64,6 +64,40 @@ describe PasswordResetController do
       end.not_to change(@user, :password_digest)
     end
 
+    # Both of these once saved and reported success; the second permanently
+    # locked the account out of bcrypt. See PasswordResetController#update.
+    it "rejects a blank password instead of reporting success" do
+      expect do
+        post :update, params: { id: @user.generate_token_for(:password_reset), user: {
+          password: '', password_confirmation: ''
+        } }
+        @user.reload
+      end.not_to change(@user, :password_digest)
+      expect(flash[:notice]).to be_blank
+      expect(response).not_to be_redirect
+    end
+
+    it "does not wipe the digest when no password is submitted at all" do
+      expect do
+        post :update, params: { id: @user.generate_token_for(:password_reset), user: {
+          password_confirmation: 'anything'
+        } }
+        @user.reload
+      end.not_to change(@user, :password_digest)
+      expect(@user.password_digest).to be_present
+    end
+
+    # The token is signed but not encrypted and carries its payload as readable
+    # JSON, so whatever the generates_token_for block returns is public.
+    it "keeps password hash material out of the reset token" do
+      token = @user.generate_token_for(:password_reset)
+      payload = JSON.parse(Base64.urlsafe_decode64(token.split("--").first))["_rails"]["data"]
+
+      expect(payload.first).to eq(@user.id)
+      expect(payload.last).not_to include(@user.password_digest.last(10))
+      expect(payload.last).to match(/\A\h{10}\z/)
+    end
+
     it "emails the user that password was reset" do
       # Currently this feature is not implemented - just test that password reset works
       old_password = @user.password_digest
@@ -74,7 +108,7 @@ describe PasswordResetController do
 
       @user.reload
       expect(@user.password_digest).not_to eq(old_password)
-      expect(response).to redirect_to(user_path)
+      expect(response).to redirect_to("/login")
 
       # Password reset works correctly (email notification could be added later)
     end

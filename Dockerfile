@@ -52,24 +52,23 @@ RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 # ---- final stage -------------------------------------------------------
 FROM base
 
-# Runtime libraries only. imagemagick is here because kt-paperclip shells out
-# to it for every uploaded image.
+# Runtime libraries only. imagemagick is here because variant_processor is
+# :mini_magick, which shells out to it for every Active Storage variant.
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
-      curl imagemagick libvips42 default-mysql-client libjemalloc2 && \
+      curl imagemagick default-mysql-client libjemalloc2 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 
-# Non-root, and it owns only what it needs to write at runtime. There is no
-# storage/ because this app uses Paperclip rather than Active Storage; data/
-# and public/system are bind mounts from the block volume at runtime, and are
-# created here so their ownership is right before anything mounts over them.
+# Non-root, and it owns only what it needs to write at runtime. storage/, data/
+# and public/system are bind mounts from the block volume, created here so
+# their ownership is right before anything mounts over them.
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    mkdir -p db log tmp data public/system && \
-    chown -R rails:rails db log tmp data public/system
+    mkdir -p db log tmp data storage public/system && \
+    chown -R rails:rails db log tmp data storage public/system
 USER 1000:1000
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]

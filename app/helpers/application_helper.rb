@@ -10,6 +10,10 @@ module ApplicationHelper
     return default_attachment_url(record, name, style) unless attachment.attached?
 
     url_for(attachment.variant(style))
+  rescue ActiveStorage::InvariableError
+    # The corpus holds zero-byte and truncated images, which Marcel types as
+    # application/octet-stream. Without this one bad row 500s a whole index.
+    default_attachment_url(record, name, style)
   end
 
   def default_attachment_url(record, name, style)
@@ -23,10 +27,6 @@ module ApplicationHelper
 
   def tag_thumbnail_url(tag, style = :medium)
     tag.remote_thumbnail_url || attachment_url(tag, :image, style)
-  end
-
-  def attachment_attached?(record, name)
-    record.public_send(name).attached?
   end
 
   def html_attrs(lang = 'en-US')
