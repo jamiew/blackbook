@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
   create_table "favorites", id: :integer, charset: "utf8mb3", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "object_id"
@@ -69,6 +69,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_04_175129) do
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
     t.string "uuid"
+    t.index ["application"], name: "index_tags_on_application"
+    t.index ["created_at"], name: "index_tags_on_created_at"
+    t.index ["gml_application"], name: "index_tags_on_gml_application"
+    t.index ["gml_uniquekey"], name: "index_tags_on_gml_uniquekey"
+    t.index ["user_id", "created_at"], name: "index_tags_on_user_id_and_created_at"
   end
 
   create_table "users", id: :integer, charset: "utf8mb3", force: :cascade do |t|
