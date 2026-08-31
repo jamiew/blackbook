@@ -22,6 +22,11 @@ Rails.application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
+  # Without this the suite writes through the default file store in tmp/cache,
+  # which development shares. Tag ids collide between the two databases, so a
+  # test run could leave the dev site serving another tag's parsed GML.
+  config.cache_store = :null_store
+
   # Render the real error page for exceptions that map to a status code (e.g.
   # RecordNotFound -> 404) and raise everything else.
   config.action_dispatch.show_exceptions = :rescuable
