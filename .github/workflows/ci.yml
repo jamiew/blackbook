@@ -134,6 +134,8 @@ jobs:
               [ "$code" = "200" ] && break
               sleep 5
             done
+            echo "--- mount ownership, app runs as uid 1000 ---"
+            docker exec probe sh -c "ls -ldn /rails/data /rails/public/system /rails/storage" 2>&1 | head -4 || true
             echo "--- listening inside the container ---"
             docker exec probe sh -c "(ss -lntp || netstat -lntp) 2>/dev/null | head -6" || true
             echo "--- container status ---"
