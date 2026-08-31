@@ -28,10 +28,15 @@ gem 'authlogic', require: false
 # API/Controllers
 gem 'responders', '~> 3.0'
 
-# File uploads. Active Storage is the destination; kt-paperclip stays only
-# until every attachment has been backfilled. See lib/tasks/active_storage.rake.
-gem 'image_processing', '~> 1.2'
-gem 'kt-paperclip'
+# File uploads. Active Storage handles attachments; kt-paperclip is gone, and
+# with it the pin holding marcel at 1.x. The *_file_name columns stay until the
+# backfill has run everywhere. See lib/active_storage_backfill.rb.
+gem 'image_processing', '~> 2.0'
+# image_processing 2.x stopped depending on mini_magick, so declaring it here is
+# what keeps config.active_storage.variant_processor = :mini_magick working on a
+# clean bundle install. Without it variants fail in the container but not on a
+# laptop that still has the gem lying around from 1.x.
+gem 'mini_magick'
 
 # Utilities
 gem 'nokogiri', '~> 1.15'

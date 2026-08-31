@@ -26,9 +26,8 @@ class Tag < ApplicationRecord
   # RAND() is MySQL-specific; postgres/sqlite want RANDOM()
   scope :in_random_order, -> { order(Arel.sql('RAND()')) }
 
-  # validates_attachment_presence :image
-  # validates_attachment :image, content_type: { content_type: ["image/jpg", "image/jpeg", "image/png", "image/gif"] }
-  do_not_validate_attachment_file_type :image
+  # Tag images arrive from GMLImageRenderer rather than a user upload, and were
+  # deliberately exempt from filetype validation under Paperclip too.
   # Variant names and geometry match the Paperclip styles they replace, so a
   # backfilled image renders identically. resize_to_limit is Paperclip's ">"
   # (shrink only, keep aspect); resize_to_fill is its "#" (crop to exact size).
