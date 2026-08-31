@@ -1,0 +1,33 @@
+# Services pinned to what the servers actually run, so local testing and CI
+# behave the same way production does.
+#
+# The app itself is NOT here on purpose. It runs natively via bundle, which is
+# faster on macOS than syncing source into a Linux VM. This file exists to fix
+# the one thing native development gets wrong: your Homebrew MySQL is a
+# different major version from the server, and that is exactly where migration
+# bugs hide.
+#
+#   docker compose up -d          start MySQL 8.4
+#   docker compose down -v        stop it and delete its data
+#
+# Port 13306 avoids a fight with a Homebrew MySQL already on 3306.
+#
+services:
+  mysql:
+    # Pinned to beta's version. Check with: ssh root@<beta> 'mysql --version'
+    image: mysql:8.4
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: blackbook_test
+    ports:
+      - "13306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

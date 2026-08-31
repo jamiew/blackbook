@@ -8,8 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        # match to the mysql version we're using in production
-        image: mysql:5.7
+        # Match the server. Keep this, compose.yaml and the server in step:
+        # testing against a different major version is how the utf8mb3 and
+        # MyISAM index-limit problems went unnoticed for so long.
+        image: mysql:8.4
         env:
           MYSQL_HOST: 127.0.0.1
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
