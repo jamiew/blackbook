@@ -129,6 +129,16 @@ jobs:
           ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
             old=$(docker ps -aq --filter "name=blackbook-web" | head -1)
             [ -z "$old" ] && { echo "no app container found"; exit 0; }
+            # The probe is attached to the kamal network by hand. If the real
+            # container is not, kamal-proxy cannot reach it however healthy the
+            # app is.
+            echo "=== the container Kamal actually deployed ==="
+            docker inspect -f "networks: {{range \$k, \$v := .NetworkSettings.Networks}}{{\$k}} {{end}}" "$old"
+            docker inspect -f "state: {{.State.Status}} exit={{.State.ExitCode}}" "$old"
+            echo "=== did it ever receive a /up request? ==="
+            docker logs "$old" 2>&1 | grep -c "/up" || echo "0 requests logged"
+            echo "=== kamal-proxy networks ==="
+            docker inspect -f "{{range \$k, \$v := .NetworkSettings.Networks}}{{\$k}} {{end}}" kamal-proxy 2>/dev/null || true
             img=$(docker inspect -f "{{.Config.Image}}" "$old")
             docker inspect -f "{{range .Config.Env}}{{println .}}{{end}}" "$old" > /root/probe.env
             docker rm -f probe >/dev/null 2>&1 || true
