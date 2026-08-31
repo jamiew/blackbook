@@ -5,6 +5,10 @@ gem 'rails', '~> 8.1.0'
 gem 'mysql2'
 gem 'puma', '~> 8.0'
 
+# Serves assets and handles compression and caching in front of Puma, inside
+# the container. It is what removes the need for nginx to serve static files.
+gem 'thruster', require: false
+
 # Assets
 gem 'propshaft'
 
@@ -49,4 +53,6 @@ end
 
 group :development do
   gem 'ruby-lsp', require: false
+  # Deploys the container. See config/deploy.yml.
+  gem 'kamal', require: false
 end

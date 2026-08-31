@@ -40,10 +40,16 @@ This application has been updated to **Rails 8.1.3.1** and **Ruby 3.4.5** for mo
 
 - **Ruby 3.4+** (see `.ruby-version`)
 - **Rails 8.1+**
-- **MySQL 5.7+** or **MySQL 8.0+**
+- **MySQL 8.4** (see `compose.yaml`)
 - **Bundler 2.0+**
+- **Docker**, for the pinned MySQL and the migration rehearsal
 
 Assets are served by Propshaft, so there is no Node.js or yarn build step.
+
+The app runs natively rather than in a container, which is faster on macOS.
+Only MySQL is containerized, pinned in `compose.yaml` to the version the server
+runs. CI pins the same version. Testing against a different major version is
+what let the utf8mb3 and MyISAM problems sit unnoticed.
 
 ## Getting Started
 
@@ -105,6 +111,21 @@ bin/rails server
 
 # Visit: http://localhost:3000
 ```
+
+## Testing Migrations
+
+The test database is built from `schema.rb`, so it has never looked like
+production, which is still MyISAM and utf8mb3. Migrations that pass the suite
+can still fail or corrupt data there.
+
+```bash
+./script/rehearse-migrations.sh
+```
+
+This pulls production's table definitions (schema only, never any rows), loads
+them into a throwaway MySQL 8.4 database, seeds the duplicate users that decide
+which branch `AddMissingUniqueIndexes` takes, and runs every pending migration.
+Run it before applying migrations to a real server.
 
 ## Data Storage
 
