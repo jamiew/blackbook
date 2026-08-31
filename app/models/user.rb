@@ -72,10 +72,11 @@ class User < ApplicationRecord
   }
   # TODO: email regex validation
 
-  has_attached_file :photo,
-                    styles: { medium: "300x300>", small: "100x100#", tiny: '32x32#' },
-                    path: ":rails_root/public/system/photos/:id/:style/:filename",
-                    url: "/system/photos/:id/:style/:filename"
+  has_one_attached :photo do |attachable|
+    attachable.variant :medium, resize_to_limit: [300, 300]
+    attachable.variant :small,  resize_to_fill:  [100, 100]
+    attachable.variant :tiny,   resize_to_fill:  [32, 32]
+  end
 
   after_create  :create_notification
   after_save    :activate_device_pairing

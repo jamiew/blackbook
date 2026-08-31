@@ -1,0 +1,17 @@
+# Local disk in every environment. There is no S3 and no cloud bucket; images
+# have always lived on the block volume next to the GML files, and Active
+# Storage keeps that arrangement.
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# The volume is mounted at /mnt/blackbook_volume on the server and bind-mounted
+# into the container. ACTIVE_STORAGE_ROOT lets the container point at it
+# without the path being baked into the image.
+production:
+  service: Disk
+  root: <%= ENV.fetch("ACTIVE_STORAGE_ROOT", "/rails/storage") %>

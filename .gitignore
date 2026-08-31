@@ -19,3 +19,7 @@ public/system
 # These variants are where literal values go, so they never are.
 /.kamal/secrets-common
 /.kamal/secrets.*
+
+# Active Storage local disk service
+/storage/*
+!/storage/.keep

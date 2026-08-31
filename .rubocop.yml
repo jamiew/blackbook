@@ -79,6 +79,13 @@ Rails/I18nLocaleTexts:
 Rails/OutputSafety:
   Enabled: false
 
+Rails/Output:
+  # These are rake-task code whose entire job is printing a report to a human
+  # running it. Sending that to the logger would hide it.
+  Exclude:
+    - 'lib/active_storage_backfill.rb'
+    - 'lib/tasks/**/*.rake'
+
 # RSpec specific
 # The suite consistently sets up in `before` blocks and reads @tag/@user/@json in the
 # examples. Converting ~77 of those to `let` is churn, not clarity.

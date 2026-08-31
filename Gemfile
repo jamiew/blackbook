@@ -28,7 +28,9 @@ gem 'authlogic', require: false
 # API/Controllers
 gem 'responders', '~> 3.0'
 
-# File uploads
+# File uploads. Active Storage is the destination; kt-paperclip stays only
+# until every attachment has been backfilled. See lib/tasks/active_storage.rake.
+gem 'image_processing', '~> 1.2'
 gem 'kt-paperclip'
 
 # Utilities
