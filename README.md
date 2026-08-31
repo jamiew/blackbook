@@ -64,13 +64,12 @@ bundle install
 ### 2. Database Setup
 
 ```bash
-# Create and migrate database
-bin/rails db:create
-bin/rails db:migrate
-
-# Optional: Load sample data
-bin/rails db:seed
+# Starts the pinned MySQL 8.4, then creates and migrates both databases
+docker compose up -d
+bin/rails db:prepare
 ```
+
+Development, test and CI all use that MySQL, so they match the server.
 
 ### 3. Credentials Configuration
 
@@ -90,18 +89,13 @@ bin/rails credentials:edit
 ```yaml
 # Available in credentials:
 secret_key_base: [automatically generated]
-
-# Optional AWS configuration (for S3 storage):
-aws:
-  access_key_id: your_access_key
-  secret_access_key: your_secret_key
 ```
 
+Uploads are stored on disk under `public/system`. There is no S3 storage.
+
 #### Environment Variables
-Some configuration can also be set via environment variables:
-- `S3_BUCKET` - AWS S3 bucket name for file storage
-- `AWS_ACCESS_KEY_ID` - AWS access key (alternative to credentials)  
-- `AWS_SECRET_ACCESS_KEY` - AWS secret key (alternative to credentials)
+See `.env.example`. `MYSQL_PORT` picks the database server, defaulting to the
+one in `compose.yaml`.
 
 ### 4. Start the Application
 
@@ -160,9 +154,6 @@ bin/rails data:validate
 ```bash
 # Find tags with missing data
 bin/rails tags:find_missing_data
-
-# Clean up spam users
-bin/rails cleanup_spam
 ```
 
 `tags:delete_missing_data` permanently destroys tags and requires
@@ -220,8 +211,10 @@ This app was upgraded from Rails 4.2 to Rails 8.1. Major changes include:
 
 **Database Connection**
 ```bash
-# config/database.yml is checked in; it reads MYSQL_PASSWORD and DATABASE_URL from the env
-bin/rails db:create
+# config/database.yml is checked in. It defaults to the MySQL in compose.yaml;
+# MYSQL_PORT and MYSQL_PASSWORD override it, and production reads DATABASE_URL.
+docker compose up -d
+bin/rails db:prepare
 ```
 
 **Asset Issues**
