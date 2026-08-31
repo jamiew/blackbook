@@ -1,5 +1,7 @@
 class FavoritesController < ApplicationController
-  before_action :require_user, only: %i[create update destroy]
+  # index included: it reads current_user.favorites, so an anonymous request
+  # raised NoMethodError on nil and returned a 500 rather than a login redirect.
+  before_action :require_user, only: %i[index create update destroy]
 
   def index
     @user = current_user

@@ -19,15 +19,13 @@ describe UserSessionsController do
     end
 
     it "redirects for a logged in user on :new" do
-      activate_authlogic
-      UserSession.create(FactoryBot.create(:user))
+      login_as_user(FactoryBot.create(:user))
       get :new
       expect(response).to be_redirect
     end
 
     it "redirects for a logged in user on :create" do
-      activate_authlogic
-      UserSession.create(FactoryBot.create(:user))
+      login_as_user(FactoryBot.create(:user))
       get :create
       expect(response).to be_redirect
     end
@@ -35,8 +33,7 @@ describe UserSessionsController do
 
   describe "actions requiring a current user" do
     it "redirects to login on GET :destroy" do
-      activate_authlogic
-      UserSession.create(FactoryBot.create(:user))
+      login_as_user(FactoryBot.create(:user))
       get :destroy
       expect(response).to redirect_to(login_path)
     end
@@ -76,8 +73,7 @@ describe UserSessionsController do
 
   describe "POST #destroy" do
     it "works if logged-in" do
-      activate_authlogic
-      UserSession.create(FactoryBot.create(:user))
+      login_as_user(FactoryBot.create(:user))
       post :destroy
       expect(flash[:notice]).to include('Logout successful')
       expect(current_user).to be_nil

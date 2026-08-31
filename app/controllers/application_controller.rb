@@ -1,7 +1,7 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
-  helper_method :current_user_session, :current_user, :page_title, :set_page_title
+  helper_method :current_user, :page_title, :set_page_title
 
   # Don't show raw GML in the logs
   # filter_parameter_logging :password, :password_confirmation, :gml, :data
@@ -55,11 +55,25 @@ class ApplicationController < ActionController::Base
   private
 
   def current_user
-    @current_user ||= current_user_session&.record
+    return @current_user if defined?(@current_user)
+
+    @current_user = session[:user_id] && User.find_by(id: session[:user_id])
   end
 
-  def current_user_session
-    @current_user_session ||= UserSession.find
+  def log_in(user)
+    # Rotating the session id makes a session fixated before login useless.
+    # It also empties the session, so carry return_to across by hand or
+    # redirect_back_or_default sends everyone to the default instead.
+    return_to = session[:return_to]
+    reset_session
+    session[:return_to] = return_to if return_to.present?
+    session[:user_id] = user.id
+    @current_user = user
+  end
+
+  def log_out
+    reset_session
+    @current_user = nil
   end
 
   def logged_in?

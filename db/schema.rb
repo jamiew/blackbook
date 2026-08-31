@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_233000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_31_011000) do
   create_table "favorites", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "object_id"
@@ -75,7 +75,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_233000) do
     t.text "about", size: :long
     t.boolean "admin"
     t.datetime "created_at", precision: nil
-    t.string "crypted_password", null: false
+    t.string "crypted_password"
     t.datetime "current_login_at", precision: nil
     t.string "current_login_ip"
     t.string "email", default: "", null: false
@@ -87,9 +87,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_233000) do
     t.string "login", null: false
     t.integer "login_count", default: 0, null: false
     t.string "name"
-    t.string "password_salt", null: false
+    t.string "password_digest"
+    t.string "password_salt"
     t.string "perishable_token", default: "", null: false
-    t.string "persistence_token", null: false
+    t.string "persistence_token"
     t.string "photo_content_type"
     t.string "photo_file_name"
     t.integer "photo_file_size"

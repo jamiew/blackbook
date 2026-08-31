@@ -18,9 +18,12 @@ gem 'bootsnap', require: false
 # Frontend
 gem 'haml'
 
-# Auth
-gem 'authlogic'
+# Auth. bcrypt backs has_secure_password; scrypt stays to verify the hashes
+# Authlogic wrote, which cannot be converted. See User#authenticate_legacy_scrypt.
+gem 'bcrypt', '~> 3.1'
 gem 'scrypt', '~> 3.0'
+# Still here only so the specs can build a real Authlogic hash to test against.
+gem 'authlogic', require: false
 
 # API/Controllers
 gem 'responders', '~> 3.0'
