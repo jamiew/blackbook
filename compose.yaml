@@ -16,6 +16,11 @@ services:
   mysql:
     # Pinned to beta's version. Check with: ssh root@<beta> 'mysql --version'
     image: mysql:8.4
+    # Without this the server default is utf8mb4_0900_ai_ci, so anything not
+    # created by Rails, including MYSQL_DATABASE below and the rehearsal
+    # database, compares strings differently from production. Tests silently
+    # stop matching the thing they are meant to be testing.
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: blackbook_test

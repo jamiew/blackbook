@@ -46,7 +46,9 @@ jobs:
         env:
           RAILS_ENV: test
           MYSQL_PASSWORD: ""
-          DATABASE_URL: mysql2://127.0.0.1:${{ job.services.mysql.ports[3306] }}/blackbook_test
+          # Same knob developers use locally, rather than a second way of
+          # spelling the connection that can drift from database.yml.
+          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
         run: |
           bundle exec rake db:create
           bundle exec rake db:schema:load --trace
