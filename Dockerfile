@@ -12,6 +12,10 @@
 ARG RUBY_VERSION=3.4.5
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
+# Links the package to the repo on ghcr.io, which is what lets a workflow's
+# GITHUB_TOKEN push to it without a personal access token.
+LABEL org.opencontainers.image.source="https://github.com/jamiew/blackbook"
+
 WORKDIR /rails
 
 # Thruster serves assets and terminates HTTP inside the container, so no nginx
