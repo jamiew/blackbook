@@ -57,9 +57,13 @@ env:
     # in-container default, every uploaded and backfilled image would be written
     # to the container's own filesystem and lost on the next deploy.
     ACTIVE_STORAGE_ROOT: /rails/storage
+    # Beta gate, replacing the nginx one that kamal-proxy displaces. Remove both
+    # this and BETA_AUTH_PASSWORD to make the site public.
+    BETA_AUTH_USER: blackbook
   secret:
     - RAILS_MASTER_KEY
     - DATABASE_URL
+    - BETA_AUTH_PASSWORD
 
 volumes:
   # The GML files and uploaded images live on the block volume and must outlive

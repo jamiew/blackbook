@@ -9,6 +9,21 @@ class ApplicationController < ActionController::Base
 
   # before_action :activate_authlogic
 
+  # Beta gate. Lives here rather than in nginx because kamal-proxy owns ports
+  # 80 and 443 and has no basic auth of its own. Set both env vars to enable it;
+  # unset, the site is open, which is what production wants.
+  #
+  # /up is unaffected because Rails::HealthController descends from
+  # ActionController::Base, not from here. That matters: kamal-proxy polls it to
+  # decide whether a container is healthy, and a 401 there would mean no deploy
+  # ever completes.
+  if ENV["BETA_AUTH_USER"].present? && ENV["BETA_AUTH_PASSWORD"].present?
+    http_basic_authenticate_with(
+      name: ENV.fetch("BETA_AUTH_USER"),
+      password: ENV.fetch("BETA_AUTH_PASSWORD")
+    )
+  end
+
   rescue_from NoPermissionError, with: :permission_denied
 
   # Oink object debugging in dev
