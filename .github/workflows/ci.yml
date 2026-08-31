@@ -131,6 +131,15 @@ jobs:
               ufw status | grep -q "3306.*$net" || ufw allow from "$net" to any port 3306 proto tcp >/dev/null
             done
 
+            # The grant was for 172.17.% while the app connects from the kamal
+            # network at 172.18.x, so MySQL refused it. RENAME USER widens the
+            # host without needing to know the password, and carries the
+            # existing privileges across.
+            if mysql -N -e "SELECT 1 FROM mysql.user WHERE user=\"blackbook\" AND host=\"172.17.%\"" | grep -q 1; then
+              mysql -e "RENAME USER \"blackbook\"@\"172.17.%\" TO \"blackbook\"@\"172.%\"" && echo "widened grant to 172.%"
+            fi
+            mysql -N -e "SELECT CONCAT(\"grant: \", user, \"@\", host) FROM mysql.user WHERE user=\"blackbook\""
+
             # Bind to every docker bridge that exists, not just docker0.
             binds=$(ip -4 -o addr show | awk "/172\.1[78]\./ {split(\$4,a,\"/\"); printf \"%s,\", a[1]}")
             want="127.0.0.1,${binds%,}"
