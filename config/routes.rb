@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  # Kamal will not send traffic to a container that fails this, so a broken
+  # boot stops at the proxy instead of reaching anyone.
+  get '/up', to: 'rails/health#show', as: :rails_health_check
+
   # Old/bad URLs to send to /dev/null
   # TODO handle inside nginx or similar instead! Yeesh
   get '/temp.png', controller: 'home', action: 'discard', as: 'discard_temp_png'

@@ -31,6 +31,12 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
+  # The health check is the one thing that must answer over plain HTTP. Kamal's
+  # proxy polls it on the container directly, without X-Forwarded-Proto, so
+  # force_ssl would send it a 301 and it would judge every container unhealthy.
+  # Nothing would ever finish deploying.
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == '/up' } } }
+
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.log_level = :info

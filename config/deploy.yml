@@ -1,0 +1,89 @@
+# Kamal deploys the app as a container. It replaces script/provision-droplet.sh
+# and ./deploy for everything above the operating system.
+#
+#   kamal setup     first time on a new server
+#   kamal deploy    build, push, and roll over with no downtime
+#   kamal rollback  go back to the previous image
+#   kamal app logs -f
+#
+# MySQL is deliberately NOT managed here. It stays a host package so the block
+# volume, backups and patching work exactly as they already do. Containerising
+# a database you already run well buys complexity, not safety.
+#
+service: blackbook
+image: jamiew/blackbook
+
+servers:
+  web:
+    hosts:
+      - 159.203.72.141
+    options:
+      # The container talks to MySQL on the host. Docker gives the host a
+      # routable name only if asked, and MySQL must be listening on the bridge
+      # address for it to answer. See "Host MySQL" at the bottom.
+      add-host: host.docker.internal:host-gateway
+
+proxy:
+  ssl: true
+  host: beta.000000book.com
+  # Thruster listens on 80 inside the container.
+  app_port: 80
+  healthcheck:
+    # Kamal will not switch traffic to a container that fails this, which is
+    # what makes a bad deploy stop before it reaches anyone.
+    path: /up
+    interval: 3
+    timeout: 30
+
+registry:
+  server: ghcr.io
+  username: jamiew
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  # The servers are x86 and the laptop is arm64, so this cross-builds.
+
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: "true"
+    RAILS_SERVE_STATIC_FILES: "true"
+  secret:
+    - RAILS_MASTER_KEY
+    - DATABASE_URL
+
+volumes:
+  # The GML files and uploaded images live on the block volume and must outlive
+  # any container. These are the same two paths production symlinks today.
+  - "/mnt/blackbook_volume/blackbook-data:/rails/data"
+  - "/mnt/blackbook_volume/blackbook-backup/public/system:/rails/public/system"
+
+aliases:
+  # Migrations are never automatic. bin/docker-entrypoint explains why.
+  migrate: app exec --reuse "bin/rails db:migrate"
+  console: app exec --interactive --reuse "bin/rails console"
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+  logs: app logs --follow
+
+# ---------------------------------------------------------------------------
+# Host MySQL
+#
+# The container reaches the host database over the Docker bridge. Two one-time
+# changes on the server, neither of which exposes MySQL publicly:
+#
+#   1. Listen on loopback and the bridge, in /etc/mysql/mysql.conf.d/mysqld.cnf:
+#        bind-address = 127.0.0.1,172.17.0.1
+#
+#   2. Let the app user connect from the bridge network:
+#        CREATE USER 'blackbook'@'172.17.%' IDENTIFIED BY '<password>';
+#        GRANT ALL PRIVILEGES ON blackbook_prod.* TO 'blackbook'@'172.17.%';
+#
+# Then DATABASE_URL in .kamal/secrets points at host.docker.internal:
+#   mysql2://blackbook:<password>@host.docker.internal/blackbook_prod
+#
+# ufw still blocks 3306 from the outside; the bridge is internal to the host.
+#
+# DigitalOcean Managed MySQL removes this whole section, and the patching along
+# with it, for about $15/mo.

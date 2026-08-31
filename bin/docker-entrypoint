@@ -1,0 +1,19 @@
+#!/bin/bash -e
+
+# jemalloc measurably cuts a long-running Rails process's memory. Rails 8's
+# generated entrypoint does this too.
+if [ -z "${LD_PRELOAD+x}" ]; then
+  LD_PRELOAD=$(find /usr/lib -name libjemalloc.so.2 -print -quit)
+  export LD_PRELOAD
+fi
+
+# Rails 8 generates a `db:prepare` here on boot. Deliberately omitted.
+#
+# ./deploy has never run migrations, for a documented reason: the pending set
+# drops a 301,076-row table. Migrating as a side effect of a container starting
+# would make that irreversible change happen on a restart, a rollback, or a
+# scale-up, at a moment nobody chose. Run migrations on purpose:
+#
+#   kamal app exec --reuse 'bin/rails db:migrate'
+#
+exec "${@}"

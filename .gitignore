@@ -14,3 +14,8 @@ tmp
 config/master.key
 public/assets
 public/system
+
+# Kamal. .kamal/secrets holds only references and is committed on purpose.
+# These variants are where literal values go, so they never are.
+/.kamal/secrets-common
+/.kamal/secrets.*
