@@ -110,72 +110,16 @@ jobs:
             printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
           } > .kamal/secrets-common
 
-      # Kamal starts an existing kamal-proxy container rather than recreating
-      # it. If that container was created by a run that failed partway, as
-      # happened when nginx still held port 80, it can end up attached to no
-      # network at all, and then the proxy can never reach the app however
-      # healthy the app is. The symptom is a health check that always times
-      # out. Recreate it when that has happened.
       - name: Ensure the host is ready for the container
         env:
           HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
         run: |
-          ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
-            # MySQL runs on the host. The app container sits on the kamal
-            # network (172.18.x), not docker0 (172.17.x), and ufw defaults to
-            # denying incoming, so container-to-host traffic on 3306 was
-            # dropped. Only requests touching the database hung; /up and static
-            # files were fine, which is what made it look like a health check
-            # problem.
-            for net in 172.17.0.0/16 172.18.0.0/16; do
-              ufw status | grep -q "3306.*$net" || ufw allow from "$net" to any port 3306 proto tcp >/dev/null
-            done
-
-            # The grant was for 172.17.% while the app connects from the kamal
-            # network at 172.18.x, so MySQL refused it. RENAME USER widens the
-            # host without needing to know the password, and carries the
-            # existing privileges across.
-            if mysql -N -e "SELECT 1 FROM mysql.user WHERE user=\"blackbook\" AND host=\"172.17.%\"" | grep -q 1; then
-              mysql -e "RENAME USER \"blackbook\"@\"172.17.%\" TO \"blackbook\"@\"172.%\"" && echo "widened grant to 172.%"
-            fi
-            mysql -N -e "SELECT CONCAT(\"grant: \", user, \"@\", host) FROM mysql.user WHERE user=\"blackbook\""
-
-            cnf=/etc/mysql/mysql.conf.d/mysqld.cnf
-            needs_restart=0
-
-            # TCP connects but the handshake never finishes: MySQL does a
-            # reverse DNS lookup on each connecting address, and a container
-            # subnet has no PTR record, so every connection stalls until that
-            # lookup gives up. Safe here because the grants are IP patterns,
-            # not hostnames.
-            if ! grep -q "^skip-name-resolve" "$cnf" 2>/dev/null; then
-              printf "\nskip-name-resolve\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-              needs_restart=1
-              echo "enabled skip-name-resolve"
-            fi
-
-            # Bind to every docker bridge that exists, not just docker0.
-            binds=$(ip -4 -o addr show | awk "/172\.1[78]\./ {split(\$4,a,\"/\"); printf \"%s,\", a[1]}")
-            want="127.0.0.1,${binds%,}"
-            if ! grep -q "^bind-address[[:space:]]*=[[:space:]]*$want\$" "$cnf"; then
-              sed -i "s|^bind-address.*|bind-address = $want|" "$cnf"
-              needs_restart=1
-              echo "mysql now binds: $want"
-            else
-              echo "mysql already binds: $want"
-            fi
-
-            [ "$needs_restart" = "1" ] && systemctl restart mysql && echo "mysql restarted"
-
-            # What the running server actually does, rather than what the
-            # config file says it should.
-            mysql -N -e "SELECT CONCAT(\"running with: bind_address=\", @@bind_address,
-              \" skip_name_resolve=\", @@skip_name_resolve,
-              \" require_secure_transport=\", @@require_secure_transport)"
-            ss -lnt | awk "/:3306/ {print \"  listening: \" \$4}"
-            true
-          '
-
+          # Kamal starts an existing kamal-proxy container rather than
+          # recreating it. If that container was created by a run that failed
+          # partway, as happened when nginx still held port 80, it can end up
+          # attached to no network at all, and then the proxy can never reach
+          # the app however healthy the app is. The symptom is a health check
+          # that always times out.
           ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
             if docker inspect kamal-proxy >/dev/null 2>&1; then
               nets=$(docker inspect -f "{{range \$k, \$v := .NetworkSettings.Networks}}{{\$k}} {{end}}" kamal-proxy)
@@ -184,6 +128,9 @@ jobs:
                 *)       echo "kamal-proxy on no network, recreating"; docker rm -f kamal-proxy ;;
               esac
             fi
+            # The app connects over the MySQL socket, so it has to be there.
+            [ -S /var/run/mysqld/mysqld.sock ] && echo "mysql socket present" \
+              || { echo "no mysql socket at /var/run/mysqld/mysqld.sock"; exit 1; }
           '
 
       - name: Deploy
@@ -206,13 +153,10 @@ jobs:
             echo "--- can the app reach the database? ---"
             ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" '
               c=$(docker ps -q --filter "name=blackbook-web" | head -1)
-              echo "resolving host.docker.internal:"
-              docker exec "$c" getent hosts host.docker.internal || echo "  does not resolve"
-              echo "tcp reachable on 3306:"
-              docker exec "$c" timeout 8 bash -c "cat < /dev/null > /dev/tcp/host.docker.internal/3306" \
-                && echo "  yes" || echo "  no"
+              echo "socket inside the container:"
+              docker exec "$c" ls -l /var/run/mysqld/mysqld.sock 2>&1 | tail -1
               echo "what Rails says:"
-              docker exec "$c" timeout 60 bin/rails runner /rails/script/db_doctor.rb 2>&1 | tail -5
+              docker exec "$c" timeout 60 bin/rails runner /rails/script/db_doctor.rb 2>&1 | tail -8
             '
             echo "--- app logs ---"
             ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" \
