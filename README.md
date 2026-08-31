@@ -115,6 +115,40 @@ The application stores data in two places:
    - Format: `{tag_id}.gml`
    - Managed by `GmlObject` model
 
+### Running the tests destroys GML in `data/`
+
+`GmlObject.file_dir` returns `Rails.root.join("data")` in **every** environment,
+test included. So `bundle exec rspec` writes its fixtures straight over the real
+files. Every factory-built tag overwrites `data/{id}.gml` with a 159-byte stub
+containing `<name>rspec</name>`.
+
+This has already happened. A local checkout was found with 1,792 tags clobbered,
+ids 2 to 2198, and the count grew to 2,273 as more test runs went by. Production
+is unaffected, and the February 2019 dump agrees with production byte for byte,
+so nothing is gone for good. But a working copy quietly loses data every time
+the suite runs, and the damage is easy to mistake for tags that were always
+empty.
+
+Check a checkout:
+
+```bash
+grep -l '<name>rspec</name>' data/*.gml | wc -l
+```
+
+Restore one file from production:
+
+```bash
+curl -fsS "https://000000book.com/data/<id>.gml" -o "data/<id>.gml"
+```
+
+The fix is to point `file_dir` somewhere else under test, the same way
+`config/environments/test.rb` already redirects the cache. Until that lands,
+treat `data/` as expendable in any checkout where the suite has run, and never
+sync it back toward production.
+
+Recovered TEMPT1 material, and the full account of this,
+are at https://github.com/jamiew/tempt1-archive
+
 ## Useful Rake Tasks
 
 ### GML Data Management
