@@ -156,7 +156,7 @@ jobs:
               echo "socket inside the container:"
               docker exec "$c" ls -l /var/run/mysqld/mysqld.sock 2>&1 | tail -1
               echo "what Rails says:"
-              docker exec "$c" timeout 60 bin/rails runner /rails/script/db_doctor.rb 2>&1 | tail -8
+              docker exec "$c" timeout 60 bin/rails runner /rails/script/db_doctor.rb 2>&1 | tail -12
             '
             echo "--- app logs ---"
             ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" \

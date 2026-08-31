@@ -31,3 +31,9 @@ rescue StandardError => e
   elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
   puts "  #{name}: #{e.class} after #{elapsed.round(1)}s - #{e.message.lines.first.to_s.strip[0, 160]}"
 end
+
+# A connection that works while the schema is behind the code looks exactly
+# like a broken connection from the outside: every page 500s.
+pending = ActiveRecord::Base.connection_pool.migration_context.needs_migration?
+puts "  pending migrations: #{pending}"
+puts "  tables: #{ActiveRecord::Base.connection.tables.sort.join(', ')}"
