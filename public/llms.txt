@@ -1,0 +1,46 @@
+# 000000book
+
+> An open archive of Graffiti Markup Language (GML) files, running since 2009. Around 76,000 tags of graffiti motion-capture data, contributed by around 140,000 accounts. Everything is public and anonymous: there is no API key, and none is needed.
+
+GML is an XML format that records a graffiti tag as timed stroke points, so the
+same gesture can be replayed by a laser projector, a browser canvas, or a robot
+arm. Every endpoint below allows cross-origin requests from any origin, and also
+accepts a `?callback=` parameter for JSONP.
+
+Reads are limited to 300 requests a minute per IP address, uploads to 30 an hour.
+Responses carry `ETag` and `Last-Modified`; send `If-None-Match` and you will get
+a `304` instead of a body. Please do that if you are polling.
+
+## Endpoints
+
+Base URL `https://000000book.com`.
+
+- `GET /data.json` — list tags, newest first. Filter with `app`, `user`,
+  `location` or `keywords`. Page with `page` and `per_page` (default 15, max 100).
+  Also available as `.xml` and `.rss`.
+- `GET /data/{id}.json` — one tag, with its full GML parsed into nested JSON.
+- `GET /data/{id}.gml` — the raw GML file. This is the canonical format.
+- `GET /data/{id}.xml` — tag metadata only, without the GML.
+- `GET /latest.gml` — the most recently uploaded tag. Good for installations.
+- `GET /random.gml` — a random tag.
+- `POST /data` — upload a tag. Send `gml` and `application`. Returns the new
+  tag's id as plain text. No authentication.
+- `POST /validate.json` — check a GML document. Send `gml`. Returns errors,
+  warnings and recommendations.
+- `GET /apps.json` — applications that read or write GML.
+
+`.json` on a single tag includes the whole GML document as nested JSON, so you
+do not have to parse XML. `.xml` is metadata only.
+
+## Documentation
+
+- [Downloading GML](https://github.com/jamiew/blackbook/blob/main/docs/api/downloading-gml.md): reading tags and their GML
+- [Uploading GML](https://github.com/jamiew/blackbook/blob/main/docs/api/uploading-gml.md): posting a new tag, and the optional fields
+- [Drawing GML with Javascript](https://github.com/jamiew/blackbook/blob/main/docs/gml/javascript-and-json.md): rendering a tag in a browser
+- [Playback implementations](https://github.com/jamiew/blackbook/blob/main/docs/gml/playback-implementations.md): sample code in C++, Processing, Python, PHP and more
+- [OpenAPI spec](https://000000book.com/openapi.yaml): the same endpoints, machine-readable
+
+## Optional
+
+- [What GML is](https://graffitimarkuplanguage.com): the format's own site
+- [Source code](https://github.com/jamiew/blackbook): the Rails app serving this

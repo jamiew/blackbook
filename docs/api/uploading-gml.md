@@ -39,3 +39,9 @@ case 000000book writes them into the GML for you.
 
 The `uniqueKey` payload uniquely identifies the uploading device. Users can
 later pair their 000000book account with a given uniqueKey.
+
+Treat it as a credential, not metadata: anyone who has it can have their own
+uploads attributed to that device's owner. We never give it back out. It is
+stripped from every GML we serve and never appears in `.json` or `.xml`, so a
+tag you download will not contain the `<uniqueKey>` you uploaded. Send a value
+that is hard to guess, and do not reuse one across users.

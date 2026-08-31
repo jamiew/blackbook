@@ -1,5 +1,14 @@
-# See http://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# The archive is public and we want it read. See /llms.txt for a summary of the
+# API and /openapi.yaml for the machine-readable version.
 #
-# To ban all spiders from the entire site uncomment the next two lines:
-# User-agent: *
-# Disallow: /
+# Please use the API rather than scraping HTML: it is cheaper for both of us,
+# it supports If-None-Match, and it is rate limited at 300 requests a minute
+# rather than whatever your crawler felt like.
+
+User-agent: *
+Allow: /
+
+# /random picks a different tag every time, so crawling it is infinite work for
+# a page nobody can link to.
+Disallow: /random
+Disallow: /validator
