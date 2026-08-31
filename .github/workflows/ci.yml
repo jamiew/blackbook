@@ -179,6 +179,19 @@ jobs:
             case "$code" in 200|301|302) ;; *) fail=1 ;; esac
           done
           if [ "$fail" = "1" ]; then
+            echo "--- can the app reach the database? ---"
+            ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" '
+              c=$(docker ps -q --filter "name=blackbook-web" | head -1)
+              echo "resolving host.docker.internal:"
+              docker exec "$c" getent hosts host.docker.internal || echo "  does not resolve"
+              echo "tcp reachable on 3306:"
+              docker exec "$c" timeout 8 bash -c "cat < /dev/null > /dev/tcp/host.docker.internal/3306" \
+                && echo "  yes" || echo "  no"
+              echo "activerecord says:"
+              docker exec "$c" timeout 40 bin/rails runner \
+                "begin; puts ActiveRecord::Base.connection.select_value(%q{SELECT VERSION()}); \
+                 rescue => e; puts \"#{e.class}: #{e.message.lines.first}\"; end" 2>&1 | tail -3
+            '
             echo "--- app logs ---"
             ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" \
               'docker logs $(docker ps -q --filter "name=blackbook-web" | head -1) 2>&1 | tail -40'
