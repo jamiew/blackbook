@@ -14,7 +14,7 @@
     - imgopts = {}
     - if attachment_attached?(@tag, :image)
       .image= image_tag attachment_url(@tag, :image, :large), imgopts
-    - elsif @tag.remote_image
-      .image= image_tag @tag.remote_image, imgopts
+      - if @tag.image_generated?
+        %p.note Drawn from the GML. No original image of this tag survives.
     - else
       %h4.warning No thumbnail generated yet.

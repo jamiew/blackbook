@@ -21,8 +21,13 @@ module ApplicationHelper
     end
   end
 
+  # Tempt's tags used to be served from fffff.at rather than attached here, and
+  # the remote URL took precedence. That host stopped serving them, so every one
+  # of his 133 tags rendered as a broken image. The attachment wins now, and the
+  # dead host is not consulted at all: a 500 is worse than the placeholder.
+  # Tag#remote_image is kept as provenance, and as the key the import joins on.
   def tag_thumbnail_url(tag, style = :medium)
-    tag.remote_thumbnail_url || attachment_url(tag, :image, style)
+    attachment_url(tag, :image, style)
   end
 
   def attachment_attached?(record, name)
