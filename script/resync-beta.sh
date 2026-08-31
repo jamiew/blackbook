@@ -21,8 +21,6 @@ set -euo pipefail
 PROD_HOST="${PROD_HOST:-138.197.101.244}"
 BETA_HOST="${BETA_HOST:-159.203.72.141}"
 DB_NAME="${DB_NAME:-blackbook_prod}"
-APP_USER="${APP_USER:-rails}"
-APP_DIR="${APP_DIR:-/home/$APP_USER/blackbook}"
 VOL_SRC="${VOL_SRC:-/mnt/volume_nyc3_01}"
 VOL_DEST="${VOL_DEST:-/mnt/blackbook_volume}"
 
@@ -70,19 +68,11 @@ ssh -A -o StrictHostKeyChecking=accept-new "root@$BETA_HOST" \
 
 step "Migrations"
 # Production is still on the old schema, so the fresh dump arrives without any
-# of this branch's migrations. Reapplying them is what makes beta the thing you
-# are actually testing.
-if ssh "${SSH_OPTS[@]}" "root@$BETA_HOST" "[ -d '$APP_DIR' ]"; then
-  # The rbenv shim by absolute path, the same way the systemd unit calls it.
-  # A bare `bundle` depends on $APP_USER's shell profile being loaded, which
-  # is one more thing to be wrong at the worst moment.
-  ssh "${SSH_OPTS[@]}" "root@$BETA_HOST" \
-    "cd '$APP_DIR' && sudo -u '$APP_USER' -H \
-       env RAILS_ENV=production \$(grep -h . /etc/blackbook.env | tr '\n' ' ') \
-       '/home/$APP_USER/.rbenv/shims/bundle' exec rails db:migrate"
-else
-  echo "$APP_DIR not present yet, skipping. Deploy the app, then re-run."
-fi
+# of this branch's migrations, and the app will 500 until they run. They are
+# deliberately not run here: the pending set drops a 301,076-row table, and
+# that should never happen as a side effect of a sync.
+echo "the dump is production's schema, so the app needs migrating before it works."
+echo "run the 'Migrate beta' workflow, or: bin/kamal migrate"
 
 step "Done"
 ssh "${SSH_OPTS[@]}" "root@$BETA_HOST" "mysql -N '$DB_NAME' -e \"
