@@ -222,6 +222,9 @@ GEM
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.7)
+    rack-cors (3.0.0)
+      logger
+      rack (>= 3.0.14)
     rack-session (2.1.2)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -392,6 +395,7 @@ DEPENDENCIES
   nokogiri (~> 1.15)
   propshaft
   puma (~> 8.0)
+  rack-cors
   rails (~> 8.1.0)
   rails-controller-testing
   responders (~> 3.0)
