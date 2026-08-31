@@ -1,4 +1,22 @@
 class Visualization < ApplicationRecord
+  # Attributes the API publishes, in schema order.
+  #
+  # /apps/:id.json and .xml were never deliberately written. The controller
+  # declares `respond_to :xml, :json`, no matching templates exist, and the
+  # responders gem falls back to api_behavior, which dumped the whole record.
+  # This pins the shape. Internal owner ids stay out, matching Tag.
+  PUBLIC_ATTRIBUTES = %w[
+    id approved_at authors created_at description download
+    embed_callback embed_code embed_params embed_url
+    image_content_type image_file_name image_file_size
+    is_embeddable kind name slug updated_at version website
+  ].freeze
+
+  # Everything else, so that adding a column without deciding which list it
+  # belongs in fails a spec. See spec/models/visualization_spec.rb.
+  # Both are internal owner ids: who submitted it, and which admin approved it.
+  PRIVATE_ATTRIBUTES = %w[user_id approved_by].freeze
+
   # supported application types; stored as an Array to maintain order pre-ruby 1.9
   # possibly rename to 'language'? Not sure. Little distinction atm
   KINDS = [
@@ -62,6 +80,15 @@ class Visualization < ApplicationRecord
   def approved?
     approved_at && approved_at < Time.zone.now
   end
+
+  # Forced rather than left to the caller, so the responders fallback in
+  # VisualizationsController cannot publish a column nobody meant to publish.
+  def as_json(opts = {}) = super(opts.merge(only: PUBLIC_ATTRIBUTES))
+
+  # Built from attributes like Tag#to_xml, not from super: Rails 8 dropped
+  # ActiveModel::Serializers::Xml, so ActiveRecord has no to_xml to call. That
+  # is also why /apps/:id.xml was raising before this existed.
+  def to_xml(opts = {}) = attributes.slice(*PUBLIC_ATTRIBUTES).to_xml(opts)
 
   protected
 

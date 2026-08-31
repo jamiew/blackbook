@@ -3,6 +3,18 @@
 class ApplicationController < ActionController::Base
   helper_method :current_user, :page_title, :set_page_title
 
+  # Rate limiting keeps its own store rather than sharing Rails.cache, which is
+  # an unconfigured file store backing the expensive Tag#gml_hash GML parse.
+  # One host, one Puma process, so an in-memory counter is accurate. It resets
+  # on deploy and is not shared during the two-container rollover; both are
+  # acceptable for a first version. See docs/operations.md.
+  RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new(size: 8.megabytes)
+
+  # Rails interpolates a JSONP callback into the response body without escaping
+  # it, as `/**/name(...)`. Anything that is not a plain function name is
+  # dropped rather than reflected back at whoever asked for it.
+  JSONP_CALLBACK = /\A[A-Za-z_$][\w$.]{0,63}\z/
+
   # Don't show raw GML in the logs
   # filter_parameter_logging :password, :password_confirmation, :gml, :data
   # protect_from_forgery
@@ -33,6 +45,46 @@ class ApplicationController < ActionController::Base
   # end
 
   protected
+
+  def jsonp_callback
+    callback = params[:callback].presence
+    callback if callback&.match?(JSONP_CALLBACK)
+  end
+
+  # True when the client's cached copy is still good and we should stop here.
+  #
+  # HTML never validates: those pages render an owner/admin modbox, so a public
+  # validator would hand one visitor another visitor's view. API responses are
+  # the same for everyone, which is what makes `public: true` safe.
+  def cached_for_api?(**validators)
+    return false if request.format.html?
+
+    !stale?(**validators, public: true)
+  end
+
+  # The `with:` handler for rate_limit. Rails' default raises and renders a 429
+  # HTML page, which is no use to a client that asked for .json or .gml, so this
+  # answers in the requested format and says when to come back. It renders
+  # directly rather than going through require_user and friends, which redirect
+  # with a flash and cannot produce a machine-readable status.
+  def too_many_requests(retry_after:)
+    response.headers['Retry-After'] = retry_after.to_i.to_s
+    # Duration#inspect already reads as "1 minute" / "1 hour"
+    message = "Rate limit exceeded. Try again in #{retry_after.inspect}."
+
+    # Switched on the requested format rather than negotiated with respond_to.
+    # Most API clients send `Accept: */*`, which negotiation resolves to whatever
+    # is declared first -- so a plain `POST /data`, whose success response is
+    # plain text, would get a JSON error. Match the format the client asked for.
+    case request.format.symbol
+    when :json
+      render json: { error: message }, status: :too_many_requests, callback: jsonp_callback
+    when :xml
+      render xml: { error: message }.to_xml(root: 'error'), status: :too_many_requests
+    else
+      render plain: message, status: :too_many_requests
+    end
+  end
 
   # Safe pagination parameter handling with customizable defaults
   def pagination_params(page: nil, per_page: 20, max_per_page: 100)

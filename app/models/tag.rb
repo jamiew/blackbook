@@ -1,8 +1,37 @@
 require 'English'
 class Tag < ApplicationRecord
-  # Blacklisted attributes, do not show in the API
-  # TODO convert to a whitelisted approach...
-  HIDDEN_ATTRIBUTES = %i[ip user_id remote_secret cached_tag_list uniquekey_hash].freeze
+  # Attributes the API publishes, in schema order so the XML element order does
+  # not move.
+  #
+  # An allowlist, because the blocklist this replaces failed twice over. It
+  # named `uniquekey_hash`, a column that does not exist, and never named the
+  # raw `gml_uniquekey` at all, so both went out in .json. Worse, it held
+  # symbols while #to_xml matched them against string attribute keys, so .xml
+  # excluded nothing and served `ip`, `user_id` and `remote_secret` to anyone
+  # who asked. app/views/tags/show.html.haml calls the uniquekey pair "Secret
+  # Fields" and shows them to the owner and admins only; anyone holding a
+  # device's uniqueKey can have their uploads attributed to that device's
+  # owner. See #find_paired_user.
+  #
+  # Adding a column no longer publishes it. That is the point.
+  PUBLIC_ATTRIBUTES = %w[
+    id application author comment_count created_at description
+    gml_application gml_keywords gml_username gml_version
+    image_content_type image_file_name image_file_size image_updated_at
+    likes_count location remote_image slug title updated_at uuid
+  ].freeze
+
+  # Everything else. Only here so that adding a column without deciding which
+  # list it belongs in fails a spec instead of quietly appearing in the API.
+  # See spec/models/tag_spec.rb.
+  #
+  # ip is the uploader's address. user_id and cached_tag_list are internal.
+  # remote_secret is vestigial: accepted from ?secret= and never read back.
+  # The gml_uniquekey pair is a device credential -- see UNIQUEKEY_ELEMENT --
+  # and secret_username is derived from the hash.
+  PRIVATE_ATTRIBUTES = %w[
+    ip user_id cached_tag_list remote_secret gml_uniquekey gml_uniquekey_hash
+  ].freeze
 
   belongs_to :user, optional: true
   has_many :favorites, as: :object
@@ -23,8 +52,19 @@ class Tag < ApplicationRecord
   scope :from_device, -> { where.not(gml_uniquekey: nil) }
   scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
   scope :unclaimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NULL') }
-  # RAND() is MySQL-specific; postgres/sqlite want RANDOM()
-  scope :in_random_order, -> { order(Arel.sql('RAND()')) }
+  # Seek to a random primary key rather than ORDER BY RAND(), which sorted all
+  # 76,000 rows on every hit and made the cheapest-looking public endpoint the
+  # most expensive one we serve. This is two index lookups and a PK seek.
+  #
+  # Deleted ids leave gaps, so a row just after a gap comes up slightly more
+  # often. That does not matter for "show me something".
+  def self.random
+    lowest = minimum(:id)
+    highest = maximum(:id)
+    return nil if lowest.nil?
+
+    where(id: rand(lowest..highest)..).order(:id).first || order(:id).first
+  end
 
   # Tag images arrive from GMLImageRenderer rather than a user upload, and were
   # deliberately exempt from filetype validation under Paperclip too.
@@ -94,6 +134,21 @@ class Tag < ApplicationRecord
     # puts "from_iphone?(#{self.gml_application} || #{self.application}) = #{test}"
   end
 
+  # The device uniqueKey is a credential, not metadata: anyone holding one can
+  # have their uploads attributed to that device's owner (see #find_paired_user).
+  # It must never leave the server in any format.
+  #
+  # Stripped from the served string rather than from the parsed document,
+  # because a Nokogiri round-trip would reformat every .gml download.
+  UNIQUEKEY_ELEMENT = %r{<uniqueKey>.*?</uniqueKey>}m
+
+  # What #gml is allowed to become once it leaves the building. Everything that
+  # serves GML goes through here; #gml itself stays raw because the upload path
+  # reads the uniqueKey out of it to do the pairing.
+  def public_gml(opts = {})
+    gml(opts)&.gsub(UNIQUEKEY_ELEMENT, '')
+  end
+
   # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
     # Rails.logger.debug "Tag #{id}: gml"
@@ -148,9 +203,12 @@ class Tag < ApplicationRecord
 
   # Override so we can add gml: :gml_hash
   # Arguably could just be using :methods but we always want this
-  def as_json(_opts = {})
+  #
+  # `only:` is forced rather than left to the caller, so a controller cannot
+  # forget it. In ActiveRecord `only` beats any `except` a caller passes.
+  def as_json(opts = {})
     # Rails.logger.debug "Tag #{id}: as_json"
-    hash = super
+    hash = super(opts.merge(only: PUBLIC_ATTRIBUTES))
     hash.reject! { |_k, v| v.blank? }
     hash[:gml] = gml_hash && gml_hash['gml']
     hash[:gml] ||= gml_hash && gml_hash['GML']
@@ -158,12 +216,13 @@ class Tag < ApplicationRecord
     hash
   end
 
-  # Also hide what we'd like, and strip empty records (for now)
+  # Publish only the allowlist, and strip empty values (for now).
+  #
+  # Options still pass through to Hash#to_xml because Array#to_xml calls this
+  # for each element with :builder, :root and :skip_instruct set.
   def to_xml(options = {})
     # Rails.logger.debug "Tag #{id}: to_xml"
-    options[:except] ||= []
-    options[:except] += attributes.map { |k, v| k if v.blank? }.compact
-    attributes.except(*options[:except]).to_xml(options)
+    attributes.slice(*PUBLIC_ATTRIBUTES).compact_blank.to_xml(options)
   end
 
   # GML as a Nokogiri object...
@@ -263,15 +322,19 @@ class Tag < ApplicationRecord
   end
 
   # Transforms (cached)
+  # v2: v1 entries were built before uniqueKey was stripped, so serving one
+  # would leak the key the rest of this class works to hide.
   def gml_hash_cache_key
-    "tag/#{id}/gml_hash"
+    "tag/#{id}/gml_hash/v2"
   end
 
   def convert_gml_to_hash
     # Rails.logger.debug "Tag #{id}: convert_gml_to_hash"
-    return {} if gml.blank?
+    return {} if public_gml.blank?
 
-    Hash.from_xml(gml_document.to_xml)
+    # Built from public_gml, not gml_document, so the nested `gml` in a .json
+    # response cannot carry the uniqueKey either.
+    Hash.from_xml(Nokogiri::XML(public_gml).to_xml)
   rescue StandardError
     Rails.logger.error "ERROR: could not parse GML for Tag #{id} into a hash: #{$ERROR_INFO}"
     {}
