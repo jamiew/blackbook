@@ -19,7 +19,7 @@ gem 'authlogic'
 gem 'scrypt', '~> 3.0'
 
 # API/Controllers
-gem 'responders', '~> 3.0'
+gem 'responders', '~> 3.2'
 
 # File uploads
 gem 'kt-paperclip'
