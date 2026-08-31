@@ -1,10 +1,6 @@
 module ApplicationHelper
   def html_attrs(lang = 'en-US')
-    { xmlns: "http://www.w3.org/1999/xhtml", 'xml:lang' => lang, lang: lang }
-  end
-
-  def http_equiv_attrs
-    { 'http-equiv' => 'Content-Type', content: 'text/html;charset=UTF-8' }
+    { lang: lang }
   end
 
   def flash_messages
@@ -15,6 +11,21 @@ module ApplicationHelper
       end
     end
     @flash_messages ||= messages
+  end
+
+  def nav_link(label, path, active: [])
+    current = active.include?(controller_name)
+    link_to label, path, 'aria-current' => (current ? 'page' : nil)
+  end
+
+  # Counts for the instrument bar under the masthead. Cached because it runs on
+  # every page and Tag.count is a full scan of ~77k rows.
+  def archive_stats
+    @archive_stats ||= Rails.cache.fetch('archive_stats', expires_in: 5.minutes) do
+      today = Time.current.in_time_zone('Pacific Time (US & Canada)').to_date
+      today_scope = Tag.where('created_at >= ?', today)
+      { total: Tag.count, today: today_scope.count, writers: today_scope.distinct.count(:gml_uniquekey) }
+    end
   end
 
   def pagination(collection = nil)

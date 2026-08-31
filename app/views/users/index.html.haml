@@ -1,26 +1,22 @@
+.page__head
+  %div
+    %span.eyebrow The archive
+    %h1.page__title Writers
+  %p.page__lede.meta= "#{number_with_delimiter(@users.total_entries)} accounts"
 
-%h2 User List
-%p
-  &larr;
-  = link_to "back to home", root_path
+%ul.people
+  - @users.each do |user|
+    -# Old records can fail to_param, so fall back to the raw id.
+    - link = (user_path(user) rescue user_path(id: user.to_param))
+    %li
+      %a.person{ href: link }
+        = image_tag user.photo.url(:small), alt: user.login
+        %span.person__name= user.login
+        %span.person__meta.meta
+          - count = user.tags.count
+          = count.positive? ? pluralize(count, 'tag') : 'no tags'
+          - unless user.iphone_uniquekey.blank?
+            = '· paired'
 
-%p.clear= pagination
-
-%p
-  %ul.users
-    - @users.each do |user|
-      -# FIXME -- old users failing
-      - link = user_path(user) rescue user_path(id: user.to_param)
-      %li
-        = link_to image_tag(user.photo.url(:small)), link
-        = link_to user.login, link
-        %br
-        %small
-          - tagcount = user.tags.count
-          - if tagcount > 0
-            == #{pluralize tagcount, 'tag'}
-          - if !user.iphone_uniquekey.blank?
-            == #{redstar}paired
-          
-
-%p.clear= pagination
+%nav{ 'aria-label' => 'Pagination', style: 'margin-top: 28px' }
+  = pagination

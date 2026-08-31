@@ -1,17 +1,9 @@
-%br{style: 'clear: both;'}
-
-#footer
-  - spacer = "&nbsp;/&nbsp;".html_safe
-  = link_to 'about', '/about'
-  = spacer
-  %script{type: 'text/javascript'} document.write('<a href="mailto:info@000000book.com">contact</a>');
-  = spacer
-  = link_to 'system activity', activity_path
-  = spacer
-  = link_to 'source code', 'http://github.com/jamiew/blackbook', target: '_blank'
-  = spacer
-
-  == powered by #{link_to 'FAT Lab', 'http://fffff.at'}
-  &mdash;
-  == copyfree 2009-#{Date.today.year}
-
+%footer.footer.shell
+  %nav{ 'aria-label' => 'Secondary' }
+    = link_to 'about', '/about'
+    -# Kept as document.write so the address stays out of scraped markup.
+    %script{ type: 'text/javascript' } document.write('<a href="mailto:info@000000book.com">contact</a>');
+    = link_to 'system activity', activity_path
+    = link_to 'source code', 'https://github.com/jamiew/blackbook', target: '_blank', rel: 'noopener'
+  %span
+    == Powered by #{link_to 'FAT Lab', 'http://fffff.at'} &mdash; copyfree 2009&ndash;#{Date.today.year}

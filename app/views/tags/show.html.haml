@@ -1,79 +1,80 @@
+.page__head
+  %div
+    %span.eyebrow
+      = link_to '← All data', @user ? user_tags_path(@user) : tags_path
+    %h1.tag-detail__id= tag_title(@tag)
+    %p.page__lede.meta
+      = application_link(@tag.sexy_app_name)
+      = '·'
+      = tag_user_link(@tag)
+      = '·'
+      %abbr{ title: @tag.created_at.strftime('%D %T') }== #{timeago(@tag.created_at)} ago
 
-/ Top level navigation
-- all_link = @user ? user_tags_path(@user) : tags_path
-/ .floatLeft= link_to '&larr; back'.html_safe, all_link
-.prevnext
-  - prev_text = '&larr; next'.html_safe
-  %li= @next.nil? ? prev_text : link_to(prev_text, tag_path(@next), class: 'button')
-  %li &nbsp;::&nbsp;
-  - next_text = 'previous &rarr;'.html_safe
-  %li= @prev.nil? ? next_text : link_to(next_text, tag_path(@prev), class: 'button')
-  %br.clear
+  .stepper
+    - if @next
+      = link_to '← Next', tag_path(@next), class: 'button button--quiet'
+    - if @prev
+      = link_to 'Previous →', tag_path(@prev), class: 'button button--quiet'
+    - on = (current_user && @tag.favorited_by?(current_user)) || false
+    = link_to (on ? '★ Favorited' : '☆ Favorite'), tag_favorites_path(@tag), method: 'post', class: "button #{'button--solid' if on}"
 
+.tag-detail
+  %div
+    = render partial: 'tags/player', object: @tag, as: :player
 
-#sidebar.tag_sidebar
-  / Information about the tag
-  .metadata.infobox
-    - if true # show for logged-out users as well, to encourage logging in
-      .right.favorite
-        - on = current_user && @tag.favorited_by?(current_user) || false
-        = link_to 'Favorite', tag_favorites_path(@tag), method: 'post', class: "favorite button #{on ? 'on' : 'off'}"
-    %h2= tag_title(@tag)
-    %hr
-    %ul
-      %li
-        == Uploaded #{@tag.created_at.strftime("%D %T")}
-        %br== (#{time_ago_in_words(@tag.created_at)} ago)
-    %hr
-    %ul
-      - app = !@tag.gml_application.blank? && @tag.gml_application || @tag.application
-      %li== <strong>Application:</strong> #{app.blank? ? 'NULL' : application_link(h(@tag.sexy_app_name))}
-      %li== <strong>Keywords:</strong> #{@tag.gml_keywords.blank? ? 'NULL' : h(@tag.gml_keywords)}
-    %hr
-    %ul
-      - if !@tag.author.blank?
-        %li== <strong>Author:</strong> #{@tag.author}
-      %li== <strong>Uploader:</strong> #{@user.blank? ? (@tag.secret_username.blank? ? 'NULL' : secret_username_link(@tag.secret_username)) : link_to(@user.login, user_path(@user)) }
-      %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : h(@tag.location)}
+  %aside
+    .specs
+      .specs__row
+        %span.specs__key Application
+        %span.specs__value
+          - app = @tag.gml_application.presence || @tag.application
+          = app.blank? ? content_tag(:span, 'null', class: 'specs__value--null') : application_link(@tag.sexy_app_name)
+      .specs__row
+        %span.specs__key Keywords
+        %span.specs__value
+          - if @tag.gml_keywords.blank?
+            %span.specs__value--null null
+          - else
+            = @tag.gml_keywords.split(',').map { |w| link_to w.strip, tags_path(keywords: w.strip) }.join(', ').html_safe
+      - unless @tag.author.blank?
+        .specs__row
+          %span.specs__key Author
+          %span.specs__value= @tag.author
+      .specs__row
+        %span.specs__key Uploader
+        %span.specs__value= tag_user_link(@tag)
+      .specs__row
+        %span.specs__key Location
+        %span.specs__value
+          = @tag.location.blank? ? content_tag(:span, 'null', class: 'specs__value--null') : location_link(@tag.location)
       - unless @tag.description.blank?
-        %li== <strong>Description:</strong> #{h(@tag.description)}
+        .specs__row
+          %span.specs__key Description
+          %span.specs__value= @tag.description
+      .specs__row
+        %span.specs__key Uploaded
+        %span.specs__value= @tag.created_at.strftime('%Y-%m-%d %H:%M:%S')
       - if @tag.image.exists? || @tag.remote_image
         - url = (@tag.image.exists? ? @tag.image.url(:original) : @tag.remote_image)
-        - #Quick little gsub to remove the queryvars... not ideal
-        %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, target: '_blank') }
+        .specs__row
+          %span.specs__key Still
+          %span.specs__value= link_to File.basename(url.gsub(/\?.*/, '')), url, target: '_blank', rel: 'noopener'
 
+    %p{ style: 'margin: 14px 0 0; display: flex; gap: 8px; flex-wrap: wrap' }
+      = link_to 'Download GML', tag_path(@tag, format: :gml), class: 'button button--solid'
+      = link_to 'What is GML?', 'http://fffff.at/gml-week-graffiti-markup-language/', class: 'button button--quiet', target: '_blank', rel: 'noopener'
 
-    %hr
-    %br
-    =# link_to '<small>Validate GML</small>'.html_safe, validate_tag_path(@tag), class: 'button', rel: 'nofollow'
+    -# Fetched when the disclosure is first opened rather than inlined. A busy
+    -# tag's GML runs to several hundred kilobytes, which was the great bulk of
+    -# this page's weight for something most visitors never unfold.
+    %details.source{ data: { source_url: tag_path(@tag, format: :gml) } }
+      %summary Source
+      %textarea{ rows: 14, readonly: true, onclick: 'this.select();', 'aria-label' => 'GML source',
+                 placeholder: 'Loading…' }
 
-    .gml
-      %span.download= link_to('download GML', tag_path(@tag, format: :gml), class: 'button smallbutton')
-      %span.what-is-gml= link_to('?', 'http://fffff.at/gml-week-graffiti-markup-language/', target: '_blank')
-      %textarea.gml{cols: 24, rows: 12, onclick: 'this.select();'}= @tag.gml
-
-  -# Tag modbox -- edit/delete/debugging etc.
-  - if is_owner?(@tag) || is_admin?
-    .modbox.infobox
-      %h2{style: 'color: #f0f'} MODBOX
-      %ol#controls
-        %li= link_to '<strong>edit</strong>', edit_tag_path, class: ''
-        %li= link_to 'delete', tag_path, method: 'delete', class: 'delete', style: 'color: #fbb'
-      %p
-        %strong{style: 'color: #f0f'} Secret Fields
-        - ['gml_uniquekey', 'gml_uniquekey_hash'].each do |field|
-          %p{style: 'overflow: hidden;'}
-            %strong= field
-            %br
-            %input{type: 'text', readonly: 'readonly', value: @tag.attributes[field], onclick: 'this.select();'}
-      %p
-        %strong{style: 'color: #f0f'} Parsed GML Header
-        - @tag.gml_header.each do |k,v|
-          %p{style: 'overflow: hidden;'}
-            %strong= k
-            %br
-            %span=h !v.blank? && v || 'NULL'
-
-/ The actual tag awwwwwww yeah
-= render partial: "tags/tag_playback", object: @tag
-
+    - if is_owner?(@tag) || is_admin?
+      .modbox
+        %h2 Modbox
+        .modbox__body
+          = link_to 'Edit', edit_tag_path, class: 'button button--quiet'
+          = link_to 'Delete', tag_path, method: 'delete', class: 'button button--danger', data: { confirm: 'Delete this tag?' }

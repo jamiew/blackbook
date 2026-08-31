@@ -33,47 +33,7 @@ module TagsHelper
     link_to(location, tags_path(location: location), class: 'location_link')
   end
 
-  # Builtin tag playback modes
-  def tag_player(tag = nil, args = {})
-    flash_tag_player(tag, args)
-  end
-
-  # Todd's flash player
-  def flash_tag_player(tag = nil, args = {})
-    # return '<br /><p><strong>[disabled in dev mode]</strong></p><br />' if dev? && !params[:flash]
-
-    # No longer specifying a specific height, just width
-    opts = { width: '100%', src: 'http://000000book.com/system/BlackBook.swf', bgcolor: '#000000' }.merge(args)
-
-    # image_urls = tag.image.styles.keys.map { |s| ["image_#{s}", "http://#{request.host}:#{request.port}"+tag.image.url(s)] }.to_hash
-    image_urls = { image_large: tag.image.url(:large) }
-    flashvars = { gml_url: tag_url(tag, format: 'gml', iphone_rotate: (tag.from_iphone? ? '1' : nil)), embed: "&lt;embed&gt;TODOWHATUP&lt;/embed&gt;",
-                  user: begin
-                    tag.user.login
-                  rescue StandardError
-                    nil
-                  end,
-                  created_at: tag.created_at.to_s, created_date: tag.created_at.strftime("%D") }.merge(image_urls)
-
-    public_attributes = %w[id application location user_id]
-    flashvars.merge!(tag.attributes.slice(*public_attributes))
-
-    querified_flashvars = flashvars.map { |k, v| "#{k}=#{CGI.escape(v.to_s) if v.present?}" }.join('&')
-    embed = %(<embed src="#{opts[:src]}?#{querified_flashvars}" quality="high" scale="noscale" wmode="gpu" loop="true" bgcolor="#{opts[:bgcolor]}" width="#{opts[:width]}" name="BlackBook" align="middle" allowScriptAccess="always" allowFullScreen="true" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" />)
-
-    %(
-      <object width="#{opts[:width]}">
-        <param name="allowScriptAccess" value="always" />
-        <param name="allowFullScreen" value="true" />
-        <param name="quality" value="high" />
-        <param name="scale" value="noscale" />
-        <param name="wmode" value="gpu" />
-        <param name="loop" value="true" />
-        <param name="movie" value="#{opts[:src]}" />
-        <param name="bgcolor" value="#{opts[:bgcolor]}" />
-        #{flashvars.map { |key, value| "<param name=\"#{key}\" value=\"#{value}\" />\n\t\t\t\t" }}
-        #{embed}
-      </object>
-    )
-  end
+  # Playback now lives in tags/_player.html.haml and gml_player.js. The Flash
+  # embed that used to be here pointed at a .swf and stopped working when the
+  # plugin was withdrawn in 2020.
 end
