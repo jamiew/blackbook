@@ -160,8 +160,8 @@ jobs:
             '
             echo "--- app logs ---"
             ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" \
-              'docker logs $(docker ps -q --filter "name=blackbook-web" | head -1) 2>&1 \
-                 | grep -v "/usr/local/bundle" | tail -40'
+              'docker logs $(docker ps -q --filter "name=blackbook-web" | head -1) 2>&1 | tail -400 \
+                 | grep -av "^/usr/local/bundle" | grep -av "^{\"time\"" | tail -40'
             exit 1
           fi
 
