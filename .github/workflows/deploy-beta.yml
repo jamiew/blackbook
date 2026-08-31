@@ -1,0 +1,66 @@
+name: Deploy beta
+
+# Builds on an amd64 runner, which is the point: a laptop on arm64 has to
+# cross-compile under QEMU, and that alone turned a ~1 minute build into ~9.
+#
+# Deploys beta from this branch for now. Switching to production later means
+# changing the branch here and pointing config/deploy.yml at the other host.
+on:
+  push:
+    branches: [upgrade-migrations]
+  workflow_dispatch:
+
+concurrency:
+  # Kamal takes a deploy lock on the server; two runs at once would collide.
+  group: deploy-beta
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Lets GITHUB_TOKEN push to ghcr.io, so no personal token is needed.
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Add the deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.BETA_SSH_PRIVATE_KEY }}
+
+      - name: Trust the host
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ vars.BETA_HOST || '159.203.72.141' }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Write the secrets Kamal reads
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          DATABASE_URL: ${{ secrets.BETA_DATABASE_URL }}
+          BETA_AUTH_PASSWORD: ${{ secrets.BETA_AUTH_PASSWORD }}
+        run: |
+          # Same files and precedence as a laptop, so there is one code path.
+          printf '%s' "$RAILS_MASTER_KEY" > config/master.key
+          {
+            printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+            printf 'BETA_AUTH_PASSWORD=%s\n' "$BETA_AUTH_PASSWORD"
+          } > .kamal/secrets-common
+
+      - name: Deploy
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: bin/kamal deploy
+
+      - name: Clean up
+        if: always()
+        run: rm -f config/master.key .kamal/secrets-common

@@ -50,7 +50,9 @@ proxy:
 
 registry:
   server: ghcr.io
-  username: jamiew
+  # In CI this is the workflow actor with GITHUB_TOKEN, so no personal token is
+  # needed. Locally it falls back to the account that owns the package.
+  username: <%= ENV.fetch("KAMAL_REGISTRY_USERNAME", "jamiew") %>
   password:
     - KAMAL_REGISTRY_PASSWORD
 
