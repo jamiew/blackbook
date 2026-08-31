@@ -31,6 +31,11 @@ proxy:
   host: beta.000000book.com
   # Thruster listens on 80 inside the container.
   app_port: 80
+  # How long kamal-proxy waits for a new container to pass its health check
+  # before giving up. This, not healthcheck.timeout, is the "target failed to
+  # become healthy within configured timeout" number.
+  deploy_timeout: 120
+
   healthcheck:
     # Kamal will not switch traffic to a container that fails this, which is
     # what makes a bad deploy stop before it reaches anyone.
