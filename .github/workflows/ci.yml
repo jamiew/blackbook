@@ -112,6 +112,26 @@ jobs:
             printf 'BETA_AUTH_PASSWORD=%s\n' "$BETA_AUTH_PASSWORD"
           } > .kamal/secrets-common
 
+      # Kamal starts an existing kamal-proxy container rather than recreating
+      # it. If that container was created by a run that failed partway, as
+      # happened when nginx still held port 80, it can end up attached to no
+      # network at all, and then the proxy can never reach the app however
+      # healthy the app is. The symptom is a health check that always times
+      # out. Recreate it when that has happened.
+      - name: Ensure kamal-proxy is on the kamal network
+        env:
+          HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
+            if docker inspect kamal-proxy >/dev/null 2>&1; then
+              nets=$(docker inspect -f "{{range \$k, \$v := .NetworkSettings.Networks}}{{\$k}} {{end}}" kamal-proxy)
+              case "$nets" in
+                *kamal*) echo "kamal-proxy is on: $nets" ;;
+                *)       echo "kamal-proxy on no network, recreating"; docker rm -f kamal-proxy ;;
+              esac
+            fi
+          '
+
       - name: Deploy
         env:
           KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
