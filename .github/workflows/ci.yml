@@ -96,10 +96,13 @@ jobs:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           DATABASE_URL: ${{ secrets.BETA_DATABASE_URL }}
           BETA_AUTH_PASSWORD: ${{ secrets.BETA_AUTH_PASSWORD }}
+          # Kamal reads this from a secrets file, not from the environment.
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Same files and precedence a laptop uses, so there is one code path.
           printf '%s' "$RAILS_MASTER_KEY" > config/master.key
           {
+            printf 'KAMAL_REGISTRY_PASSWORD=%s\n' "$KAMAL_REGISTRY_PASSWORD"
             printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
             printf 'BETA_AUTH_PASSWORD=%s\n' "$BETA_AUTH_PASSWORD"
           } > .kamal/secrets-common

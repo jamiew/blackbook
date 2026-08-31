@@ -58,7 +58,15 @@ registry:
 
 builder:
   arch: amd64
-  # The servers are x86 and the laptop is arm64, so this cross-builds.
+  # The servers are x86. On an arm64 laptop this cross-builds under emulation,
+  # which is slow; CI runs on amd64 and builds natively.
+  cache:
+    # Registry rather than 'gha' so the same cache works from a laptop too.
+    # mode=max keeps intermediate layers, so a Gemfile-only change does not
+    # rebuild the whole image.
+    type: registry
+    options: mode=max
+    image: ghcr.io/jamiew/blackbook-build-cache
 
 env:
   clear:
