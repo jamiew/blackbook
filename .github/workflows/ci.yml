@@ -166,6 +166,13 @@ jobs:
             fi
 
             [ "$needs_restart" = "1" ] && systemctl restart mysql && echo "mysql restarted"
+
+            # What the running server actually does, rather than what the
+            # config file says it should.
+            mysql -N -e "SELECT CONCAT(\"running with: bind_address=\", @@bind_address,
+              \" skip_name_resolve=\", @@skip_name_resolve,
+              \" require_secure_transport=\", @@require_secure_transport)"
+            ss -lnt | awk "/:3306/ {print \"  listening: \" \$4}"
             true
           '
 

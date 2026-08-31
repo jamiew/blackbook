@@ -92,6 +92,10 @@ volumes:
   # Active Storage blobs. Same reasoning: these are the real images now, so they
   # belong on the volume rather than inside a container that gets replaced.
   - "/mnt/blackbook_volume/active-storage:/rails/storage"
+  # MySQL's socket, so the app can reach the database without TCP, TLS or a
+  # bridge address in the way. Read-only: the container has no business
+  # writing into the host's run directory.
+  - "/var/run/mysqld:/var/run/mysqld:ro"
 
 aliases:
   # Migrations are never automatic. bin/docker-entrypoint explains why.
