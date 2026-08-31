@@ -140,16 +140,33 @@ jobs:
             fi
             mysql -N -e "SELECT CONCAT(\"grant: \", user, \"@\", host) FROM mysql.user WHERE user=\"blackbook\""
 
+            cnf=/etc/mysql/mysql.conf.d/mysqld.cnf
+            needs_restart=0
+
+            # TCP connects but the handshake never finishes: MySQL does a
+            # reverse DNS lookup on each connecting address, and a container
+            # subnet has no PTR record, so every connection stalls until that
+            # lookup gives up. Safe here because the grants are IP patterns,
+            # not hostnames.
+            if ! grep -q "^skip-name-resolve" "$cnf" 2>/dev/null; then
+              printf "\nskip-name-resolve\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+              needs_restart=1
+              echo "enabled skip-name-resolve"
+            fi
+
             # Bind to every docker bridge that exists, not just docker0.
             binds=$(ip -4 -o addr show | awk "/172\.1[78]\./ {split(\$4,a,\"/\"); printf \"%s,\", a[1]}")
             want="127.0.0.1,${binds%,}"
-            cnf=/etc/mysql/mysql.conf.d/mysqld.cnf
             if ! grep -q "^bind-address[[:space:]]*=[[:space:]]*$want\$" "$cnf"; then
               sed -i "s|^bind-address.*|bind-address = $want|" "$cnf"
-              systemctl restart mysql && echo "mysql now binds: $want"
+              needs_restart=1
+              echo "mysql now binds: $want"
             else
               echo "mysql already binds: $want"
             fi
+
+            [ "$needs_restart" = "1" ] && systemctl restart mysql && echo "mysql restarted"
+            true
           '
 
           ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
