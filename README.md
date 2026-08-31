@@ -10,7 +10,11 @@ Graffiti writers are invited to capture and share their own tags, and computer p
 
 ## API
 
-Please visit the [API documentation](http://jamiedubs.com/wikis/blackbook/).
+- [Downloading GML](docs/api/downloading-gml.md)
+- [Uploading GML](docs/api/uploading-gml.md)
+- [Rendering GML](docs/gml/playback-implementations.md), across C++, Processing, Javascript, Flash, PHP and Python
+
+Full documentation is in [docs/](docs/README.md), imported from the GitHub wiki.
 
 ## Team
 
@@ -69,7 +73,8 @@ docker compose up -d
 bin/rails db:prepare
 ```
 
-Development, test and CI all use that MySQL, so they match the server.
+Development, test and CI all use that MySQL, so they match the server. Set
+`MYSQL_PORT` to point at a different one.
 
 ### 3. Credentials Configuration
 
@@ -162,7 +167,17 @@ unmounted `data/` makes every tag look empty. Run `data:validate` first.
 
 ## Deployment
 
-`./deploy` ships code to the production server. It reads `PROD_HOST`, `PROD_USER` and `PROD_APP_PATH` from `.env`.
+Beta deploys as a container via Kamal. See [docs/deployment.md](docs/deployment.md).
+
+```bash
+kamal deploy      # build, push, roll over with no downtime
+kamal rollback    # back to the previous image
+kamal migrate     # migrations, deliberately never automatic
+```
+
+### The older path, still in use for production
+
+`./deploy` ships code to the production server. It reads `PROD_HOST`, `PROD_USER` and `PROD_APP_PATH` from `.env`. Both it and `script/provision-droplet.sh` retire once Kamal is serving.
 
 ```bash
 ./deploy              # deploy origin/main
@@ -178,7 +193,10 @@ It does not run migrations. The currently pending set includes a `drop_table` on
 ```bash
 script/audit-production.sh    # read-only: what is deployed, what pending migrations will hit
 script/backup-production.sh   # verified dump, GML corpus, images, gitignored config
+script/resync-beta.sh         # reload beta from live production data
 ```
+
+More in [docs/operations.md](docs/operations.md).
 
 ## Migration Notes
 
@@ -189,14 +207,19 @@ This app was upgraded from Rails 4.2 to Rails 8.1. Major changes include:
 - **Modern Validations**: Updated from `validates_presence_of` to `validates` syntax
 - **Asset Pipeline**: Sprockets replaced by Propshaft. Propshaft does not read `//= require`
   directives, so every JS file is listed explicitly in `layouts/_template_header.html.haml`.
-- **Auth and uploads**: still Authlogic and kt-paperclip, not the Rails 8 built-ins
+- **Auth**: Authlogic replaced by `has_secure_password`. Pre-existing scrypt
+  hashes are verified against the old scheme and rehashed to bcrypt on next
+  login, so nobody is locked out
+- **Uploads**: kt-paperclip replaced by Active Storage, with variants matching
+  the old Paperclip geometry
+- **Database**: MySQL 5.7 to 8.4, MyISAM to InnoDB, utf8mb3 to utf8mb4
 
 ## Development Notes
 
 - **No Rails Console in Production**: Use `RAILS_ENV=production bin/rails runner "code here"`
 - **Asset Compilation**: `bin/rails assets:precompile` for production
 - **Background Jobs**: None currently configured
-- **File Uploads**: Uses kt-paperclip gem for image attachments
+- **File Uploads**: Active Storage, stored on local disk. There is no S3
 
 ## Troubleshooting
 
@@ -234,5 +257,7 @@ chmod 755 data
 
 ## API Documentation
 
-For API usage, see: [API documentation](http://jamiedubs.com/wikis/blackbook/)
+See [docs/](docs/README.md): [downloading](docs/api/downloading-gml.md),
+[uploading](docs/api/uploading-gml.md), and
+[rendering GML](docs/gml/playback-implementations.md).
 
