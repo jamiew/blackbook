@@ -6,7 +6,7 @@
 # Answers three questions before we touch the deploy:
 #   1. What code is actually running on the VPS?
 #   2. Will `git reset --hard` clobber anything the server holds locally?
-#   3. Will the 5 pending migrations abort partway through?
+#   3. Will the pending migrations abort partway through?
 #
 # Usage:  ./script/audit-production.sh              # uses .env
 #         ./script/audit-production.sh > audit.txt  # keep a copy to diff later
@@ -181,10 +181,8 @@ echo
 echo "-- migration state --"
 echo "applied migrations: $(q 'SELECT COUNT(*) FROM schema_migrations;')"
 echo "latest version:     $(q 'SELECT MAX(version) FROM schema_migrations;')"
-echo "which of the 5 pending are already applied:"
-q "SELECT version FROM schema_migrations WHERE version IN
-   ('20250821231341','20250919154715','20250919160811','20251204000001','20251204175129');"
-echo "(empty above = all 5 still pending, as expected)"
+echo "anything newer than MAX(version) above is pending. Compare against"
+echo "db/migrate/ in the branch you are about to deploy."
 
 echo
 echo "-- MIGRATION BLOCKERS: duplicates that abort a UNIQUE index build --"

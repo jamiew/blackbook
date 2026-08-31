@@ -2,8 +2,8 @@ class ConvertToUtf8mb4 < ActiveRecord::Migration[8.1]
   # utf8mb3 cannot store 4-byte characters, so emoji and some CJK have always
   # been silently rejected, and MySQL 8.4 deprecates the charset outright.
   #
-  # utf8mb4_unicode_ci matches the collation script/provision-droplet.sh gives
-  # the database. Every table must share one collation or joins on string
+  # utf8mb4_unicode_ci matches the collation compose.yaml and docs/deployment.md
+  # give the database. Every table must share one collation or joins on string
   # columns fail with "illegal mix of collations".
   COLLATION = "utf8mb4_unicode_ci".freeze
 

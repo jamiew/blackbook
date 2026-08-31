@@ -1,39 +1,25 @@
 # Says why the app cannot reach the database, instead of hanging.
 #
-#   docker exec <container> bin/rails runner /rails/script/db_doctor.rb
+#   bin/kamal app exec --reuse "bin/rails runner /rails/script/db_doctor.rb"
 #
 # A failed connection inside a container reaches the browser as a 504 or a
-# blank 500, which looks the same whether the app is slow, the port is
-# blocked, or the credentials are wrong. This tries the connection several
-# ways and says which of them work. It never prints the password.
+# blank 500, which looks the same whether the app is slow, the socket is
+# missing or the credentials are wrong. This says which. It never prints the
+# password.
 config = ActiveRecord::Base.connection_db_config.configuration_hash
 
 puts "  client library: #{Mysql2::Client.info.inspect}"
-puts "  host=#{config[:host]} database=#{config[:database]} username=#{config[:username]}"
-puts "  ssl_mode=#{config[:ssl_mode].inspect} connect_timeout=#{config[:connect_timeout].inspect}"
+puts "  socket=#{config[:socket]} database=#{config[:database]} username=#{config[:username]}"
 
-base = config.slice(:host, :port, :username, :password, :database).merge(connect_timeout: 5)
-
-attempts = {
-  "as configured" => config.except(:adapter, :pool),
-  "no ssl option" => base,
-  "ssl_mode disabled" => base.merge(ssl_mode: :disabled),
-  "no CLIENT_SSL flag" => base.merge(flags: %w[-SSL]),
-  "unix socket" => base.except(:host, :port).merge(socket: "/var/run/mysqld/mysqld.sock")
-}
-
-attempts.each do |name, options|
-  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-  client = Mysql2::Client.new(**options.symbolize_keys)
-  puts "  #{name}: ok, server is #{client.query('SELECT VERSION()').first.values.first}"
-  client.close
+begin
+  version = ActiveRecord::Base.connection.select_value("SELECT VERSION()")
+  puts "  connected, server is #{version}"
 rescue StandardError => e
-  elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
-  puts "  #{name}: #{e.class} after #{elapsed.round(1)}s - #{e.message.lines.first.to_s.strip[0, 160]}"
+  puts "  FAILED: #{e.class} - #{e.message.lines.first.to_s.strip[0, 200]}"
+  exit 1
 end
 
 # A connection that works while the schema is behind the code looks exactly
 # like a broken connection from the outside: every page 500s.
-pending = ActiveRecord::Base.connection_pool.migration_context.needs_migration?
-puts "  pending migrations: #{pending}"
+puts "  pending migrations: #{ActiveRecord::Base.connection_pool.migration_context.needs_migration?}"
 puts "  tables: #{ActiveRecord::Base.connection.tables.sort.join(', ')}"
