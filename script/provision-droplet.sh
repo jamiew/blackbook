@@ -18,6 +18,10 @@ APP_DIR="${APP_DIR:-/home/$APP_USER/blackbook}"
 RUBY_VERSION="${RUBY_VERSION:-3.4.5}"
 DB_NAME="${DB_NAME:-blackbook_prod}"
 DB_USER="${DB_USER:-blackbook}"
+AUTH_USER="${AUTH_USER:-blackbook}"
+# Deliberately no default: this repo is public. Pass AUTH_PASS=... or take the
+# random one the script prints on first run.
+AUTH_PASS="${AUTH_PASS:-}"
 ENV_FILE=/etc/blackbook.env
 
 [ "$(id -u)" -eq 0 ] || { echo "Run as root"; exit 1; }
@@ -41,7 +45,7 @@ apt-get install -y -qq \
   libssl-dev libyaml-dev libreadline-dev zlib1g-dev libncurses-dev libffi-dev libgdbm-dev \
   libmysqlclient-dev libvips42 imagemagick \
   git curl ufw nginx mysql-server certbot python3-certbot-nginx \
-  unattended-upgrades tmux
+  apache2-utils unattended-upgrades tmux
 timedatectl set-timezone Etc/UTC
 dpkg-reconfigure -f noninteractive unattended-upgrades
 
@@ -67,6 +71,16 @@ echo "$APP_USER ready"
 step "rbenv and Ruby $RUBY_VERSION"
 sudo -u "$APP_USER" bash <<RBENV
 set -euo pipefail
+# Start in the app user's home. sudo keeps root's cwd of /root, which
+# $APP_USER cannot read, and ruby-build's popd back to it fails after a
+# successful make install, rolling the whole build back.
+cd "\$HOME"
+# Ubuntu 26.04 mounts /tmp as a tmpfs at half of RAM, so 2GB on this box.
+# ruby-build defaults there and dies linking libruby-static.a with "Disk quota
+# exceeded", and because tmpfs is RAM it also steals memory from the compile.
+# 24.04 left /tmp on disk, which is why this only appears on 26.04.
+export TMPDIR="\$HOME/.rbenv-build-tmp"
+mkdir -p "\$TMPDIR"
 export RBENV_ROOT="\$HOME/.rbenv"
 [ -d "\$RBENV_ROOT" ] || git clone -q https://github.com/rbenv/rbenv.git "\$RBENV_ROOT"
 [ -d "\$RBENV_ROOT/plugins/ruby-build" ] || \
@@ -79,6 +93,17 @@ if ! rbenv versions --bare | grep -qx "$RUBY_VERSION"; then
 fi
 rbenv global "$RUBY_VERSION"
 gem install bundler --no-document --silent
+
+# The systemd unit calls the shim by absolute path, so the service runs without
+# this. Humans do not: every manual step below, and script/resync-beta.sh, run
+# as $APP_USER and would otherwise get "bundle: command not found".
+if ! grep -q RBENV_ROOT "\$HOME/.profile" 2>/dev/null; then
+  cat >> "\$HOME/.profile" <<'PROFILE'
+
+export RBENV_ROOT="\$HOME/.rbenv"
+export PATH="\$RBENV_ROOT/bin:\$RBENV_ROOT/shims:\$PATH"
+PROFILE
+fi
 ruby -v && bundle -v
 RBENV
 
@@ -132,6 +157,21 @@ else
   ls -la /mnt/blackbook_volume/
 fi
 
+step "Basic auth gate"
+if [ -f /etc/nginx/.htpasswd ]; then
+  echo "/etc/nginx/.htpasswd already exists, left alone"
+else
+  if [ -z "$AUTH_PASS" ]; then
+    AUTH_PASS=$(openssl rand -base64 12)
+    echo "No AUTH_PASS given, generated one. Write this down now:"
+  fi
+  htpasswd -bcB /etc/nginx/.htpasswd "$AUTH_USER" "$AUTH_PASS" >/dev/null
+  chown root:www-data /etc/nginx/.htpasswd
+  chmod 640 /etc/nginx/.htpasswd
+  echo "  user: $AUTH_USER"
+  echo "  pass: $AUTH_PASS"
+fi
+
 step "nginx for $APP_DOMAIN"
 # X-Forwarded-Proto is load-bearing: main sets config.force_ssl = true, and
 # without this header Rails redirects to https forever.
@@ -144,10 +184,23 @@ server {
   root $APP_DIR/public;
   client_max_body_size 20M;
 
-  location ^~ /assets/ { expires max; add_header Cache-Control public; }
-  location ^~ /system/ { expires max; add_header Cache-Control public; }
+  # Beta is gated. auth_basic sits on each location rather than on the server,
+  # so certbot's own /.well-known/acme-challenge/ block inherits nothing and
+  # can still answer unauthenticated. Delete these three pairs to go public.
+  location ^~ /assets/ {
+    auth_basic "blackbook beta";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    expires max; add_header Cache-Control public;
+  }
+  location ^~ /system/ {
+    auth_basic "blackbook beta";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    expires max; add_header Cache-Control public;
+  }
 
   location / {
+    auth_basic "blackbook beta";
+    auth_basic_user_file /etc/nginx/.htpasswd;
     try_files \$uri @app;
   }
 
