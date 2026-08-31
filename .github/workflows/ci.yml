@@ -89,7 +89,12 @@ jobs:
       - name: Trust the host
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H "${{ vars.BETA_HOST || '159.203.72.141' }}" >> ~/.ssh/known_hosts 2>/dev/null
+          # Unhashed and one key type on purpose. `ssh-keyscan -H` returns rsa,
+          # ecdsa and ed25519 in no fixed order, and net-ssh then sometimes
+          # compares against a different one and reports a host key mismatch.
+          ssh-keyscan -t ed25519 "${{ vars.BETA_HOST || '159.203.72.141' }}" \
+            >> ~/.ssh/known_hosts 2>/dev/null
+          sort -u ~/.ssh/known_hosts -o ~/.ssh/known_hosts
 
       - name: Write the secrets Kamal reads
         env:
@@ -134,6 +139,9 @@ jobs:
               [ "$code" = "200" ] && break
               sleep 5
             done
+            echo "--- is the block volume actually mounted? ---"
+            mountpoint /mnt/blackbook_volume || echo "NOT MOUNTED"
+            echo "gml files on host: $(ls /mnt/blackbook_volume/blackbook-data 2>/dev/null | wc -l)"
             echo "--- mount ownership, app runs as uid 1000 ---"
             docker exec probe sh -c "ls -ldn /rails/data /rails/public/system /rails/storage" 2>&1 | head -4 || true
             echo "--- listening inside the container ---"
