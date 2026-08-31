@@ -34,9 +34,13 @@ proxy:
   healthcheck:
     # Kamal will not switch traffic to a container that fails this, which is
     # what makes a bad deploy stop before it reaches anyone.
+    #
+    # 30s was not enough: on 2 vCPU, Rails eager-loading takes most of that
+    # before Puma accepts a connection, so a healthy container was killed for
+    # being slow to start rather than for being broken.
     path: /up
     interval: 3
-    timeout: 30
+    timeout: 90
 
 registry:
   server: ghcr.io
