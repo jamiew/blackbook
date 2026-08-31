@@ -113,6 +113,36 @@ jobs:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: bin/kamal deploy
 
+      # A failed health check says only "target failed to become healthy",
+      # which does not distinguish a container that never bound its port from
+      # one answering with a non-200. This asks the container directly.
+      - name: Diagnose a failed deploy
+        if: failure()
+        env:
+          HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
+            old=$(docker ps -aq --filter "name=blackbook-web" | head -1)
+            [ -z "$old" ] && { echo "no app container found"; exit 0; }
+            img=$(docker inspect -f "{{.Config.Image}}" "$old")
+            docker inspect -f "{{range .Config.Env}}{{println .}}{{end}}" "$old" > /root/probe.env
+            docker rm -f probe >/dev/null 2>&1 || true
+            docker run -d --name probe --network kamal               --add-host=host.docker.internal:host-gateway               --env-file /root/probe.env "$img" >/dev/null
+            for i in $(seq 1 12); do
+              code=$(docker exec probe curl -s -o /dev/null -w "%{http_code}" --max-time 5                 http://localhost/up 2>/dev/null || echo "refused")
+              echo "t+$((i*5))s  /up -> $code"
+              [ "$code" = "200" ] && break
+              sleep 5
+            done
+            echo "--- listening inside the container ---"
+            docker exec probe sh -c "(ss -lntp || netstat -lntp) 2>/dev/null | head -6" || true
+            echo "--- container status ---"
+            docker ps -a --filter name=probe --format "{{.Status}}"
+            echo "--- last 30 log lines ---"
+            docker logs probe 2>&1 | tail -30
+            docker rm -f probe >/dev/null 2>&1; rm -f /root/probe.env
+          '
+
       # Deliberately NOT automatic. The pending set drops a 301,076-row table,
       # so migrating is a decision, not a side effect of shipping code. Run it
       # with: bin/kamal migrate
