@@ -1,6 +1,13 @@
 name: "CI Tests"
 
+# One pipeline: test and lint on every push, and deploy beta only when both
+# pass. Job names are kept as Test and RuboCop so existing branch protection
+# and PR checks keep matching.
 on: push
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -12,35 +19,24 @@ jobs:
         # testing against a different major version is how the utf8mb3 and
         # MyISAM index-limit problems went unnoticed for so long.
         image: mysql:8.4
+        options: >-
+          --health-cmd="mysqladmin ping" --health-interval=10s
+          --health-timeout=5s --health-retries=3
         env:
-          MYSQL_HOST: 127.0.0.1
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DB: blackbook_test
         ports:
           - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        # No collation args here: unlike compose.yaml, a service container
+        # takes no command override. It does not matter, because `rake
+        # db:create` builds the database with the collation in database.yml
+        # rather than inheriting the server default.
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-
-      - name: Cache Gems
-        uses: actions/cache@v4
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: Install Gems
-        run: |
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
 
       - name: Run tests
         env:
@@ -53,3 +49,75 @@ jobs:
           bundle exec rake db:create
           bundle exec rake db:schema:load --trace
           bundle exec rspec
+
+  rubocop:
+    name: RuboCop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle exec rubocop --format github
+
+  deploy:
+    name: Deploy beta
+    needs: [test, rubocop]
+    if: github.ref == 'refs/heads/upgrade-migrations'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Lets GITHUB_TOKEN push to ghcr.io, so no personal token is needed.
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # An amd64 runner builds natively. A laptop on arm64 has to cross-compile
+      # under QEMU, which turned a short build into roughly nine minutes.
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Add the deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.BETA_SSH_PRIVATE_KEY }}
+
+      - name: Trust the host
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ vars.BETA_HOST || '159.203.72.141' }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Write the secrets Kamal reads
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          DATABASE_URL: ${{ secrets.BETA_DATABASE_URL }}
+          BETA_AUTH_PASSWORD: ${{ secrets.BETA_AUTH_PASSWORD }}
+        run: |
+          # Same files and precedence a laptop uses, so there is one code path.
+          printf '%s' "$RAILS_MASTER_KEY" > config/master.key
+          {
+            printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+            printf 'BETA_AUTH_PASSWORD=%s\n' "$BETA_AUTH_PASSWORD"
+          } > .kamal/secrets-common
+
+      - name: Deploy
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: bin/kamal deploy
+
+      # Deliberately NOT automatic. The pending set drops a 301,076-row table,
+      # so migrating is a decision, not a side effect of shipping code. Run it
+      # with: bin/kamal migrate
+      - name: Remind about migrations
+        run: |
+          echo "Deployed. Migrations were not run." >> $GITHUB_STEP_SUMMARY
+          echo "Run them deliberately with: bin/kamal migrate" >> $GITHUB_STEP_SUMMARY
+
+      - name: Clean up
+        if: always()
+        run: rm -f config/master.key .kamal/secrets-common
