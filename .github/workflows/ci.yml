@@ -139,6 +139,16 @@ jobs:
               [ "$code" = "200" ] && break
               sleep 5
             done
+            # The probe reaches /up on localhost, but kamal-proxy calls the
+            # container across the kamal network. That path is the last
+            # untested difference between the two.
+            echo "--- reachable across the docker network? ---"
+            ip=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" probe)
+            echo "probe ip: $ip"
+            docker run --rm --network kamal curlimages/curl:latest \
+              -s -o /dev/null -w "by name: %{http_code}\n" --max-time 8 http://probe/up 2>&1 | tail -1
+            docker run --rm --network kamal curlimages/curl:latest \
+              -s -o /dev/null -w "by ip:   %{http_code}\n" --max-time 8 "http://$ip/up" 2>&1 | tail -1
             echo "--- is the block volume actually mounted? ---"
             mountpoint /mnt/blackbook_volume || echo "NOT MOUNTED"
             echo "gml files on host: $(ls /mnt/blackbook_volume/blackbook-data 2>/dev/null | wc -l)"
