@@ -116,10 +116,33 @@ jobs:
       # network at all, and then the proxy can never reach the app however
       # healthy the app is. The symptom is a health check that always times
       # out. Recreate it when that has happened.
-      - name: Ensure kamal-proxy is on the kamal network
+      - name: Ensure the host is ready for the container
         env:
           HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
         run: |
+          ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
+            # MySQL runs on the host. The app container sits on the kamal
+            # network (172.18.x), not docker0 (172.17.x), and ufw defaults to
+            # denying incoming, so container-to-host traffic on 3306 was
+            # dropped. Only requests touching the database hung; /up and static
+            # files were fine, which is what made it look like a health check
+            # problem.
+            for net in 172.17.0.0/16 172.18.0.0/16; do
+              ufw status | grep -q "3306.*$net" || ufw allow from "$net" to any port 3306 proto tcp >/dev/null
+            done
+
+            # Bind to every docker bridge that exists, not just docker0.
+            binds=$(ip -4 -o addr show | awk "/172\.1[78]\./ {split(\$4,a,\"/\"); printf \"%s,\", a[1]}")
+            want="127.0.0.1,${binds%,}"
+            cnf=/etc/mysql/mysql.conf.d/mysqld.cnf
+            if ! grep -q "^bind-address[[:space:]]*=[[:space:]]*$want\$" "$cnf"; then
+              sed -i "s|^bind-address.*|bind-address = $want|" "$cnf"
+              systemctl restart mysql && echo "mysql now binds: $want"
+            else
+              echo "mysql already binds: $want"
+            fi
+          '
+
           ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
             if docker inspect kamal-proxy >/dev/null 2>&1; then
               nets=$(docker inspect -f "{{range \$k, \$v := .NetworkSettings.Networks}}{{\$k}} {{end}}" kamal-proxy)
