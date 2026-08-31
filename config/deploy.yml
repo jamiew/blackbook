@@ -23,11 +23,6 @@ servers:
   web:
     hosts:
       - 159.203.72.141
-    options:
-      # The container talks to MySQL on the host. Docker gives the host a
-      # routable name only if asked, and MySQL must be listening on the bridge
-      # address for it to answer. See "Host MySQL" at the bottom.
-      add-host: host.docker.internal:host-gateway
 
 ssh:
   user: root
@@ -92,6 +87,10 @@ volumes:
   # Active Storage blobs. Same reasoning: these are the real images now, so they
   # belong on the volume rather than inside a container that gets replaced.
   - "/mnt/blackbook_volume/active-storage:/rails/storage"
+  # MySQL's socket, so the app can reach the database without TCP, TLS or a
+  # bridge address in the way. Read-only: the container has no business
+  # writing into the host's run directory.
+  - "/var/run/mysqld:/var/run/mysqld:ro"
 
 aliases:
   # Migrations are never automatic. bin/docker-entrypoint explains why.
@@ -103,20 +102,19 @@ aliases:
 # ---------------------------------------------------------------------------
 # Host MySQL
 #
-# The container reaches the host database over the Docker bridge. Two one-time
-# changes on the server, neither of which exposes MySQL publicly:
+# MySQL runs on the host and the app reaches it over the Unix socket, which is
+# bind-mounted above. Two things this needs, neither of which opens a port:
 #
-#   1. Listen on loopback and the bridge, in /etc/mysql/mysql.conf.d/mysqld.cnf:
-#        bind-address = 127.0.0.1,172.17.0.1
+#   1. A grant for the socket, which MySQL sees as localhost:
+#        CREATE USER 'blackbook'@'localhost' IDENTIFIED BY '<password>';
+#        GRANT ALL PRIVILEGES ON blackbook_prod.* TO 'blackbook'@'localhost';
 #
-#   2. Let the app user connect from the bridge network:
-#        CREATE USER 'blackbook'@'172.17.%' IDENTIFIED BY '<password>';
-#        GRANT ALL PRIVILEGES ON blackbook_prod.* TO 'blackbook'@'172.17.%';
+#   2. DATABASE_URL naming localhost, so the client picks the socket:
+#        mysql2://blackbook:<password>@localhost/blackbook_prod
 #
-# Then DATABASE_URL in .kamal/secrets points at host.docker.internal:
-#   mysql2://blackbook:<password>@host.docker.internal/blackbook_prod
-#
-# ufw still blocks 3306 from the outside; the bridge is internal to the host.
+# TCP was tried first and every route timed out at connect, from a container
+# that could otherwise reach port 3306. The socket sidesteps the bridge
+# address, the firewall rules and MySQL 8.4's self-signed certificate at once.
 #
 # DigitalOcean Managed MySQL removes this whole section, and the patching along
 # with it, for about $15/mo.

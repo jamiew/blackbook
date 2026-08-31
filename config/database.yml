@@ -26,4 +26,16 @@ test:
 
 production:
   <<: *default
+  # DATABASE_URL must name localhost as its host. MySQL runs on the same
+  # machine, so the app reaches it over the Unix socket below rather than over
+  # TCP. Every TCP route from the container timed out at connect, whatever the
+  # TLS settings, while the socket answers immediately, and the socket needs no
+  # bridge address, firewall rule or certificate to keep working.
   url: <%= ENV['DATABASE_URL'] %>
+  # Keys the URL does not set survive the merge, so this is the default and the
+  # URL can still override it.
+  socket: <%= ENV.fetch('MYSQL_SOCKET', '/var/run/mysqld/mysqld.sock') %>
+  # Without a timeout an unreachable database hangs each request until the OS
+  # gives up, which reads as a slow app rather than as a database it cannot
+  # reach. That is what turned this into a 504 instead of an error.
+  connect_timeout: 5

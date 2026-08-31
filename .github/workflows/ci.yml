@@ -110,16 +110,16 @@ jobs:
             printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
           } > .kamal/secrets-common
 
-      # Kamal starts an existing kamal-proxy container rather than recreating
-      # it. If that container was created by a run that failed partway, as
-      # happened when nginx still held port 80, it can end up attached to no
-      # network at all, and then the proxy can never reach the app however
-      # healthy the app is. The symptom is a health check that always times
-      # out. Recreate it when that has happened.
-      - name: Ensure kamal-proxy is on the kamal network
+      - name: Ensure the host is ready for the container
         env:
           HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
         run: |
+          # Kamal starts an existing kamal-proxy container rather than
+          # recreating it. If that container was created by a run that failed
+          # partway, as happened when nginx still held port 80, it can end up
+          # attached to no network at all, and then the proxy can never reach
+          # the app however healthy the app is. The symptom is a health check
+          # that always times out.
           ssh -o StrictHostKeyChecking=accept-new "root@$HOST" '
             if docker inspect kamal-proxy >/dev/null 2>&1; then
               nets=$(docker inspect -f "{{range \$k, \$v := .NetworkSettings.Networks}}{{\$k}} {{end}}" kamal-proxy)
@@ -128,6 +128,9 @@ jobs:
                 *)       echo "kamal-proxy on no network, recreating"; docker rm -f kamal-proxy ;;
               esac
             fi
+            # The app connects over the MySQL socket, so it has to be there.
+            [ -S /var/run/mysqld/mysqld.sock ] && echo "mysql socket present" \
+              || { echo "no mysql socket at /var/run/mysqld/mysqld.sock"; exit 1; }
           '
 
       - name: Deploy
@@ -147,9 +150,18 @@ jobs:
             case "$code" in 200|301|302) ;; *) fail=1 ;; esac
           done
           if [ "$fail" = "1" ]; then
+            echo "--- can the app reach the database? ---"
+            ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" '
+              c=$(docker ps -q --filter "name=blackbook-web" | head -1)
+              echo "socket inside the container:"
+              docker exec "$c" ls -l /var/run/mysqld/mysqld.sock 2>&1 | tail -1
+              echo "what Rails says:"
+              docker exec "$c" timeout 60 bin/rails runner /rails/script/db_doctor.rb 2>&1 | tail -12
+            '
             echo "--- app logs ---"
             ssh -o StrictHostKeyChecking=accept-new "root@${{ vars.BETA_HOST || '159.203.72.141' }}" \
-              'docker logs $(docker ps -q --filter "name=blackbook-web" | head -1) 2>&1 | tail -40'
+              'docker logs $(docker ps -q --filter "name=blackbook-web" | head -1) 2>&1 | tail -400 \
+                 | grep -av "^/usr/local/bundle" | grep -av "^{\"time\"" | tail -40'
             exit 1
           fi
 
