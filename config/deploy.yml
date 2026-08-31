@@ -23,6 +23,9 @@ servers:
       # address for it to answer. See "Host MySQL" at the bottom.
       add-host: host.docker.internal:host-gateway
 
+ssh:
+  user: root
+
 proxy:
   ssl: true
   host: beta.000000book.com
