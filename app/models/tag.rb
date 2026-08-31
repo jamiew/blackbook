@@ -26,15 +26,20 @@ class Tag < ApplicationRecord
   # RAND() is MySQL-specific; postgres/sqlite want RANDOM()
   scope :in_random_order, -> { order(Arel.sql('RAND()')) }
 
-  # validates_attachment_presence :image
-  # validates_attachment :image, content_type: { content_type: ["image/jpg", "image/jpeg", "image/png", "image/gif"] }
-  do_not_validate_attachment_file_type :image
-  has_attached_file :image,
-                    default_style: :medium,
-                    default_url: "/images/defaults/tag_:style.jpg",
-                    url: "/system/:attachment/:id_partition/:style/:basename.:extension",
-                    path: ":rails_root/public/system/:attachment/:id_partition/:style/:basename.:extension",
-                    styles: { large: '600x600>', medium: "300x300>", small: '100x100#', tiny: "32x32#" }
+  # Tag images arrive from GMLImageRenderer rather than a user upload, and were
+  # deliberately exempt from filetype validation under Paperclip too.
+  # Variant names and geometry match the Paperclip styles they replace, so a
+  # backfilled image renders identically. resize_to_limit is Paperclip's ">"
+  # (shrink only, keep aspect); resize_to_fill is its "#" (crop to exact size).
+  has_one_attached :image do |attachable|
+    attachable.variant :large,  resize_to_limit: [600, 600]
+    attachable.variant :medium, resize_to_limit: [300, 300]
+    attachable.variant :small,  resize_to_fill:  [100, 100]
+    attachable.variant :tiny,   resize_to_fill:  [32, 32]
+  end
+
+  DEFAULT_IMAGE_STYLE = :medium
+  def default_image_url(style = DEFAULT_IMAGE_STYLE) = "/images/defaults/tag_#{style}.jpg"
 
   # Placeholders for assigning data from forms
   attr_accessor :gml_file
@@ -73,15 +78,13 @@ class Tag < ApplicationRecord
     "http://fffff.at/tempt1/photos/data/eyetags/#{attributes['remote_image'].gsub('gml', 'png')}"
   end
 
-  # if we have a remote image (for Tempt) use that...
-  def thumbnail_image(size = :medium)
-    if remote_image.present?
-      "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{attributes['remote_image'].gsub('gml', 'png')}"
-    # elsif Rails.env == 'development' && !File.exist?(self.image_path(size)) #don't do image 404s in development
-    #   return "/images/defaults/tag_#{size.to_s}.jpg"
-    else
-      image(size)
-    end
+  # Tempt's tags are hosted elsewhere and have no attachment of their own.
+  # Returns nil when this tag is not one of those, and the caller falls back to
+  # the attachment. See ApplicationHelper#tag_thumbnail_url.
+  def remote_thumbnail_url
+    return nil if remote_image.blank?
+
+    "http://fffff.at/tempt1/photos/data/eyetags/thumb/#{attributes['remote_image'].gsub('gml', 'png')}"
   end
 
   # Check to see if this data is from an iPhone, which means we'll need to rotate

@@ -1,23 +1,28 @@
 default: &default
   adapter: mysql2
-  encoding: utf8
+  # `utf8` is MySQL's alias for utf8mb3, which cannot carry 4-byte characters.
+  # Leaving it here would defeat the utf8mb4 tables: the connection itself
+  # would still refuse emoji. Collation is pinned so a freshly created dev or
+  # test database compares strings the same way production does.
+  encoding: utf8mb4
+  collation: utf8mb4_unicode_ci
   pool: 5
   host: 127.0.0.1
+  # Defaults to the MySQL 8.4 that compose.yaml runs, which is the version the
+  # server runs. Development used to point at whatever MySQL was on the laptop,
+  # which is how a version gap opened up between here and production.
+  # Set MYSQL_PORT to use a different server.
+  port: <%= ENV.fetch('MYSQL_PORT', 13306) %>
+  username: root
+  password: <%= ENV.fetch('MYSQL_PASSWORD', '') %>
 
 development:
   <<: *default
   database: blackbook_dev
-  username: root
-  password: <%= ENV.fetch('MYSQL_PASSWORD', 'root') %>
 
 test:
   <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
   database: blackbook_test
-  username: root
-  # An explicit password: here overrides the one in DATABASE_URL, so CI (empty-password
-  # MySQL) sets MYSQL_PASSWORD="" to opt out rather than inheriting the local default.
-  password: <%= ENV.fetch('MYSQL_PASSWORD', 'root') %>
 
 production:
   <<: *default

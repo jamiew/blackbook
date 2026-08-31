@@ -37,7 +37,7 @@
   %aside.profile__aside
     .hero__panel
       %h2 Profile
-      %p.profile__photo= link_to image_tag(@user.photo.url(:small), alt: @user.login), @user.photo.url
+      %p.profile__photo= link_to image_tag(attachment_url(@user, :photo, :small), alt: @user.login), attachment_url(@user, :photo, :medium)
       - unless @user.website.blank?
         %p= link_to @user.website.gsub(%r{^https?://}, ''), (@user.website =~ /^http/ ? @user.website : "http://#{@user.website}"), rel: 'nofollow'
       - unless @user.about.blank?

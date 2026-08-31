@@ -39,6 +39,12 @@ Metrics/ClassLength:
 Metrics/AbcSize:
   Max: 30
 
+# A rake task is one linear `task ... do` block by nature. Splitting an audit
+# script into methods to satisfy a line count scatters it for no reader's benefit.
+Metrics/BlockLength:
+  Exclude:
+    - 'lib/tasks/**/*.rake'
+
 # Naming conventions - existing code patterns
 Naming/PredicatePrefix:
   Enabled: false
@@ -59,6 +65,7 @@ Rails/WhereRange:
 Rails/DynamicFindBy:
   AllowedMethods:
     - find_by_param
+    - find_by_login_or_email
 
 # All three mass-assignment sites now use `params.expect`. What's left is plain reads
 # (`Tag.find(params[:id])`, `params[:user].gsub(...)`) where `expect` would only swap a
@@ -71,6 +78,13 @@ Rails/I18nLocaleTexts:
 
 Rails/OutputSafety:
   Enabled: false
+
+Rails/Output:
+  # These are rake-task code whose entire job is printing a report to a human
+  # running it. Sending that to the logger would hide it.
+  Exclude:
+    - 'lib/active_storage_backfill.rb'
+    - 'lib/tasks/**/*.rake'
 
 # RSpec specific
 # The suite consistently sets up in `before` blocks and reads @tag/@user/@json in the

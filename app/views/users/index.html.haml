@@ -10,7 +10,7 @@
     - link = (user_path(user) rescue user_path(id: user.to_param))
     %li
       %a.person{ href: link }
-        = image_tag user.photo.url(:small), alt: user.login
+        = image_tag attachment_url(user, :photo, :small), alt: user.login
         %span.person__name= user.login
         %span.person__meta.meta
           - count = user.tags.count

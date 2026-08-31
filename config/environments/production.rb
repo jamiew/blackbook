@@ -1,4 +1,5 @@
 Rails.application.configure do
+  config.active_storage.service = :production
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
@@ -31,6 +32,12 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
+  # The health check is the one thing that must answer over plain HTTP. Kamal's
+  # proxy polls it on the container directly, without X-Forwarded-Proto, so
+  # force_ssl would send it a 301 and it would judge every container unhealthy.
+  # Nothing would ever finish deploying.
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == '/up' } } }
+
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.log_level = :info
@@ -51,8 +58,35 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
-  # We run postfix locally
-  config.action_mailer.delivery_method = :sendmail
+  # Amazon SES over SMTP. The old :sendmail setting assumed a local postfix,
+  # which the container does not have, so mail failed silently there.
+  #
+  # Credentials live in Rails encrypted credentials, not the environment: the
+  # encrypted file is safe to commit in a public repo, and RAILS_MASTER_KEY is
+  # already handed to the container by Kamal. Edit them with:
+  #
+  #   bin/rails credentials:edit
+  #
+  # Falls back to :sendmail when unconfigured, so a laptop and the old server
+  # keep behaving as they do today.
+  ses = Rails.application.credentials.ses
+
+  if ses.present?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: ses[:smtp_address],
+      port: ses.fetch(:port, 587),
+      user_name: ses[:smtp_username],
+      password: ses[:smtp_password],
+      authentication: :login,
+      enable_starttls_auto: true
+    }
+    config.action_mailer.default_options = { from: ses[:from] }
+    # Without this a delivery failure is swallowed and nobody finds out.
+    config.action_mailer.raise_delivery_errors = true
+  else
+    config.action_mailer.delivery_method = :sendmail
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

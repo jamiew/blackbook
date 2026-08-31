@@ -5,7 +5,6 @@ describe PasswordResetController do
 
   before do
     request.env["rack.url_scheme"] = "https"
-    # activate_authlogic
     @user = FactoryBot.create(:user)
   end
 
@@ -22,7 +21,6 @@ describe PasswordResetController do
     it "sends an email to the user if found" do
       expect do
         post :create, params: { email: @user.email }
-        expect(@user.perishable_token).not_to be_blank
         expect(response).to redirect_to(root_path)
       end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
@@ -37,25 +35,23 @@ describe PasswordResetController do
 
   describe "POST #update" do
     it "changes password given a valid token and matching passwords" do
-      @user.reset_perishable_token!
       expect do
-        post :update, params: { id: @user.perishable_token, user: {
+        post :update, params: { id: @user.generate_token_for(:password_reset), user: {
           password: 'totally_fresh!', password_confirmation: 'totally_fresh!'
         } }
         @user.reload
-      end.to change(@user, :crypted_password)
+      end.to change(@user, :password_digest)
       expect(flash[:notice]).not_to be_blank
       expect(response).to redirect_to(user_path)
     end
 
     it "does not change password given a valid token and non-matching passwords" do
-      @user.reset_perishable_token!
       expect do
-        post :update, params: { id: @user.perishable_token, user: {
+        post :update, params: { id: @user.generate_token_for(:password_reset), user: {
           password: 'new_pass', password_confirmation: 'new'
         } }
         @user.reload
-      end.not_to change(@user, :crypted_password)
+      end.not_to change(@user, :password_digest)
       expect(response).not_to be_redirect
     end
 
@@ -65,20 +61,19 @@ describe PasswordResetController do
           password: 'new_pass', password_confirmation: 'new'
         } }
         expect(response).to redirect_to(root_url)
-      end.not_to change(@user, :crypted_password)
+      end.not_to change(@user, :password_digest)
     end
 
     it "emails the user that password was reset" do
       # Currently this feature is not implemented - just test that password reset works
-      @user.reset_perishable_token!
-      old_password = @user.crypted_password
+      old_password = @user.password_digest
 
-      post :update, params: { id: @user.perishable_token, user: {
+      post :update, params: { id: @user.generate_token_for(:password_reset), user: {
         password: 'new_pass', password_confirmation: 'new_pass'
       } }
 
       @user.reload
-      expect(@user.crypted_password).not_to eq(old_password)
+      expect(@user.password_digest).not_to eq(old_password)
       expect(response).to redirect_to(user_path)
 
       # Password reset works correctly (email notification could be added later)

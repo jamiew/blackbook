@@ -1,0 +1,123 @@
+# Kamal deploys the app as a container. It replaces script/provision-droplet.sh
+# and ./deploy for everything above the operating system.
+#
+#   kamal setup     first time on a new server
+#   kamal deploy    build, push, and roll over with no downtime
+#   kamal rollback  go back to the previous image
+#   kamal app logs -f
+#
+# MySQL is deliberately NOT managed here. It stays a host package so the block
+# volume, backups and patching work exactly as they already do. Containerising
+# a database you already run well buys complexity, not safety.
+#
+service: blackbook
+image: jamiew/blackbook
+
+# How long kamal-proxy waits for a new container to pass its health check.
+# This, not proxy.healthcheck.timeout, produces "target failed to become
+# healthy within configured timeout". Rails eager-loading on 2 vCPU uses most
+# of the 30s default before Puma accepts its first connection.
+deploy_timeout: 120
+
+servers:
+  web:
+    hosts:
+      - 159.203.72.141
+    options:
+      # The container talks to MySQL on the host. Docker gives the host a
+      # routable name only if asked, and MySQL must be listening on the bridge
+      # address for it to answer. See "Host MySQL" at the bottom.
+      add-host: host.docker.internal:host-gateway
+
+ssh:
+  user: root
+
+proxy:
+  ssl: true
+  host: beta.000000book.com
+  # Thruster listens on 80 inside the container.
+  app_port: 80
+  healthcheck:
+    # Kamal will not switch traffic to a container that fails this, which is
+    # what makes a bad deploy stop before it reaches anyone.
+    #
+    # 30s was not enough: on 2 vCPU, Rails eager-loading takes most of that
+    # before Puma accepts a connection, so a healthy container was killed for
+    # being slow to start rather than for being broken.
+    path: /up
+    interval: 3
+    timeout: 90
+
+registry:
+  server: ghcr.io
+  # In CI this is the workflow actor with GITHUB_TOKEN, so no personal token is
+  # needed. Locally it falls back to the account that owns the package.
+  username: <%= ENV.fetch("KAMAL_REGISTRY_USERNAME", "jamiew") %>
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  # The servers are x86. On an arm64 laptop this cross-builds under emulation,
+  # which is slow; CI runs on amd64 and builds natively.
+  cache:
+    # Registry rather than 'gha' so the same cache works from a laptop too.
+    # mode=max keeps intermediate layers, so a Gemfile-only change does not
+    # rebuild the whole image.
+    type: registry
+    options: mode=max
+    image: ghcr.io/jamiew/blackbook-build-cache
+
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: "true"
+    RAILS_SERVE_STATIC_FILES: "true"
+    # Must resolve to a path backed by the block volume below. Left at the
+    # in-container default, every uploaded and backfilled image would be written
+    # to the container's own filesystem and lost on the next deploy.
+    ACTIVE_STORAGE_ROOT: /rails/storage
+    # Beta gate, replacing the nginx one that kamal-proxy displaces. Remove both
+    # this and BETA_AUTH_PASSWORD to make the site public.
+    BETA_AUTH_USER: blackbook
+  secret:
+    - RAILS_MASTER_KEY
+    - DATABASE_URL
+    - BETA_AUTH_PASSWORD
+
+volumes:
+  # The GML files and uploaded images live on the block volume and must outlive
+  # any container. These are the same two paths production symlinks today.
+  - "/mnt/blackbook_volume/blackbook-data:/rails/data"
+  - "/mnt/blackbook_volume/blackbook-backup/public/system:/rails/public/system"
+  # Active Storage blobs. Same reasoning: these are the real images now, so they
+  # belong on the volume rather than inside a container that gets replaced.
+  - "/mnt/blackbook_volume/active-storage:/rails/storage"
+
+aliases:
+  # Migrations are never automatic. bin/docker-entrypoint explains why.
+  migrate: app exec --reuse "bin/rails db:migrate"
+  console: app exec --interactive --reuse "bin/rails console"
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+  logs: app logs --follow
+
+# ---------------------------------------------------------------------------
+# Host MySQL
+#
+# The container reaches the host database over the Docker bridge. Two one-time
+# changes on the server, neither of which exposes MySQL publicly:
+#
+#   1. Listen on loopback and the bridge, in /etc/mysql/mysql.conf.d/mysqld.cnf:
+#        bind-address = 127.0.0.1,172.17.0.1
+#
+#   2. Let the app user connect from the bridge network:
+#        CREATE USER 'blackbook'@'172.17.%' IDENTIFIED BY '<password>';
+#        GRANT ALL PRIVILEGES ON blackbook_prod.* TO 'blackbook'@'172.17.%';
+#
+# Then DATABASE_URL in .kamal/secrets points at host.docker.internal:
+#   mysql2://blackbook:<password>@host.docker.internal/blackbook_prod
+#
+# ufw still blocks 3306 from the outside; the bridge is internal to the host.
+#
+# DigitalOcean Managed MySQL removes this whole section, and the patching along
+# with it, for about $15/mo.

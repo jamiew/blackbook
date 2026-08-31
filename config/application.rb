@@ -5,6 +5,7 @@ require "rails"
 require "active_model/railtie"
 require "active_job/railtie"
 require "active_record/railtie"
+require "active_storage/engine"
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "action_view/railtie"
@@ -22,6 +23,12 @@ module Blackbook4
     # -- all .rb files in that directory are automatically loaded.
 
     config.load_defaults 8.1
+
+    # Rails 8 defaults to :vips. ImageMagick is what Paperclip used, what this
+    # app has always depended on, and what the Dockerfile and a plain macOS
+    # setup both already have; vips would need installing separately. The
+    # image also ships libvips42, so switching is a one-line change later.
+    config.active_storage.variant_processor = :mini_magick
 
     # 8.1 default is :raise. The GML upload API deliberately takes a caller-supplied
     # `?redirect_to=` with `allow_other_host: true`, so a scheme-less value like

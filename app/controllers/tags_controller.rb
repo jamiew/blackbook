@@ -172,7 +172,7 @@ class TagsController < ApplicationController
 
   # Upload an image for a tag if one doesn't already exist (for GMLImageRenderer)
   def thumbnail
-    render plain: 'thumbnail already exists', status: :conflict and return if @tag.image.exists?
+    render plain: 'thumbnail already exists', status: :conflict and return if @tag.image.attached?
 
     @tag.image = params[:image]
     @tag.save!

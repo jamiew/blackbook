@@ -22,7 +22,7 @@
 
   - @visualizations.each do |app|
     %tr.fat
-      %td= link_to(image_tag(app.image(:small), width: 100), visualization_path(app))
+      %td= link_to(image_tag(attachment_url(app, :image, :small), width: 100), visualization_path(app))
       %td.name
         %strong= link_to app.name, visualization_path(app)
       %td.authors{style: 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'

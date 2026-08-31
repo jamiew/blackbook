@@ -1,5 +1,5 @@
 class PasswordResetController < ApplicationController
-  before_action :load_user_using_perishable_token, only: %i[edit update]
+  before_action :load_user_from_token, only: %i[edit update]
   before_action :require_no_user
 
   def new
@@ -36,8 +36,10 @@ class PasswordResetController < ApplicationController
 
   private
 
-  def load_user_using_perishable_token
-    @user = User.find_using_perishable_token(params[:id])
+  # Authlogic's perishable_token was a column that never expired. This token is
+  # signed, expires in a day, and is invalidated by a password change.
+  def load_user_from_token
+    @user = User.find_by_token_for(:password_reset, params[:id])
     return unless @user.nil?
 
     flash[:notice] = "We're sorry, but we could not locate your account. " \

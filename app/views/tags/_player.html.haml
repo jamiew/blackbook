@@ -7,8 +7,8 @@
   .player__stage
     %canvas.player__canvas{ role: 'img', 'aria-label' => "Playback of tag ##{player.id}" }
     %noscript
-      - if player.thumbnail_image.present?
-        = image_tag player.thumbnail_image(:large), alt: "Tag ##{player.id}"
+      - if attachment_attached?(player, :image) || player.remote_thumbnail_url.present?
+        = image_tag tag_thumbnail_url(player, :large), alt: "Tag ##{player.id}"
     -# Escaped by ActiveSupport's JSON encoder, so `</script>` cannot break out.
     %script{ type: 'application/json' }!= player.player_data.to_json
   .player__transport{ data: { player_controls: true } }

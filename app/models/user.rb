@@ -1,12 +1,58 @@
 class User < ApplicationRecord
-  acts_as_authentic do |c|
-    c.crypto_provider = ::Authlogic::CryptoProviders::SCrypt
+  # bcrypt, via password_digest. Validations are off because most rows predate
+  # this column and would otherwise fail to save on any unrelated update.
+  has_secure_password validations: false
+
+  validates :password, confirmation: true, length: { minimum: 4 }, if: -> { password.present? }
+
+  # Password reset links. Replaces Authlogic's perishable_token, which was a
+  # column that never expired; this is signed and expires on its own.
+  generates_token_for :password_reset, expires_in: 1.day do
+    # Changing the password invalidates any outstanding reset link.
+    (password_digest.presence || legacy_crypted_password).to_s.last(10)
   end
 
-  # Add password confirmation support for forms
-  attr_accessor :password_confirmation
+  # Returns the user when the password is right, otherwise nil.
+  #
+  # Accounts created before the move off Authlogic have only an scrypt hash in
+  # crypted_password. scrypt cannot be converted to bcrypt, so those are checked
+  # against the old scheme and quietly rehashed here, one login at a time.
+  def self.authenticate_by_credentials(login_or_email, password)
+    user = find_by_login_or_email(login_or_email.to_s.strip)
+    return nil if user.nil? || password.blank?
 
-  validates :password, confirmation: { if: :password_changed? }
+    if user.password_digest.present?
+      user.authenticate(password) || nil
+    elsif user.authenticate_legacy_scrypt(password)
+      user.migrate_password_to_bcrypt!(password)
+      user
+    end
+  end
+
+  # Verify against the scrypt hash Authlogic wrote.
+  #
+  # The hashed string is the password with the salt appended, in that order.
+  # Authlogic's encrypt_arguments returns [raw_password, salt] and its SCrypt
+  # provider joins them, so reversing these silently fails every legacy login.
+  # spec/models/user_spec.rb pins the order against a real Authlogic hash.
+  def authenticate_legacy_scrypt(password)
+    return false if legacy_crypted_password.blank?
+
+    ::SCrypt::Password.new(legacy_crypted_password) == "#{password}#{legacy_password_salt}"
+  rescue ::SCrypt::Errors::InvalidHash
+    false
+  end
+
+  # has_secure_password defines its own password_salt, derived from the bcrypt
+  # digest, which shadows the legacy column of the same name and returns nil
+  # while password_digest is empty. Read the columns directly so the two
+  # schemes stop colliding.
+  def legacy_crypted_password = self[:crypted_password]
+  def legacy_password_salt    = self[:password_salt]
+
+  def migrate_password_to_bcrypt!(password)
+    update_column(:password_digest, ::BCrypt::Password.create(password))
+  end
 
   # FIXME: manually reimplmenting this for now...
   # should we just use friendly_id?
@@ -26,10 +72,11 @@ class User < ApplicationRecord
   }
   # TODO: email regex validation
 
-  has_attached_file :photo,
-                    styles: { medium: "300x300>", small: "100x100#", tiny: '32x32#' },
-                    path: ":rails_root/public/system/photos/:id/:style/:filename",
-                    url: "/system/photos/:id/:style/:filename"
+  has_one_attached :photo do |attachable|
+    attachable.variant :medium, resize_to_limit: [300, 300]
+    attachable.variant :small,  resize_to_fill:  [100, 100]
+    attachable.variant :tiny,   resize_to_fill:  [32, 32]
+  end
 
   after_create  :create_notification
   after_save    :activate_device_pairing
@@ -47,7 +94,6 @@ class User < ApplicationRecord
   end
 
   def deliver_password_reset_instructions!
-    reset_perishable_token!
     UserMailer.password_reset_instructions(self).deliver_now
   end
 

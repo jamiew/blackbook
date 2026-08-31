@@ -2,8 +2,8 @@
 %a.tag-card{ href: tag_path(tag) }
   .tag-card__frame
     %span.tag-card__id= "##{tag.id}"
-    - if tag.image.exists? || tag.remote_image.present?
-      = image_tag tag.thumbnail_image(:medium), alt: "Tag ##{tag.id}", loading: 'lazy'
+    - if attachment_attached?(tag, :image) || tag.remote_thumbnail_url.present?
+      = image_tag tag_thumbnail_url(tag), alt: "Tag ##{tag.id}", loading: 'lazy'
     - else
       -# Older uploads never had a still generated. Say so rather than falling
       -# back to a stock photo that reads as the tag itself.

@@ -1,0 +1,49 @@
+# 000000book documentation
+
+Imported from the [GitHub wiki](https://github.com/jamiew/blackbook/wiki) so it
+lives with the code, can be reviewed in pull requests, and is available to both
+the website and anyone (or anything) working on the repo.
+
+## Using the API
+
+- [Downloading GML](api/downloading-gml.md)
+- [Uploading GML](api/uploading-gml.md)
+
+## Rendering GML
+
+- [Sample playback code](gml/playback-implementations.md), across C++, Processing, Javascript, Flash, PHP and Python
+- [Drawing GML with Javascript and JSON](gml/javascript-and-json.md)
+- [PHP API scraping example](examples/php-scraper.md)
+
+## Running it
+
+- [Deployment](deployment.md)
+- [Operations](operations.md), including backups, resync and migration rehearsal
+
+## Elsewhere
+
+- [Official GML 1.0 spec](http://graffitimarkuplanguage.com)
+- [GML syntax validator](http://000000book.com/validator)
+- [Applications using GML](http://000000book.com/apps)
+- [GML mailing list](http://groups.google.com/group/graffiti-markup-language)
+
+## What is GML?
+
+Graffiti Markup Language (`.gml`) is a universal, XML-based, open file format for
+storing graffiti motion data: x and y coordinates and time. The format is designed
+to maximize readability and ease of implementation, even for hobbyist programmers,
+artists and graffiti writers. Applications implementing GML include
+[Graffiti Analysis](http://graffitianalysis.com/) and [EyeWriter](http://eyewriter.org).
+
+Beyond storing data, a main goal of GML is to spark interest in the importance
+(and fun) of open data, and to introduce open source collaboration to new
+communities. GML is intended as a simple bridge between ink and code.
+
+## Gaps
+
+The wiki linked two pages that were never written, so they did not come across:
+
+- **Device Pairing** — how uniqueKeys link an app's uploads to a 000000book user.
+  Referenced from the old wiki home and from [Uploading GML](api/uploading-gml.md).
+- **GML Minimum Specs** — the required fields an upload is validated against.
+  Referenced from [Uploading GML](api/uploading-gml.md).

@@ -4,7 +4,6 @@ describe TagsController do
   render_views
 
   before do
-    activate_authlogic
     @gml = FactoryBot.build(:gml_object).data
     allow_any_instance_of(GmlObject).to receive(:data).and_return(DEFAULT_GML)
   end

@@ -10,8 +10,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
-  create_table "favorites", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+ActiveRecord::Schema[8.1].define(version: 2026_08_31_015520) do
+  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "favorites", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "object_id"
     t.string "object_type"
@@ -21,7 +49,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
     t.index ["user_id", "object_id", "object_type"], name: "index_favorites_unique_on_user_and_object", unique: true
   end
 
-  create_table "likes", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "likes", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.integer "object_id"
     t.string "object_type"
@@ -30,7 +58,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
     t.index ["user_id", "object_id", "object_type"], name: "index_likes_unique_on_user_and_object", unique: true
   end
 
-  create_table "notifications", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "notifications", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.string "subject_id"
     t.string "subject_type"
@@ -42,13 +70,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
-  create_table "tags", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "tags", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "application"
     t.string "author"
     t.string "cached_tag_list"
     t.integer "comment_count"
     t.datetime "created_at", precision: nil
-    t.text "description", size: :medium
+    t.text "description", size: :long
     t.string "gml_application"
     t.string "gml_keywords"
     t.string "gml_uniquekey"
@@ -76,11 +104,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
     t.index ["user_id", "created_at"], name: "index_tags_on_user_id_and_created_at"
   end
 
-  create_table "users", id: :integer, charset: "utf8mb3", force: :cascade do |t|
-    t.text "about", size: :medium
+  create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.text "about", size: :long
     t.boolean "admin"
     t.datetime "created_at", precision: nil
-    t.string "crypted_password", null: false
+    t.string "crypted_password"
     t.datetime "current_login_at", precision: nil
     t.string "current_login_ip"
     t.string "email", default: "", null: false
@@ -92,9 +120,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
     t.string "login", null: false
     t.integer "login_count", default: 0, null: false
     t.string "name"
-    t.string "password_salt", null: false
+    t.string "password_digest"
+    t.string "password_salt"
     t.string "perishable_token", default: "", null: false
-    t.string "persistence_token", null: false
+    t.string "persistence_token"
     t.string "photo_content_type"
     t.string "photo_file_name"
     t.integer "photo_file_size"
@@ -111,12 +140,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
     t.index ["persistence_token"], name: "index_users_on_persistence_token"
   end
 
-  create_table "visualizations", id: :integer, charset: "utf8mb3", force: :cascade do |t|
+  create_table "visualizations", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "approved_at", precision: nil
     t.integer "approved_by"
     t.string "authors"
     t.datetime "created_at", precision: nil
-    t.text "description", size: :medium
+    t.text "description", size: :long
     t.string "download"
     t.string "embed_callback"
     t.text "embed_code", size: :long
@@ -135,4 +164,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_220000) do
     t.string "website"
     t.index ["name"], name: "index_visualizations_unique_on_name", unique: true
   end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
 end
