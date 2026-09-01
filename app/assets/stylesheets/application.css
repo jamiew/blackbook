@@ -371,3 +371,35 @@ ul.users li img { display: block; margin-bottom: 5px; }
 #validator #results dd li { line-height: 1.5em; list-style: disc; margin-left: 25px; margin-bottom: 4px; }
 #validator .congratulations { margin-top: 50px; font-size: 20pt; font-weight: normal; }
 #validator .congratulations img { margin-top: 30px; }
+
+/* Docs (/docs), rendered from the markdown in docs/.
+   The reset at the top of this file zeroes margins and list styles, so prose
+   has to put them back rather than inherit them. */
+.docs { display: flex; gap: 40px; align-items: flex-start; }
+.docs__nav { flex: 0 0 200px; position: sticky; top: 20px; font-size: 0.9em; }
+.docs__nav h3 { font-size: 1.1em; font-weight: bold; margin-bottom: 10px; }
+.docs__nav ul { list-style: none; }
+.docs__nav li { margin-bottom: 6px; line-height: 1.3em; }
+.docs__nav li.is-current a { background-color: #ff0; color: #000; text-decoration: none; }
+
+.docs__body { flex: 1 1 auto; min-width: 0; max-width: 46em; line-height: 1.6em; }
+.docs__body h1 { font-size: 1.9em; font-weight: bold; margin: 0 0 0.6em; }
+.docs__body h2 { font-size: 1.4em; font-weight: bold; margin: 1.8em 0 0.5em; border-bottom: 1px solid #333; padding-bottom: 0.2em; }
+.docs__body h3 { font-size: 1.15em; font-weight: bold; margin: 1.4em 0 0.4em; }
+.docs__body p { margin: 0 0 1em; }
+.docs__body ul, .docs__body ol { margin: 0 0 1em 1.5em; }
+.docs__body li { list-style: disc; margin-bottom: 0.4em; }
+.docs__body ol li { list-style: decimal; }
+.docs__body code { background: #1a1a1a; padding: 1px 5px; font-size: 0.9em; }
+.docs__body pre { background: #111; border: 1px solid #333; padding: 12px; overflow-x: auto; margin: 0 0 1em; }
+.docs__body pre code { background: none; padding: 0; }
+.docs__body table { margin-bottom: 1em; }
+.docs__body table td { padding: 5px 10px; vertical-align: top; }
+.docs__body blockquote { border-left: 3px solid #333; padding-left: 12px; margin: 0 0 1em; color: #bbb; }
+.docs__body hr { border: 0; border-top: 1px solid #333; margin: 2em 0; }
+.docs__source { margin-top: 3em; padding-top: 1em; border-top: 1px solid #333; font-size: 0.9em; color: #888; }
+
+@media (max-width: 700px) {
+  .docs { display: block; }
+  .docs__nav { position: static; margin-bottom: 30px; }
+}
