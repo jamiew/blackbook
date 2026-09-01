@@ -24,11 +24,23 @@ class PasswordResetController < ApplicationController
   end
 
   def update
-    @user.password = params[:user][:password]
-    @user.password_confirmation = params[:user][:password_confirmation]
+    credentials = params.expect(user: %i[password password_confirmation])
+
+    # has_secure_password's validations are off, and `password=` ignores "" but
+    # nils the digest for nil: without this a blank form reports success, and a
+    # confirmation-only post locks the account out of bcrypt for good.
+    if credentials[:password].blank?
+      flash.now[:error] = "Password can't be blank"
+      return render action: :edit
+    end
+
+    @user.password = credentials[:password]
+    @user.password_confirmation = credentials[:password_confirmation]
     if @user.save
       flash[:notice] = "Password successfully updated"
-      redirect_to(user_path)
+      # Bare `user_path` fills :id from the current request, i.e. the reset
+      # token, so it 404s and leaves the token in browser history.
+      redirect_to(login_path)
     else
       render action: :edit
     end

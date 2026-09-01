@@ -11,6 +11,10 @@ AllCops:
     - 'bin/**/*'
     - 'vendor/**/*' 
     - 'node_modules/**/*'
+    # Defining Exclude replaces RuboCop's defaults, so the ones that matter here
+    # have to be restated. Without tmp/ it lints vendored checkouts under it.
+    - 'tmp/**/*'
+    - 'storage/**/*'
     - 'db/migrate/**/*'
     - 'db/schema.rb'
     - 'config/**/*'

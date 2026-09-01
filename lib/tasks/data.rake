@@ -4,6 +4,10 @@
 require "set"
 # rubocop:enable Lint/RedundantRequireStatement
 require "fileutils"
+# Paperclip is gone, so the attachment section below reads its path shapes from
+# the backfill rather than restating them. Required by path, and holding only
+# lambdas and a Struct, so it still loads on the legacy checkout.
+require File.expand_path("../active_storage_backfill", __dir__)
 
 # Read-only integrity audit of the GML corpus, the uploaded images and the
 # database. Writes nothing except a report under tmp/data-validate/.
@@ -13,6 +17,7 @@ require "fileutils"
 # upgrade migrations, then again after, and diff the two reports:
 #
 #   scp lib/tasks/data.rake prod:~/blackbook/lib/tasks/
+#   scp lib/active_storage_backfill.rb prod:~/blackbook/lib/
 #   RAILS_ENV=production bundle exec rake data:validate > before.txt
 #
 # Exits non-zero when it finds something that will abort a pending migration,
@@ -32,6 +37,17 @@ namespace :data do
 
   def count(sql)
     conn.select_value(sql).to_i
+  end
+
+  # True when the named migration is on disk but not yet in schema_migrations.
+  # Reads the table directly; the migration API differs across the Rails
+  # versions this task runs on.
+  def pending_migration?(name)
+    file = Rails.root.glob("db/migrate/*_#{name}.rb").first
+    return false if file.nil?
+
+    version = File.basename(file).split("_").first
+    count("SELECT COUNT(*) FROM schema_migrations WHERE version = #{conn.quote(version)}").zero?
   end
 
   def heading(title)
@@ -122,21 +138,20 @@ namespace :data do
       puts "  MISSING"
     end
 
-    heading "paperclip attachments"
-    [%w[Tag image], %w[User photo], %w[Visualization image]].each do |model_name, att|
+    heading "attachment files on disk"
+    ActiveStorageBackfill::ATTACHMENTS.each do |spec|
+      model_name = spec[:model]
+      att = spec[:name].to_s
+      col = spec[:column].to_s
       klass = model_name.safe_constantize
       next puts "  #{model_name}: model not loadable, skipped" unless klass
-      unless klass.respond_to?(:attachment_definitions) && klass.attachment_definitions.key?(att.to_sym)
-        next puts "  #{model_name}##{att}: no attachment defined, skipped"
-      end
 
-      col = "#{att}_file_name"
       checked = 0
       broken = []
       klass.where("#{col} IS NOT NULL AND #{col} != ''").find_each do |record|
         checked += 1
-        path = record.public_send(att).path(:original)
-        broken << record.id if path.nil? || !File.exist?(path)
+        file = record.read_attribute(col)
+        broken << record.id if spec[:paths].call(record, file).none? { |path| Rails.root.join(path).file? }
       end
 
       puts "  #{"#{model_name}##{att}:".ljust(24)} #{checked} with a filename, #{broken.size} missing from disk"
@@ -206,8 +221,12 @@ namespace :data do
       blockers << "#{n} duplicate #{table} (#{cols}) rows will abort the unique index migration" if n.positive?
     end
 
-    # convert_tables_to_innodb ALTERs comments unconditionally, with no if_exists
-    blockers << "convert_tables_to_innodb runs ALTER TABLE comments but that table is gone" unless table?("comments")
+    # convert_tables_to_innodb ALTERs comments unconditionally, with no if_exists.
+    # Only a problem while it is still pending: afterwards, comments is meant to
+    # be gone.
+    if !table?("comments") && pending_migration?("convert_tables_to_innodb")
+      blockers << "convert_tables_to_innodb runs ALTER TABLE comments but that table is gone"
+    end
 
     heading "irreversible data loss in the pending migrations"
     if table?("comments")

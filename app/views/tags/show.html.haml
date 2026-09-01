@@ -37,7 +37,7 @@
       %li== <strong>Location:</strong> #{@tag.location.blank? ? 'NULL' : h(@tag.location)}
       - unless @tag.description.blank?
         %li== <strong>Description:</strong> #{h(@tag.description)}
-      - if attachment_attached?(@tag, :image)
+      - if @tag.image.attached?
         - url = url_for(@tag.image)
         - #Quick little gsub to remove the queryvars... not ideal
         %li== Image: #{link_to(File.basename(url.gsub(/\?.*/,'')), url, target: '_blank') }

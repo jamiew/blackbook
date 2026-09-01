@@ -65,6 +65,22 @@ RSpec.describe ActiveStorageBackfill do
       expect(tag.reload.image).to be_attached
     end
 
+    # Visualization's path puts the style in the filename, not in a directory of
+    # its own. Getting that wrong finds none of them.
+    it 'attaches a visualization stored at Paperclip default path' do
+      Visualization.where(id: 7).delete_all
+      Visualization.insert_all([{ id: 7, name: 'viz', image_file_name: 'poster.png', # rubocop:disable Rails/SkipsModelValidations
+                                  created_at: Time.current, updated_at: Time.current }])
+      dir = root.join('public/system/visualizations/images/7')
+      FileUtils.mkdir_p(dir)
+      FileUtils.cp(png, dir.join('poster_original.png'))
+
+      report = described_class.new(root: root, verbose: false).run
+
+      expect(report.missing).to be_empty
+      expect(Visualization.find(7).image).to be_attached
+    end
+
     it 'reports a row whose file is missing instead of failing silently' do
       tag_with_filename(999, 'gone.png')
 

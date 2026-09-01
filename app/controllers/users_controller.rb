@@ -9,7 +9,7 @@ class UsersController < ApplicationController
   # Show all users
   def index
     @page, @per_page = pagination_params(per_page: 28)
-    @users = User.paginate(page: @page, per_page: @per_page)
+    @users = User.with_attached_photo.paginate(page: @page, per_page: @per_page)
     set_page_title "Users"
     # default_respond_to(@users, layout: true, exclude: [:email,:password,:crypted_password,:persistence_token])
   end
@@ -21,7 +21,8 @@ class UsersController < ApplicationController
 
     @page, @per_page = pagination_params(per_page: 10)
 
-    @tags = @user.tags.order(created_at: :desc).includes(:user).paginate(page: @page, per_page: @per_page)
+    @tags = @user.tags.order(created_at: :desc).with_attached_image.includes(:user)
+                 .paginate(page: @page, per_page: @per_page)
     @notifications = @user.notifications.includes(:subject, :user).order(created_at: :desc).paginate(page: 1,
                                                                                                      per_page: 15)
 

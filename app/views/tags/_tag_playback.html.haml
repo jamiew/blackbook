@@ -12,7 +12,7 @@
 
   #image
     - imgopts = {}
-    - if attachment_attached?(@tag, :image)
+    - if @tag.image.attached?
       .image= image_tag attachment_url(@tag, :image, :large), imgopts
       - if @tag.image_generated?
         %p.note Drawn from the GML. No original image of this tag survives.
