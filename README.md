@@ -1,8 +1,8 @@
-![000000book-handshake](https://000000book.com/images/000000book-handshake.jpg)
+![000000book-handshake](public/images/000000book-handshake.jpg)
 
 # About
 
-**000000book** ("blackbook") is an open repository for sharing and archiving motion captured graffiti tags. Tags are saved as digital text files known as GML (Graffiti Markup Language), which can be captured through freely available software such as [Graffiti Analysis](http://graffitianalysis.com) (marker), [DustTag](http://graffitianalysis.com/iphone) (iPhone), [EyeWriter](http://eyewriter.org) (eye capture), [Laser Tag](http://graffitiresearchlab.com/?page_id=76) (laser).
+**000000book** ("blackbook") is an open repository for sharing and archiving motion captured graffiti tags. Tags are saved as digital text files known as GML (Graffiti Markup Language), which can be captured through freely available software such as [Graffiti Analysis](http://graffitianalysis.com/downloads/) (marker), [DustTag](http://graffitianalysis.com/iphone/) (iPhone), [EyeWriter](http://eyewriter.org) (eye capture), [Laser Tag](http://graffitiresearchlab.com/?page_id=76) (laser).
 
 Graffiti writers are invited to capture and share their own tags, and computer programmers are invited to create new applications and visualizations of the resulting data. The project aims to bring together two seemingly disparate communities that share an interest hacking systems, whether found in code or in the city.
 
@@ -32,7 +32,7 @@ Code available under an MIT License
 Copyfree 2009-2023 F.A.T.<br />
 "Release early, often & w/ rap music"
 
-![gml-file](https://000000book.com/images/gml-file.png)
+![gml-file](public/images/gml-file.png)
 
 ---
 
@@ -97,8 +97,9 @@ secret_key_base: [automatically generated]
 ```
 
 #### Environment Variables
-See `.env.example`. `MYSQL_PORT` picks the database server, defaulting to the
-one in `compose.yaml`.
+`.env.example` covers the production scripts only. For local work, `MYSQL_PORT`
+and `MYSQL_PASSWORD` override `config/database.yml`, which defaults to the
+MySQL in `compose.yaml`.
 
 ### 4. Start the Application
 
@@ -128,10 +129,9 @@ Run it before applying migrations to a real server.
 
 The application stores data in two places:
 
-1. **Database**: Standard Rails models (users, tags, comments, etc.)
-2. **GML Files**: Raw graffiti markup files stored in `/data/` directory
-   - Format: `{tag_id}.gml`
-   - Managed by `GmlObject` model
+1. **Database**: `users`, `tags`, `visualizations`, `favorites`, `likes` and `notifications`
+2. **GML Files**: one file per tag under `data/`, named `{tag_id}.gml`, read and
+   written by `GmlObject`
 
 ## Useful Rake Tasks
 
@@ -184,7 +184,7 @@ kamal migrate     # migrations, deliberately never automatic
 
 It stops before changing anything if the server has uncommitted work, if the GML volume is not mounted, if `secret_key_base` is unavailable, or if the target needs a Ruby version rbenv does not have. After restarting it confirms the service is up and the site returns 200, then prints the previous SHA so you can roll back with `./deploy <sha>`.
 
-It does not run migrations. The currently pending set includes a `drop_table` on 301,076 comments, so migrating is a separate deliberate command. `./deploy` reports what is pending and stops there.
+It does not run migrations. The pending set drops the `comments` table, so migrating is a separate deliberate command. Run `rake data:validate` first: it reports how many rows that destroys. `./deploy` reports what is pending and stops there.
 
 ### Auditing production
 
@@ -201,20 +201,21 @@ More in [docs/operations.md](docs/operations.md).
 This app was upgraded from Rails 4.2 to Rails 8.1. Major changes include:
 
 - **Credentials**: Moved from `config/secrets.yml` to encrypted `config/credentials.yml.enc`
-- **Strong Parameters**: Added to all controllers, using `params.expect`
+- **Strong Parameters**: the three mass-assignment sites (tags, users, password reset) use `params.expect`
 - **Modern Validations**: Updated from `validates_presence_of` to `validates` syntax
 - **Asset Pipeline**: Sprockets replaced by Propshaft. Propshaft does not read `//= require`
-  directives, so every JS file is listed explicitly in `layouts/_template_header.html.haml`.
+  directives, so scripts are listed explicitly in `layouts/_template_header.html.haml`.
 - **Auth**: Authlogic replaced by `has_secure_password`. Pre-existing scrypt
   hashes are verified against the old scheme and rehashed to bcrypt on next
   login, so nobody is locked out
 - **Uploads**: kt-paperclip replaced by Active Storage, with variants matching
   the old Paperclip geometry
-- **Database**: MySQL 5.7 to 8.4, MyISAM to InnoDB, utf8mb3 to utf8mb4
+- **Database**: MyISAM to InnoDB and utf8mb3 to utf8mb4. Development, test and CI
+  now all run the MySQL 8.4 in `compose.yaml`
 
 ## Development Notes
 
-- **No Rails Console in Production**: Use `RAILS_ENV=production bin/rails runner "code here"`
+- **Console**: `kamal console`, or `kamal app exec --reuse "bin/rails runner 'code'"`
 - **Asset Compilation**: `bin/rails assets:precompile` for production
 - **Background Jobs**: None currently configured
 - **File Uploads**: Active Storage, stored on local disk. There is no S3

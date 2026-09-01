@@ -3,7 +3,7 @@
 # Deploy 000000book.
 #
 # Deploys code and restarts. It does NOT run migrations. The pending set
-# includes drop_table on 301,076 comments, so migrating is a separate,
+# includes drop_table on the comments table, so migrating is a separate,
 # deliberate command rather than a side effect of shipping code.
 #
 # Usage:  ./deploy              # deploy origin/main

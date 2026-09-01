@@ -20,14 +20,13 @@ A random tag:
 curl http://000000book.com/random.gml
 ```
 
-Latest tag by a specific user:
+To filter, use the index rather than `/latest`. `/data` accepts `user_id`,
+`app`, `location` and `keywords`:
 
 ```
-curl http://000000book.com/tempt1/latest.gml
+curl "http://000000book.com/data.json?app=eyewriter"
+curl "http://000000book.com/data.json?user_id=tempt1"
 ```
 
-Latest from a specific application:
-
-```
-curl http://000000book.com/latest.gml?application=eyewriter
-```
+`/latest` and `/random` take no filters: they always return the newest and a
+random tag site-wide.

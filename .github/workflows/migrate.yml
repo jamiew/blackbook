@@ -1,8 +1,8 @@
 name: "Migrate beta"
 
-# Migrations never run as part of a deploy. The pending set drops a
-# 301,076-row table, so running them is a decision someone makes, not a side
-# effect of shipping code.
+# Migrations never run as part of a deploy. The pending set drops the comments
+# table, so running them is a decision someone makes, not a side effect of
+# shipping code.
 #
 # Run this from the Actions tab. With the confirm box empty it only reports
 # what would happen, so looking first costs nothing.

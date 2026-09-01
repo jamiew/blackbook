@@ -167,7 +167,7 @@ jobs:
           '
           exit 1
 
-      # Deliberately NOT automatic. The pending set drops a 301,076-row table,
+      # Deliberately NOT automatic. The pending set drops the comments table,
       # so migrating is a decision, not a side effect of shipping code.
       - name: Remind about migrations
         run: echo "Deployed. Migrations were not run; use the Migrate beta workflow." >> $GITHUB_STEP_SUMMARY

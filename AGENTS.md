@@ -3,8 +3,8 @@
 An archive of graffiti motion-capture data (GML) running since 2009. Rails 8.1 on
 Ruby 3.4, MySQL, deployed as a container by Kamal.
 
-It holds real data for real people: around 140,000 accounts, 76,000 tags, and a
-36 GB corpus of GML files and images on a block volume. Most of it cannot be
+It holds real data for real people: about 140,000 accounts, 76,000 tags, and
+roughly 35 GB of GML files and images on a block volume. Most of it cannot be
 regenerated. Prefer the cautious option.
 
 ## Setup
@@ -31,7 +31,8 @@ throwaway MySQL 8.4 and runs the pending set against them. See
 [docs/operations.md](docs/operations.md).
 
 Migrations never run automatically on deploy. That is deliberate: the pending set
-drops a 301,076-row table.
+drops the `comments` table. `rake data:validate` reports how many rows that is
+before you run it.
 
 ## Things that look wrong but are not
 
