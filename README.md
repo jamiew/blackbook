@@ -96,8 +96,6 @@ bin/rails credentials:edit
 secret_key_base: [automatically generated]
 ```
 
-Uploads are stored on disk under `public/system`. There is no S3 storage.
-
 #### Environment Variables
 See `.env.example`. `MYSQL_PORT` picks the database server, defaulting to the
 one in `compose.yaml`.
@@ -177,7 +175,7 @@ kamal migrate     # migrations, deliberately never automatic
 
 ### The older path, still in use for production
 
-`./deploy` ships code to the production server. It reads `PROD_HOST`, `PROD_USER` and `PROD_APP_PATH` from `.env`. Both it and `script/provision-droplet.sh` retire once Kamal is serving.
+`./deploy` ships code to the production server. It reads `PROD_HOST`, `PROD_USER` and `PROD_APP_PATH` from `.env`. It retires once Kamal serves production.
 
 ```bash
 ./deploy              # deploy origin/main
@@ -254,10 +252,4 @@ mkdir -p data
 # Check permissions
 chmod 755 data
 ```
-
-## API Documentation
-
-See [docs/](docs/README.md): [downloading](docs/api/downloading-gml.md),
-[uploading](docs/api/uploading-gml.md), and
-[rendering GML](docs/gml/playback-implementations.md).
 

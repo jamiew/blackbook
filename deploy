@@ -169,9 +169,10 @@ trap - ERR
 echo
 echo "===== pending migrations ====="
 # Reported, never run. See the header comment.
-PENDING=$(RAILS_ENV=production $BUNDLE exec rake db:migrate:status 2>/dev/null | grep -c '^ *down' || true)
+STATUS=$(RAILS_ENV=production $BUNDLE exec rake db:migrate:status 2>/dev/null || true)
+PENDING=$(printf '%s\n' "$STATUS" | grep -c '^ *down' || true)
 if [ "${PENDING:-0}" -gt 0 ]; then
-  RAILS_ENV=production $BUNDLE exec rake db:migrate:status 2>/dev/null | grep '^ *down' || true
+  printf '%s\n' "$STATUS" | grep '^ *down' || true
   echo
   echo "$PENDING migration(s) pending. They are NOT applied automatically."
   echo "Check what they destroy first:"

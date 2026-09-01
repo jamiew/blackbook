@@ -38,8 +38,7 @@ class Tag < ApplicationRecord
     attachable.variant :tiny,   resize_to_fill:  [32, 32]
   end
 
-  DEFAULT_IMAGE_STYLE = :medium
-  def default_image_url(style = DEFAULT_IMAGE_STYLE) = "/images/defaults/tag_#{style}.jpg"
+  def default_image_url(style) = "/images/defaults/tag_#{style}.jpg"
 
   # Placeholders for assigning data from forms
   attr_accessor :gml_file

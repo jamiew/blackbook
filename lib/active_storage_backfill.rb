@@ -37,11 +37,11 @@ class ActiveStorageBackfill
     },
     {
       model: 'Visualization', name: :image, column: :image_file_name,
-      # This one never had an explicit :path, so it used Paperclip's default.
-      # Both shapes are tried because the url: option suggested the flatter one.
+      # This one set only :url, so Paperclip's default :path applied, which puts
+      # the style in the filename rather than in a directory of its own.
       paths: lambda { |r, file|
-        id_partitions(r.id).map { |part| "public/system/visualizations/images/#{part}/original/#{file}" } +
-          ["public/system/visualizations/images/#{r.id}/original/#{file}"]
+        ["public/system/visualizations/images/#{r.id}/" \
+         "#{File.basename(file, '.*')}_original#{File.extname(file)}"]
       }
     }
   ].freeze
@@ -81,7 +81,7 @@ class ActiveStorageBackfill
       model = config[:model].safe_constantize
       next unless model
 
-      scope = model.where.not(config[:column] => [nil, ''])
+      scope = model.where.not(config[:column] => [nil, '']).includes(:"#{config[:name]}_attachment")
       puts "#{config[:model]}##{config[:name]}: #{scope.count} to consider" if @verbose
 
       scope.find_each { |record| process(record, config, report) }

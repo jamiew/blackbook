@@ -26,8 +26,7 @@ module Blackbook4
 
     # Rails 8 defaults to :vips. ImageMagick is what Paperclip used, what this
     # app has always depended on, and what the Dockerfile and a plain macOS
-    # setup both already have; vips would need installing separately. The
-    # image also ships libvips42, so switching is a one-line change later.
+    # setup both already have; vips would need installing separately.
     config.active_storage.variant_processor = :mini_magick
 
     # 8.1 default is :raise. The GML upload API deliberately takes a caller-supplied

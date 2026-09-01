@@ -1,28 +1,17 @@
-# Kamal deploys the app as a container. It replaces script/provision-droplet.sh
-# and ./deploy for everything above the operating system.
-#
-#   kamal setup     first time on a new server
-#   kamal deploy    build, push, and roll over with no downtime
-#   kamal rollback  go back to the previous image
-#   kamal app logs -f
-#
-# MySQL is deliberately NOT managed here. It stays a host package so the block
-# volume, backups and patching work exactly as they already do. Containerising
-# a database you already run well buys complexity, not safety.
-#
+# Kamal deploys the app as a container. See docs/deployment.md.
+# MySQL stays a host package on purpose.
 service: blackbook
 image: jamiew/blackbook
 
-# How long kamal-proxy waits for a new container to pass its health check.
-# This, not proxy.healthcheck.timeout, produces "target failed to become
-# healthy within configured timeout". Rails eager-loading on 2 vCPU uses most
-# of the 30s default before Puma accepts its first connection.
+# On 2 vCPU, Rails eager-loading uses most of the 30s default before Puma
+# binds. This is the timeout behind "target failed to become healthy", not
+# proxy.healthcheck.timeout.
 deploy_timeout: 120
 
 servers:
   web:
     hosts:
-      - 159.203.72.141
+      - <%= ENV.fetch("BETA_HOST", "159.203.72.141") %>
 
 ssh:
   user: root
@@ -33,15 +22,7 @@ proxy:
   # Thruster listens on 80 inside the container.
   app_port: 80
   healthcheck:
-    # Kamal will not switch traffic to a container that fails this, which is
-    # what makes a bad deploy stop before it reaches anyone.
-    #
-    # 30s was not enough: on 2 vCPU, Rails eager-loading takes most of that
-    # before Puma accepts a connection, so a healthy container was killed for
-    # being slow to start rather than for being broken.
     path: /up
-    interval: 3
-    timeout: 90
 
 registry:
   server: ghcr.io
@@ -65,16 +46,9 @@ builder:
 
 env:
   clear:
-    RAILS_ENV: production
     RAILS_LOG_TO_STDOUT: "true"
+    # kamal-proxy terminates TLS and does not serve files, so Rails must.
     RAILS_SERVE_STATIC_FILES: "true"
-    # Must resolve to a path backed by the block volume below. Left at the
-    # in-container default, every uploaded and backfilled image would be written
-    # to the container's own filesystem and lost on the next deploy.
-    ACTIVE_STORAGE_ROOT: /rails/storage
-    # Beta is public. ApplicationController only gates the site when both
-    # BETA_AUTH_USER and BETA_AUTH_PASSWORD are set, so leaving them unset
-    # turns it off without a code change.
   secret:
     - RAILS_MASTER_KEY
     - DATABASE_URL
@@ -99,22 +73,4 @@ aliases:
   dbc: app exec --interactive --reuse "bin/rails dbconsole"
   logs: app logs --follow
 
-# ---------------------------------------------------------------------------
-# Host MySQL
-#
-# MySQL runs on the host and the app reaches it over the Unix socket, which is
-# bind-mounted above. Two things this needs, neither of which opens a port:
-#
-#   1. A grant for the socket, which MySQL sees as localhost:
-#        CREATE USER 'blackbook'@'localhost' IDENTIFIED BY '<password>';
-#        GRANT ALL PRIVILEGES ON blackbook_prod.* TO 'blackbook'@'localhost';
-#
-#   2. DATABASE_URL naming localhost, so the client picks the socket:
-#        mysql2://blackbook:<password>@localhost/blackbook_prod
-#
-# TCP was tried first and every route timed out at connect, from a container
-# that could otherwise reach port 3306. The socket sidesteps the bridge
-# address, the firewall rules and MySQL 8.4's self-signed certificate at once.
-#
-# DigitalOcean Managed MySQL removes this whole section, and the patching along
-# with it, for about $15/mo.
+# Setting the host's MySQL up for this is in docs/deployment.md.

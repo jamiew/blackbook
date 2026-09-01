@@ -2,7 +2,7 @@
 %a.tag-card{ href: tag_path(tag) }
   .tag-card__frame
     %span.tag-card__id= "##{tag.id}"
-    - if attachment_attached?(tag, :image) || tag.remote_thumbnail_url.present?
+    - if tag.image.attached? || tag.remote_thumbnail_url.present?
       = image_tag tag_thumbnail_url(tag), alt: "Tag ##{tag.id}", loading: 'lazy'
     - else
       -# Older uploads never had a still generated. Say so rather than falling

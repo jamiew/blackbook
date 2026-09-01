@@ -8,6 +8,7 @@
 .env
 .env.*
 config/master.key
+.kamal/
 config/credentials/*.key
 
 # Local state

@@ -54,9 +54,9 @@
       .specs__row
         %span.specs__key Uploaded
         %span.specs__value= @tag.created_at.strftime('%Y-%m-%d %H:%M:%S')
-      - if attachment_attached?(@tag, :image) || @tag.remote_image
-        -# There is no :original variant, so this links the stored blob itself.
-        - url = (attachment_attached?(@tag, :image) ? url_for(@tag.image) : @tag.remote_image)
+      -# There is no :original variant, so this links the stored blob itself.
+      - url = @tag.image.attached? ? url_for(@tag.image) : @tag.remote_image
+      - if url
         .specs__row
           %span.specs__key Still
           %span.specs__value= link_to File.basename(url.gsub(/\?.*/, '')), url, target: '_blank', rel: 'noopener'

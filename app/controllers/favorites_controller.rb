@@ -11,7 +11,8 @@ class FavoritesController < ApplicationController
     # Using double paginate as a 'ghetto limit'. doesn't cause trouble (??)
     fave_objects = @user.favorites.tags.select('object_id, created_at').all
     object_ids = fave_objects.map { |f| f.attributes['object_id'] }
-    @tags = Tag.order(created_at: :desc).where(id: object_ids).paginate(page: @page, per_page: @per_page)
+    @tags = Tag.order(created_at: :desc).with_attached_image
+               .where(id: object_ids).paginate(page: @page, per_page: @per_page)
     @favorites = @tags
 
     set_page_title "Your Favorites"
