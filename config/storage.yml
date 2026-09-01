@@ -9,9 +9,8 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-# The volume is mounted at /mnt/blackbook_volume on the server and bind-mounted
-# into the container. ACTIVE_STORAGE_ROOT lets the container point at it
-# without the path being baked into the image.
+# config/deploy.yml bind-mounts the block volume here. Anywhere else and every
+# uploaded and backfilled image is lost with the next container.
 production:
   service: Disk
-  root: <%= ENV.fetch("ACTIVE_STORAGE_ROOT", "/rails/storage") %>
+  root: /rails/storage

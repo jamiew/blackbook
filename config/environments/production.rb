@@ -45,8 +45,11 @@ Rails.application.configure do
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
 
-  # Use a different logger for distributed setups.
-  # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  # In a container the log has to go to stdout, or it goes into a filesystem
+  # that is thrown away with the container. Kamal sets this, and without it
+  # every exception was written to log/production.log where nobody could
+  # read it, which made a 500 indistinguishable from a 504.
+  config.logger = ActiveSupport::TaggedLogging.logger($stdout) if ENV["RAILS_LOG_TO_STDOUT"].present?
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store

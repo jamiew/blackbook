@@ -1,0 +1,81 @@
+name: "Migrate beta"
+
+# Migrations never run as part of a deploy. The pending set drops a
+# 301,076-row table, so running them is a decision someone makes, not a side
+# effect of shipping code.
+#
+# Run this from the Actions tab. With the confirm box empty it only reports
+# what would happen, so looking first costs nothing.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type MIGRATE to run them. Anything else only reports status."
+        required: false
+        default: ""
+
+jobs:
+  migrate:
+    name: Migrate beta
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-beta
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      packages: write
+    env:
+      BETA_HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Add the deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.BETA_SSH_PRIVATE_KEY }}
+
+      - name: Trust the host
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -t ed25519 "$BETA_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Write the secrets Kamal reads
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          DATABASE_URL: ${{ secrets.BETA_DATABASE_URL }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$RAILS_MASTER_KEY" > config/master.key
+          {
+            printf 'KAMAL_REGISTRY_PASSWORD=%s\n' "$KAMAL_REGISTRY_PASSWORD"
+            printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+          } > .kamal/secrets-common
+
+      - name: Report the schema as it stands
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: bin/kamal app exec --reuse "bin/rails db:migrate:status" 2>&1 | tail -40
+
+      - name: Run the migrations
+        if: inputs.confirm == 'MIGRATE'
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: bin/kamal app exec --reuse "bin/rails db:migrate"
+
+      - name: Report what the database holds now
+        if: inputs.confirm == 'MIGRATE'
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: bin/kamal app exec --reuse "bin/rails runner /rails/script/db_doctor.rb"
+
+      - name: Clean up
+        if: always()
+        run: rm -f config/master.key .kamal/secrets-common

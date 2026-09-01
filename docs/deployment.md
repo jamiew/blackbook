@@ -10,7 +10,7 @@ volume, backups and unattended-upgrades keep working as they already do.
 |---|---|
 | Beta | `beta.000000book.com`, droplet `blackbook-beta`, nyc3 |
 | Storage | block volume mounted at `/mnt/blackbook_volume`, holding GML files and images |
-| Database | MySQL 8.4 on the host, reached over the Docker bridge |
+| Database | MySQL 8.4 on the host, reached over its Unix socket |
 | Registry | `ghcr.io/jamiew/blackbook` |
 
 ## Commands
@@ -49,24 +49,26 @@ bin/rails credentials:edit
 
 ## Host MySQL
 
-The container reaches the database over the Docker bridge. Two one-time changes
-on the server, neither of which exposes MySQL publicly, since ufw still blocks
-3306 from outside:
+The container reaches the database over MySQL's Unix socket, bind-mounted
+read-only by `config/deploy.yml`. Nothing listens on a port, so there is no
+bind address, firewall rule or certificate to keep working. TCP was tried
+first and every route timed out at connect.
 
-1. Listen on loopback and the bridge, in `/etc/mysql/mysql.conf.d/mysqld.cnf`:
+Two one-time things on the server:
 
-   ```
-   bind-address = 127.0.0.1,172.17.0.1
-   ```
-
-2. Let the app user connect from the bridge network:
+1. A grant for the socket, which MySQL sees as localhost:
 
    ```sql
-   CREATE USER 'blackbook'@'172.17.%' IDENTIFIED BY '<password>';
-   GRANT ALL PRIVILEGES ON blackbook_prod.* TO 'blackbook'@'172.17.%';
+   CREATE USER 'blackbook'@'localhost' IDENTIFIED BY '<password>';
+   GRANT ALL PRIVILEGES ON blackbook_prod.* TO 'blackbook'@'localhost';
    ```
 
-`DATABASE_URL` then points at `host.docker.internal`.
+2. `DATABASE_URL` naming `localhost`, so the client picks the socket:
+
+   ```
+   mysql2://blackbook:<password>@localhost/blackbook_prod
+   ```
+
 [DigitalOcean Managed MySQL](https://www.digitalocean.com/products/managed-databases-mysql)
 removes this section, and the patching with it.
 
@@ -97,16 +99,28 @@ It sends one real message through the production settings while reading nothing
 from production. A rejection naming the *recipient* means the sender is fine and
 you are still in the SES sandbox.
 
-## The older path
+## A new host
 
-`script/provision-droplet.sh` builds a server the pre-container way: rbenv, Ruby
-from source, Puma under systemd, nginx in front. It is kept until Kamal is
-serving beta, then both it and `./deploy` should go.
+`kamal setup` does everything above the operating system. Four things it does
+not do, so a fresh droplet needs them first:
 
-Two things it works around, both specific to Ubuntu 26.04:
+```bash
+# 1. Attach the block volume and mount it at /mnt/blackbook_volume, then:
+mkdir -p /mnt/blackbook_volume/{blackbook-data,active-storage}
 
-- `sudo` keeps root's cwd of `/root`, which the app user cannot read, so
-  ruby-build's `popd` fails *after* a successful `make install` and rolls the
-  whole build back.
-- 26.04 mounts `/tmp` as a tmpfs at half of RAM. The Ruby build overruns it and,
-  because tmpfs is RAM, also competes with the compile for memory.
+# 2. MySQL, matching the version in compose.yaml
+apt-get install -y mysql-server
+mysql -e "CREATE DATABASE blackbook_prod
+          CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# 3. The grant and DATABASE_URL from "Host MySQL" above.
+
+# 4. Only 80 and 443 need to be open; nothing listens on 3306.
+ufw allow 80,443/tcp
+```
+
+Nothing may hold port 80 when `kamal setup` runs: kamal-proxy binds it, and a
+partly-created proxy container is hard to recover from. In particular, do not
+install nginx.
+
+`./deploy` still ships the old production server, and retires with it.

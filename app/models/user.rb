@@ -3,13 +3,16 @@ class User < ApplicationRecord
   # this column and would otherwise fail to save on any unrelated update.
   has_secure_password validations: false
 
-  validates :password, confirmation: true, length: { minimum: 4 }, if: -> { password.present? }
+  # bcrypt silently ignores everything past 72 bytes, so without a maximum two
+  # different long passphrases sharing a prefix both unlock the account.
+  validates :password, confirmation: true, length: { minimum: 4, maximum: 72 }, if: -> { password.present? }
 
   # Password reset links. Replaces Authlogic's perishable_token, which was a
   # column that never expired; this is signed and expires on its own.
   generates_token_for :password_reset, expires_in: 1.day do
-    # Changing the password invalidates any outstanding reset link.
-    (password_digest.presence || legacy_crypted_password).to_s.last(10)
+    # Changing the password invalidates any outstanding link. Hashed because the
+    # token publishes this value as readable JSON in every reset URL.
+    Digest::SHA256.hexdigest(password_digest.presence || legacy_crypted_password.to_s).last(10)
   end
 
   # Returns the user when the password is right, otherwise nil.

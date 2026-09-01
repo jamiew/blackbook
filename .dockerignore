@@ -8,6 +8,7 @@
 .env
 .env.*
 config/master.key
+.kamal/
 config/credentials/*.key
 
 # Local state
@@ -23,6 +24,9 @@ vendor/bundle/
 spec/
 compose.yaml
 script/
+# Except the database connection diagnostic, which has to run inside the
+# deployed container to be worth anything.
+!script/db_doctor.rb
 deploy
 README.md
 .rubocop*.yml

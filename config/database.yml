@@ -26,4 +26,11 @@ test:
 
 production:
   <<: *default
+  # DATABASE_URL must name localhost, so the client picks the socket below
+  # rather than TCP. MySQL runs on the same machine as the container.
   url: <%= ENV['DATABASE_URL'] %>
+  # Keys the URL does not set survive the merge, so the URL can still override.
+  socket: /var/run/mysqld/mysqld.sock
+  # Fail fast. Without this an unreachable database hangs every request until
+  # the OS gives up, which reads as a slow app rather than a broken one.
+  connect_timeout: 5

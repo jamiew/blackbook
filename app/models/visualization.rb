@@ -57,8 +57,7 @@ class Visualization < ApplicationRecord
     attachable.variant :tiny,   resize_to_fill:  [32, 32]
   end
 
-  DEFAULT_IMAGE_STYLE = :medium
-  def default_image_url(style = DEFAULT_IMAGE_STYLE) = "/images/defaults/app_#{style}.jpg"
+  def default_image_url(style) = "/images/defaults/app_#{style}.jpg"
   # Rails 8 validates attachments directly, so the Paperclip-era :if guards on
   # image_file_name are gone. Backfilled images are exempt: some predate these
   # rules and would make otherwise valid records unsaveable.

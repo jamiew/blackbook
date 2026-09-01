@@ -12,7 +12,7 @@
 
   #image
     - imgopts = {}
-    - if attachment_attached?(@tag, :image)
+    - if @tag.image.attached?
       .image= image_tag attachment_url(@tag, :image, :large), imgopts
     - elsif @tag.remote_image
       .image= image_tag @tag.remote_image, imgopts
