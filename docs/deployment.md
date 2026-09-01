@@ -27,7 +27,6 @@ kamal migrate          # run migrations, deliberately a separate step
 Migrations never run automatically. `bin/docker-entrypoint` omits the `db:prepare`
 that Rails generates, because the pending set drops the `comments` table and that
 must not happen because a container restarted or a deploy rolled back.
-`rake data:validate` reports how many rows that destroys.
 
 ## Secrets
 

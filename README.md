@@ -14,7 +14,10 @@ Graffiti writers are invited to capture and share their own tags, and computer p
 - [Uploading GML](docs/api/uploading-gml.md)
 - [Rendering GML](docs/gml/playback-implementations.md), across C++, Processing, Javascript, Flash, PHP and Python
 
-Full documentation is in [docs/](docs/README.md), imported from the GitHub wiki.
+Full documentation is in [docs/](docs/README.md), imported from the GitHub wiki
+and served on the site at [/docs](https://000000book.com/docs). `/api` redirects
+to the API section, and [/llms.txt](https://000000book.com/llms.txt) indexes it
+all for crawlers.
 
 ## Team
 
@@ -184,7 +187,7 @@ kamal migrate     # migrations, deliberately never automatic
 
 It stops before changing anything if the server has uncommitted work, if the GML volume is not mounted, if `secret_key_base` is unavailable, or if the target needs a Ruby version rbenv does not have. After restarting it confirms the service is up and the site returns 200, then prints the previous SHA so you can roll back with `./deploy <sha>`.
 
-It does not run migrations. The pending set drops the `comments` table, so migrating is a separate deliberate command. Run `rake data:validate` first: it reports how many rows that destroys. `./deploy` reports what is pending and stops there.
+It does not run migrations. The pending set drops the `comments` table, so migrating is a separate deliberate command. Run `rake data:validate` first. `./deploy` reports what is pending and stops there.
 
 ### Auditing production
 

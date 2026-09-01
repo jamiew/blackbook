@@ -1,5 +1,8 @@
 # Downloading GML
 
+Every tag is public and needs no key. Append a format to a tag's URL to get
+it, or use one of the shortcuts below.
+
 - Every tag page has a "Download GML" button.
 - Or append `.gml` to any data page URL, e.g. `http://000000book.com/data/154.gml`
 - Other formats work too: `.json` includes the full GML as JSON, and `.xml` gives
