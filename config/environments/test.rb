@@ -43,6 +43,13 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  # The suite builds tags through a factory, and saving one writes
+  # data/<id>.gml for real. Sharing that directory with development meant every
+  # run replaced real GML with a 159-byte rspec fixture; 2,273 tags were found
+  # clobbered that way, ids 2 to 2198. Nothing was lost for good, production was
+  # never affected, but a checkout quietly lost data on every run.
+  config.x.gml_data_dir = Rails.root.join("tmp/test-gml")
+
   # Silence logs during tests - write to log/test.log instead of STDOUT
   config.log_level = :warn
   config.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/test.log"))

@@ -88,6 +88,7 @@ Rails/Output:
   # running it. Sending that to the logger would hide it.
   Exclude:
     - 'lib/active_storage_backfill.rb'
+    - 'lib/tempt1_import.rb'
     - 'lib/tasks/**/*.rake'
 
 # RSpec specific

@@ -198,6 +198,10 @@ class TagsController < ApplicationController
 
     @tag.image = params[:image]
     @tag.save!
+    # Images posted here are drawn from the GML by GMLImageRenderer, not
+    # captured by the app that made the tag. Recording which is which lets the
+    # page say so, rather than passing a reconstruction off as an original.
+    @tag.image.blob.update!(metadata: @tag.image.blob.metadata.merge(generated: true))
     render plain: "OK", status: :ok, layout: false
   rescue StandardError
     logger.error $ERROR_INFO

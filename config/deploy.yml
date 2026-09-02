@@ -72,5 +72,9 @@ aliases:
   console: app exec --interactive --reuse "bin/rails console"
   dbc: app exec --interactive --reuse "bin/rails dbconsole"
   logs: app logs --follow
+  # One-shot data import, safe to re-run. Check with tempt1-verify first; the
+  # "Import TEMPT1 archive" workflow does both from the Actions tab.
+  tempt1-verify: app exec --reuse "bin/rails tempt1:verify"
+  tempt1-import: app exec --reuse "bin/rails tempt1:import"
 
 # Setting the host's MySQL up for this is in docs/deployment.md.

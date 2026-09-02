@@ -80,6 +80,13 @@ class Tag < ApplicationRecord
 
   def default_image_url(style) = "/images/defaults/tag_#{style}.jpg"
 
+  # True when the image was drawn from the GML rather than captured alongside
+  # it. Two of Tempt's drawings survive only as GML, and thousands of other
+  # tags never had a thumbnail, so a render is often the only picture there is.
+  def image_generated?
+    image.attached? && image.blob.metadata['generated'].present?
+  end
+
   # Placeholders for assigning data from forms
   attr_accessor :gml_file
   attr_accessor :_gml_object, :existing_application_id, :validation_results
