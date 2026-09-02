@@ -3,14 +3,13 @@
 .page__head
   %div
     - if @user
-      %span.eyebrow= link_to '← Back to profile', user_path(@user)
+      %p.crumb= link_to '← Back to profile', user_path(@user)
       %h1.page__title== #{@user.login}'s #{@favorites ? 'favorites' : 'tags'}
     - elsif @search_context
-      %span.eyebrow= link_to '← Back to all data', tags_path
+      %p.crumb= link_to '← Back to all data', tags_path
       %h1.page__title= @search_context[:value]
       %p.page__lede.meta== Filtered by #{@search_context[:key]}
     - else
-      %span.eyebrow The archive
       %h1.page__title Data
   %p.page__lede.meta== #{number_with_delimiter(@tags.total_entries)} tags
 

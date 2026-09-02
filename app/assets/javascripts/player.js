@@ -304,57 +304,6 @@ if (browse && browseRoot?.player) {
   });
 }
 
-/* --- logo: a variant picked on /logos, for this browser ----------------- */
-
-const LOGO_KEY = 'blackbook.logo';
-const logo = document.querySelector('[data-logo-default]');
-// The white wordmark vanishes on the light themes; this one is black.
-const LOGO_DARK = '/images/logo/clean-paper.png';
-
-function applyLogo() {
-  if (!logo) return;
-  const light = ['paper', 'acid'].includes(document.documentElement.dataset.theme);
-  logo.src = stored(LOGO_KEY) || (light ? LOGO_DARK : logo.dataset.original);
-}
-
-// The reset button carries an empty data-logo, which puts the original back.
-document.querySelectorAll('button[data-logo]').forEach(choice => {
-  choice.addEventListener('click', () => {
-    const src = choice.dataset.logo;
-    store(LOGO_KEY, src || null);
-    applyLogo();
-    document.querySelectorAll('[data-logo-variant]').forEach(v => {
-      v.toggleAttribute('data-chosen', v.querySelector('button[data-logo]').dataset.logo === src);
-    });
-  });
-});
-
-/* --- skins: theme and chrome, from the masthead ------------------------- */
-
-// Applied on every page from what the browser remembers. The buttons only
-// exist on the browse pages.
-const SKINS = { theme: ['ink', 'paper', 'acid'], chrome: ['full', 'quiet', 'bare'] };
-
-Object.entries(SKINS).forEach(([key, names]) => {
-  const host = document.querySelector(`[data-${key}-switch]`);
-  const buttons = host ? [...host.querySelectorAll(`button[data-${key}]`)] : [];
-  const set = name => {
-    document.documentElement.dataset[key] = name;
-    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === name)));
-    applyLogo();
-  };
-
-  const saved = stored(`blackbook.${key}`);
-  set(names.includes(saved) ? saved : names[0]);
-
-  host?.addEventListener('click', event => {
-    const chosen = event.target.closest(`button[data-${key}]`);
-    if (!chosen) return;
-    set(chosen.dataset[key]);
-    store(`blackbook.${key}`, chosen.dataset[key]);
-  });
-});
-
 // The page's keys. Space plays and pauses; the arrows follow whichever links
 // carry them, which on a tag page is the next and previous tag. Fields, and
 // buttons that space would already press, are left alone.

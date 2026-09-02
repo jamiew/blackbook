@@ -63,8 +63,6 @@ Rails.application.routes.draw do
 
   get '/about' => 'home#about', as: 'about'
   get '/upload' => 'home#upload', as: 'upload'
-  # Logo variants to try in the masthead. A design tool, not a page to index.
-  get '/logos' => 'home#logos', as: 'logos'
 
   # The repo's docs/ served as pages. `format: false` so a slug ending in
   # something like .md is passed through rather than parsed as a format.

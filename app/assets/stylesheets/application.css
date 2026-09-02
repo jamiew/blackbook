@@ -20,8 +20,6 @@
   --dimmer: #767676; /* 4.6:1 on black, the floor for small text */
   --accent: #f5ff00;
   --warn: #ff5c47;
-  /* Text on an accent or ink background. Each theme sets its own. */
-  --on-accent: #000000;
 
   --display: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -95,7 +93,7 @@ textarea:focus-visible,
   z-index: 50;
   padding: 8px 12px;
   background: var(--accent);
-  color: var(--on-accent);
+  color: #000;
   font-family: var(--mono);
   font-size: var(--meta-size);
   letter-spacing: var(--meta-tracking);
@@ -201,15 +199,16 @@ textarea:focus-visible,
 
 .page__lede { color: var(--dim); max-width: 46ch; margin: 0; }
 
-.eyebrow {
-  font-family: var(--mono);
-  font-size: var(--meta-size);
-  letter-spacing: var(--meta-tracking);
-  text-transform: uppercase;
-  color: var(--dimmer);
-  display: block;
-  margin-bottom: 10px;
-}
+/* A way back, above the title. A link, not a label. */
+.crumb { font-family: var(--mono); font-size: var(--meta-size); color: var(--dim); margin: 0 0 8px; }
+.crumb a { border-bottom-color: var(--line); color: var(--dim); }
+.crumb a:hover { color: var(--accent); }
+
+/* The front page: the tags and the player's readout, no labels around them. */
+.page--quiet .player__context,
+.page--quiet .tag-card__body,
+.page--quiet .browse__actions,
+.page--quiet .section-head { display: none; }
 
 /* --- buttons ------------------------------------------------------------ */
 
@@ -233,11 +232,11 @@ button.button {
 }
 .button:hover,
 a.button:hover,
-button.button:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+button.button:hover { background: var(--accent); border-color: var(--accent); color: #000; }
 
-.button--solid { background: var(--ink); border-color: var(--ink); color: var(--on-accent); }
+.button--solid { background: var(--ink); border-color: var(--ink); color: #000; }
 .button--quiet { border-color: var(--line); color: var(--dim); }
-.button--danger:hover { background: var(--warn); border-color: var(--warn); color: var(--on-accent); }
+.button--danger:hover { background: var(--warn); border-color: var(--warn); color: #000; }
 
 /* --- forms -------------------------------------------------------------- */
 
@@ -264,7 +263,7 @@ input[type="submit"], button[type="submit"] {
   letter-spacing: var(--meta-tracking);
   text-transform: uppercase;
   background: var(--ink);
-  color: var(--on-accent);
+  color: #000;
   border: 1px solid var(--ink);
   padding: 9px 16px;
   cursor: pointer;
@@ -323,8 +322,8 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   color: var(--dim);
 }
 .pagination a { border-color: var(--line); }
-.pagination a:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.pagination em, .pagination .current { font-style: normal; color: var(--on-accent); background: var(--ink); border-color: var(--ink); }
+.pagination a:hover { background: var(--accent); border-color: var(--accent); color: #000; }
+.pagination em, .pagination .current { font-style: normal; color: #000; background: var(--ink); border-color: var(--ink); }
 
 /* --- flash -------------------------------------------------------------- */
 
@@ -429,7 +428,7 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 .gml-transport input[type="range"]::-webkit-slider-thumb { background: var(--accent); }
 .gml-transport input[type="range"]::-moz-range-thumb { background: var(--accent); }
 .gml-switches button[aria-pressed="true"]:not(:disabled),
-.player__debug[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.player__debug[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #000; }
 
 /* The pane sits over the stage rather than under it, so opening it does not
    resize the canvas. */
@@ -497,7 +496,7 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   color: var(--dim);
   border: 1px solid var(--line-bright);
 }
-a.strip__step:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+a.strip__step:hover { background: var(--accent); border-color: var(--accent); color: #000; }
 .strip__step--off { opacity: 0.3; }
 .strip__hint { flex: 0 0 auto; white-space: nowrap; padding-left: 6px; }
 
@@ -544,7 +543,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   background: rgba(0, 0, 0, 0.72);
   color: var(--ink);
 }
-.tag-card:hover .tag-card__id { background: var(--accent); color: var(--on-accent); }
+.tag-card:hover .tag-card__id { background: var(--accent); color: #000; }
 
 .tag-card__body {
   padding: 10px 12px 13px;
@@ -591,7 +590,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   color: var(--dim);
 }
 .chip:hover { color: var(--ink); border-color: var(--line-bright); }
-.chip[aria-current] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+.chip[aria-current] { color: #000; background: var(--accent); border-color: var(--accent); }
 .chips__gap { width: 10px; }
 
 /* --- home --------------------------------------------------------------- */
@@ -723,12 +722,8 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 
 /* The cell whose tag is playing. */
 .tag-card[aria-current] { outline: 1px solid var(--accent); outline-offset: -1px; }
-.tag-card[aria-current] .tag-card__id { background: var(--accent); color: var(--on-accent); }
+.tag-card[aria-current] .tag-card__id { background: var(--accent); color: #000; }
 
-
-.masthead__view { display: flex; }
-.masthead__view + .masthead__view { margin-left: 10px; }
-.masthead__view button {
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: var(--meta-tracking);
@@ -739,15 +734,12 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   border: 1px solid var(--line);
   cursor: pointer;
 }
-.masthead__view button + button { margin-left: -1px; }
-.masthead__view button:hover { color: var(--ink); border-color: var(--line-bright); position: relative; z-index: 1; }
-.masthead__view button[aria-pressed="true"] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
 
 /* --- upload ------------------------------------------------------------- */
 
 /* The one loud item in the nav. */
 .masthead__nav a.masthead__upload { color: var(--accent); border: 1px solid var(--accent); padding: 4px 9px; }
-.masthead__nav a.masthead__upload:hover { background: var(--accent); color: var(--on-accent); }
+.masthead__nav a.masthead__upload:hover { background: var(--accent); color: #000; }
 .masthead__nav a.masthead__upload[aria-current="page"]::before { content: none; }
 
 .upload-apps { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 0; }
@@ -793,79 +785,6 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   margin: 0 0 12px;
   overflow-x: auto;
 }
-
-/* --- logos (design tool) ----------------------------------------------- */
-
-.logos { display: grid; gap: 1px; background: var(--line); border: var(--rule); }
-.logos__variant { background: var(--ground); display: grid; grid-template-columns: minmax(0, 1fr) 300px; align-items: center; }
-.logos__masthead { padding: 20px var(--gutter); border-right: var(--rule); }
-.logos__image { height: 56px; width: auto; }
-.logos__meta { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-.logos__note { color: var(--dim); font-size: 14px; }
-.logos__variant[data-chosen] { outline: 1px solid var(--accent); outline-offset: -1px; }
-
-/* --- themes and chrome --------------------------------------------------- */
-/* The masthead's switches set data-theme and data-chrome on <html>. The engine
-   paints every canvas white on black, so the other themes turn the canvases
-   with a filter rather than teaching each player a palette. */
-
-[data-theme="paper"] {
-  --ground: #f4f2ec;
-  --surface: #ecebe4;
-  --surface-raised: #e3e1d8;
-  --line: #d6d3c8;
-  --line-bright: #b9b5a6;
-  --ink: #111111;
-  --dim: #5c5a52;
-  --dimmer: #7a776c;
-  --accent: #d81b10;
-  --warn: #d81b10;
-  --on-accent: #ffffff;
-}
-[data-theme="paper"] canvas,
-[data-theme="paper"] .player__still { filter: invert(1); }
-
-[data-theme="acid"] {
-  --ground: #f5ff00;
-  --surface: #eef700;
-  --surface-raised: #e3ec00;
-  --line: #c9d000;
-  --line-bright: #a8ae00;
-  --ink: #000000;
-  --dim: #4a4d00;
-  --dimmer: #6b6f00;
-  --accent: #000000;
-  --warn: #d81b10;
-  --on-accent: #f5ff00;
-}
-/* Inverted ink multiplied onto the yellow ground: black strokes, no fringe. */
-[data-theme="acid"] canvas,
-[data-theme="acid"] .player__still { filter: invert(1); mix-blend-mode: multiply; }
-
-/* quiet: the tags without their readouts. bare: nothing but the tags. */
-[data-chrome="quiet"] .player__meta,
-[data-chrome="quiet"] .player__context,
-[data-chrome="quiet"] .tag-card__body,
-[data-chrome="quiet"] .specs,
-[data-chrome="quiet"] .browse__actions,
-[data-chrome="quiet"] .section-head,
-[data-chrome="quiet"] .strip__hint,
-[data-chrome="bare"] .player__meta,
-[data-chrome="bare"] .player__context,
-[data-chrome="bare"] .tag-card__body,
-[data-chrome="bare"] .specs,
-[data-chrome="bare"] .browse__actions,
-[data-chrome="bare"] .section-head,
-[data-chrome="bare"] .strip__hint,
-[data-chrome="bare"] .tag-card__id,
-[data-chrome="bare"] .player__head,
-[data-chrome="bare"] .lede,
-[data-chrome="bare"] .page__head,
-[data-chrome="bare"] .filters,
-[data-chrome="bare"] .chips,
-[data-chrome="bare"] .footer { display: none; }
-[data-chrome="bare"] { --line: transparent; --line-bright: transparent; }
-[data-chrome="bare"] .tag-grid { background: var(--ground); }
 
 /* Previous and next on the browse player. */
 .player__step {
@@ -1026,9 +945,6 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   .masthead__nav { gap: 16px; order: 3; width: 100%; }
   .player__stage { aspect-ratio: 1 / 1; }
   .strip__hint { display: none; }
-  .masthead__view { display: none; }
-  .logos__variant { grid-template-columns: minmax(0, 1fr); }
-  .logos__masthead { border-right: 0; }
   .about__hero figcaption { position: static; transform: none; max-width: none; padding: 12px; }
   .strip__cell { width: 84px; height: 56px; }
   .tag-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }

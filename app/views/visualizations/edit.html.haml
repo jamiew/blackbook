@@ -1,6 +1,6 @@
 .page__head
   %div
-    %span.eyebrow= link_to "← #{@visualization.name}", visualization_path(@visualization)
+    %p.crumb= link_to "← #{@visualization.name}", visualization_path(@visualization)
     %h1.page__title Edit application
 
 .form-page

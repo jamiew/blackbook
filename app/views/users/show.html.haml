@@ -2,7 +2,6 @@
 
 .page__head
   %div
-    %span.eyebrow Writer
     %h1.page__title= @user.login
     - unless @user.tagline.blank?
       %p.page__lede= @user.tagline

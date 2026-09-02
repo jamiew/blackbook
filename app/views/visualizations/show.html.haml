@@ -5,7 +5,7 @@
 
 .page__head
   %div
-    %span.eyebrow= link_to '← All applications', visualizations_path
+    %p.crumb= link_to '← All applications', visualizations_path
     %h1.page__title
       = @visualization.name
       - unless @visualization.version.blank?

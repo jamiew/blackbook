@@ -13,14 +13,14 @@ app cards, in the recorder.
 - Browse: `/` and `/data` play one tag beside the grid; click or `←`/`→` loads
   it in place; four layouts from the masthead switch; combinable chips.
 - Apps: `source_url`, chips, every card and page playing the app's newest tag.
-- Upload: capture apps, a GML recorder, form and API. `/logos` with a toggle.
+- Upload: capture apps, a GML recorder, form and API.
 - Search and social: descriptions, canonical, cards, `sitemap.xml`, skip link.
 - Cleanup: dead icons, placeholders, the ga.js partial, an unused view and a
   stale spec gone; docs rewritten short.
-- Skins: the tagline-free logo by default with four Glif variations that keep
-  its letterforms; headlines smaller, in Fraunces italic to match; theme (ink,
-  paper, acid) and chrome (full, quiet, bare) switches; prev/next on the
-  browse player, which plays on to the next tag like a slideshow.
+- The logo without its tagline (Glif variations were tried and dropped);
+  headlines smaller, in Fraunces italic to match; a quiet front page; prev/next
+  on the browse player, which plays on to the next tag like a slideshow.
+  Themes and chrome switches were tried and dropped.
 
 ## Next
 

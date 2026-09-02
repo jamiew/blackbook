@@ -43,12 +43,12 @@ bundle exec rspec         # no environment variables needed
 ## Pages
 
 - `/` and `/data` play one tag beside the grid. Click a cell, press ← →, or
-  let it run on like a slideshow. The masthead switches try themes (ink,
-  paper, acid) and chrome (full, quiet, bare).
+  let it run on like a slideshow. The front page keeps quiet: no labels, just
+  the tags and the player's readout.
 - `/data/:id` is one tag with a filmstrip of its neighbours. Controls opens the
   pane: looks, live or still, ink mode, effects, data layers.
 - `/apps` plays the newest tag made with each app. `/upload` explains how to
-  make a tag and lets you draw one. `/logos` tries wordmark variants.
+  make a tag and lets you draw one.
 
 ## API
 

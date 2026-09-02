@@ -4,7 +4,8 @@
   %body
     %a.skip{ href: '#main' } Skip to content
     = render partial: 'layouts/header'
-    %main#main.page.shell
+    -# The front page is quiet: the tags and their readouts, without labels.
+    %main#main.page.shell{ class: ('page--quiet' if @quiet) }
       = flash_messages.present? && flash_messages.map(&:to_s).join.html_safe || ''
       = yield :layout
     = render partial: 'layouts/footer'

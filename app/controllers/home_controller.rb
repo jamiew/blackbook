@@ -9,6 +9,7 @@ class HomeController < ApplicationController
     # The browse layout plays one tag beside the grid: ?tag=id, or the first.
     @tag = (params[:tag].present? && Tag.find_by(id: params[:tag])) || @tags.first
     @browse = true
+    @quiet = true
     set_page_title("#000000book - an open database for Graffiti Markup Language (GML) files", false)
   end
 
@@ -20,10 +21,6 @@ class HomeController < ApplicationController
 
   def upload
     set_page_title 'Make and upload a tag'
-  end
-
-  def logos
-    set_page_title 'Logo variants'
   end
 
   # The static pages, the docs, every approved app and the newest 500 tags.
