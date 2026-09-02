@@ -115,8 +115,11 @@ Rails.application.configure do
     ignore_exceptions: ['ActionController::BadRequest'] + ExceptionNotifier.ignored_exceptions,
     email: {
       email_prefix: "[blackbook-prod] ",
-      sender_address: %{"000000book Errors" <no-reply@000book.com>},
-      exception_recipients: %w[jamie@jamiedubs.com]
+      # The SES-verified sender, same as every other mailer. Hardcoding
+      # no-reply@000book.com here meant error mail was sent as a domain we no
+      # longer use, which SES will refuse once it is not a verified identity.
+      sender_address: ses.present? ? ses[:from] : %{"000000book Errors" <no-reply@000000book.com>},
+      exception_recipients: config.x.alert_recipients
     }
 
 end

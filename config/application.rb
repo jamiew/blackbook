@@ -40,6 +40,18 @@ module Blackbook4
     # "example.com" is an expected input, not an attack we can reject.
     config.action_controller.action_on_path_relative_redirect = :log
 
+    # Where operational alerts go: rate limit trips and exception notifications.
+    # One place so the two cannot drift apart. Set ALERT_EMAIL to change it
+    # without a code change; config/deploy.yml can supply it.
+    config.x.alert_recipients = ENV.fetch('ALERT_EMAIL', 'jamie@jamiedubs.com').split(',')
+
+    # The fallback sender. Production replaces it with the address SES has
+    # actually verified, from encrypted credentials. It lives here rather than
+    # as a `default from:` in ApplicationMailer because a mailer-class default
+    # overrides this, which is how outgoing mail ended up claiming to come from
+    # 000book.com long after we stopped using that domain.
+    config.action_mailer.default_options = { from: '000000book <no-reply@000000book.com>' }
+
     # Use RSpec for generators
     config.generators do |g|
       g.test_framework :rspec

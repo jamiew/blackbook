@@ -1,0 +1,7 @@
+<p><%= @ip %> crossed the <%= @name %> rate limit on <%= @scope %>.
+
+<p><%= @count %> requests against a limit of <%= @limit %> per <%= @within.inspect %>.
+
+<p>Further alerts for this client are suppressed for an hour.
+
+<p>If this is a legitimate client, raise the limit in app/controllers/tags_controller.rb.

@@ -118,3 +118,27 @@ Two traps, both pinned by `spec/models/user_authenticate_legacy_scrypt_spec.rb`:
   counts them first and skips those two indexes rather than failing, so the
   migration is safe to run before they are cleaned up.
   `script/rehearse-migrations.sh` prints the current counts.
+
+## Rate limits
+
+`TagsController` limits reads to 300 a minute and uploads to 30 an hour, per IP
+address. Crossing either sends one email to the address in `AbuseMailer`, over
+the same SES SMTP settings `exception_notification` uses. Alerts are capped at
+one an hour per client and ten an hour overall, so a client hammering us cannot
+turn into a mail flood.
+
+The counters live in an in-memory store in the app process, not `Rails.cache`.
+Two consequences worth knowing before reading a graph:
+
+- **A deploy resets every counter.** A client that was being refused gets a
+  clean slate the moment a new container takes over.
+- **During the rollover both containers count separately**, so for a few seconds
+  a client can get roughly double the allowance.
+
+Neither matters for stopping abuse, and both avoid adding Redis or a migration.
+If the limits ever need to be exact, that is the trade to revisit.
+
+To change the numbers, edit the `rate_limit` calls in
+`app/controllers/tags_controller.rb`. They were set without traffic data, so the
+alert mail is the feedback loop: if a legitimate client keeps tripping, raise them.
+
