@@ -72,6 +72,7 @@ Rails.application.routes.draw do
   get '/docs/*path' => 'docs#show', as: 'doc', format: false
   get '/api' => redirect('/docs/api'), as: 'api'
   get '/llms.txt' => 'docs#llms', as: 'llms'
+  get '/sitemap.xml' => 'home#sitemap', as: 'sitemap', defaults: { format: 'xml' }
 
   root controller: 'home', action: 'index'
 end

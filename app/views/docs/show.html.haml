@@ -1,10 +1,17 @@
+- content_for :description, "#{@doc.title}. Documentation for the 000000book API and the Graffiti Markup Language."
+- sections = { 'api' => 'API', 'gml' => 'GML', 'examples' => 'Examples', nil => 'Running it' }
+- pages = DocsPage.all.reject { |p| p.slug == 'README' }.group_by { |p| p.slug.include?('/') ? p.slug.split('/').first : nil }
+
 .docs
-  %nav.docs__nav
+  %nav.docs__nav{ 'aria-label' => 'Documentation' }
     %h3= link_to 'Docs', docs_path
-    %ul
-      - DocsPage.all.reject { |p| p.slug == 'README' }.each do |page|
-        %li{ class: ('is-current' if page.slug == @doc.slug) }
-          = link_to page.title, page.url_path
+    - sections.each do |key, label|
+      - next if pages[key].blank?
+      %h4.docs__section= label
+      %ul
+        - pages[key].each do |page|
+          %li{ class: ('is-current' if page.slug == @doc.slug) }
+            = link_to page.title, page.url_path, 'aria-current' => (page.slug == @doc.slug ? 'page' : nil)
 
   %article.docs__body
     != @doc.to_html

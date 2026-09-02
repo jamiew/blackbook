@@ -1,3 +1,7 @@
+- who = @tag.user&.login || @tag.secret_username || 'an anonymous writer'
+- content_for :description, "Tag ##{@tag.id}, motion-captured graffiti by #{who}#{" drawn with #{@tag.sexy_app_name}" if @tag.sexy_app_name.present?}. Play it back stroke by stroke, or download the GML."
+- content_for :og_image, tag_thumbnail_url(@tag, :large) if @tag.image.attached? || @tag.remote_thumbnail_url.present?
+
 = render 'tags/player', tag: @tag, heading: :h1, strip: @strip, prev: @prev, next: @next
 = render 'tags/specs', tag: @tag
 

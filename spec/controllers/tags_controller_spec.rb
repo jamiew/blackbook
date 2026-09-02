@@ -165,6 +165,17 @@ describe TagsController do
       expect(response.body).to match(/Tag ##{@tag.id}/)
     end
 
+    it "describes itself for search and social, with its still as the card" do
+      get :show, params: { id: @tag.to_param }
+      expect(response.body).to match(%r{<link href="http://test.host/data/#{@tag.id}" rel="canonical">})
+      expect(response.body).to include('/images/social-card.jpg" property="og:image"')
+      expect(response.body).to match(/content="Tag ##{@tag.id}, motion-captured graffiti[^"]*" name="description"/)
+
+      @tag.image.attach(io: StringIO.new('x'), filename: 'still.png', content_type: 'image/png')
+      get :show, params: { id: @tag.to_param }
+      expect(response.body).to match(%r{content="http://test.host/rails/active_storage/[^"]+" property="og:image"})
+    end
+
     it "lines the neighbours up oldest to newest around the tag" do
       older = @tag
       middle = FactoryBot.create(:tag)

@@ -26,6 +26,16 @@ class HomeController < ApplicationController
     set_page_title 'Logo variants'
   end
 
+  # The static pages, the docs, every approved app and the newest 500 tags.
+  # The archive has 76,000 tags; the rest are reachable through /data, and the
+  # API is the better way in for anything that wants them all.
+  def sitemap
+    @docs = DocsPage.all
+    @apps = Visualization.approved.select(:id, :updated_at)
+    @tags = Tag.order(created_at: :desc).limit(500).select(:id, :updated_at)
+    expires_in 1.day, public: true
+  end
+
   def about
     # Six of the archive's own tags, alive, as the page's second graphic.
     @tags = Array.new(6) { Tag.random }.compact.uniq

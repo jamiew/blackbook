@@ -1,4 +1,8 @@
-- description = "An open archive of motion-captured graffiti. Every tag is a GML file: the writer's hand as coordinates and timestamps, replayable by anyone."
+-# Pages set their own description and card with content_for(:description)
+-# and content_for(:og_image); everything else gets the site's.
+- description = content_for(:description).presence || "An open archive of motion-captured graffiti. Every tag is a GML file: the writer's hand as coordinates and timestamps, replayable by anyone."
+- canonical = request.base_url + request.path
+- card = URI.join(request.base_url, content_for(:og_image).presence || '/images/social-card.jpg').to_s
 %head
   %meta{ charset: 'utf-8' }
   -# Without this the layout renders at desktop width on phones, zoomed out.
@@ -6,13 +10,18 @@
   %meta{ name: 'robots', content: @noindex ? 'noindex,follow' : 'all' }
   %meta{ name: 'theme-color', content: '#000000' }
   %meta{ name: 'description', content: description }
+  %link{ rel: 'canonical', href: canonical }
 
-  -# One card for the whole site until tags get their own (see PLAN.md).
   %meta{ property: 'og:type', content: 'website' }
+  %meta{ property: 'og:site_name', content: '#000000book' }
+  %meta{ property: 'og:url', content: canonical }
   %meta{ property: 'og:title', content: page_title }
   %meta{ property: 'og:description', content: description }
-  %meta{ property: 'og:image', content: image_url('/images/social-card.jpg') }
+  %meta{ property: 'og:image', content: card }
   %meta{ name: 'twitter:card', content: 'summary_large_image' }
+  %meta{ name: 'twitter:title', content: page_title }
+  %meta{ name: 'twitter:description', content: description }
+  %meta{ name: 'twitter:image', content: card }
   %link{ rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }
   %link{ rel: 'icon', type: 'image/png', sizes: '512x512', href: '/images/icon-512.png' }
 
@@ -24,6 +33,7 @@
   -# machine-readable description (RFC 8631), `describedby` the prose one.
   %link{ rel: 'service-desc', type: 'application/yaml', href: '/openapi.yaml', title: 'OpenAPI' }
   %link{ rel: 'describedby', type: 'text/plain', href: '/llms.txt', title: 'llms.txt' }
+  %link{ rel: 'sitemap', type: 'application/xml', href: '/sitemap.xml' }
 
   -# The vendored player. player.js and gml_thumbnails.js read the directory
   -# from this meta, and the controls' stylesheet goes before ours so ours wins ties.
