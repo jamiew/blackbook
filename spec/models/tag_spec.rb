@@ -310,8 +310,19 @@ RSpec.describe Tag, type: :model do
 
     it 'drops the per-stroke styling and screen size' do
       tag = tag_with_gml('<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>')
-      expect(tag.preview_data.keys).to contain_exactly(:id, :app, :rotate, :strokes)
+      expect(tag.preview_data.keys).to contain_exactly(:id, :app, :up, :rotate, :strokes)
       expect(tag.preview_data[:strokes].first.keys).to eq([:points])
+    end
+  end
+
+  describe '#player_data up vector' do
+    it 'passes it through for the client to read' do
+      expect(tag_with_environment(up_x: 1, up_y: 0).player_data[:up]).to eq(x: 1.0, y: 0.0)
+    end
+
+    it 'is nil when none was recorded' do
+      tag = tag_with_gml('<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>')
+      expect(tag.player_data[:up]).to be_nil
     end
   end
 

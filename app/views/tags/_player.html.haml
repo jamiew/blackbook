@@ -1,14 +1,17 @@
--# The tag, played back from its own timestamps. Transport, readout and layer
--# switches are built by gml_player_ui.js so the markup stays inert without JS.
+-# The tag, played back from its own timestamps. Transport and pane are built
+-# by player.js so the markup stays inert without JS.
 .player{ data: { gml_player: true } }
   .player__head
     %span.player__label Canvas player
     %span.player__meta{ data: { player_meta: true } }
   .player__stage
     %canvas.player__canvas{ role: 'img', 'aria-label' => "Playback of tag ##{player.id}" }
-    %noscript
-      - if player.image.attached? || player.remote_thumbnail_url.present?
-        = image_tag tag_thumbnail_url(player, :large), alt: "Tag ##{player.id}"
+    - if player.image.attached? || player.remote_thumbnail_url.present?
+      - still = tag_thumbnail_url(player, :large)
+      -# The still the capture app uploaded, for the pane's live/still switch.
+      = image_tag still, alt: "Still of tag ##{player.id}", class: 'player__still', hidden: true, loading: 'lazy'
+      %noscript
+        = image_tag still, alt: "Tag ##{player.id}"
     -# Escaped by ActiveSupport's JSON encoder, so `</script>` cannot break out.
     %script{ type: 'application/json' }!= player.player_data.to_json
   .player__transport{ data: { player_controls: true } }

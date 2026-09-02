@@ -12,9 +12,9 @@
 
   .stepper
     - if @next
-      = link_to '← Next', tag_path(@next), class: 'button button--quiet'
+      = link_to '← Next', tag_path(@next), class: 'button button--quiet', data: { key: 'ArrowLeft' }
     - if @prev
-      = link_to 'Previous →', tag_path(@prev), class: 'button button--quiet'
+      = link_to 'Previous →', tag_path(@prev), class: 'button button--quiet', data: { key: 'ArrowRight' }
     - on = (current_user && @tag.favorited_by?(current_user)) || false
     = link_to (on ? '★ Favorited' : '☆ Favorite'), tag_favorites_path(@tag), method: 'post', class: "button #{'button--solid' if on}"
 

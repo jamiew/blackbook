@@ -33,7 +33,7 @@ module TagsHelper
     link_to(location, tags_path(location: location), class: 'location_link')
   end
 
-  # Playback now lives in tags/_player.html.haml and gml_player.js. The Flash
+  # Playback now lives in tags/_player.html.haml and player.js. The Flash
   # embed that used to be here pointed at a .swf and stopped working when the
   # plugin was withdrawn in 2020.
 end

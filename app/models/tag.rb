@@ -212,6 +212,7 @@ class Tag < ApplicationRecord
     drawing = gml_hash.dig('gml', 'tag', 'drawing') || gml_hash.dig('GML', 'tag', 'drawing') || {}
     header  = gml_hash.dig('gml', 'tag', 'header') || gml_hash.dig('GML', 'tag', 'header') || {}
     env     = gml_hash.dig('gml', 'tag', 'environment') || gml_hash.dig('GML', 'tag', 'environment') || {}
+    up      = env['up']
 
     strokes = Array.wrap(drawing['stroke']).filter_map do |stroke|
       next if stroke.blank?
@@ -235,6 +236,9 @@ class Tag < ApplicationRecord
       app: sexy_app_name.presence,
       screen: { x: Float(env.dig('screenBounds', 'x'), exception: false),
                 y: Float(env.dig('screenBounds', 'y'), exception: false) },
+      # Which way was up, so the client can settle rotation with the same
+      # function the reference player uses. `rotate` stays for older clients.
+      up: up.is_a?(Hash) ? { x: Float(up['x'], exception: false), y: Float(up['y'], exception: false) } : nil,
       rotate: landscape_capture?(env),
       client: header.dig('client', 'name'),
       strokes: strokes }
@@ -259,7 +263,7 @@ class Tag < ApplicationRecord
       { points: kept.map { |x, y, t| [x.round(3), y.round(3), t.round(2)] } }
     end
 
-    full.slice(:id, :app, :rotate).merge(strokes: strokes)
+    full.slice(:id, :app, :up, :rotate).merge(strokes: strokes)
   end
 
   # GML records which way was up when the tag was captured. An up vector along

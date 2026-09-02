@@ -11,23 +11,23 @@ tag: the detail page, the grid, the filmstrip, and later the social card.
 - [x] Fix `/apps/1` (nil website) and rebuild `visualizations/*` on the
       refreshed vocabulary. `website_link` helper shared with writer profiles.
 
+- [x] **Engine.** canvasplayer 6.0.0 vendored verbatim under
+      `public/canvasplayer/6.0.0/` (see `SOURCE` there for the commit and how
+      to update). `player.js` is the only blackbook glue. Rotation is decided
+      on the client with upstream `isLandscape`, so there is one parser.
+- [x] **Pane.** Looks, source `LIVE | STILL`, and gml-ui's switches overlay
+      top right of the stage. Remembered per browser. `space` plays and
+      pauses; `←`/`→` follow next and previous on a tag page.
+- [x] `Tag#preview_data`, served from `tags#show` as `.json?preview=1`.
+
 ## Next
 
-- [ ] **Engine.** Vendor `gml.js`, `gml-player.js`, `gml-ui.js`, `gml-ui.css`
-      verbatim into `public/canvasplayer/<version>/` with a `SOURCE` file (URL,
-      commit, date, how to update). Blocked on an upstream commit. Blackbook
-      keeps one glue module, `player.js`, loaded as `type="module"`. Rotation
-      moves to the client via upstream `isLandscape`, so there is one parser.
-      Delete `gml_player.js` and `gml_player_ui.js`.
-- [ ] **Debug pane.** Switches overlay top-right of the stage, not below it.
-      One new control: source `LIVE | STILL`, where STILL is the attachment.
-- [ ] **Grid.** `Tag#preview_data` (≤300 points, ~5KB) served from
-      `tags#show` as `.json?preview=1` with the existing ETag. Cells are
-      canvases mounted on scroll, `hairline` mode, looped on hover.
-      `prefers-reduced-motion` draws the finished tag once.
-- [ ] **Filmstrip and keyboard.** `tags/_filmstrip` under the player on `/`
-      and `/data/:id`. Cells are links. `←`/`→` follow prev/next, `space`
-      toggles play. No pushState; every tag stays a URL.
+- [ ] **Grid.** Cells become canvases mounted on scroll from `?preview=1`,
+      `hairline` mode, looped on hover. `prefers-reduced-motion` draws the
+      finished tag once. `NO STILL` stays as the pre-JS state.
+- [ ] **Filmstrip.** `tags/_filmstrip` under the player on `/` and
+      `/data/:id`: the neighbouring tags as the same live cells, each a link,
+      with a `← → browse · space play` hint. No pushState.
 
 ## Backlog
 

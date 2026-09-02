@@ -14,10 +14,16 @@
   %link{ rel: 'service-desc', type: 'application/yaml', href: '/openapi.yaml', title: 'OpenAPI' }
   %link{ rel: 'describedby', type: 'text/plain', href: '/llms.txt', title: 'llms.txt' }
 
+  -# The vendored player. player.js reads the directory from this meta, and the
+  -# controls' stylesheet goes before ours so ours wins ties.
+  %meta{ name: 'canvasplayer', content: canvasplayer_path }
+  %link{ rel: 'stylesheet', href: canvasplayer_path('gml-ui.css') }
+
   = stylesheet_link_tag 'application', media: 'all'
   -# Propshaft doesn't read sprockets `//= require` directives, so each file is listed here.
   -# `rails-ujs` ships with actionview and drives data-method/data-confirm on links.
-  = javascript_include_tag 'rails-ujs', 'application', 'gml_player', 'gml_player_ui'
+  = javascript_include_tag 'rails-ujs', 'application'
+  = javascript_include_tag 'player', type: 'module'
   = csrf_meta_tags
 
   = yield :head

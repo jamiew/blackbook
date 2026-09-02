@@ -39,6 +39,13 @@ module ApplicationHelper
     link_to url.sub(scheme, '').chomp('/'), href, rel: 'nofollow noopener', target: '_blank'
   end
 
+  # The vendored canvasplayer. It is served from public/ because Propshaft would
+  # fingerprint the files and break the modules' relative imports. See SOURCE in
+  # that directory for the commit and how to update; bump the version here.
+  def canvasplayer_path(file = nil)
+    ['/canvasplayer/6.0.0', file].compact.join('/')
+  end
+
   def html_attrs(lang = 'en-US')
     { lang: lang }
   end

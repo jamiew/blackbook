@@ -161,7 +161,7 @@ describe TagsController do
       it "renders the cut-down preview with ?preview=1" do
         get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
         expect(response).to be_successful
-        expect(response.parsed_body.keys).to contain_exactly('id', 'app', 'rotate', 'strokes')
+        expect(response.parsed_body.keys).to contain_exactly('id', 'app', 'up', 'rotate', 'strokes')
       end
 
       it "gives the preview its own ETag" do

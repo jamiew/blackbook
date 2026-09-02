@@ -1,0 +1,24 @@
+canvasplayer 6.0.0, vendored verbatim.
+
+Source:  https://github.com/jamiew/canvasplayer
+Commit:  a1f00ea306c2c868f43ccd46918b2151e6fdc922 (2026-09-01)
+         "Split into ES modules and set up for npm"
+Files:   gml.js gml-player.js gml-ui.js gml-ui.css, byte for byte from
+         that commit. Public domain, no rights reserved.
+
+Why here and not app/assets: Propshaft fingerprints filenames, which
+breaks the modules' relative imports (`import ... from './gml.js'`).
+Thruster serves public/ in production.
+
+To update:
+  1. In a clean canvasplayer checkout, `node --test test.js`.
+  2. Copy the four files into public/canvasplayer/<new version>/ and
+     write a new SOURCE there with the commit.
+  3. Bump the version in ApplicationHelper#canvasplayer_path.
+  4. `bundle exec rspec spec/requests/canvasplayer_spec.rb`, then open
+     a tag page. Delete the old version directory.
+
+Edits belong upstream first. Anything that had to land here instead is
+listed below, so it can be carried back.
+
+Local edits: none.
