@@ -27,8 +27,8 @@
 - if @tags.empty?
   %p.page__lede No results.
 - else
-  .tag-grid
-    = render partial: 'tags/tag', collection: @tags, as: :tag
-
-  %nav{ 'aria-label' => 'Pagination', style: 'margin-top: 28px' }
-    = pagination
+  = render layout: 'tags/browse', locals: { tag: @tag } do
+    .tag-grid
+      = render partial: 'tags/tag', collection: @tags, as: :tag, locals: { current: @tag }
+    %nav{ 'aria-label' => 'Pagination', style: 'margin-top: 28px' }
+      = pagination

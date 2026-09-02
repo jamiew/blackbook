@@ -1,25 +1,25 @@
 = auto_discovery_link_tag(:rss, { format: :rss, controller: 'tags', action: 'index' }, title: '#000000book: Latest Tags')
 
-- if @tag.blank?
-  %p.page__lede No tag data.
-- else
-  = render 'tags/player', tag: @tag, strip: @strip, prev: @prev
-
-  .lede
+.lede.lede--home
+  %div
     %h1.lede__title An open archive of motion-captured graffiti
     %p.page__lede
       Every tag is a #{link_to 'GML', 'http://fffff.at/gml-week-graffiti-markup-language/'} file:
       the writer's hand as coordinates and timestamps, replayable by anyone.
+  .actions
+    = link_to 'View all data →', tags_path, class: 'button'
     - if current_user
       = link_to '+ Upload GML', new_tag_path, class: 'button button--solid'
     - else
       = link_to 'Create an account', signup_path, class: 'button button--solid'
 
-  .section-head
-    %h2 Recent tags
-    %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_stats[:total])} archived
-
-  .tag-grid
-    = render partial: 'tags/tag', collection: @tags, as: :tag
-
-  %p{ style: 'margin-top: 20px' }= link_to 'View all data →', tags_path, class: 'button'
+- if @tag.blank?
+  %p.page__lede No tag data.
+- else
+  = render layout: 'tags/browse', locals: { tag: @tag } do
+    .section-head
+      %h2 Featured and recent
+      %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_stats[:total])} archived
+    .tag-grid
+      = render partial: 'tags/tag', collection: @tags, as: :tag, locals: { current: @tag }
+    %p{ style: 'margin-top: 20px' }= link_to 'View all data →', tags_path, class: 'button'

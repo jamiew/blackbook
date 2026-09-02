@@ -30,6 +30,17 @@ tag: the detail page, the grid, the filmstrip, and later the social card.
 
 ## Next
 
+- [ ] **Browse.** `/` and `/data` become player-left, grid-right on wide
+      screens. Clicking a cell or pressing `←`/`→` loads that tag into the
+      player in place (`/data/:id.json?player=1`) and sets `?tag=id`, so
+      reload and back work. `/` leads with `Tag::FEATURED` (canvasplayer's
+      six) then newest; `/data` keeps filters and pagination.
+- [ ] **Hover.** Leaving a cell resumes where it was, still playing if it was.
+- [ ] **Apps.** `source_url` column (rehearsed migration) so "open source" is
+      a fact; chips for language, open source, embeddable; each card animates
+      one of that app's own tags; dev seeds for real apps and tags.
+- [ ] **Upload page.** `/upload` in the nav: how to make a GML tag today
+      (Fat Tag Deluxe and friends) and how to upload one, by form or API.
 - [ ] Per-tag OpenGraph cards, and stills for tags with no attachment. The
       cheapest renderer is `gml2img.py` in the tempt1-archive worktree, which
       already ports the marker model to SVG (PNG via `rsvg-convert`).

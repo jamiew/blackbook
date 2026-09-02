@@ -13,11 +13,27 @@ describe HomeController do
     expect(response).to be_successful
   end
 
-  it "plays the latest tag with a filmstrip and live cells" do
-    FactoryBot.create(:tag)
-    get :index
-    expect(response.body).to include('class="strip"')
-    expect(response.body).to include('data-preview="/data/')
+  describe "the front page" do
+    it "leads with the featured tags, then the newest, and plays the first" do
+      older = FactoryBot.create(:tag)
+      newest = FactoryBot.create(:tag)
+      stub_const('Tag::FEATURED', [older.id])
+      get :index
+      expect(assigns(:tags).first(2)).to eq([older, newest])
+      expect(assigns(:tag)).to eq(older)
+      expect(response.body).to include('class="browse"')
+      expect(response.body).to include('data-preview="/data/')
+      expect(response.body).to include('data-view-switch')
+    end
+
+    it "plays the tag ?tag= asks for" do
+      FactoryBot.create(:tag)
+      chosen = FactoryBot.create(:tag)
+      stub_const('Tag::FEATURED', [])
+      get :index, params: { tag: chosen.id }
+      expect(assigns(:tag)).to eq(chosen)
+      expect(response.body).to match(%r{<a[^>]*aria-current="true"[^>]*href="/data/#{chosen.id}"})
+    end
   end
 
   it "/about works" do

@@ -59,6 +59,9 @@ curl 'http://000000book.com/data/147.json?preview=1'
 reference player does; `rotate` is the server's answer for older clients. It
 carries the same ETag and caching rules as the full `.json`.
 
+`?player=1` is the same shape at full fidelity, every point with its
+per-stroke colour and brush: what the site inlines for its own player.
+
 ## Other handy API access points
 
 Latest tag uploaded site-wide:

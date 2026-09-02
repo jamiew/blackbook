@@ -78,6 +78,24 @@ function currentLook(player) {
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Fit the stage to the drawing and fill the head's readout. Called on mount
+// and again whenever the browse page swaps the tag.
+function present(root, stage, tag) {
+  // The stage takes the drawing's own proportions, within reason.
+  const { x0, x1, y0, y1 } = tag.bounds;
+  stage.style.aspectRatio = Math.min(Math.max((x1 - x0) / (y1 - y0), 0.75), 2);
+
+  const meta = root.querySelector('[data-player-meta]');
+  if (!meta) return;
+  const count = tag.strokes.length;
+  meta.textContent = [
+    `${count} ${count === 1 ? 'stroke' : 'strokes'}`,
+    `${tag.pointCount} pts`,
+    `${secs(tag.duration)}s`,
+    tag.rotate ? 'rot 90°' : null
+  ].filter(Boolean).join('  //  ');
+}
+
 function mount(root) {
   const payload = root.querySelector('script[type="application/json"]');
   const canvas = root.querySelector('canvas');
@@ -102,21 +120,7 @@ function mount(root) {
 
   const player = new GmlPlayer(canvas, data);
   const tag = player.tag;
-
-  // The stage takes the drawing's own proportions, within reason.
-  const { x0, x1, y0, y1 } = tag.bounds;
-  stage.style.aspectRatio = Math.min(Math.max((x1 - x0) / (y1 - y0), 0.75), 2);
-
-  const meta = root.querySelector('[data-player-meta]');
-  if (meta) {
-    const count = tag.strokes.length;
-    meta.textContent = [
-      `${count} ${count === 1 ? 'stroke' : 'strokes'}`,
-      `${tag.pointCount} pts`,
-      `${secs(tag.duration)}s`,
-      tag.rotate ? 'rot 90°' : null
-    ].filter(Boolean).join('  //  ');
-  }
+  present(root, stage, tag);
 
   /* --- transport and pane ---------------------------------------------- */
 
@@ -190,6 +194,112 @@ function mount(root) {
 
 document.querySelectorAll('[data-gml-player]').forEach(mount);
 
+/* --- browse: the grid drives the player --------------------------------- */
+
+const browse = document.querySelector('[data-browse]');
+const browseRoot = browse?.querySelector('[data-gml-player]');
+
+if (browse && browseRoot?.player) {
+  const player = browseRoot.player;
+  const stage = browseRoot.querySelector('.player__stage');
+  const cards = () => [...browse.querySelectorAll('.tag-card')];
+  const loads = new Map();
+
+  function fetchTag(href) {
+    if (!loads.has(href)) {
+      loads.set(href, fetch(`${href}.json?player=1`).then(response => {
+        if (!response.ok) throw new Error(response.status);
+        return response.json();
+      }));
+    }
+    return loads.get(href);
+  }
+
+  // Play a card's tag in place. The URL follows it, so reload and back work.
+  // If the fetch fails, the card's own link is where we would have gone.
+  function select(card, push = true) {
+    const href = card.getAttribute('href');
+    fetchTag(href).then(data => {
+      data.rotate = isLandscape({ up: data.up }, data.strokes);
+      player.pause().load(data);
+      present(browseRoot, stage, player.tag);
+
+      const id = browseRoot.querySelector('.player__id');
+      id.textContent = `#${data.id}`;
+      const app = card.querySelector('.tag-card__app')?.textContent.trim();
+      const who = card.querySelector('.tag-card__who')?.textContent.replace(/\s+/g, ' ').trim();
+      browseRoot.querySelector('.player__context').textContent = [app, who].filter(Boolean).join(' · ');
+      document.querySelectorAll('[data-browse-open]').forEach(a => a.setAttribute('href', href));
+      document.querySelectorAll('[data-browse-download]').forEach(a => a.setAttribute('href', `${href}.gml`));
+      cards().forEach(other => {
+        if (other === card) other.setAttribute('aria-current', 'true');
+        else other.removeAttribute('aria-current');
+      });
+
+      if (push) {
+        const url = new URL(location);
+        url.searchParams.set('tag', data.id);
+        history.pushState({ tag: data.id }, '', url);
+      }
+      if (reduceMotion) player.seek(player.duration);
+      else player.play();
+    }).catch(() => { location.href = href; });
+  }
+
+  // In the grid-only view there is no player to load into; let the link go.
+  const playerShown = () => browseRoot.offsetParent !== null;
+
+  browse.addEventListener('click', event => {
+    const card = event.target.closest('.tag-card');
+    if (!card || event.metaKey || event.ctrlKey || event.shiftKey || event.button) return;
+    if (!playerShown()) return;
+    event.preventDefault();
+    select(card);
+  });
+
+  window.addEventListener('popstate', () => {
+    const id = new URL(location).searchParams.get('tag');
+    const card = cards().find(c => c.getAttribute('href') === `/data/${id}`);
+    if (card) select(card, false);
+  });
+
+  // ← → step through the grid. Returns false when there is nothing to do, so
+  // the key can fall through to the single-tag page's own arrows.
+  browse.step = direction => {
+    if (!playerShown()) return false;
+    const all = cards();
+    const next = all[all.findIndex(c => c.hasAttribute('aria-current')) + direction];
+    if (!next) return false;
+    select(next);
+    next.scrollIntoView({ block: 'nearest' });
+    return true;
+  };
+}
+
+/* --- view switch: the browse page four ways ------------------------------ */
+
+const VIEW_KEY = 'blackbook.view';
+const views = document.querySelector('[data-view-switch]');
+
+if (views) {
+  const buttons = [...views.querySelectorAll('button[data-view]')];
+  const setView = name => {
+    document.documentElement.dataset.view = name;
+    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === name)));
+  };
+
+  let saved = null;
+  try { saved = localStorage.getItem(VIEW_KEY); } catch { /* private */ }
+  setView(buttons.some(b => b.dataset.view === saved) ? saved : 'split');
+
+  views.addEventListener('click', event => {
+    const button = event.target.closest('button[data-view]');
+    if (!button) return;
+    setView(button.dataset.view);
+    try { localStorage.setItem(VIEW_KEY, button.dataset.view); } catch { /* private */ }
+  });
+}
+
 // The page's keys. Space plays and pauses; the arrows follow whichever links
 // carry them, which on a tag page is the next and previous tag. Fields, and
 // buttons that space would already press, are left alone.
@@ -202,7 +312,11 @@ document.addEventListener('keydown', event => {
     if (!player) return;
     event.preventDefault();
     player.toggle();
-  } else {
+  } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    if (browse?.step?.(event.key === 'ArrowRight' ? 1 : -1)) {
+      event.preventDefault();
+      return;
+    }
     // Compared here rather than spliced into a selector, which a key like
     // \ or " would make invalid.
     const link = [...document.querySelectorAll('a[data-key]')].find(a => a.dataset.key === event.key);

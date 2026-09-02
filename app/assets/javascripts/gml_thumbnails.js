@@ -48,8 +48,19 @@ function mount(canvas) {
     if ('autoplay' in canvas.dataset) player.play();
     else player.seek(player.duration);
 
-    const replay = () => player.seek(0).play();
-    const rest = () => player.pause().seek(player.duration);
+    // Hover replays from the start; leaving picks up where the cell was,
+    // still playing if it was.
+    let resumeAt = null;
+    let wasPlaying = false;
+    const replay = () => {
+      resumeAt = player.time;
+      wasPlaying = player.playing;
+      player.seek(0).play();
+    };
+    const rest = () => {
+      player.pause().seek(resumeAt ?? player.duration);
+      if (wasPlaying) player.play();
+    };
     cell.addEventListener('mouseenter', replay);
     cell.addEventListener('focus', replay);
     cell.addEventListener('mouseleave', rest);

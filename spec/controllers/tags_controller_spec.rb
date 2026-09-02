@@ -104,6 +104,15 @@ describe TagsController do
       # @should_mention_application.call(/user_test/)
     end
 
+    it "plays the tag ?tag= asks for beside the grid" do
+      FactoryBot.create(:tag)
+      chosen = FactoryBot.create(:tag)
+      get :index, params: { tag: chosen.id }
+      expect(assigns(:tag)).to eq(chosen)
+      expect(response.body).to include('class="browse"')
+      expect(response.body).to match(%r{<a[^>]*aria-current="true"[^>]*href="/data/#{chosen.id}"})
+    end
+
     it "works for a valid user" do
       user = FactoryBot.create(:user)
       get :index, params: { user_id: user.login }
@@ -179,6 +188,12 @@ describe TagsController do
         get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
         expect(response).to be_successful
         expect(response.parsed_body.keys).to contain_exactly('id', 'app', 'up', 'rotate', 'strokes')
+      end
+
+      it "renders the player payload with ?player=1" do
+        get :show, params: { id: @tag.to_param, format: 'json', player: '1' }
+        expect(response.parsed_body.keys).to include('strokes', 'up', 'client')
+        expect(response.parsed_body).not_to have_key('gml')
       end
 
       it "gives the preview its own ETag" do

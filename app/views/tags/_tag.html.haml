@@ -1,6 +1,6 @@
 -# One cell in the tag grid. The canvas draws the tag itself once it scrolls
 -# into view (gml_thumbnails.js); the still is only for browsers without JS.
-%a.tag-card{ href: tag_path(tag) }
+%a.tag-card{ href: tag_path(tag), 'aria-current' => (local_assigns[:current] == tag ? 'true' : nil) }
   .tag-card__frame
     %span.tag-card__id= "##{tag.id}"
     %canvas.tag-card__canvas{ data: { preview: tag_path(tag, format: :json, preview: 1), autoplay: true }, 'aria-label' => "Tag ##{tag.id}" }

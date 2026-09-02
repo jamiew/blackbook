@@ -67,6 +67,12 @@ class TagsController < ApplicationController
 
     set_page_title "GML Tags#{": #{@search_context[:key]}=#{@search_context[:value].inspect} " if @search_context}"
 
+    if request.format.html?
+      # The browse layout plays one tag beside the grid: ?tag=id, or the first.
+      @tag = (params[:tag].present? && Tag.find_by(id: params[:tag])) || @tags.first
+      @browse = true
+    end
+
     # The callback is in the etag because JSONP changes the body.
     return if cached_for_api?(etag: [@tags.map { |t| [t.id, t.updated_at] }, jsonp_callback],
                               last_modified: @tags.filter_map(&:updated_at).max)
@@ -84,13 +90,13 @@ class TagsController < ApplicationController
 
     # Checked before the GML is touched, so a 304 costs no disk read.
     # iphone_rotate is in the etag because it changes the .gml body, and so are
-    # the JSONP callback and preview, which swaps the .json body.
+    # the JSONP callback, preview and player, which swap the .json body.
     #
     # #random routes through here and must never validate: a 304 would defeat
     # the point, and a shared cache would pin one "random" tag for everybody.
     if action_name == 'random'
       response.headers['Cache-Control'] = 'no-store'
-    elsif cached_for_api?(etag: [@tag, jsonp_callback, params[:iphone_rotate], params[:preview]],
+    elsif cached_for_api?(etag: [@tag, jsonp_callback, params[:iphone_rotate], params[:preview], params[:player]],
                           last_modified: @tag.updated_at)
       return
     end
@@ -115,9 +121,16 @@ class TagsController < ApplicationController
       wants.xml   { render xml: @tag.to_xml(dasherize: false, skip_types: true) }
       # CORS headers used to be set by hand here, and only here. Rack::Cors now
       # covers every API format and answers the preflight. See config/initializers/cors.rb.
-      # ?preview=1 is the grid's cut-down payload. See Tag#preview_data.
+      # ?preview=1 is the grid's cut-down payload and ?player=1 is what the
+      # page inlines for its own player. See Tag#preview_data and #player_data.
       wants.json do
-        body = params[:preview] ? @tag.preview_data : @tag.to_json
+        body = if params[:preview]
+                 @tag.preview_data
+               elsif params[:player]
+                 @tag.player_data
+               else
+                 @tag.to_json
+               end
         render json: body, callback: jsonp_callback
       end
     end

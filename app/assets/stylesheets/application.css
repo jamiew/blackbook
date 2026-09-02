@@ -559,8 +559,20 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 
 /* --- home --------------------------------------------------------------- */
 
-/* One line on what this is, under the player. */
+/* One line on what this is. On the front page it sits above the browse
+   layout, words left and actions right. */
 .lede { padding: 28px 0 8px; max-width: 60ch; }
+.lede--home {
+  max-width: none;
+  padding: 0 0 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.lede--home > div { max-width: 60ch; }
+.lede--home .actions { margin: 0; }
 .lede__title {
   font-size: clamp(1.25rem, 2.6vw, 1.75rem);
   font-variation-settings: "wdth" 108;
@@ -667,6 +679,58 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 /* An app's screenshot on its detail page. */
 .figure { border: var(--rule); background: var(--surface); margin: 0; padding: 12px; }
 .figure img { margin: 0 auto; }
+
+/* --- browse ------------------------------------------------------------- */
+/* One tag playing beside the grid. The masthead's view switch sets data-view
+   on <html>: split (default), stack, cinema, grid. */
+
+.browse {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--gutter);
+  align-items: start;
+}
+.browse__player { position: sticky; top: 16px; }
+.browse__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.browse .tag-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+
+/* The cell whose tag is playing. */
+.tag-card[aria-current] { outline: 1px solid var(--accent); outline-offset: -1px; }
+.tag-card[aria-current] .tag-card__id { background: var(--accent); color: #000; }
+
+[data-view="stack"] .browse,
+[data-view="cinema"] .browse,
+[data-view="grid"] .browse { grid-template-columns: minmax(0, 1fr); }
+[data-view="stack"] .browse__player,
+[data-view="cinema"] .browse__player { position: static; }
+[data-view="grid"] .browse__player { display: none; }
+
+/* cinema: the grid becomes a rail under the player. */
+[data-view="cinema"] .browse .tag-grid {
+  display: flex;
+  gap: 1px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+[data-view="cinema"] .browse .tag-grid::-webkit-scrollbar { display: none; }
+[data-view="cinema"] .browse .tag-card { flex: 0 0 150px; }
+[data-view="cinema"] .browse .tag-card__body { display: none; }
+
+.masthead__view { display: flex; }
+.masthead__view button {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: var(--meta-tracking);
+  text-transform: uppercase;
+  padding: 5px 8px;
+  background: transparent;
+  color: var(--dimmer);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.masthead__view button + button { margin-left: -1px; }
+.masthead__view button:hover { color: var(--ink); border-color: var(--line-bright); position: relative; z-index: 1; }
+.masthead__view button[aria-pressed="true"] { color: #000; background: var(--accent); border-color: var(--accent); }
 
 /* --- profile & people --------------------------------------------------- */
 
@@ -816,6 +880,8 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 
 @media (max-width: 1080px) {
   .profile { grid-template-columns: minmax(0, 1fr); }
+  .browse { grid-template-columns: minmax(0, 1fr); }
+  .browse__player { position: static; }
 }
 
 @media (max-width: 720px) {
@@ -825,6 +891,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   .masthead__nav { gap: 16px; order: 3; width: 100%; }
   .player__stage { aspect-ratio: 1 / 1; }
   .strip__hint { display: none; }
+  .masthead__view { display: none; }
   .about__hero figcaption { position: static; transform: none; max-width: none; padding: 12px; }
   .strip__cell { width: 84px; height: 56px; }
   .tag-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }

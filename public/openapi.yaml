@@ -69,6 +69,10 @@ paths:
           in: query
           schema: { type: boolean }
           description: "Cut down for drawing small: about 300 points, three decimals, no per-stroke styling and no `gml` document. What the site's thumbnails use."
+        - name: player
+          in: query
+          schema: { type: boolean }
+          description: "The same shape as preview at full fidelity, with per-stroke colour and brush and no `gml` document. What the site's own player uses."
       responses:
         '200':
           description: The tag

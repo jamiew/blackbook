@@ -1,12 +1,14 @@
 class HomeController < ApplicationController
   def index
-    # Loaded up front because the page reads the same 30 rows four ways, and an
-    # unloaded relation would run a query for each.
-    @tags = Tag.order(created_at: :desc).limit(30).with_attached_image.includes(:user).load
-    @tag = @tags.first
-    @prev = @tags.second
-    # Oldest on the left, like the tag page's strip; @tags is newest first.
-    @strip = @tags.first(16).reverse
+    newest = Tag.order(created_at: :desc).limit(30).with_attached_image.includes(:user).to_a
+    featured = Tag.where(id: Tag::FEATURED).with_attached_image.includes(:user)
+                  .index_by(&:id).values_at(*Tag::FEATURED).compact
+    # canvasplayer's picks lead, then the newest. Stale by design: a front page
+    # that previews well beats one that changes every hour.
+    @tags = (featured + newest).uniq.first(30)
+    # The browse layout plays one tag beside the grid: ?tag=id, or the first.
+    @tag = (params[:tag].present? && Tag.find_by(id: params[:tag])) || @tags.first
+    @browse = true
     set_page_title("#000000book - an open database for Graffiti Markup Language (GML) files", false)
   end
 

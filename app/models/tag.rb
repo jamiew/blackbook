@@ -52,6 +52,10 @@ class Tag < ApplicationRecord
   scope :from_device, -> { where.not(gml_uniquekey: nil) }
   scope :claimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NOT NULL') }
   scope :unclaimed, -> { where('gml_uniquekey IS NOT NULL AND user_id IS NULL') }
+
+  # The front page leads with these, in this order: canvasplayer's picks.
+  # Katsu, Jesus Saves, Seen, Hell, hello world, 404. Stale by design.
+  FEATURED = [161, 158, 1399, 818, 147, 842].freeze
   # Seek to a random primary key rather than ORDER BY RAND(), which sorted all
   # 76,000 rows on every hit and made the cheapest-looking public endpoint the
   # most expensive one we serve. This is two index lookups and a PK seek.

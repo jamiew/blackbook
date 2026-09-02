@@ -10,6 +10,11 @@
     = nav_link 'about', '/about', active: []
 
   .masthead__account.meta
+    - if @browse
+      -# The browse page four ways. player.js remembers the choice per browser.
+      .masthead__view{ role: 'group', 'aria-label' => 'Layout', data: { view_switch: true } }
+        - %w[split stack cinema grid].each do |name|
+          %button{ type: 'button', data: { view: name }, 'aria-pressed' => (name == 'split').to_s }= name
     - if current_user
       %a{ href: user_path(current_user) }= image_tag(attachment_url(current_user, :photo, :tiny), alt: current_user.login)
       = link_to 'settings', settings_path

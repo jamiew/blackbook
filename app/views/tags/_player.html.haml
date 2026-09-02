@@ -1,11 +1,15 @@
 -# The tag, played back from its own timestamps. Transport and pane are built
 -# by player.js so the markup stays inert without JS. `heading` is :h1 on the
--# tag's own page and a span anywhere else; `strip` adds the filmstrip.
+-# tag's own page and a span anywhere else, or a link with `link`; `strip`
+-# adds the filmstrip.
 - heading = local_assigns.fetch(:heading, :span)
 - strip = local_assigns[:strip]
 .player{ data: { gml_player: true } }
   .player__head
-    = content_tag heading, tag_title(tag), class: 'player__id'
+    - if local_assigns[:link]
+      %a.player__id{ href: tag_path(tag), data: { browse_open: true } }= tag_title(tag)
+    - else
+      = content_tag heading, tag_title(tag), class: 'player__id'
     %span.player__context
       = application_link(tag.sexy_app_name)
       = '·'
