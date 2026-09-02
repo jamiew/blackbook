@@ -126,6 +126,7 @@ class Tempt1Import
   def attach_eyetags
     by_name = entries('images').index_by(&:name)
     Tag.where.not(remote_image: [nil, '']).find_each do |tag|
+      # Tag#remote_image returns a fffff.at URL, so read the stored filename.
       name = tag.attributes['remote_image'].to_s.sub(/\.gml\z/, '.png')
       next @report.skipped += 1 if tag.image.attached?
       next @report.missing << "tag #{tag.id}: no image recovered for #{name}" unless by_name.key?(name)
@@ -181,21 +182,24 @@ class Tempt1Import
       next if known.include?(print)
 
       known << print
-      create_tag(entry.name, gml) unless @dry_run
-      @report.created += 1
+      @report.created += 1 if create_tag(entry.name, gml)
     end
   end
 
+  # True when the tag was created, or would have been.
   def create_tag(name, gml)
+    return true if @dry_run
+
     Tag.create!(
       user: tempt, data: gml, application: CLIENT, gml_application: CLIENT,
       author: LOGIN, created_at: captured_at(name),
       description: "Recovered #{name}. Drawn on the EyeWriter but never " \
                    'uploaded here; see github.com/jamiew/tempt1-archive.'
     )
+    true
   rescue StandardError => e
     @report.failed << "#{name}: #{e.message}"
-    @report.created -= 1
+    false
   end
 
   def captured_at(name)
