@@ -36,7 +36,7 @@ step "Checks"
 ssh "${SSH_OPTS[@]}" "root@$PROD_HOST" true || die "cannot reach production at $PROD_HOST"
 ssh "${SSH_OPTS[@]}" "root@$BETA_HOST" true || die "cannot reach beta at $BETA_HOST"
 
-# rsync --delete below would happily fill beta's 80GB root disk with 36GB of
+# rsync --delete below would happily fill beta's root disk with ~35GB of
 # images if the block volume were not actually mounted. Refuse in that case.
 ssh "${SSH_OPTS[@]}" "root@$BETA_HOST" "mountpoint -q '$VOL_DEST'" \
   || die "$VOL_DEST is not a mounted volume on beta. Attach and mount it first."
@@ -58,7 +58,7 @@ ssh "${SSH_OPTS[@]}" "root@$PROD_HOST" \
 echo "loaded"
 
 step "Volume files"
-# rsync runs on beta pulling from production, so 36GB never touches the laptop.
+# rsync runs on beta pulling from production, so ~35GB never touches the laptop.
 # ssh -A forwards this laptop's agent, which is what lets beta authenticate to
 # production without a key ever being copied onto either server.
 ssh -A -o StrictHostKeyChecking=accept-new "root@$BETA_HOST" \
@@ -69,7 +69,7 @@ ssh -A -o StrictHostKeyChecking=accept-new "root@$BETA_HOST" \
 step "Migrations"
 # Production is still on the old schema, so the fresh dump arrives without any
 # of this branch's migrations, and the app will 500 until they run. They are
-# deliberately not run here: the pending set drops a 301,076-row table, and
+# deliberately not run here: the pending set drops the comments table, and
 # that should never happen as a side effect of a sync.
 echo "the dump is production's schema, so the app needs migrating before it works."
 echo "run the 'Migrate beta' workflow, or: bin/kamal migrate"

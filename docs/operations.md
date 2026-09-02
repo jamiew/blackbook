@@ -30,7 +30,7 @@ This is what caught two things reasoning alone did not:
 ```
 
 Streams a fresh dump and rsyncs the volume from production to beta directly, so
-36 GB never travels through a laptop. Production is only ever read.
+roughly 35 GB never travels through a laptop. Production is only ever read.
 
 Two guards, both tested: it refuses when source and target are the same host, and
 when beta's volume is not mounted, which would otherwise fill the root disk.
@@ -71,7 +71,7 @@ around 1,900 files at 9 digits (`000/002/062`) and 879 at 15
 Generating only one layout silently misses a third of the images.
 
 Do this after growing the volume. Copying every image needs headroom the 50 GiB
-volume does not have at 36 GB used.
+volume does not have at roughly 35 GB used.
 
 ## Passwords after the Authlogic removal
 
@@ -94,6 +94,7 @@ Two traps, both pinned by `spec/models/user_authenticate_legacy_scrypt_spec.rb`:
 
 ## Known data issues
 
-- 45 duplicate logins and 45 duplicate emails in production. Until these are
-  cleaned up, `AddMissingUniqueIndexes` skips those two indexes rather than
-  failing. The migration's own comment suspects spam accounts.
+- Duplicate logins and emails exist in production. `AddMissingUniqueIndexes`
+  counts them first and skips those two indexes rather than failing, so the
+  migration is safe to run before they are cleaned up.
+  `script/rehearse-migrations.sh` prints the current counts.

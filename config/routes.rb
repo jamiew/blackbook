@@ -63,5 +63,12 @@ Rails.application.routes.draw do
 
   get '/about' => 'home#about', as: 'about'
 
+  # The repo's docs/ served as pages. `format: false` so a slug ending in
+  # something like .md is passed through rather than parsed as a format.
+  get '/docs' => 'docs#show', as: 'docs'
+  get '/docs/*path' => 'docs#show', as: 'doc', format: false
+  get '/api' => redirect('/docs/api'), as: 'api'
+  get '/llms.txt' => 'docs#llms', as: 'llms'
+
   root controller: 'home', action: 'index'
 end
