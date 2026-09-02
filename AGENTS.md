@@ -48,9 +48,9 @@ Migrations never run automatically on deploy. The pending set drops the
   `isLandscape` from the `up` vector each payload carries.
 - Test UI changes with `agent-browser` at 1440 and 390 wide. Thumbnails only
   draw once their cells scroll into view.
-- `/logos` and the masthead view switch are design tools that ship. Choices
-  live in `localStorage`: `blackbook.view`, `blackbook.logo`,
-  `blackbook.player.v2`.
+- `/logos` and the masthead theme and chrome switches are design tools that
+  ship. Choices live in `localStorage`: `blackbook.theme`, `blackbook.chrome`,
+  `blackbook.logo`, `blackbook.player.v2`.
 
 ## Things that look wrong but are not
 

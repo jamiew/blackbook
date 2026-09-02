@@ -23,7 +23,7 @@ describe HomeController do
       expect(assigns(:tag)).to eq(older)
       expect(response.body).to include('class="browse"')
       expect(response.body).to include('data-preview="/data/')
-      expect(response.body).to include('data-view-switch')
+      expect(response.body).to include('data-theme-switch')
     end
 
     it "plays the tag ?tag= asks for" do

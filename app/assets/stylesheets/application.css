@@ -20,9 +20,14 @@
   --dimmer: #767676; /* 4.6:1 on black, the floor for small text */
   --accent: #f5ff00;
   --warn: #ff5c47;
+  /* Text on an accent or ink background. Each theme sets its own. */
+  --on-accent: #000000;
 
   --display: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Headlines. Fraunces at full SOFT is the closest free face to the
+     logo's italic. */
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
 
   --gutter: clamp(16px, 3.5vw, 44px);
   --rule: 1px solid var(--line);
@@ -50,6 +55,18 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700; line-height: 1.04; letter-spacing: -0.02em; }
+
+/* Headlines take the logo's voice: italic, soft, mixed case, and smaller
+   than the earlier uppercase Archivo. */
+.page__title, .lede__title, .section-head h2, .player__id, .about__defs dt {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  text-transform: none;
+}
 p { margin: 0 0 1em; }
 ul, ol, dl, dd { margin: 0; padding: 0; }
 li { list-style: none; }
@@ -78,7 +95,7 @@ textarea:focus-visible,
   z-index: 50;
   padding: 8px 12px;
   background: var(--accent);
-  color: #000;
+  color: var(--on-accent);
   font-family: var(--mono);
   font-size: var(--meta-size);
   letter-spacing: var(--meta-tracking);
@@ -180,11 +197,7 @@ textarea:focus-visible,
   margin-bottom: 28px;
 }
 
-.page__title {
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  font-variation-settings: "wdth" 112;
-  text-transform: uppercase;
-}
+.page__title { font-size: clamp(1.5rem, 3vw, 2.25rem); }
 
 .page__lede { color: var(--dim); max-width: 46ch; margin: 0; }
 
@@ -220,11 +233,11 @@ button.button {
 }
 .button:hover,
 a.button:hover,
-button.button:hover { background: var(--accent); border-color: var(--accent); color: #000; }
+button.button:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
-.button--solid { background: var(--ink); border-color: var(--ink); color: #000; }
+.button--solid { background: var(--ink); border-color: var(--ink); color: var(--on-accent); }
 .button--quiet { border-color: var(--line); color: var(--dim); }
-.button--danger:hover { background: var(--warn); border-color: var(--warn); color: #000; }
+.button--danger:hover { background: var(--warn); border-color: var(--warn); color: var(--on-accent); }
 
 /* --- forms -------------------------------------------------------------- */
 
@@ -251,7 +264,7 @@ input[type="submit"], button[type="submit"] {
   letter-spacing: var(--meta-tracking);
   text-transform: uppercase;
   background: var(--ink);
-  color: #000;
+  color: var(--on-accent);
   border: 1px solid var(--ink);
   padding: 9px 16px;
   cursor: pointer;
@@ -310,8 +323,8 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   color: var(--dim);
 }
 .pagination a { border-color: var(--line); }
-.pagination a:hover { background: var(--accent); border-color: var(--accent); color: #000; }
-.pagination em, .pagination .current { font-style: normal; color: #000; background: var(--ink); border-color: var(--ink); }
+.pagination a:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.pagination em, .pagination .current { font-style: normal; color: var(--on-accent); background: var(--ink); border-color: var(--ink); }
 
 /* --- flash -------------------------------------------------------------- */
 
@@ -360,17 +373,7 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 }
 /* The id is the label. Display face, not mono, and the one thing in the head
    set in mixed case. */
-.player__id {
-  font-family: var(--display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  font-variation-settings: "wdth" 112;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  text-transform: none;
-  color: var(--ink);
-  margin: 0;
-}
+.player__id { font-size: 1.35rem; color: var(--ink); margin: 0; }
 .player__context { color: var(--dim); }
 .player__context a { color: var(--ink); border-bottom-color: var(--line); }
 .player__context a:hover { color: var(--accent); }
@@ -426,7 +429,7 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 .gml-transport input[type="range"]::-webkit-slider-thumb { background: var(--accent); }
 .gml-transport input[type="range"]::-moz-range-thumb { background: var(--accent); }
 .gml-switches button[aria-pressed="true"]:not(:disabled),
-.player__debug[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #000; }
+.player__debug[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 /* The pane sits over the stage rather than under it, so opening it does not
    resize the canvas. */
@@ -494,7 +497,7 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   color: var(--dim);
   border: 1px solid var(--line-bright);
 }
-a.strip__step:hover { background: var(--accent); border-color: var(--accent); color: #000; }
+a.strip__step:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .strip__step--off { opacity: 0.3; }
 .strip__hint { flex: 0 0 auto; white-space: nowrap; padding-left: 6px; }
 
@@ -541,7 +544,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   background: rgba(0, 0, 0, 0.72);
   color: var(--ink);
 }
-.tag-card:hover .tag-card__id { background: var(--accent); color: #000; }
+.tag-card:hover .tag-card__id { background: var(--accent); color: var(--on-accent); }
 
 .tag-card__body {
   padding: 10px 12px 13px;
@@ -588,7 +591,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   color: var(--dim);
 }
 .chip:hover { color: var(--ink); border-color: var(--line-bright); }
-.chip[aria-current] { color: #000; background: var(--accent); border-color: var(--accent); }
+.chip[aria-current] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
 .chips__gap { width: 10px; }
 
 /* --- home --------------------------------------------------------------- */
@@ -607,12 +610,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 }
 .lede--home > div { max-width: 60ch; }
 .lede--home .actions { margin: 0; }
-.lede__title {
-  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
-  font-variation-settings: "wdth" 108;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
+.lede__title { font-size: 1.4rem; margin-bottom: 8px; }
 .lede .page__lede { margin-bottom: 14px; }
 
 /* A bordered box with a small mono heading, used by the writer profile. */
@@ -637,11 +635,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   margin-bottom: 20px;
   border-bottom: var(--rule);
 }
-.section-head h2 {
-  font-size: clamp(1.25rem, 2.4vw, 1.9rem);
-  font-variation-settings: "wdth" 108;
-  text-transform: uppercase;
-}
+.section-head h2 { font-size: 1.2rem; }
 
 /* --- tag detail --------------------------------------------------------- */
 
@@ -715,8 +709,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 .figure img { margin: 0 auto; }
 
 /* --- browse ------------------------------------------------------------- */
-/* One tag playing beside the grid. The masthead's view switch sets data-view
-   on <html>: split (default), stack, cinema, grid. */
+/* One tag playing beside the grid. */
 
 .browse {
   display: grid;
@@ -730,27 +723,11 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 
 /* The cell whose tag is playing. */
 .tag-card[aria-current] { outline: 1px solid var(--accent); outline-offset: -1px; }
-.tag-card[aria-current] .tag-card__id { background: var(--accent); color: #000; }
+.tag-card[aria-current] .tag-card__id { background: var(--accent); color: var(--on-accent); }
 
-[data-view="stack"] .browse,
-[data-view="cinema"] .browse,
-[data-view="grid"] .browse { grid-template-columns: minmax(0, 1fr); }
-[data-view="stack"] .browse__player,
-[data-view="cinema"] .browse__player { position: static; }
-[data-view="grid"] .browse__player { display: none; }
-
-/* cinema: the grid becomes a rail under the player. */
-[data-view="cinema"] .browse .tag-grid {
-  display: flex;
-  gap: 1px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-[data-view="cinema"] .browse .tag-grid::-webkit-scrollbar { display: none; }
-[data-view="cinema"] .browse .tag-card { flex: 0 0 150px; }
-[data-view="cinema"] .browse .tag-card__body { display: none; }
 
 .masthead__view { display: flex; }
+.masthead__view + .masthead__view { margin-left: 10px; }
 .masthead__view button {
   font-family: var(--mono);
   font-size: 11px;
@@ -764,13 +741,13 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 }
 .masthead__view button + button { margin-left: -1px; }
 .masthead__view button:hover { color: var(--ink); border-color: var(--line-bright); position: relative; z-index: 1; }
-.masthead__view button[aria-pressed="true"] { color: #000; background: var(--accent); border-color: var(--accent); }
+.masthead__view button[aria-pressed="true"] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
 
 /* --- upload ------------------------------------------------------------- */
 
 /* The one loud item in the nav. */
 .masthead__nav a.masthead__upload { color: var(--accent); border: 1px solid var(--accent); padding: 4px 9px; }
-.masthead__nav a.masthead__upload:hover { background: var(--accent); color: #000; }
+.masthead__nav a.masthead__upload:hover { background: var(--accent); color: var(--on-accent); }
 .masthead__nav a.masthead__upload[aria-current="page"]::before { content: none; }
 
 .upload-apps { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 0; }
@@ -826,6 +803,78 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 .logos__meta { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .logos__note { color: var(--dim); font-size: 14px; }
 .logos__variant[data-chosen] { outline: 1px solid var(--accent); outline-offset: -1px; }
+
+/* --- themes and chrome --------------------------------------------------- */
+/* The masthead's switches set data-theme and data-chrome on <html>. The engine
+   paints every canvas white on black, so the other themes turn the canvases
+   with a filter rather than teaching each player a palette. */
+
+[data-theme="paper"] {
+  --ground: #f4f2ec;
+  --surface: #ecebe4;
+  --surface-raised: #e3e1d8;
+  --line: #d6d3c8;
+  --line-bright: #b9b5a6;
+  --ink: #111111;
+  --dim: #5c5a52;
+  --dimmer: #7a776c;
+  --accent: #d81b10;
+  --warn: #d81b10;
+  --on-accent: #ffffff;
+}
+[data-theme="paper"] canvas,
+[data-theme="paper"] .player__still { filter: invert(1); }
+
+[data-theme="acid"] {
+  --ground: #f5ff00;
+  --surface: #eef700;
+  --surface-raised: #e3ec00;
+  --line: #c9d000;
+  --line-bright: #a8ae00;
+  --ink: #000000;
+  --dim: #4a4d00;
+  --dimmer: #6b6f00;
+  --accent: #000000;
+  --warn: #d81b10;
+  --on-accent: #f5ff00;
+}
+/* Inverted ink multiplied onto the yellow ground: black strokes, no fringe. */
+[data-theme="acid"] canvas,
+[data-theme="acid"] .player__still { filter: invert(1); mix-blend-mode: multiply; }
+
+/* quiet: the tags without their readouts. bare: nothing but the tags. */
+[data-chrome="quiet"] .player__meta,
+[data-chrome="quiet"] .player__context,
+[data-chrome="quiet"] .tag-card__body,
+[data-chrome="quiet"] .specs,
+[data-chrome="quiet"] .browse__actions,
+[data-chrome="quiet"] .section-head,
+[data-chrome="quiet"] .strip__hint,
+[data-chrome="bare"] .player__meta,
+[data-chrome="bare"] .player__context,
+[data-chrome="bare"] .tag-card__body,
+[data-chrome="bare"] .specs,
+[data-chrome="bare"] .browse__actions,
+[data-chrome="bare"] .section-head,
+[data-chrome="bare"] .strip__hint,
+[data-chrome="bare"] .tag-card__id,
+[data-chrome="bare"] .player__head,
+[data-chrome="bare"] .lede,
+[data-chrome="bare"] .page__head,
+[data-chrome="bare"] .filters,
+[data-chrome="bare"] .chips,
+[data-chrome="bare"] .footer { display: none; }
+[data-chrome="bare"] { --line: transparent; --line-bright: transparent; }
+[data-chrome="bare"] .tag-grid { background: var(--ground); }
+
+/* Previous and next on the browse player. */
+.player__step {
+  width: 30px;
+  min-width: 0 !important;
+  padding: 0 !important;
+  font-size: 16px !important;
+  line-height: 1;
+}
 
 /* --- profile & people --------------------------------------------------- */
 
@@ -922,13 +971,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   margin-bottom: 24px;
 }
 .about__defs > div { background: var(--ground); padding: 14px 16px; }
-.about__defs dt {
-  font-family: var(--display);
-  font-weight: 700;
-  font-size: 1.25rem;
-  font-variation-settings: "wdth" 112;
-  margin-bottom: 4px;
-}
+.about__defs dt { font-size: 1.25rem; margin-bottom: 4px; }
 .about__defs dd { color: var(--dim); }
 .about__defs em {
   font-style: normal;

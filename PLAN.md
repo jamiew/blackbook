@@ -17,12 +17,15 @@ app cards, in the recorder.
 - Search and social: descriptions, canonical, cards, `sitemap.xml`, skip link.
 - Cleanup: dead icons, placeholders, the ga.js partial, an unused view and a
   stale spec gone; docs rewritten short.
+- Skins: the tagline-free logo by default with four Glif variations that keep
+  its letterforms; headlines smaller, in Fraunces italic to match; theme (ink,
+  paper, acid) and chrome (full, quiet, bare) switches; prev/next on the
+  browse player, which plays on to the next tag like a slideshow.
 
 ## Next
 
 - [ ] `./script/rehearse-migrations.sh` for `add_source_url_to_visualizations`
       before it ships. Needs SSH to production.
-- [ ] Redo the hairline, chrome and skeleton logo remixes; they wrote "co1".
 - [ ] Cards and stills for tags with no attachment. `gml2img.py` in the tempt1
       worktree already ports the marker model to SVG. Backfilling production
       needs its own approval.

@@ -211,6 +211,7 @@ if (browse && browseRoot?.player) {
   const stage = browseRoot.querySelector('.player__stage');
   const cards = () => [...browse.querySelectorAll('.tag-card')];
   const loads = new Map();
+  let swapping = false;
 
   function fetchTag(href) {
     if (!loads.has(href)) {
@@ -224,11 +225,13 @@ if (browse && browseRoot?.player) {
 
   // Play a card's tag in place. The URL follows it, so reload and back work.
   // If the fetch fails, the card's own link is where we would have gone.
-  function select(card, push = true) {
+  function select(card, { push = true, replace = false } = {}) {
     const href = card.getAttribute('href');
     fetchTag(href).then(data => {
       data.rotate = isLandscape({ up: data.up }, data.strokes);
+      swapping = true;
       player.pause().load(data);
+      swapping = false;
       present(browseRoot, stage, player.tag);
 
       browseRoot.querySelector('.player__id').textContent = `#${data.id}`;
@@ -243,7 +246,7 @@ if (browse && browseRoot?.player) {
       if (push) {
         const url = new URL(location);
         url.searchParams.set('tag', data.id);
-        history.pushState({ tag: data.id }, '', url);
+        history[replace ? 'replaceState' : 'pushState']({ tag: data.id }, '', url);
       }
       if (reduceMotion) player.seek(player.duration);
       else player.play();
@@ -264,66 +267,93 @@ if (browse && browseRoot?.player) {
   window.addEventListener('popstate', () => {
     const id = new URL(location).searchParams.get('tag');
     const card = cards().find(c => c.getAttribute('href') === `/data/${id}`);
-    if (card) select(card, false);
+    if (card) select(card, { push: false });
   });
 
   // ← → step through the grid. Returns false when there is nothing to do, so
   // the key can fall through to the single-tag page's own arrows.
-  browse.step = direction => {
+  browse.step = (direction, { wrap = false, replace = false } = {}) => {
     if (!playerShown()) return false;
     const all = cards();
-    const next = all[all.findIndex(c => c.hasAttribute('aria-current')) + direction];
+    const at = all.findIndex(c => c.hasAttribute('aria-current'));
+    let next = all[at + direction];
+    if (!next && wrap) next = all[(at + direction + all.length) % all.length];
     if (!next) return false;
-    select(next);
+    select(next, { replace });
     next.scrollIntoView({ block: 'nearest' });
     return true;
   };
+
+  // Previous and next on the player itself, beside Controls.
+  const bar = browseRoot.querySelector('[data-player-controls]');
+  const controls = bar.querySelector('.player__debug');
+  [['‹', -1, 'Previous tag'], ['›', 1, 'Next tag']].forEach(([glyph, direction, label]) => {
+    const step = button(glyph, () => browse.step(direction, { wrap: true }));
+    step.className = 'player__step';
+    step.setAttribute('aria-label', label);
+    bar.insertBefore(step, controls);
+  });
+
+  // A slideshow: once a tag has played through, the next one starts. A pause
+  // of your own holds it, because only the end arrives with the clock run out.
+  player.opts.loop = false;
+  player.on('state', state => {
+    if (state.playing || swapping || reduceMotion) return;
+    if (player.time < player.tag.duration) return;
+    setTimeout(() => browse.step(1, { wrap: true, replace: true }), 600);
+  });
 }
 
 /* --- logo: a variant picked on /logos, for this browser ----------------- */
 
 const LOGO_KEY = 'blackbook.logo';
 const logo = document.querySelector('[data-logo-default]');
+// The white wordmark vanishes on the light themes; this one is black.
+const LOGO_DARK = '/images/logo/clean-paper.png';
 
-if (logo) {
-  const chosen = stored(LOGO_KEY);
-  if (chosen) logo.src = chosen;
+function applyLogo() {
+  if (!logo) return;
+  const light = ['paper', 'acid'].includes(document.documentElement.dataset.theme);
+  logo.src = stored(LOGO_KEY) || (light ? LOGO_DARK : logo.dataset.original);
+}
 
-  // The reset button carries an empty data-logo, which puts the original back.
-  document.querySelectorAll('button[data-logo]').forEach(choice => {
-    choice.addEventListener('click', () => {
-      const src = choice.dataset.logo;
-      logo.src = src || logo.dataset.original || logo.src;
-      store(LOGO_KEY, src || null);
-      document.querySelectorAll('[data-logo-variant]').forEach(v => {
-        v.toggleAttribute('data-chosen', v.querySelector('button[data-logo]').dataset.logo === src);
-      });
+// The reset button carries an empty data-logo, which puts the original back.
+document.querySelectorAll('button[data-logo]').forEach(choice => {
+  choice.addEventListener('click', () => {
+    const src = choice.dataset.logo;
+    store(LOGO_KEY, src || null);
+    applyLogo();
+    document.querySelectorAll('[data-logo-variant]').forEach(v => {
+      v.toggleAttribute('data-chosen', v.querySelector('button[data-logo]').dataset.logo === src);
     });
   });
-}
+});
 
-/* --- view switch: the browse page four ways ------------------------------ */
+/* --- skins: theme and chrome, from the masthead ------------------------- */
 
-const VIEW_KEY = 'blackbook.view';
-const views = document.querySelector('[data-view-switch]');
+// Applied on every page from what the browser remembers. The buttons only
+// exist on the browse pages.
+const SKINS = { theme: ['ink', 'paper', 'acid'], chrome: ['full', 'quiet', 'bare'] };
 
-if (views) {
-  const buttons = [...views.querySelectorAll('button[data-view]')];
-  const setView = name => {
-    document.documentElement.dataset.view = name;
-    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === name)));
+Object.entries(SKINS).forEach(([key, names]) => {
+  const host = document.querySelector(`[data-${key}-switch]`);
+  const buttons = host ? [...host.querySelectorAll(`button[data-${key}]`)] : [];
+  const set = name => {
+    document.documentElement.dataset[key] = name;
+    buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === name)));
+    applyLogo();
   };
 
-  const saved = stored(VIEW_KEY);
-  setView(buttons.some(b => b.dataset.view === saved) ? saved : 'split');
+  const saved = stored(`blackbook.${key}`);
+  set(names.includes(saved) ? saved : names[0]);
 
-  views.addEventListener('click', event => {
-    const chosen = event.target.closest('button[data-view]');
+  host?.addEventListener('click', event => {
+    const chosen = event.target.closest(`button[data-${key}]`);
     if (!chosen) return;
-    setView(chosen.dataset.view);
-    store(VIEW_KEY, chosen.dataset.view);
+    set(chosen.dataset[key]);
+    store(`blackbook.${key}`, chosen.dataset[key]);
   });
-}
+});
 
 // The page's keys. Space plays and pauses; the arrows follow whichever links
 // carry them, which on a tag page is the next and previous tag. Fields, and

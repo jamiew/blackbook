@@ -42,8 +42,9 @@ bundle exec rspec         # no environment variables needed
 
 ## Pages
 
-- `/` and `/data` play one tag beside the grid. Click a cell or press ← → to
-  load it in place. The switch in the masthead tries four layouts.
+- `/` and `/data` play one tag beside the grid. Click a cell, press ← →, or
+  let it run on like a slideshow. The masthead switches try themes (ink,
+  paper, acid) and chrome (full, quiet, bare).
 - `/data/:id` is one tag with a filmstrip of its neighbours. Controls opens the
   pane: looks, live or still, ink mode, effects, data layers.
 - `/apps` plays the newest tag made with each app. `/upload` explains how to

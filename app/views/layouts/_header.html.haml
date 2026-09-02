@@ -1,7 +1,7 @@
 - alt = '#000000book: An open database for Graffiti Markup Language (GML) files'
 %header.masthead.shell
   %a.masthead__logo{ href: root_path, 'aria-label' => alt }
-    = image_tag('/images/000000book-logo-beta.png', alt: alt, data: { logo_default: true, original: '/images/000000book-logo-beta.png' })
+    = image_tag('/images/logo/clean.png', alt: alt, data: { logo_default: true, original: '/images/logo/clean.png' })
 
   %nav.masthead__nav{ 'aria-label' => 'Primary' }
     = nav_link 'data', tags_path, active: %w[tags favorites]
@@ -12,10 +12,13 @@
 
   .masthead__account.meta
     - if @browse
-      -# The browse page four ways. player.js remembers the choice per browser.
-      .masthead__view{ role: 'group', 'aria-label' => 'Layout', data: { view_switch: true } }
-        - %w[split stack cinema grid].each do |name|
-          %button{ type: 'button', data: { view: name }, 'aria-pressed' => (name == 'split').to_s }= name
+      -# Try the site in another skin. player.js remembers the choice per browser.
+      .masthead__view{ role: 'group', 'aria-label' => 'Theme', data: { theme_switch: true } }
+        - %w[ink paper acid].each do |name|
+          %button{ type: 'button', data: { theme: name }, 'aria-pressed' => (name == 'ink').to_s }= name
+      .masthead__view{ role: 'group', 'aria-label' => 'Chrome', data: { chrome_switch: true } }
+        - %w[full quiet bare].each do |name|
+          %button{ type: 'button', data: { chrome: name }, 'aria-pressed' => (name == 'full').to_s }= name
     - if current_user
       %a{ href: user_path(current_user) }= image_tag(attachment_url(current_user, :photo, :tiny), alt: current_user.login)
       = link_to 'settings', settings_path
