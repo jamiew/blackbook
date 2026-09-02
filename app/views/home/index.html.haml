@@ -1,66 +1,48 @@
+= auto_discovery_link_tag(:rss, { format: :rss, controller: 'tags', action: 'index' }, title: '#000000book: Latest Tags')
 
--# RSS
-= auto_discovery_link_tag(:rss, {format: :rss, controller: 'tags', action: 'index'}, title: '#0000book: Latest Tags')
+- if @tag.blank?
+  %h1.page__title No tag data
+- else
+  .hero
+    .hero__main
+      %span.eyebrow Most recent capture
+      %h1.hero__title
+        %a{ href: tag_path(@tag) }= tag_title(@tag)
+      .hero__meta.meta
+        %span= application_link(@tag.sexy_app_name)
+        %span= tag_user_link(@tag)
+        - unless @tag.location.blank?
+          %span= location_link(@tag.location)
+        %span== #{timeago(@tag.created_at)} ago
+      = render partial: 'tags/player', object: @tag, as: :player
 
--# Be a little more specific about what 'today' is.
-- timezone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
-- today = DateTime.now.in_time_zone(timezone).to_date
+    .hero__aside
+      .hero__panel
+        %h2 Latest uploads
+        %ul.feed
+          - @tags.first(14).each do |tag|
+            %li
+              %a{ href: tag_path(tag) }
+                %span.feed__id= "##{tag.id}"
+                %span.feed__app= tag.sexy_app_name.presence || 'upload'
+        %p{ style: 'margin: 14px 0 0' }
+          = link_to 'View all data →', tags_path, class: 'button'
 
-#home
+      .hero__panel
+        %h2 What this is
+        %p{ style: 'margin-bottom: 12px; color: var(--dim); font-size: 14px' }
+          An open archive of motion-captured graffiti. Every tag here is a
+          #{link_to 'GML', 'http://fffff.at/gml-week-graffiti-markup-language/'} file:
+          the writer's hand, sampled as coordinates and timestamps, replayable by anyone.
+        %p{ style: 'margin: 0' }
+          - if current_user
+            = link_to '+ Upload GML', new_tag_path, class: 'button button--solid'
+          - else
+            = link_to 'Create an account', signup_path, class: 'button button--solid'
 
-  #intro
-    .right{style: 'font-weight: normal; margin-left: 20px; margin-top: 0px; color: #777;'}
-      == #{pluralize Tag.where("created_at >= ?", today).count, 'tag'} uploaded
-      == by #{pluralize Tag.where("created_at >= ?", today).select('DISTINCT gml_uniquekey').count, 'person'} today (last #{time_ago_in_words(today).gsub('about ','')})
-      %br
-      == &rarr; #{link_to 'view all activity', activity_path, style: 'text-decoration: underline;'}
+.section-head
+  %h2 Recent tags
+  %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_stats[:total])} archived
 
-    .welcome{style: 'width: 600px;'}
-      %strong Welcome to #000000book
-      == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
-      == &ndash; uploading tags? #{link_to 'Register an account', signup_path}
-      == <br/> Signup and #{link_to 'link your iPhone', settings_path} to claim your uploads
-
-  #vanderplayer
-
-    .prevnext
-      - next_text = '&larr; next'.html_safe
-      - prev_text = 'previous &rarr;'.html_safe
-      %li= @next.nil? ? next_text : link_to(next_text, tag_path(@next), class: 'button')
-      %li &nbsp;::&nbsp;
-      %li= @prev.nil? ? prev_text : link_to(prev_text, tag_path(@prev), class: 'button')
-    - if @tag.blank?
-      %h2.warning Warning: no tag data
-    - else
-      %h2
-        %a{href: tag_path(@tag)}= tag_title(@tag)
-        %small
-          - if true
-            %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
-          - unless @tag.location.blank?
-            %span.location== &ndash; #{@tag.location}
-          - if !@tag.user.nil?
-            %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
-          - elsif @tag.secret_username.blank?
-            %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}
-          == &ndash; uploaded #{time_ago_in_words(@tag.created_at)} ago
-      = render partial: 'tags/tag_playback', object: @tag
-
-  - # List of tags
-  #tag-list
-    %ul#frontpage_tags
-      - @tags.each do |tag|
-        %li
-          %span
-            %a{href: tag_path(tag)}= tag_title(tag)
-          %small
-            -# unless tag.application.blank? && tag.gml_application.blank?
-            - if true
-              %span.application== <em>|</em> #{application_link(tag.sexy_app_name, short: true)}
-            - if !tag.user.nil?
-              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
-            - elsif !tag.secret_username.blank?
-              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
-    %br
-    %p.right
-      %strong= link_to '<span>View all data &raquo;</span>'.html_safe, tags_path, class: 'button ghost small'
+.tag-grid
+  = render partial: 'tags/tag', collection: @tags, as: :tag

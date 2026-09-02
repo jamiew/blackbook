@@ -1,76 +1,53 @@
 - @user ||= current_user
-#profile
-  #sidebar
 
-    -# Roles
-    - if @user.admin?
-      .roles
-        %strong.role.admin Admin
-
-    %h2.login
-      = link_to(image_tag(attachment_url(@user, :photo, :small)), attachment_url(@user, :photo, :medium))
-      .clear= @user.login
+.page__head
+  %div
+    %span.eyebrow Writer
+    %h1.page__title= @user.login
     - unless @user.tagline.blank?
-      .tagline== "#{@user.tagline}"
+      %p.page__lede= @user.tagline
+  %ul.instruments{ style: 'border: 0; gap: 0' }
+    %li.instrument
+      %span.instrument__label Tags
+      %span.instrument__value= link_to @user.tags.count, user_tags_path(@user)
+    %li.instrument
+      %span.instrument__label Favorites
+      %span.instrument__value= @user.favorites.count
+    %li.instrument
+      %span.instrument__label Joined
+      %span.instrument__value== #{timeago(@user.created_at)} ago
+    - if @user.admin?
+      %li.instrument
+        %span.instrument__label Role
+        %span.instrument__value Admin
 
-    - unless @user.website.blank?
-      .website
-        = link_to @user.website.gsub('http://',''), @user.website =~ /^http/ ? @user.website : "http://#{@user.website}", rel: 'nofollow'
+.profile
+  %div
+    - if @tags.blank?
+      %p.page__lede Nothing uploaded yet.
+    - else
+      .section-head
+        %h2 Uploaded tags
+        %span.meta= "#{number_with_delimiter(@tags.total_entries)} total"
+      .tag-grid
+        = render partial: 'tags/tag', collection: @tags, as: :tag
+      %nav{ 'aria-label' => 'Pagination', style: 'margin-top: 24px' }
+        = pagination(@tags)
 
-    -# About/Bio down low...
-    - unless @user.about.blank?
-      .about
-        = @user.about
-
-    -# Meta
-    %p
-      == Joined #{timeago(@user.created_at)} ago
+  %aside.profile__aside
+    .hero__panel
+      %h2 Profile
+      %p.profile__photo= link_to image_tag(attachment_url(@user, :photo, :small), alt: @user.login), attachment_url(@user, :photo, :medium)
+      - unless @user.website.blank?
+        %p= link_to @user.website.gsub(%r{^https?://}, ''), (@user.website =~ /^http/ ? @user.website : "http://#{@user.website}"), rel: 'nofollow'
+      - unless @user.about.blank?
+        %p{ style: 'color: var(--dim); font-size: 14px' }= @user.about
       - unless @user.iphone_uniquekey.blank?
-        %br= redstar+"paired with device"
+        %p.meta Paired with a device
+      - if current_user == @user
+        %p= link_to 'Edit settings', settings_path, class: 'button'
 
-    -# Simple stats
-    %ul.stats.circle
-      %li= link_to pluralize(@user.tags.count, 'tag'), user_tags_path(@user)
-      %li= pluralize(@user.favorites.count, 'favorite')
-
-    -# Personal editing...
-    - if false && current_user == @user
-      .ownerbox
-        %em This is you!
-        %ol
-          %li= link_to 'Edit Settings', edit_user_path(@user)
-          %li= link_to 'Change Password', edit_user_path(@user)
-
-    -# Apps
-    - if false
-      - if @user.visualizations.blank?
-        / None
-      - else
-        %br
-        %h3 Applications
-        %ul.square
-          - @user.visualizations.each do |vis|
-            %li= link_to vis.name, visualization_path(vis)
-
-  -#Notifis... activity feed? comments etc.
-  - if true
-    #activity
-      %h2 Activity
-      - if @notifications.blank?
-        = "None yet."
-      - else
+    - unless @notifications.blank?
+      .hero__panel
+        %h2 Activity
         = render partial: 'home/notifications', object: @notifications
-
-  -# User's tags
-  #main
-    - if true
-      - if @tags.blank?
-        %p.empty
-          %strong Nothing yet!
-      - else
-        %h1== #{@tags.total_entries} Uploaded Tags
-        = render partial: 'tags/tag', collection: @tags
-
-      %br.clear
-      %p= pagination(@tags)
-

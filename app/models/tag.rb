@@ -200,6 +200,62 @@ class Tag < ApplicationRecord
     @gml_hash
   end
 
+  # Compact payload for the canvas player: just the strokes, as flat
+  # [x, y, time] triples. The full #as_json ships the whole XML-as-JSON tree,
+  # which is several times larger and makes the player dig through a shape that
+  # changes depending on how many strokes and points a tag happens to have.
+  #
+  # Timing is passed through untouched, including gaps and out-of-order stamps.
+  # The player repairs it and reports what it had to do, so bad captures stay
+  # visible instead of being silently smoothed over here.
+  def player_data
+    drawing = gml_hash.dig('gml', 'tag', 'drawing') || gml_hash.dig('GML', 'tag', 'drawing') || {}
+    header  = gml_hash.dig('gml', 'tag', 'header') || gml_hash.dig('GML', 'tag', 'header') || {}
+    env     = gml_hash.dig('gml', 'tag', 'environment') || gml_hash.dig('GML', 'tag', 'environment') || {}
+
+    strokes = Array.wrap(drawing['stroke']).filter_map do |stroke|
+      next if stroke.blank?
+
+      points = Array.wrap(stroke['pt']).filter_map do |pt|
+        next if pt.blank?
+
+        x = Float(pt['x'], exception: false)
+        y = Float(pt['y'], exception: false)
+        next if x.nil? || y.nil?
+
+        [x.round(5), y.round(5), (Float(pt['time'], exception: false) || 0.0).round(4)]
+      end
+      next if points.empty?
+
+      { color: stroke['color'], brush: Float(stroke['brush'] || stroke['stroke_size'], exception: false),
+        drips: ActiveModel::Type::Boolean.new.cast(stroke['dripping']) || false, points: points }
+    end
+
+    { id: id,
+      app: sexy_app_name.presence,
+      screen: { x: Float(env.dig('screenBounds', 'x'), exception: false),
+                y: Float(env.dig('screenBounds', 'y'), exception: false) },
+      rotate: landscape_capture?(env),
+      client: header.dig('client', 'name'),
+      strokes: strokes }
+  end
+
+  # GML records which way was up when the tag was captured. An up vector along
+  # +x means the device was held sideways and the points were written out
+  # unrotated, so playback owes them a quarter turn.
+  #
+  # This is per capture, not per app: the same phone app appears with up=(1,0,0)
+  # on old 480x320 captures and up=(0,1,0) on later ones. Matching on client
+  # name -- which is what the old player did, and then rotated by 80 *radians*
+  # rather than 90 degrees -- got both cases wrong.
+  def landscape_capture?(env = nil)
+    env ||= gml_hash.dig('gml', 'tag', 'environment') || gml_hash.dig('GML', 'tag', 'environment') || {}
+    up = env['up'] || {}
+    x = Float(up['x'], exception: false) || 0.0
+    y = Float(up['y'], exception: false) || 0.0
+    x.abs > y.abs
+  end
+
   # Override so we can add gml: :gml_hash
   # Arguably could just be using :methods but we always want this
   #

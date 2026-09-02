@@ -1,10 +1,13 @@
 %head
-  %meta{ http_equiv_attrs }
-  %meta{ 'http-equiv' => 'imagetoolbar', content: 'no' }
-  %meta{ name: 'distribution', content: 'all' }
+  %meta{ charset: 'utf-8' }
+  -# Without this the layout renders at desktop width on phones, zoomed out.
+  %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1' }
   %meta{ name: 'robots', content: @noindex ? 'noindex,follow' : 'all' }
-  %meta{ name: 'resource-type', content: 'document' }
-  %meta{ name: 'MSSmartTagsPreventParsing', content: 'true' }
+  %meta{ name: 'theme-color', content: '#000000' }
+
+  %link{ rel: 'preconnect', href: 'https://fonts.googleapis.com' }
+  %link{ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' }
+  %link{ rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap' }
 
   -# How a client finds the API without reading the site. `service-desc` is the
   -# machine-readable description (RFC 8631), `describedby` the prose one.
@@ -14,10 +17,9 @@
   = stylesheet_link_tag 'application', media: 'all'
   -# Propshaft doesn't read sprockets `//= require` directives, so each file is listed here.
   -# `rails-ujs` ships with actionview and drives data-method/data-confirm on links.
-  = javascript_include_tag 'rails-ujs', 'application'
+  = javascript_include_tag 'rails-ujs', 'application', 'gml_player', 'gml_player_ui'
   = csrf_meta_tags
 
   = yield :head
 
   %title= page_title
-

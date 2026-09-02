@@ -1,21 +1,39 @@
--# Common code we're using on every page (for the time being)
-#header
-  %ul.navigation.user_navigation
-    = yield :header_nav
-  %ul.navigation.buttons
-    -#TODO: select the currently active link
-    %li= link_to 'data', tags_path
-    %li= link_to 'applications', visualizations_path
-    -# The wiki this used to point at is archived; the docs live in the repo now
-    %li= link_to 'API/docs', "https://github.com/jamiew/blackbook/tree/main/docs", target: '_blank'
-    %li= link_to 'about', "/about"
-    - if false
-      %li= link_to 'activity', activity_path
-  .masthead
-    - if false
-      %h1.title= link_to '#000000book', root_path, class: 'root_link'
-      %h2.byline= link_to "An open database for Graffiti Markup Language (GML) files", root_path, class: 'root_link'
-    - alt = '#000000book: An open database for Graffiti Markup Language (GML) files'
-    %h1
-      %a.root_link{href: root_path}
-        = image_tag("/images/000000book-logo-beta.png", alt: alt, title: alt)
+- alt = '#000000book: An open database for Graffiti Markup Language (GML) files'
+%header.masthead.shell
+  %a.masthead__logo{ href: root_path, 'aria-label' => alt }
+    = image_tag('/images/000000book-logo-beta.png', alt: alt)
+
+  %nav.masthead__nav{ 'aria-label' => 'Primary' }
+    = nav_link 'data', tags_path, active: %w[tags favorites]
+    = nav_link 'applications', visualizations_path, active: %w[visualizations]
+    = nav_link 'API/docs', docs_path, active: %w[docs]
+    = nav_link 'about', '/about', active: []
+
+  .masthead__account.meta
+    - if current_user
+      %a{ href: user_path(current_user) }= image_tag(attachment_url(current_user, :photo, :tiny), alt: current_user.login)
+      = link_to 'settings', settings_path
+      = link_to 'logout', logout_path, class: 'logout'
+    - else
+      = link_to 'login', login_path
+      = link_to 'signup', signup_path
+
+-# Live readings off the archive. This is a database that is still being
+-# written to by phones in the street, so the chrome says so.
+.instruments.shell
+  .instrument
+    %span.instrument__label Archive
+    %span.instrument__value= number_with_delimiter(archive_stats[:total])
+    %span.instrument__label tags
+  .instrument
+    %span.instrument__label Today
+    %span.instrument__value= archive_stats[:today]
+    %span.instrument__label from
+    %span.instrument__value= archive_stats[:writers]
+    %span.instrument__label writers
+  .instrument
+    %span.instrument__label Spec
+    %span.instrument__value GML 0.1b
+  .instrument
+    %span.instrument__label Feed
+    %span.instrument__value= link_to 'RSS', tags_path(format: :rss)

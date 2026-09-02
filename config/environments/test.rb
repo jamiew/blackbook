@@ -23,6 +23,13 @@ Rails.application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
+  # Not the default file store: that is tmp/cache, which development shares, and
+  # tag ids collide between the two databases, so a test run could leave the dev
+  # site serving another tag's parsed GML. Not :null_store either, because
+  # RateLimitAlerts is backed by Rails.cache and silently never trips when its
+  # writes go nowhere. In memory, per process, nothing on disk.
+  config.cache_store = :memory_store
+
   # Render the real error page for exceptions that map to a status code (e.g.
   # RecordNotFound -> 404) and raise everything else.
   config.action_dispatch.show_exceptions = :rescuable

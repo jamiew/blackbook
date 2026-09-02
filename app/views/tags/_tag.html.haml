@@ -1,32 +1,16 @@
-
--# A single tag pls
--# link = @user ? user_tag_path(@user, tag) : tag_path(tag)
-- link = tag_path(tag)
-
--# TODO FIXME lots of hardcoded styles/widths in here
-.meta.right{style: 'position: absolute; width: 200px; margin: 10px 0 0 280px;'}
-  %br
-  %strong.title= link_to tag_title(tag), link
-  .posted_at
-    == #{time_ago_in_words(tag.created_at)} ago
-    %br= tag.created_at.strftime('%D %T')
-  - unless tag.sexy_app_name.blank?
-    %p.application 
-      %strong Application: <br />
-      = application_link(h(tag.sexy_app_name)) || 'NULL'
-
-  - if is_owner?(tag) && is_admin?
-    .controls.left
-      %small
-        = link_to 'edit', edit_tag_path(tag)          
-        &nbsp;
-        = link_to 'delete', tag_path(tag), method: 'delete', class: 'delete', confirm: 'Are you sure?'
-    
-%p
-  =# link_to image_tag(tag.image.url(:medium)), link
-  -# if tag.image.exists?    
-  - if tag.remote_image
-    .image= link_to(image_tag(tag_thumbnail_url(tag)), link)
-  - else
-    .image= link_to(image_tag(attachment_url(tag, :image, :medium), width: 260), link)
-
+-# One cell in the tag grid. The image is the content, so it gets the space.
+%a.tag-card{ href: tag_path(tag) }
+  .tag-card__frame
+    %span.tag-card__id= "##{tag.id}"
+    - if tag.image.attached? || tag.remote_thumbnail_url.present?
+      = image_tag tag_thumbnail_url(tag), alt: "Tag ##{tag.id}", loading: 'lazy'
+    - else
+      -# Older uploads never had a still generated. Say so rather than falling
+      -# back to a stock photo that reads as the tag itself.
+      %span.tag-card__empty No still
+  .tag-card__body
+    %span.tag-card__app= tag.sexy_app_name.presence || 'Upload'
+    %span.tag-card__who
+      = tag.user&.login || tag.secret_username || 'anon'
+      = '·'
+      = "#{timeago(tag.created_at)} ago"
