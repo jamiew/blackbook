@@ -76,28 +76,25 @@ RSpec.configure do |config|
   #   Kernel.srand config.seed
 end
 
-# FIXME: MOVEME
-# Authentication-related spec helpers
+# Authentication-related spec helpers. Sessions are a plain user_id in the
+# session hash now, so a controller spec logs in by setting it.
 def login_as_user(user = nil)
   user ||= FactoryBot.create(:user)
-  UserSession.create(user)
+  session[:user_id] = user.id
+  user
 end
 
 def login_as_admin(admin = nil)
-  admin ||= FactoryBot.create(:admin)
-  UserSession.create(admin)
+  login_as_user(admin || FactoryBot.create(:admin))
 end
 
 def logout
-  current_user_session.destroy
+  session.delete(:user_id)
 end
 
-# FIXME: these are copied from ApplicationController
-# what are the typical procedures for AuthLogic...?
+# Deliberately not memoized: a controller action can log in or out mid-example
+# and the assertion afterwards needs to see that, not a stale object.
 def current_user
-  @current_user ||= current_user_session&.record
-end
-
-def current_user_session
-  @current_user_session ||= UserSession.find
+  user_id = session[:user_id]
+  user_id && User.find_by(id: user_id)
 end

@@ -8,7 +8,7 @@
         %strong.role.admin Admin
 
     %h2.login
-      = link_to(image_tag(@user.photo.url(:small)), @user.photo.url)
+      = link_to(image_tag(attachment_url(@user, :photo, :small)), attachment_url(@user, :photo, :medium))
       .clear= @user.login
     - unless @user.tagline.blank?
       .tagline== "#{@user.tagline}"

@@ -1,6 +1,6 @@
 - content_for :header_nav do
   - if current_user
-    %li.user_photo= link_to image_tag(current_user.photo.url(:tiny), class: 'photo'), user_path(current_user)
+    %li.user_photo= link_to image_tag(attachment_url(current_user, :photo, :tiny), class: 'photo'), user_path(current_user)
     -# %li.user_name= link_to current_user.login, user_path(current_user)
     %li= link_to 'settings', settings_path
     -# %li= link_to 'favorites', favorites_path

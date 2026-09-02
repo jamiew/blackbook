@@ -19,7 +19,7 @@
     %label{for: 'visualization_image'}== Image/screenshot (JPG/PNG/GIF)
     = f.file_field :image, size: 10
   %p
-    = image_tag(@visualization.image(:small))
+    = image_tag(attachment_url(@visualization, :image, :small))
 
 .left_column
   %p

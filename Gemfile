@@ -5,6 +5,10 @@ gem 'rails', '~> 8.1.0'
 gem 'mysql2'
 gem 'puma', '~> 8.0'
 
+# Serves assets and handles compression and caching in front of Puma, inside
+# the container. It is what removes the need for nginx to serve static files.
+gem 'thruster', require: false
+
 # Assets
 gem 'propshaft'
 
@@ -14,15 +18,29 @@ gem 'bootsnap', require: false
 # Frontend
 gem 'haml'
 
-# Auth
-gem 'authlogic'
+# Auth. bcrypt backs has_secure_password; scrypt stays to verify the hashes
+# Authlogic wrote, which cannot be converted. See User#authenticate_legacy_scrypt.
+gem 'bcrypt', '~> 3.1'
 gem 'scrypt', '~> 3.0'
+# Still here only so the specs can build a real Authlogic hash to test against.
+gem 'authlogic', require: false
 
 # API/Controllers
 gem 'responders', '~> 3.0'
 
-# File uploads
-gem 'kt-paperclip'
+# File uploads. Active Storage handles attachments; kt-paperclip is gone, and
+# with it the pin holding marcel at 1.x. The *_file_name columns stay until the
+# backfill has run everywhere. See lib/active_storage_backfill.rb.
+gem 'image_processing', '~> 2.0'
+# image_processing 2.x stopped depending on mini_magick, so declaring it here is
+# what keeps config.active_storage.variant_processor = :mini_magick working on a
+# clean bundle install. Without it variants fail in the container but not on a
+# laptop that still has the gem lying around from 1.x.
+gem 'mini_magick'
+
+# Renders docs/*.md at /docs. GFM out of the box, so the tables and fenced code
+# already in those files come through without a second parser gem.
+gem 'redcarpet'
 
 # Utilities
 gem 'nokogiri', '~> 1.15'
@@ -49,4 +67,6 @@ end
 
 group :development do
   gem 'ruby-lsp', require: false
+  # Deploys the container. See config/deploy.yml.
+  gem 'kamal', require: false
 end

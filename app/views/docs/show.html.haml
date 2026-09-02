@@ -1,0 +1,15 @@
+.docs
+  %nav.docs__nav
+    %h3= link_to 'Docs', docs_path
+    %ul
+      - DocsPage.all.reject { |p| p.slug == 'README' }.each do |page|
+        %li{ class: ('is-current' if page.slug == @doc.slug) }
+          = link_to page.title, page.url_path
+
+  %article.docs__body
+    != @doc.to_html
+
+    %p.docs__source
+      = link_to 'Edit this page on GitHub',
+        "https://github.com/jamiew/blackbook/blob/main/#{@doc.repo_path}",
+        target: '_blank', rel: 'noopener'

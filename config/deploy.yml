@@ -1,0 +1,76 @@
+# Kamal deploys the app as a container. See docs/deployment.md.
+# MySQL stays a host package on purpose.
+service: blackbook
+image: jamiew/blackbook
+
+# On 2 vCPU, Rails eager-loading uses most of the 30s default before Puma
+# binds. This is the timeout behind "target failed to become healthy", not
+# proxy.healthcheck.timeout.
+deploy_timeout: 120
+
+servers:
+  web:
+    hosts:
+      - <%= ENV.fetch("BETA_HOST", "159.203.72.141") %>
+
+ssh:
+  user: root
+
+proxy:
+  ssl: true
+  host: beta.000000book.com
+  # Thruster listens on 80 inside the container.
+  app_port: 80
+  healthcheck:
+    path: /up
+
+registry:
+  server: ghcr.io
+  # In CI this is the workflow actor with GITHUB_TOKEN, so no personal token is
+  # needed. Locally it falls back to the account that owns the package.
+  username: <%= ENV.fetch("KAMAL_REGISTRY_USERNAME", "jamiew") %>
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  # The servers are x86. On an arm64 laptop this cross-builds under emulation,
+  # which is slow; CI runs on amd64 and builds natively.
+  cache:
+    # Registry rather than 'gha' so the same cache works from a laptop too.
+    # mode=max keeps intermediate layers, so a Gemfile-only change does not
+    # rebuild the whole image.
+    type: registry
+    options: mode=max
+    image: ghcr.io/jamiew/blackbook-build-cache
+
+env:
+  clear:
+    RAILS_LOG_TO_STDOUT: "true"
+    # kamal-proxy terminates TLS and does not serve files, so Rails must.
+    RAILS_SERVE_STATIC_FILES: "true"
+  secret:
+    - RAILS_MASTER_KEY
+    - DATABASE_URL
+
+volumes:
+  # The GML files and uploaded images live on the block volume and must outlive
+  # any container. These are the same two paths production symlinks today.
+  - "/mnt/blackbook_volume/blackbook-data:/rails/data"
+  - "/mnt/blackbook_volume/blackbook-backup/public/system:/rails/public/system"
+  # Active Storage blobs. Same reasoning: these are the real images now, so they
+  # belong on the volume rather than inside a container that gets replaced.
+  - "/mnt/blackbook_volume/active-storage:/rails/storage"
+  # MySQL's socket, so the app can reach the database without TCP, TLS or a
+  # bridge address in the way. Read-only: the container has no business
+  # writing into the host's run directory.
+  - "/var/run/mysqld:/var/run/mysqld:ro"
+
+aliases:
+  # Migrations are never automatic. bin/docker-entrypoint explains why.
+  migrate: app exec --reuse "bin/rails db:migrate"
+  console: app exec --interactive --reuse "bin/rails console"
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+  logs: app logs --follow
+
+# Setting the host's MySQL up for this is in docs/deployment.md.

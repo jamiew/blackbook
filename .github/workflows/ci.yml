@@ -1,6 +1,15 @@
 name: "CI Tests"
 
+# One pipeline: test and lint on every push, and deploy beta only when both
+# pass. Job names are kept as Test and RuboCop so existing branch protection
+# and PR checks keep matching.
 on: push
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Never cancel a run that might be mid-deploy: kamal holds a host lock it does
+  # not release when the runner is killed.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/upgrade-migrations' }}
 
 jobs:
   test:
@@ -8,44 +17,161 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        # match to the mysql version we're using in production
-        image: mysql:5.7
+        # Match the server. Keep this, compose.yaml and the server in step:
+        # testing against a different major version is how the utf8mb3 and
+        # MyISAM index-limit problems went unnoticed for so long.
+        image: mysql:8.4
+        options: >-
+          --health-cmd="mysqladmin ping" --health-interval=10s
+          --health-timeout=5s --health-retries=3
         env:
-          MYSQL_HOST: 127.0.0.1
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DB: blackbook_test
         ports:
           - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        # No collation args here: unlike compose.yaml, a service container
+        # takes no command override. It does not matter, because `rake
+        # db:create` builds the database with the collation in database.yml
+        # rather than inheriting the server default.
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-
-      - name: Cache Gems
-        uses: actions/cache@v4
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: Install Gems
-        run: |
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
 
       - name: Run tests
         env:
           RAILS_ENV: test
           MYSQL_PASSWORD: ""
-          DATABASE_URL: mysql2://127.0.0.1:${{ job.services.mysql.ports[3306] }}/blackbook_test
+          # Same knob developers use locally, rather than a second way of
+          # spelling the connection that can drift from database.yml.
+          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
         run: |
           bundle exec rake db:create
           bundle exec rake db:schema:load --trace
           bundle exec rspec
+
+  rubocop:
+    name: RuboCop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle exec rubocop --format github
+
+  deploy:
+    name: Deploy beta
+    needs: [test, rubocop]
+    if: github.ref == 'refs/heads/upgrade-migrations'
+    runs-on: ubuntu-latest
+    # kamal takes a lock on the host and does not release it when a runner is
+    # cancelled, so two overlapping deploys leave a stale lock that blocks every
+    # later one. The workflow-level cancel above is disabled for this branch for
+    # the same reason.
+    concurrency:
+      group: deploy-beta
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      # Lets GITHUB_TOKEN push to ghcr.io, so no personal token is needed.
+      packages: write
+    env:
+      # One place for the address, read by every step below and by deploy.yml.
+      BETA_HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # An amd64 runner builds natively. A laptop on arm64 has to cross-compile
+      # under QEMU, which turned a short build into roughly nine minutes.
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Add the deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.BETA_SSH_PRIVATE_KEY }}
+
+      - name: Trust the host
+        run: |
+          mkdir -p ~/.ssh
+          # One key type on purpose. `ssh-keyscan -H` returns rsa, ecdsa and
+          # ed25519 in no fixed order, and net-ssh then sometimes compares
+          # against a different one and reports a host key mismatch.
+          ssh-keyscan -t ed25519 "$BETA_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Write the secrets Kamal reads
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          DATABASE_URL: ${{ secrets.BETA_DATABASE_URL }}
+          # Kamal reads this from a secrets file, not from the environment.
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Same files and precedence a laptop uses, so there is one code path.
+          printf '%s' "$RAILS_MASTER_KEY" > config/master.key
+          {
+            printf 'KAMAL_REGISTRY_PASSWORD=%s\n' "$KAMAL_REGISTRY_PASSWORD"
+            printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+          } > .kamal/secrets-common
+
+      - name: Ensure the host is ready for the container
+        run: |
+          # Kamal starts an existing kamal-proxy rather than recreating it, so a
+          # proxy left attached to no network by a half-finished run can never
+          # reach the app however healthy it is.
+          ssh -o StrictHostKeyChecking=accept-new "root@$BETA_HOST" '
+            if docker inspect kamal-proxy >/dev/null 2>&1; then
+              nets=$(docker inspect -f "{{range \$k, \$v := .NetworkSettings.Networks}}{{\$k}} {{end}}" kamal-proxy)
+              case "$nets" in
+                *kamal*) echo "kamal-proxy is on: $nets" ;;
+                *)       echo "kamal-proxy on no network, recreating"; docker rm -f kamal-proxy ;;
+              esac
+            fi
+            # The app connects over the MySQL socket, so it has to be there.
+            [ -S /var/run/mysqld/mysqld.sock ] && echo "mysql socket present" \
+              || { echo "no mysql socket at /var/run/mysqld/mysqld.sock"; exit 1; }
+          '
+
+      - name: Deploy
+        env:
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: bin/kamal deploy
+
+      - name: Smoke test the deployed site
+        env:
+          URL: https://beta.000000book.com
+        run: |
+          fail=0
+          for path in /up / /data; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$URL$path" || echo timeout)
+            echo "$path -> $code"
+            # 200 only. Accepting a redirect scores an endlessly-redirecting app
+            # green, which is one of the failures this branch already chased.
+            [ "$code" = "200" ] || fail=1
+          done
+          [ "$fail" = "0" ] && exit 0
+
+          echo "--- can the app reach the database? ---"
+          ssh -o StrictHostKeyChecking=accept-new "root@$BETA_HOST" '
+            c=$(docker ps -q --filter "name=blackbook-web" | head -1)
+            docker exec "$c" timeout 60 bin/rails runner /rails/script/db_doctor.rb 2>&1 | tail -12
+            echo "--- app logs ---"
+            docker logs "$c" 2>&1 | grep -av "^/usr/local/bundle" | tail -40
+          '
+          exit 1
+
+      # Deliberately NOT automatic. The pending set drops the comments table,
+      # so migrating is a decision, not a side effect of shipping code.
+      - name: Remind about migrations
+        run: echo "Deployed. Migrations were not run; use the Migrate beta workflow." >> $GITHUB_STEP_SUMMARY
+
+      - name: Clean up
+        if: always()
+        run: rm -f config/master.key .kamal/secrets-common

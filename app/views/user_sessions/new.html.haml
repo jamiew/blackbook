@@ -1,17 +1,13 @@
 #login.signup_or_login.user_form.quarter.centered
 
-  = form_for @user_session, url: user_session_path do |f|
+  = form_with url: user_session_path, method: :post do |f|
 
     %h2 Login
     = f.label :login, 'Username'
-    = f.text_field :login
+    = f.text_field :login, value: params[:login]
 
     = f.label :password, 'Password'
     = f.password_field :password
-
-    .remember_me
-      = f.label :remember_me, "Remember me"
-      = f.check_box :remember_me
 
     %br
     .buttons

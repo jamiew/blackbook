@@ -3,9 +3,8 @@ require 'factory_bot'
 # FIXME: should not be a constant
 # Deliberately not frozen: TagsController#show strips the uniqueKey with `gsub!`, mutating
 # whatever `Tag#gml` memoized. Freezing this turns that into a FrozenError.
-# rubocop:disable Style/MutableConstant
+# rubocop:disable-next Style/MutableConstant
 DEFAULT_GML = "<gml><tag><header><environment><name>rspec</name></client></environment><drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>"
-# rubocop:enable Style/MutableConstant
 
 FactoryBot.define do
   sequence :login do |i|
