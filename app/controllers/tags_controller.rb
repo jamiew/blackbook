@@ -5,6 +5,20 @@ class TagsController < ApplicationController
 
   # We allow open access to API #create -- no authentication or forgery protection
   protect_from_forgery except: %i[show latest random create thumbnail validate]
+
+  # The API is anonymous, so the limits are keyed on IP. Reads are generous
+  # enough for an installation polling /latest and for a polite scraper. Writes
+  # are tight because each one lands a file on the block volume and needs no
+  # authentication at all. Both numbers are first guesses; tune them from the
+  # alert mail. See config/initializers/rate_limit_alerts.rb.
+  rate_limit to: 300, within: 1.minute, name: 'reads',
+             only: %i[index show latest random validate],
+             store: RATE_LIMIT_STORE,
+             with: -> { too_many_requests(retry_after: 1.minute) }
+  rate_limit to: 30, within: 1.hour, name: 'writes',
+             only: %i[create thumbnail],
+             store: RATE_LIMIT_STORE,
+             with: -> { too_many_requests(retry_after: 1.hour) }
   before_action :get_tag, only: %i[show edit update destroy thumbnail]
   before_action :require_user, only: %i[new edit update destroy]
   before_action :require_owner, only: %i[edit update destroy]
@@ -53,19 +67,33 @@ class TagsController < ApplicationController
 
     set_page_title "GML Tags#{": #{@search_context[:key]}=#{@search_context[:value].inspect} " if @search_context}"
 
-    # fresh_when last_modified: @tags.first.updated_at.utc unless @tags.blank?
-    # , etag: @tags.first
-    # expires_in 5.minutes, public: true unless logged_in? # Rack::Cache
+    # The callback is in the etag because JSONP changes the body.
+    return if cached_for_api?(etag: [@tags.map { |t| [t.id, t.updated_at] }, jsonp_callback],
+                              last_modified: @tags.filter_map(&:updated_at).max)
+
     respond_to do |wants|
       wants.html { render 'index' }
-      wants.xml  { render xml: @tags.to_xml(dasherize: false, except: Tag::HIDDEN_ATTRIBUTES, skip_types: true) }
-      wants.json { render json: @tags.to_json(except: Tag::HIDDEN_ATTRIBUTES), callback: params[:callback], processingjs: params[:processingjs] }
+      wants.xml  { render xml: @tags.to_xml(dasherize: false, skip_types: true) }
+      wants.json { render json: @tags.to_json, callback: jsonp_callback }
       wants.rss  { render rss: @tags }
     end
   end
 
   def show
     set_page_title "Tag ##{@tag.id}"
+
+    # Checked before the GML is touched, so a 304 costs no disk read.
+    # iphone_rotate is in the etag because it changes the .gml body, and so is
+    # the JSONP callback.
+    #
+    # #random routes through here and must never validate: a 304 would defeat
+    # the point, and a shared cache would pin one "random" tag for everybody.
+    if action_name == 'random'
+      response.headers['Cache-Control'] = 'no-store'
+    elsif cached_for_api?(etag: [@tag, jsonp_callback, params[:iphone_rotate]],
+                          last_modified: @tag.updated_at)
+      return
+    end
 
     # We only need these instance variables when rendering HTML (aka ghetto interlok)
     if ['html', nil].include?(params[:format])
@@ -74,26 +102,18 @@ class TagsController < ApplicationController
 
       @user = User.find_by_param(params[:user_id]) if params[:user_id]
       @user ||= @tag.user
-
-      # Some ghetto 'excludes' stripping until Tag after_save cleanup is working 100%
-      # FIXME wow. just wow.
-      @tag.gml&.gsub!(%r{<uniqueKey>.*</uniqueKey>}, '')
     end
 
     # Freak out if GML data is missing; this really isn't ever supposed to happen
     raise MissingDataError if @tag.gml.blank?
 
-    # fresh_when last_modified: @tag.updated_at.utc, etag: @tag
     respond_to do |wants|
       wants.html  { render }
-      wants.gml   { render xml: @tag.gml(iphone_rotate: params[:iphone_rotate]) }
-      wants.xml   { render xml: @tag.to_xml(except: Tag::HIDDEN_ATTRIBUTES, dasherize: false, skip_types: true) }
-      wants.json  do
-        response['Access-Control-Allow-Origin'] = '*'
-        response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-        response['Access-Control-Max-Age'] = '1728000'
-        render json: @tag.to_json(except: Tag::HIDDEN_ATTRIBUTES), callback: params[:callback]
-      end
+      wants.gml   { render xml: @tag.public_gml(iphone_rotate: params[:iphone_rotate]) }
+      wants.xml   { render xml: @tag.to_xml(dasherize: false, skip_types: true) }
+      # CORS headers used to be set by hand here, and only here. Rack::Cors now
+      # covers every API format and answers the preflight. See config/initializers/cors.rb.
+      wants.json  { render json: @tag.to_json, callback: jsonp_callback }
     end
   end
 
@@ -108,7 +128,7 @@ class TagsController < ApplicationController
 
   # Just a random tag -- redirect to canonical for HTML, but otherwise don't bother (API)
   def random
-    @tag = Tag.in_random_order.first
+    @tag = Tag.random
     redirect_to(tag_path(@tag), status: :found) and return if [nil, 'html'].include?(params[:format])
 
     show
@@ -207,7 +227,9 @@ class TagsController < ApplicationController
       # FIXME: to_xml does the fuckin' <hash> thing :(
       joined_hash = @tag.validation_results.transform_values { |v| v.join(";\n") }
       wants.xml   { render xml: joined_hash.to_xml(dasherize: false, skip_types: true) }
-      wants.json  { render json: @tag.validation_results.to_json(callback: params[:callback]) }
+      # callback: belongs on render, not on to_json, which ignores it. Passing it
+      # to to_json is why JSONP silently returned plain JSON here for years.
+      wants.json  { render json: @tag.validation_results, callback: jsonp_callback }
       wants.text  { render plain: validation_results_text }
     end
   end

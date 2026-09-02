@@ -9,6 +9,11 @@
   %link{ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' }
   %link{ rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap' }
 
+  -# How a client finds the API without reading the site. `service-desc` is the
+  -# machine-readable description (RFC 8631), `describedby` the prose one.
+  %link{ rel: 'service-desc', type: 'application/yaml', href: '/openapi.yaml', title: 'OpenAPI' }
+  %link{ rel: 'describedby', type: 'text/plain', href: '/llms.txt', title: 'llms.txt' }
+
   = stylesheet_link_tag 'application', media: 'all'
   -# Propshaft doesn't read sprockets `//= require` directives, so each file is listed here.
   -# `rails-ujs` ships with actionview and drives data-method/data-confirm on links.

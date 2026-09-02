@@ -47,4 +47,9 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.include FactoryBot::Syntax::Methods
+
+  # The rate limit counters live in an in-memory store that outlives an example,
+  # and every request in the suite arrives from the same IP. Without this, a spec
+  # file that uploads more than 30 tags starts 429ing itself partway through.
+  config.before { ApplicationController::RATE_LIMIT_STORE.clear }
 end

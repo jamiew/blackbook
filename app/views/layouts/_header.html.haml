@@ -6,7 +6,7 @@
   %nav.masthead__nav{ 'aria-label' => 'Primary' }
     = nav_link 'data', tags_path, active: %w[tags favorites]
     = nav_link 'applications', visualizations_path, active: %w[visualizations]
-    %a{ href: 'https://github.com/jamiew/blackbook/wiki/', target: '_blank', rel: 'noopener' } API/docs
+    = nav_link 'API/docs', docs_path, active: %w[docs]
     = nav_link 'about', '/about', active: []
 
   .masthead__account.meta

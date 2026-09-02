@@ -374,12 +374,60 @@ RSpec.describe Tag, type: :model do
       expect(xml_output).not_to include('location')
     end
 
-    it "excludes hidden attributes from API output" do
-      tag = FactoryBot.create(:tag, ip: '192.168.1.1', remote_secret: 'secret')
-      json_output = tag.to_json(except: Tag::HIDDEN_ATTRIBUTES)
+    it "excludes private attributes from API output, without being asked to" do
+      tag = FactoryBot.create(:tag, ip: '192.168.1.1', remote_secret: 'secret',
+                                    gml_uniquekey: 'DEVICE-KEY', gml_uniquekey_hash: 'HASHED',
+                                    cached_tag_list: 'listed', user: FactoryBot.create(:user))
 
-      expect(json_output).not_to include('192.168.1.1')
-      expect(json_output).not_to include('secret')
+      %i[to_json to_xml].each do |format|
+        output = tag.public_send(format)
+        %w[192.168.1.1 secret DEVICE-KEY HASHED listed user_id].each do |private_value|
+          expect(output).not_to include(private_value), "#{format} leaked #{private_value}"
+        end
+      end
+    end
+
+    it "strips the device uniqueKey from the GML it serves, in every format" do
+      gml_with_key = '<gml><tag><header><client><name>app</name>' \
+                     '<uniqueKey>DEVICE-KEY-XYZ</uniqueKey></client></header>' \
+                     '<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>'
+      tag = FactoryBot.create(:tag, data: gml_with_key)
+
+      expect(tag.gml).to include('DEVICE-KEY-XYZ') # still readable internally
+      expect(tag.public_gml).not_to include('DEVICE-KEY-XYZ')
+      expect(tag.to_json).not_to include('DEVICE-KEY-XYZ')
+      expect(tag.gml_hash.to_s).not_to include('DEVICE-KEY-XYZ')
+    end
+
+    it "still reads the uniqueKey on upload, or device pairing breaks" do
+      gml_with_key = '<gml><tag><header><client><name>app</name>' \
+                     '<uniqueKey>DEVICE-KEY-XYZ</uniqueKey></client></header>' \
+                     '<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing></tag></gml>'
+      tag = FactoryBot.create(:tag, data: gml_with_key)
+
+      expect(tag.gml_header[:gml_uniquekey]).to eq('DEVICE-KEY-XYZ')
+    end
+
+    # The guard. Adding a column now forces a decision about whether the API
+    # publishes it, rather than publishing it by default and finding out later.
+    it "classifies every column as either public or private" do
+      classified = described_class::PUBLIC_ATTRIBUTES + described_class::PRIVATE_ATTRIBUTES
+      unclassified = described_class.column_names - classified
+
+      expect(unclassified).to be_empty,
+                              "not in PUBLIC_ATTRIBUTES or PRIVATE_ATTRIBUTES: #{unclassified.join(', ')}"
+      expect(classified - described_class.column_names).to be_empty
+      expect(described_class::PUBLIC_ATTRIBUTES & described_class::PRIVATE_ATTRIBUTES).to be_empty
+    end
+
+    it "publishes every allowlisted attribute that has a value" do
+      tag = FactoryBot.create(:tag, title: 'Burner', application: 'Fatline', location: 'NYC')
+      json = tag.as_json
+
+      # as_json adds :gml as a symbol key alongside the string attribute names
+      keys = json.keys.map(&:to_s)
+      expect(keys).to include('id', 'title', 'application', 'location', 'created_at')
+      expect(keys - (Tag::PUBLIC_ATTRIBUTES + ['gml'])).to be_empty
     end
   end
 
