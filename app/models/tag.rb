@@ -240,6 +240,28 @@ class Tag < ApplicationRecord
       strokes: strokes }
   end
 
+  # player_data cut down for a grid of thumbnails: every Nth point, three
+  # decimal places, no per-stroke styling. Thirty of these on a page come to
+  # around 150KB, where thirty player_datas would be megabytes.
+  PREVIEW_POINTS = 300
+
+  def preview_data
+    full = player_data
+    total = full[:strokes].sum { |stroke| stroke[:points].size }
+    step = [(total.to_f / PREVIEW_POINTS).ceil, 1].max
+
+    strokes = full[:strokes].map do |stroke|
+      points = stroke[:points]
+      # The first point of every slice, and always the last, so each stroke
+      # still ends where the hand did.
+      kept = points.each_slice(step).map(&:first)
+      kept << points.last unless kept.last.equal?(points.last)
+      { points: kept.map { |x, y, t| [x.round(3), y.round(3), t.round(2)] } }
+    end
+
+    full.slice(:id, :app, :rotate).merge(strokes: strokes)
+  end
+
   # GML records which way was up when the tag was captured. An up vector along
   # +x means the device was held sideways and the points were written out
   # unrotated, so playback owes them a quarter turn.

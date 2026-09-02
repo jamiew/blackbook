@@ -292,6 +292,29 @@ RSpec.describe Tag, type: :model do
     end
   end
 
+  describe '#preview_data' do
+    it 'keeps about PREVIEW_POINTS points, always including the last' do
+      pts = (0..999).map { |i| "<pt><x>#{i / 1000.0}</x><y>0.5</y><time>#{i / 100.0}</time></pt>" }.join
+      tag = tag_with_gml("<drawing><stroke>#{pts}</stroke></drawing>")
+
+      points = tag.preview_data[:strokes].first[:points]
+      expect(points.size).to be_between(Tag::PREVIEW_POINTS / 2, Tag::PREVIEW_POINTS + 1)
+      expect(points.first).to eq([0.0, 0.5, 0.0])
+      expect(points.last).to eq([0.999, 0.5, 9.99])
+    end
+
+    it 'leaves a short tag alone apart from rounding' do
+      tag = tag_with_gml('<drawing><stroke><pt><x>0.12345</x><y>0.5</y><time>0.123</time></pt></stroke></drawing>')
+      expect(tag.preview_data[:strokes].first[:points]).to eq([[0.123, 0.5, 0.12]])
+    end
+
+    it 'drops the per-stroke styling and screen size' do
+      tag = tag_with_gml('<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>')
+      expect(tag.preview_data.keys).to contain_exactly(:id, :app, :rotate, :strokes)
+      expect(tag.preview_data[:strokes].first.keys).to eq([:points])
+    end
+  end
+
   # The old player decided this from the client's name, which is wrong in both
   # directions: the same app wrote landscape captures on early phones and
   # upright ones later. GML records the orientation, so read it.

@@ -158,6 +158,19 @@ describe TagsController do
         expect(response.body).to match("\"gml\":")
       end
 
+      it "renders the cut-down preview with ?preview=1" do
+        get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
+        expect(response).to be_successful
+        expect(response.parsed_body.keys).to contain_exactly('id', 'app', 'rotate', 'strokes')
+      end
+
+      it "gives the preview its own ETag" do
+        get :show, params: { id: @tag.to_param, format: 'json' }
+        full = response.headers['ETag']
+        get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
+        expect(response.headers['ETag']).not_to eq(full)
+      end
+
       # CORS moved from this action to Rack::Cors middleware, which controller
       # specs do not run. Covered by spec/integration/cors_spec.rb.
     end

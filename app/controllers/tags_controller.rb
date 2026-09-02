@@ -83,14 +83,14 @@ class TagsController < ApplicationController
     set_page_title "Tag ##{@tag.id}"
 
     # Checked before the GML is touched, so a 304 costs no disk read.
-    # iphone_rotate is in the etag because it changes the .gml body, and so is
-    # the JSONP callback.
+    # iphone_rotate is in the etag because it changes the .gml body, and so are
+    # the JSONP callback and preview, which swaps the .json body.
     #
     # #random routes through here and must never validate: a 304 would defeat
     # the point, and a shared cache would pin one "random" tag for everybody.
     if action_name == 'random'
       response.headers['Cache-Control'] = 'no-store'
-    elsif cached_for_api?(etag: [@tag, jsonp_callback, params[:iphone_rotate]],
+    elsif cached_for_api?(etag: [@tag, jsonp_callback, params[:iphone_rotate], params[:preview]],
                           last_modified: @tag.updated_at)
       return
     end
@@ -113,7 +113,11 @@ class TagsController < ApplicationController
       wants.xml   { render xml: @tag.to_xml(dasherize: false, skip_types: true) }
       # CORS headers used to be set by hand here, and only here. Rack::Cors now
       # covers every API format and answers the preflight. See config/initializers/cors.rb.
-      wants.json  { render json: @tag.to_json, callback: jsonp_callback }
+      # ?preview=1 is the grid's cut-down payload. See Tag#preview_data.
+      wants.json do
+        body = params[:preview] ? @tag.preview_data : @tag.to_json
+        render json: body, callback: jsonp_callback
+      end
     end
   end
 
