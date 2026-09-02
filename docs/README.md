@@ -7,7 +7,7 @@ the website and anyone (or anything) working on the repo.
 ## Using the API
 
 - [Downloading GML](api/downloading-gml.md), including CORS, rate limits and caching
-- [Uploading GML](api/uploading-gml.md)
+- [Uploading GML](api/uploading-gml.md), or draw one at [/upload](http://000000book.com/upload)
 - [OpenAPI spec](http://000000book.com/openapi.yaml), the same thing machine-readable
 - [llms.txt](http://000000book.com/llms.txt), a summary for language models
 

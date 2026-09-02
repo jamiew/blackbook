@@ -54,12 +54,19 @@ function row(label, buttons, segmented) {
 }
 
 // localStorage throws outright in some privacy modes, so never assume it.
-function remembered() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch { return null; }
+function stored(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
 }
 
-function remember(state) {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch { /* full, blocked or private */ }
+function store(key, value) {
+  try {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch { /* full, blocked or private */ }
+}
+
+function remembered() {
+  try { return JSON.parse(stored(STORE_KEY)); } catch { return null; }
 }
 
 function apply(player, look) {
@@ -142,7 +149,7 @@ function mount(root) {
   }
 
   function save() {
-    remember({ ...currentLook(player), pane: !pane.hidden });
+    store(STORE_KEY, JSON.stringify({ ...currentLook(player), pane: !pane.hidden }));
   }
 
   // The still the capture app uploaded, if there is one, over the canvas.
@@ -224,17 +231,14 @@ if (browse && browseRoot?.player) {
       player.pause().load(data);
       present(browseRoot, stage, player.tag);
 
-      const id = browseRoot.querySelector('.player__id');
-      id.textContent = `#${data.id}`;
+      browseRoot.querySelector('.player__id').textContent = `#${data.id}`;
       const app = card.querySelector('.tag-card__app')?.textContent.trim();
       const who = card.querySelector('.tag-card__who')?.textContent.replace(/\s+/g, ' ').trim();
       browseRoot.querySelector('.player__context').textContent = [app, who].filter(Boolean).join(' · ');
       document.querySelectorAll('[data-browse-open]').forEach(a => a.setAttribute('href', href));
       document.querySelectorAll('[data-browse-download]').forEach(a => a.setAttribute('href', `${href}.gml`));
-      cards().forEach(other => {
-        if (other === card) other.setAttribute('aria-current', 'true');
-        else other.removeAttribute('aria-current');
-      });
+      cards().forEach(other => other.removeAttribute('aria-current'));
+      card.setAttribute('aria-current', 'true');
 
       if (push) {
         const url = new URL(location);
@@ -282,18 +286,15 @@ const LOGO_KEY = 'blackbook.logo';
 const logo = document.querySelector('[data-logo-default]');
 
 if (logo) {
-  try {
-    const chosen = localStorage.getItem(LOGO_KEY);
-    if (chosen) logo.src = chosen;
-  } catch { /* private */ }
-  document.querySelectorAll('button[data-logo]').forEach(button => {
-    button.addEventListener('click', () => {
-      const src = button.dataset.logo;
+  const chosen = stored(LOGO_KEY);
+  if (chosen) logo.src = chosen;
+
+  // The reset button carries an empty data-logo, which puts the original back.
+  document.querySelectorAll('button[data-logo]').forEach(choice => {
+    choice.addEventListener('click', () => {
+      const src = choice.dataset.logo;
       logo.src = src || logo.dataset.original || logo.src;
-      try {
-        if (src) localStorage.setItem(LOGO_KEY, src);
-        else localStorage.removeItem(LOGO_KEY);
-      } catch { /* private */ }
+      store(LOGO_KEY, src || null);
       document.querySelectorAll('[data-logo-variant]').forEach(v => {
         v.toggleAttribute('data-chosen', v.querySelector('button[data-logo]').dataset.logo === src);
       });
@@ -313,15 +314,14 @@ if (views) {
     buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === name)));
   };
 
-  let saved = null;
-  try { saved = localStorage.getItem(VIEW_KEY); } catch { /* private */ }
+  const saved = stored(VIEW_KEY);
   setView(buttons.some(b => b.dataset.view === saved) ? saved : 'split');
 
   views.addEventListener('click', event => {
-    const button = event.target.closest('button[data-view]');
-    if (!button) return;
-    setView(button.dataset.view);
-    try { localStorage.setItem(VIEW_KEY, button.dataset.view); } catch { /* private */ }
+    const chosen = event.target.closest('button[data-view]');
+    if (!chosen) return;
+    setView(chosen.dataset.view);
+    store(VIEW_KEY, chosen.dataset.view);
   });
 }
 

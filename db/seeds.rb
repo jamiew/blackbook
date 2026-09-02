@@ -1,11 +1,3 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Major.create(name: 'Daley', city: cities.first)
-
 # Development only: the apps that wrote most of the archive, so /apps looks
 # like the real thing, and the dev tags handed out among them so every card
 # has something to play. Idempotent: apps are found by name, and only tags

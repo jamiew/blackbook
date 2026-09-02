@@ -16,7 +16,8 @@ XML by appending an extension to its URL.
 | One tag | `/data/154.gml`, `.json` or `.xml` |
 | Newest tag site-wide | `/latest.gml` |
 | A random tag | `/random.gml` |
-| Filtered list | `/data.json?app=eyewriter`, also `user_id`, `location`, `keywords` |
+| Filtered list | `/data.json?app=eyewriter`, also `user`, `location`, `keywords`, `has=still`, `who=anon`, `year=2010` |
+| For drawing | `/data/154.json?preview=1` (about 300 points) or `?player=1` (everything) |
 | Upload | `POST /data` with a `gml` parameter |
 
 Rendering what you download is covered in

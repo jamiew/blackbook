@@ -26,10 +26,8 @@ if (root) {
   let started = null;
   let player = null;
 
-  const width = () => pad.clientWidth;
-
   function redraw() {
-    const w = width();
+    const w = pad.clientWidth;
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, w, pad.clientHeight);
     ctx.strokeStyle = '#fff';
@@ -38,7 +36,10 @@ if (root) {
     ctx.lineJoin = 'round';
     strokes.forEach(s => {
       ctx.beginPath();
-      s.points.forEach(([x, y], i) => (i ? ctx.lineTo(x * w, y * w) : ctx.moveTo(x * w, y * w)));
+      s.points.forEach(([x, y], i) => {
+        if (i) ctx.lineTo(x * w, y * w);
+        else ctx.moveTo(x * w, y * w);
+      });
       ctx.stroke();
     });
   }
@@ -58,25 +59,24 @@ if (root) {
     return [(event.clientX - rect.left) / rect.width, (event.clientY - rect.top) / rect.width, (now - started) / 1000];
   }
 
-  const fixed = (n, places) => Number(n).toFixed(places);
-
   // GML 1.0, the shape every capture app writes and this site parses.
   function gml() {
     const points = s => s.points.map(([x, y, t]) =>
-      `<pt><x>${fixed(x, 4)}</x><y>${fixed(y, 4)}</y><time>${fixed(t, 3)}</time></pt>`).join('');
+      `<pt><x>${x.toFixed(4)}</x><y>${y.toFixed(4)}</y><time>${t.toFixed(3)}</time></pt>`).join('');
     return '<gml spec="1.0"><tag><header>' +
       `<client><name>000000book.com</name><version>1.0</version><time>${new Date().toISOString()}</time></client>` +
-      `<environment><screenBounds><x>${width()}</x><y>${pad.clientHeight}</y></screenBounds>` +
+      `<environment><screenBounds><x>${pad.clientWidth}</x><y>${pad.clientHeight}</y></screenBounds>` +
       '<up><x>0</x><y>1</y><z>0</z></up></environment></header><drawing>' +
       strokes.map(s => `<stroke>${points(s)}</stroke>`).join('') +
       '</drawing></tag></gml>';
   }
 
   function describe() {
-    const count = strokes.reduce((n, s) => n + s.points.length, 0);
-    const last = strokes.at(-1)?.points.at(-1);
+    const pointCount = strokes.reduce((n, s) => n + s.points.length, 0);
+    const seconds = strokes.at(-1)?.points.at(-1)[2];
+    const label = strokes.length === 1 ? 'stroke' : 'strokes';
     readout.textContent = strokes.length
-      ? `${strokes.length} ${strokes.length === 1 ? 'stroke' : 'strokes'}  //  ${count} pts  //  ${fixed(last[2], 2)}s`
+      ? `${strokes.length} ${label}  //  ${pointCount} pts  //  ${seconds.toFixed(2)}s`
       : 'Draw here';
     root.toggleAttribute('data-empty', !strokes.length);
     if (field) field.value = strokes.length ? gml() : '';
@@ -116,7 +116,13 @@ if (root) {
     if (!strokes.length) return;
     stopPlayback();
     stage.hidden = false;
-    const tag = { id: null, app: '000000book.com', rotate: false, strokes: strokes.map(s => ({ points: s.points.map(p => [...p]) })) };
+    // Copied, so playback cannot reach the points still being drawn.
+    const tag = {
+      id: null,
+      app: '000000book.com',
+      rotate: false,
+      strokes: strokes.map(s => ({ points: s.points.map(p => [...p]) }))
+    };
     player = new GmlPlayer(stage, tag, { loop: false });
     player.play();
   });

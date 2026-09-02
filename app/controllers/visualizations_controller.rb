@@ -79,6 +79,10 @@ class VisualizationsController < ApplicationController
   def current_objects
     @page, @per_page = pagination_params
     which = is_admin? ? Visualization : Visualization.approved
+    # A kind gets a chip only if something listed is written in it. Read before
+    # the filters below, so a chip never disappears because you are standing on it.
+    kinds = which.distinct.pluck(:kind)
+    @kinds = Visualization::KINDS.select { |_, value| value.present? && kinds.include?(value) }
     if params[:user_id]
       @user = User.find_by_param(params[:user_id])
       which = which.where(user_id: @user.id)
@@ -87,7 +91,6 @@ class VisualizationsController < ApplicationController
     @visualizations ||= chipped(which).with_attached_image.includes(:user)
                                       .order(approved_at: :desc, name: :asc)
                                       .paginate(page: @page, per_page: @per_page)
-    @kinds = Visualization::KINDS.select { |_, value| value.present? && kinds_present.include?(value) }
     @samples = sample_tags(@visualizations.map(&:name))
   end
 
@@ -99,19 +102,14 @@ class VisualizationsController < ApplicationController
     scope
   end
 
-  def kinds_present
-    (is_admin? ? Visualization : Visualization.approved).distinct.pluck(:kind)
-  end
-
   # The newest tag made with each app, by name, so a card can play one. Tags
-  # name their app in either of two columns.
+  # name their app in either of two columns. One LIMIT 1 per app: an app like
+  # DustTag has tens of thousands of tags, and loading them to pick one is not
+  # an option.
   def sample_tags(names)
-    return {} if names.empty?
-
-    Tag.where(application: names).or(Tag.where(gml_application: names))
-       .order(created_at: :desc, id: :desc).to_a
-       .group_by { |tag| names.include?(tag.application) ? tag.application : tag.gml_application }
-       .transform_values(&:first)
+    names.index_with do |name|
+      Tag.where(application: name).or(Tag.where(gml_application: name)).order(created_at: :desc, id: :desc).first
+    end.compact
   end
 
   def update_approval_state(obj, enabled)

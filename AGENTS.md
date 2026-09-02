@@ -1,7 +1,7 @@
 # Working on 000000book
 
 An archive of graffiti motion-capture data (GML) running since 2009. Rails 8.1 on
-Ruby 3.4, MySQL, deployed as a container by Kamal.
+Ruby 3.4, MySQL 8.4, deployed as a container by Kamal. No JavaScript build step.
 
 It holds real data for real people: 70,000+ tags and roughly 35 GB of GML files
 and images on a block volume. Most of it cannot be regenerated. Prefer the
@@ -13,32 +13,47 @@ cautious option.
 docker compose up -d     # MySQL 8.4, pinned to the version the server runs
 bundle install
 bin/rails db:prepare
+bin/rails db:seed        # development only: real app names on the test tags
 bundle exec rspec        # needs no environment variables
+bundle exec rubocop
 ```
 
-Development, test and CI all use that MySQL. Development used to point at
-whatever MySQL was on the laptop, which is how a version gap opened up against
-production and hid the utf8mb3 and MyISAM problems for years. Keep them aligned.
-
-`MYSQL_PORT` overrides the port if you run your own server.
+Development, test and CI all use that MySQL. A version gap against production
+once hid the utf8mb3 and MyISAM problems for years; keep them aligned.
+`MYSQL_PORT` overrides the port. Pages 500 while MySQL is down.
 
 ## Before changing a migration
 
-Run `./script/rehearse-migrations.sh`. The test database is built from
-`schema.rb` and has never resembled production, which is still MyISAM and
-utf8mb3. The rehearsal loads production's real table definitions into a
-throwaway MySQL 8.4 and runs the pending set against them. See
-[docs/operations.md](docs/operations.md).
+Run `./script/rehearse-migrations.sh`; it needs SSH to production. The test
+database is built from `schema.rb` and has never resembled production, which is
+still MyISAM and utf8mb3. See [docs/operations.md](docs/operations.md).
 
-Migrations never run automatically on deploy. That is deliberate: the pending set
-drops the `comments` table. Run `rake data:validate` first.
+Migrations never run automatically on deploy. The pending set drops the
+`comments` table. Run `bin/rails data:validate` first.
+
+## Frontend
+
+- `public/canvasplayer/<version>/` is canvasplayer, vendored byte for byte.
+  `SOURCE` there records the commit and how to update. Never edit those files
+  here; changes go upstream first. It sits outside the asset pipeline because
+  Propshaft's fingerprints break the modules' relative imports.
+- Blackbook's own JavaScript is three ES modules listed in
+  `layouts/_template_header.html.haml`: `player.js` (tag page, browse, pane,
+  keys, view switch, logo toggle), `gml_thumbnails.js` (every grid cell) and
+  `recorder.js` (`/upload`). They find the player through
+  `<meta name="canvasplayer">`, set by `ApplicationHelper#canvasplayer_path`.
+- Tag payloads: the page inlines `Tag#player_data`; `.json?preview=1` is
+  `Tag#preview_data` for thumbnails; `.json?player=1` is `player_data` for the
+  browse page's swaps. Rotation is decided on the client with upstream
+  `isLandscape` from the `up` vector each payload carries.
+- Test UI changes with `agent-browser` at 1440 and 390 wide. Thumbnails only
+  draw once their cells scroll into view.
+- `/logos` and the masthead view switch are design tools that ship. Choices
+  live in `localStorage`: `blackbook.view`, `blackbook.logo`,
+  `blackbook.player.v2`.
 
 ## Things that look wrong but are not
 
-- **`public/canvasplayer/` is vendored JavaScript outside the asset pipeline.**
-  Propshaft fingerprints filenames, which breaks the modules' relative
-  imports. `SOURCE` in that directory records the commit and how to update.
-  Never edit those files here; changes go upstream first.
 - **`crypted_password` and `password_salt` are still on `users`.** Accounts
   predating the Authlogic removal have only an scrypt hash, verified against the
   old scheme and rehashed to bcrypt on next login. Dropping these columns logs
@@ -53,8 +68,11 @@ drops the `comments` table. Run `rake data:validate` first.
   can build a real scrypt hash to test legacy login against.
 - **`variant_processor` is `:mini_magick`, not the Rails 8 default of `:vips`.**
   ImageMagick is what the app has always used and what both the Dockerfile and a
-  plain macOS setup already have. `mini_magick` is declared explicitly because
-  `image_processing` 2.x stopped depending on it.
+  plain macOS setup already have.
+- **`db/seeds.rb` renames tags.** In development only, it gives the rate-limit
+  test rows real app names so `/apps` has something to play. It never creates
+  tags: `data/` holds orphan files at the next ids and a new row would overwrite
+  one.
 
 ## Conventions
 
@@ -63,6 +81,7 @@ drops the `comments` table. Run `rake data:validate` first.
 - `script/*.sh` are idempotent and safe to re-run. Keep them that way.
 - Anything that touches production data must be read-only, or say loudly that it
   is not.
+- Keep `PLAN.md` current: what landed, what is next.
 
 ## Don't
 

@@ -8,6 +8,3 @@
       = flash_messages.present? && flash_messages.map(&:to_s).join.html_safe || ''
       = yield :layout
     = render partial: 'layouts/footer'
-
-  - if Rails.env == 'production'
-    = render partial: 'layouts/stats'

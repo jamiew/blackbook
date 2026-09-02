@@ -23,6 +23,9 @@ curl -A curlwriter \
 - `-A` sets a user-agent
 - `-d` is the POST data, which needs only `application` and `gml`
 
+The recorder at [/upload](http://000000book.com/upload) writes a valid file in
+the browser if you want one to test with.
+
 ## Optional fields
 
 These can be specified either in the GML itself **or** via HTTP POST, in which

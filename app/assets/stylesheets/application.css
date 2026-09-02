@@ -888,9 +888,6 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 .signup_or_login input[type="text"],
 .signup_or_login input[type="email"],
 .signup_or_login input[type="password"] { max-width: none; }
-.signup_or_login .remember_me { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
-.signup_or_login .remember_me label { margin: 0; }
-.signup_or_login .remember_me input { width: auto; }
 .signup_or_login .buttons { margin-top: 18px; }
 .signup_or_login .help { margin-top: 16px; padding-top: 14px; border-top: var(--rule); }
 .signup_or_login .help li { margin-bottom: 6px; }

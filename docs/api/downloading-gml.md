@@ -89,7 +89,9 @@ curl 'http://000000book.com/data.json?user=anon-1a2b3'
 ```
 
 Filtering also works on `location` and `keywords`, and pages with `page` and
-`per_page` (default 15, maximum 100).
+`per_page` (default 15, maximum 100). The chips on `/data` are plain
+parameters too and combine: `has=still`, `from=device`, `who=claimed` or
+`who=anon`, and `year=2010`.
 
 Note that `/latest` and `/random` take no filters: they are the newest and a
 random tag across the whole archive. Earlier versions of this page documented

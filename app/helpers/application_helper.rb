@@ -53,9 +53,12 @@ module ApplicationHelper
     on = on.stringify_keys
     active = on.empty? ? keys.none? { |k| params[k].present? } : on.all? { |k, v| params[k].to_s == v.to_s }
     query = request.query_parameters.except('page')
-    query = if on.empty? then query.except(*keys)
-            elsif active then query.except(*on.keys)
-            else query.merge(on)
+    query = if on.empty?
+              query.except(*keys)
+            elsif active
+              query.except(*on.keys)
+            else
+              query.merge(on)
             end
     link_to label, url_for(query.merge(only_path: true)), class: 'chip', 'aria-current' => (active ? 'true' : nil)
   end
@@ -81,14 +84,10 @@ module ApplicationHelper
     link_to label, path, class: css, 'aria-current' => (current ? 'page' : nil)
   end
 
-  # Archive counts for the home page. Cached because Tag.count is a full scan
-  # of ~77k rows.
-  def archive_stats
-    @archive_stats ||= Rails.cache.fetch('archive_stats', expires_in: 5.minutes) do
-      today = Time.current.in_time_zone('Pacific Time (US & Canada)').to_date
-      today_scope = Tag.where('created_at >= ?', today)
-      { total: Tag.count, today: today_scope.count, writers: today_scope.distinct.count(:gml_uniquekey) }
-    end
+  # How many tags the archive holds, for the front page. Cached because
+  # Tag.count is a full scan of ~77k rows.
+  def archive_total
+    Rails.cache.fetch('archive_total', expires_in: 5.minutes) { Tag.count }
   end
 
   def pagination(collection = nil)

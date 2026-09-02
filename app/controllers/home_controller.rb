@@ -45,6 +45,6 @@ class HomeController < ApplicationController
   # Ghetto handling for known-bad URLs -- mapping them here as a blackhole
   def discard
     logger.warn "Discarding request..."
-    render nothing: true, status: :not_modified # Not Modified
+    head :not_modified
   end
 end

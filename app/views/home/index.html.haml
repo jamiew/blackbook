@@ -19,7 +19,7 @@
   = render layout: 'tags/browse', locals: { tag: @tag } do
     .section-head
       %h2 Featured and recent
-      %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_stats[:total])} archived
+      %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_total)} archived
     .tag-grid
       = render partial: 'tags/tag', collection: @tags, as: :tag, locals: { current: @tag }
     %p{ style: 'margin-top: 20px' }= link_to 'View all data →', tags_path, class: 'button'
