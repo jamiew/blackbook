@@ -24,7 +24,8 @@ the website and anyone (or anything) working on the repo.
 
 ## Elsewhere
 
-- [Official GML 1.0 spec](http://graffitimarkuplanguage.com)
+- Official GML 1.0 spec — graffitimarkuplanguage.com is down; use the
+  [2022 snapshot](http://web.archive.org/web/20221225193938/http://graffitimarkuplanguage.com/)
 - [GML syntax validator](http://000000book.com/validator)
 - [Applications using GML](http://000000book.com/apps)
 - [GML mailing list](http://groups.google.com/group/graffiti-markup-language)

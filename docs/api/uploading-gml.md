@@ -6,9 +6,9 @@ registering your app is optional.
 Send an HTTP POST to `http://000000book.com/data` with a payload containing:
 
 - **gml** (text, required) — the complete GML data. Validated for required GML
-  fields, e.g. at least one x/y point. Maximum functional size is around 1 MB.
-- **application** (string, required) — the name of your application. Should be
-  unique.
+  fields, e.g. at least one x/y point.
+- **application** (string) — the name of your application. Not enforced, but
+  send it: it is how uploads are attributed and how `/data?app=` filters.
 
 ## Sample
 

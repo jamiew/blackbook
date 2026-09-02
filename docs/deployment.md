@@ -25,7 +25,7 @@ kamal migrate          # run migrations, deliberately a separate step
 ```
 
 Migrations never run automatically. `bin/docker-entrypoint` omits the `db:prepare`
-that Rails generates, because the pending set drops a 301,076-row table and that
+that Rails generates, because the pending set drops the `comments` table and that
 must not happen because a container restarted or a deploy rolled back.
 
 ## Secrets
@@ -36,8 +36,9 @@ if that resolves to an empty string because the shell variable it references is
 unset. That failure is silent.
 
 - `.kamal/secrets` is committed and contains only references, never values.
-- `.kamal/secrets-common` is gitignored and holds `KAMAL_REGISTRY_PASSWORD`, a
-  GitHub token with the `write:packages` scope.
+- `.kamal/secrets-common` is gitignored and holds `KAMAL_REGISTRY_PASSWORD` (a
+  GitHub token with the `write:packages` scope) and `DATABASE_URL`. Neither may
+  be named in `.kamal/secrets`, or the empty shell value would win.
 
 Application secrets go in Rails encrypted credentials rather than the
 environment. The encrypted file is safe to commit in a public repo, and
@@ -105,8 +106,10 @@ you are still in the SES sandbox.
 not do, so a fresh droplet needs them first:
 
 ```bash
-# 1. Attach the block volume and mount it at /mnt/blackbook_volume, then:
+# 1. Attach the block volume and mount it at /mnt/blackbook_volume, then
+#    create the three directories config/deploy.yml bind-mounts:
 mkdir -p /mnt/blackbook_volume/{blackbook-data,active-storage}
+mkdir -p /mnt/blackbook_volume/blackbook-backup/public/system
 
 # 2. MySQL, matching the version in compose.yaml
 apt-get install -y mysql-server

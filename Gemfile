@@ -42,6 +42,10 @@ gem 'image_processing', '~> 2.0'
 # laptop that still has the gem lying around from 1.x.
 gem 'mini_magick'
 
+# Renders docs/*.md at /docs. GFM out of the box, so the tables and fenced code
+# already in those files come through without a second parser gem.
+gem 'redcarpet'
+
 # Utilities
 gem 'nokogiri', '~> 1.15'
 gem 'will_paginate'
