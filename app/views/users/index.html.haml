@@ -12,7 +12,7 @@
       -# FIXME -- old users failing
       - link = user_path(user) rescue user_path(id: user.to_param)
       %li
-        = link_to image_tag(user.photo.url(:small)), link
+        = link_to image_tag(attachment_url(user, :photo, :small)), link
         = link_to user.login, link
         %br
         %small

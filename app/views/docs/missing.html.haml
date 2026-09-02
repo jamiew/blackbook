@@ -1,0 +1,8 @@
+.docs
+  %article.docs__body
+    %h1 No such page
+    %p
+      That documentation page does not exist. Everything there is:
+    %ul
+      - DocsPage.all.each do |page|
+        %li= link_to page.title, page.url_path

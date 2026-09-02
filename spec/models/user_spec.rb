@@ -23,20 +23,27 @@ RSpec.describe User, type: :model do
       end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
-    it "calls user.reset_perishable_token!" do
-      expect(user).to receive(:reset_perishable_token!)
+    it "sends a token that identifies the user" do
       user.deliver_password_reset_instructions!
+      token = user.generate_token_for(:password_reset)
+      expect(described_class.find_by_token_for(:password_reset, token)).to eq(user)
     end
   end
 
-  describe "#reset_perishable_token!" do
+  describe "password reset tokens" do
     let(:user) { FactoryBot.create(:user) }
 
-    it "changes the user's perishable token" do
-      expect(user.perishable_token).not_to be_blank
-      expect do
-        user.deliver_password_reset_instructions!
-      end.to change(user, :perishable_token)
+    it "stops working once the password changes" do
+      token = user.generate_token_for(:password_reset)
+      expect(described_class.find_by_token_for(:password_reset, token)).to eq(user)
+
+      user.update!(password: 'a-brand-new-one', password_confirmation: 'a-brand-new-one')
+
+      expect(described_class.find_by_token_for(:password_reset, token)).to be_nil
+    end
+
+    it "rejects a token that was not issued here" do
+      expect(described_class.find_by_token_for(:password_reset, 'made-up')).to be_nil
     end
   end
 

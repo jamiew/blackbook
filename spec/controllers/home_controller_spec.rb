@@ -5,7 +5,6 @@ describe HomeController do
 
   before do
     request.env["rack.url_scheme"] = "https"
-    activate_authlogic
   end
 
   it "/ works" do

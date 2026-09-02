@@ -34,8 +34,7 @@ describe UsersController do
     end
 
     it "redirects for a logged-in user on :new" do
-      activate_authlogic
-      UserSession.create(user)
+      login_as_user(user)
       get :new
       expect(response).to be_redirect
       expect(flash[:error]).not_to be_blank
@@ -43,8 +42,7 @@ describe UsersController do
 
     it "redirects for a logged-in user on :create" do
       pending 'USER SIGNUPS DISABLED'
-      activate_authlogic
-      UserSession.create(user)
+      login_as_user(user)
       get :create
       expect(response).to be_redirect
       expect(flash[:error]).not_to be_blank
@@ -81,8 +79,7 @@ describe UsersController do
     let!(:user) { FactoryBot.create(:user) }
 
     before do
-      activate_authlogic
-      UserSession.create(user)
+      login_as_user(user)
     end
 
     it "works on :edit" do
@@ -120,7 +117,6 @@ describe UsersController do
     end
 
     it 'works if you are logged-in' do
-      activate_authlogic
       get :show, params: { id: default_user.login }
       expect(response).to be_successful
     end

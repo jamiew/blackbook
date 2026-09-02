@@ -1,0 +1,30 @@
+# 000000book
+
+> An open archive of motion-captured graffiti, stored as GML (Graffiti Markup
+> Language) files. Running since 2009. Graffiti writers capture tags with tools
+> like Graffiti Analysis, DustTag and the EyeWriter; programmers build new
+> applications and visualizations on the resulting open data.
+
+Every tag is downloadable as GML, JSON or XML. The API needs no key and no SDK:
+append a format to a tag URL to read one, POST to /data to add one.
+
+## Docs
+<% @docs.select(&:reference?).each do |page| -%>
+- [<%= page.title %>](<%= request.base_url %><%= page.url_path %>)<%= ": #{page.summary}" if page.summary.present? %>
+<% end -%>
+
+## API
+
+- [One tag](<%= request.base_url %>/data/154.gml): also .json and .xml
+- [Newest tag](<%= request.base_url %>/latest.gml): site-wide, takes no filters
+- [Random tag](<%= request.base_url %>/random.gml): site-wide
+- [Filtered list](<%= request.base_url %>/data.json?app=eyewriter): also user_id, location, keywords
+- Upload: POST to <%= request.base_url %>/data with a `gml` parameter
+
+## Optional
+<% @docs.reject(&:reference?).each do |page| -%>
+- [<%= page.title %>](<%= request.base_url %><%= page.url_path %>)<%= ": #{page.summary}" if page.summary.present? %>
+<% end -%>
+- [Source code](https://github.com/jamiew/blackbook): Rails, MIT licensed
+- [GML syntax validator](<%= request.base_url %>/validator)
+- [Applications using GML](<%= request.base_url %>/apps)

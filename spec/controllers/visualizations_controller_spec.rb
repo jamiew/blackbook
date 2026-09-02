@@ -4,7 +4,6 @@ describe VisualizationsController do
   render_views
 
   before do
-    activate_authlogic
     @visualization = create(:visualization)
   end
 
@@ -45,7 +44,7 @@ describe VisualizationsController do
   describe "POST #create" do
     before do
       @user = create(:user)
-      UserSession.create(@user)
+      login_as_user(@user)
     end
 
     it "routes from POST /apps" do

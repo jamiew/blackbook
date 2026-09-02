@@ -3,3 +3,6 @@
 # To ban all spiders from the entire site uncomment the next two lines:
 # User-agent: *
 # Disallow: /
+
+# /llms.txt indexes the documentation for language models. It is not an XML
+# sitemap, so it is named here rather than declared with Sitemap:.

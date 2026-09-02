@@ -1,31 +1,193 @@
-#!/bin/sh
+#!/bin/bash
+#
+# Deploy 000000book.
+#
+# Deploys code and restarts. It does NOT run migrations. The pending set
+# includes drop_table on the comments table, so migrating is a separate,
+# deliberate command rather than a side effect of shipping code.
+#
+# Usage:  ./deploy              # deploy origin/main
+#         ./deploy <git-ref>    # deploy a specific branch, tag or SHA
+#
+set -euo pipefail
+
+TARGET_REF="${1:-origin/main}"
+
+# Same .env convention as script/audit-production.sh
+if [ -f ".env" ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "${line// }" ]] && continue
+    [[ "$line" =~ ^[a-zA-Z_][a-zA-Z0-9_]*= ]] && export "${line?}"
+  done < ".env"
+fi
+
+PROD_HOST="${PROD_HOST:-}"
+PROD_USER="${PROD_USER:-}"
+PROD_APP_PATH="${PROD_APP_PATH:-}"
+PROD_URL="${PROD_URL:-https://000000book.com}"
+
+if [ -z "$PROD_HOST" ] || [ -z "$PROD_USER" ] || [ -z "$PROD_APP_PATH" ]; then
+  echo "Set PROD_HOST, PROD_USER and PROD_APP_PATH in .env first." >&2
+  exit 1
+fi
 
 echo "*** Deploying 000000book ***"
-ssh blackbook "
-  echo Hello from the remote server
-  cd ~/blackbook/
-  git fetch --all
-  git reset --hard origin/master
-  ln -fs ~/blackbook-data ~/blackbook/data
-  # ruby --version
-  # cd /home/rails/.rbenv/plugins/ruby-build && git pull && cd -
-  # rbenv install $(cat .ruby-version)
-  echo 'Bundle install...'
-  /home/rails/.rbenv/shims/bundle install --quiet
-  echo 'Running migrations...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/bundle exec rake db:migrate 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
-  echo 'Compiling assets...'
-  RAILS_ENV=production /home/rails/.rbenv/shims/bundle exec rake assets:precompile 2>&1 | grep -v 'previous definition' | grep -v 'already initialized' | grep -v 'WARNING'
-  touch tmp/restart.txt
-  echo 'Restarting service...'
-  sudo systemctl restart blackbook4
-  echo 'All done'
-"
+echo "target:  $TARGET_REF"
+echo "server:  $PROD_USER@$PROD_HOST:$PROD_APP_PATH"
+echo
 
-echo "Testing..."
-for i in {1..10}; do
-  curl -sL -w "%{http_code}" http://000000book.com -o /dev/null; echo
-  sleep 1
+ssh "$PROD_USER@$PROD_HOST" \
+  "APP_PATH='$PROD_APP_PATH' TARGET_REF='$TARGET_REF' PROD_URL='$PROD_URL' bash -s" <<'REMOTE'
+set -euo pipefail
+
+cd "$APP_PATH"
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "FATAL: $APP_PATH is not a git repo"; exit 1; }
+
+PREV_SHA=$(git rev-parse HEAD)
+rollback_hint() {
+  echo
+  echo "To roll back:"
+  echo "  ssh $USER@$(hostname) 'cd $APP_PATH && git reset --hard $PREV_SHA && sudo systemctl restart blackbook4'"
+}
+trap 'echo; echo "DEPLOY FAILED. Nothing further ran."; rollback_hint' ERR
+
+echo "===== preflight ====="
+
+# 1. Refuse to destroy uncommitted work. `git reset --hard` silently discards it,
+#    and this server has carried edited files that exist nowhere else.
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+  echo "FATAL: uncommitted changes on the server. Deploying would destroy them:"
+  git status --porcelain --untracked-files=no
+  echo
+  echo "Save them first:  git -C $APP_PATH diff > ~/server-drift-\$(date -u +%Y%m%d).patch"
+  exit 1
+fi
+echo "ok   working tree clean"
+
+# 2. --prune deletes the stale origin/master ref. Without it the old version of
+#    this script reset to a 2021 commit that no longer exists upstream.
+git fetch --prune --quiet origin
+git rev-parse --verify --quiet "$TARGET_REF" >/dev/null || { echo "FATAL: $TARGET_REF does not resolve"; exit 1; }
+NEW_SHA=$(git rev-parse "$TARGET_REF")
+echo "ok   $TARGET_REF resolves to $NEW_SHA"
+
+if [ "$PREV_SHA" = "$NEW_SHA" ]; then
+  echo "Already at $NEW_SHA. Nothing to deploy."
+  trap - ERR
+  exit 0
+fi
+
+# 3. The GML corpus lives on a block volume behind a symlink. Verify it rather
+#    than recreating it: a wrong `ln -fs` target would hide the whole corpus.
+if [ ! -d data ]; then
+  echo "FATAL: data/ is missing"; exit 1
+fi
+DATA_REAL=$(readlink -f data)
+GML_COUNT=$(find -L data/ -maxdepth 1 -name '*.gml' | head -1000 | wc -l)
+if [ "$GML_COUNT" -eq 0 ]; then
+  echo "FATAL: data/ -> $DATA_REAL contains no .gml files. Volume not mounted?"
+  exit 1
+fi
+echo "ok   data/ -> $DATA_REAL"
+
+# 4. Rails 8 will not boot in production without secret_key_base, and the
+#    encrypted credentials file is useless without the key to decrypt it.
+if [ ! -f config/master.key ] && [ -z "${RAILS_MASTER_KEY:-}" ] && [ -z "${SECRET_KEY_BASE:-}" ]; then
+  if git cat-file -e "$NEW_SHA:config/credentials.yml.enc" 2>/dev/null; then
+    echo "FATAL: $TARGET_REF ships config/credentials.yml.enc but this server has no"
+    echo "       config/master.key, and neither RAILS_MASTER_KEY nor SECRET_KEY_BASE is set."
+    echo "       Rails will not boot. Copy the key over before deploying."
+    exit 1
+  fi
+fi
+echo "ok   secret_key_base available"
+
+# 5. main's database.yml production block is only `url: ENV['DATABASE_URL']`, and
+#    it overwrites the server's gitignored copy on checkout. dotenv-rails is
+#    dev/test only, so .env will not supply it.
+if git show "$NEW_SHA:config/database.yml" 2>/dev/null | grep -q "DATABASE_URL"; then
+  if [ -z "${DATABASE_URL:-}" ]; then
+    echo "FATAL: $TARGET_REF reads DATABASE_URL, which is not set in this environment."
+    echo "       Add it to the blackbook4 systemd unit before deploying."
+    exit 1
+  fi
+fi
+echo "ok   database config resolvable"
+
+# 6. Ruby has to exist before bundler can use it
+WANT_RUBY=$(git show "$NEW_SHA:.ruby-version" 2>/dev/null | tr -d '[:space:]')
+if [ -n "$WANT_RUBY" ] && ! ~/.rbenv/bin/rbenv versions --bare 2>/dev/null | grep -qx "$WANT_RUBY"; then
+  echo "FATAL: $TARGET_REF needs Ruby $WANT_RUBY, which rbenv does not have installed."
+  echo "       Installed: $(~/.rbenv/bin/rbenv versions --bare 2>/dev/null | tr '\n' ' ')"
+  exit 1
+fi
+echo "ok   ruby $WANT_RUBY installed"
+
+echo
+echo "===== deploying $PREV_SHA -> $NEW_SHA ====="
+git log --oneline "$PREV_SHA..$NEW_SHA" | head -20
+echo
+
+BUNDLE=~/.rbenv/shims/bundle
+
+# --detach rather than `git reset --hard` so no local branch pointer moves. The
+# server's `deployed` branch keeps pointing at the last known-good commit, which
+# is one more rollback anchor for free.
+git checkout --detach --quiet "$NEW_SHA"
+
+echo "Bundle install..."
+$BUNDLE install --quiet
+
+echo "Compiling assets..."
+RAILS_ENV=production $BUNDLE exec rake assets:precompile >/dev/null
+
+echo "Restarting service..."
+sudo systemctl restart blackbook4
+
+echo
+echo "===== verifying ====="
+
+# systemd reports active the moment it forks, so give Rails time to boot or crash
+for _ in $(seq 1 30); do
+  sleep 2
+  systemctl is-active --quiet blackbook4 && break
 done
+systemctl is-active --quiet blackbook4 || { echo "FATAL: blackbook4 is not running"; exit 1; }
+echo "ok   service active"
 
+for _ in $(seq 1 30); do
+  CODE=$(curl -sL -o /dev/null -w '%{http_code}' --max-time 10 "$PROD_URL" || echo 000)
+  [ "$CODE" = "200" ] && break
+  sleep 2
+done
+[ "$CODE" = "200" ] || { echo "FATAL: $PROD_URL returned $CODE, not 200"; exit 1; }
+echo "ok   $PROD_URL returns 200"
+
+trap - ERR
+
+echo
+echo "===== pending migrations ====="
+# Reported, never run. See the header comment.
+STATUS=$(RAILS_ENV=production $BUNDLE exec rake db:migrate:status 2>/dev/null || true)
+PENDING=$(printf '%s\n' "$STATUS" | grep -c '^ *down' || true)
+if [ "${PENDING:-0}" -gt 0 ]; then
+  printf '%s\n' "$STATUS" | grep '^ *down' || true
+  echo
+  echo "$PENDING migration(s) pending. They are NOT applied automatically."
+  echo "Check what they destroy first:"
+  echo "  ssh $USER@$(hostname) 'cd $APP_PATH && RAILS_ENV=production $BUNDLE exec rake data:validate'"
+  echo "Then, after a backup:"
+  echo "  ssh $USER@$(hostname) 'cd $APP_PATH && RAILS_ENV=production $BUNDLE exec rake db:migrate'"
+else
+  echo "none"
+fi
+
+echo
+echo "Deployed $NEW_SHA"
+echo "Previous was $PREV_SHA. To roll back:"
+echo "  ./deploy $PREV_SHA"
+REMOTE
+
+echo
 echo "All done"

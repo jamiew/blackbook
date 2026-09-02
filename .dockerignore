@@ -1,0 +1,33 @@
+# Everything the image does not need, and everything it must never contain.
+.git/
+.github/
+.claude/
+.vscode/
+
+# Secrets. master.key arrives at runtime as RAILS_MASTER_KEY, never in a layer.
+.env
+.env.*
+config/master.key
+.kamal/
+config/credentials/*.key
+
+# Local state
+log/*
+tmp/*
+storage/*
+data/*
+public/system/*
+node_modules/
+vendor/bundle/
+
+# Not used in production
+spec/
+compose.yaml
+script/
+# Except the database connection diagnostic, which has to run inside the
+# deployed container to be worth anything.
+!script/db_doctor.rb
+deploy
+README.md
+.rubocop*.yml
+.rspec

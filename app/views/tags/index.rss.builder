@@ -14,7 +14,7 @@ xml.rss version: "2.0" do
         xml.description "Uploader: #{tag_user_link(tag)}<br/>\n
           Application: #{application_link(tag.sexy_app_name)}<br/>\n
           Image:<br/>\n
-          #{image_tag(tag.thumbnail_image)}\n"
+          #{image_tag(tag_thumbnail_url(tag))}\n"
         xml.pubDate tag.created_at.to_fs(:rfc822)
       end
     end

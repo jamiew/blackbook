@@ -1,0 +1,16 @@
+# Local disk in every environment. There is no S3 and no cloud bucket; images
+# have always lived on the block volume next to the GML files, and Active
+# Storage keeps that arrangement.
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# config/deploy.yml bind-mounts the block volume here. Anywhere else and every
+# uploaded and backfilled image is lost with the next container.
+production:
+  service: Disk
+  root: /rails/storage

@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @tags = Tag.order(created_at: :desc).limit(30).includes(:user)
+    @tags = Tag.order(created_at: :desc).limit(30).with_attached_image.includes(:user)
     @tag = (@tags.present? && @tags[0]) || nil
     @prev = (@tags.present? && @tags[1]) || nil
     set_page_title("#000000book - an open database for Graffiti Markup Language (GML) files", false)

@@ -21,7 +21,7 @@
   .left_column
     %p
       / .right{style: 'margin-right: 15px;'}
-      = image_tag(@user.photo.url(:small))
+      = image_tag(attachment_url(@user, :photo, :small))
       = form.file_field :photo, size: 9
 
       %hr

@@ -41,9 +41,11 @@ class TagsController < ApplicationController
     end
 
     @page, @per_page = pagination_params(per_page: 15)
-    @tags ||= Tag.order('tags.created_at DESC').includes(:user).where(@search_context && @search_context[:conditions]).paginate(
-      page: @page, per_page: @per_page
-    )
+    @tags ||= Tag.order('tags.created_at DESC')
+                 .with_attached_image
+                 .includes(user: { photo_attachment: :blob })
+                 .where(@search_context && @search_context[:conditions])
+                 .paginate(page: @page, per_page: @per_page)
     @applications ||= Tag.select("DISTINCT application AS name")
                          .where.not(application: [nil, ""])
                          .order(:name)
@@ -172,7 +174,7 @@ class TagsController < ApplicationController
 
   # Upload an image for a tag if one doesn't already exist (for GMLImageRenderer)
   def thumbnail
-    render plain: 'thumbnail already exists', status: :conflict and return if @tag.image.exists?
+    render plain: 'thumbnail already exists', status: :conflict and return if @tag.image.attached?
 
     @tag.image = params[:image]
     @tag.save!

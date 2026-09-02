@@ -4,24 +4,27 @@ describe FavoritesController do
   render_views
 
   before do
-    activate_authlogic
     @user = FactoryBot.create(:user)
     @tag = FactoryBot.create(:tag)
   end
 
   describe "GET#index" do
-    it "fails if not logged-in" do
-      current_user_session.destroy
-      expect { get :index }.to raise_error
+    it "sends anonymous visitors to login rather than blowing up" do
+      logout
+      get :index
+      expect(response).to redirect_to(login_path)
+      expect(flash[:error]).to include('logged in')
     end
 
     it "works with no user_id" do
+      login_as_user(@user)
       get :index
       expect(response).to be_successful
       expect(assigns(:user)).to eq(current_user)
     end
 
     it "works with user_id but ignore it" do
+      login_as_user(@user)
       get :index, params: { user_id: @user.id }
       expect(response).to be_successful
       expect(assigns(:user)).to eq(current_user)
@@ -36,7 +39,7 @@ describe FavoritesController do
     end
 
     it "fails if not logged-in" do
-      current_user_session.destroy
+      logout
       post :create, params: { tag_id: @tag.id }
       expect(response).not_to be_successful
       expect(flash[:error]).not_to be_blank

@@ -32,21 +32,31 @@ class Visualization < ApplicationRecord
 
   after_create :create_notification
 
-  has_attached_file :image,
-                    default_style: :medium,
-                    # default_url: "/images/defaults/app_:style.jpg",
-                    default_url: "/images/defaults/app_:style.jpg",
-                    url: "/system/:class/:attachment/:id/:basename_:style.:extension",
-                    # path: ":rails_root/public/system/:class/:attachment/:id/:basename_:style.:extension",
-                    styles: { large: '600x600>', medium: "300x300>", small: '100x100#', tiny: "32x32#" }
-  # validates_attachment_presence :image
-  # TODO: remove :if conditionals; only needed with new version of Paperclip + Rails 2.3 (???); Weird bug.
-  validates_attachment_content_type :image, content_type: ['image/jpeg', 'image/pjpeg', 'image/jpg', 'image/gif', 'image/png', 'image/x-png'], message: "Your thumbnail is not a valid image filetype (we accept JPG, PNG & GIF)", if: lambda { |e|
-    e.image_file_name.present?
-  }
-  validates_attachment_size :image, less_than: 1.megabyte, message: 'Your thumbnail must be less than 1 megabyte (MB).', if: lambda { |e|
-    e.image_file_name.present?
-  }
+  has_one_attached :image do |attachable|
+    attachable.variant :large,  resize_to_limit: [600, 600]
+    attachable.variant :medium, resize_to_limit: [300, 300]
+    attachable.variant :small,  resize_to_fill:  [100, 100]
+    attachable.variant :tiny,   resize_to_fill:  [32, 32]
+  end
+
+  def default_image_url(style) = "/images/defaults/app_#{style}.jpg"
+  # Rails 8 validates attachments directly, so the Paperclip-era :if guards on
+  # image_file_name are gone. Backfilled images are exempt: some predate these
+  # rules and would make otherwise valid records unsaveable.
+  validate :image_is_a_supported_size_and_type, if: -> { image.attached? && image.changed_for_autosave? }
+
+  SUPPORTED_IMAGE_TYPES = %w[image/jpeg image/pjpeg image/jpg image/gif image/png image/x-png].freeze
+  MAX_IMAGE_SIZE = 1.megabyte
+
+  def image_is_a_supported_size_and_type
+    unless SUPPORTED_IMAGE_TYPES.include?(image.content_type)
+      errors.add(:image, "Your thumbnail is not a valid image filetype (we accept JPG, PNG & GIF)")
+    end
+
+    return unless image.byte_size > MAX_IMAGE_SIZE
+
+    errors.add(:image, 'Your thumbnail must be less than 1 megabyte (MB).')
+  end
 
   def approved?
     approved_at && approved_at < Time.zone.now

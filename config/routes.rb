@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  # Kamal will not send traffic to a container that fails this, so a broken
+  # boot stops at the proxy instead of reaching anyone.
+  get '/up', to: 'rails/health#show', as: :rails_health_check
+
   # Old/bad URLs to send to /dev/null
   # TODO handle inside nginx or similar instead! Yeesh
   get '/temp.png', controller: 'home', action: 'discard', as: 'discard_temp_png'
@@ -58,6 +62,13 @@ Rails.application.routes.draw do
   get '/activity' => 'home#activity', as: 'activity'
 
   get '/about' => 'home#about', as: 'about'
+
+  # The repo's docs/ served as pages. `format: false` so a slug ending in
+  # something like .md is passed through rather than parsed as a format.
+  get '/docs' => 'docs#show', as: 'docs'
+  get '/docs/*path' => 'docs#show', as: 'doc', format: false
+  get '/api' => redirect('/docs/api'), as: 'api'
+  get '/llms.txt' => 'docs#llms', as: 'llms'
 
   root controller: 'home', action: 'index'
 end
