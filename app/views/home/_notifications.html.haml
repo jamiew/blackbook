@@ -16,7 +16,7 @@
           - when Tag
             - tag = notif.subject
             - user = tag.user
-            %td.thumbnail= image_tag(tag.remote_image || attachment_url(tag, :image, :small), height: '50', style: 'border: 1px solid #444')
+            %td.thumbnail= image_tag(tag.remote_image || attachment_url(tag, :image, :small), alt: '', height: '50', style: 'border: 1px solid #444')
             %td
               = link_to tag_title(tag), url_for(notif.subject)
               -# currently no user = API, and Tag should parse application name out of the GML
@@ -42,7 +42,7 @@
             - obj = fave.object
             -#FIXME assuming it's a Tag...
             - if obj.class == Tag
-              %td.thumbnail= image_tag(obj.remote_image || attachment_url(obj, :image, :small), height: '50', style: 'border: 1px solid #444')
+              %td.thumbnail= image_tag(obj.remote_image || attachment_url(obj, :image, :small), alt: '', height: '50', style: 'border: 1px solid #444')
             %td
               = link_to notif.user.login, user_path(notif.user)
               favorited

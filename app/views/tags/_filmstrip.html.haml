@@ -10,7 +10,7 @@
     - tags.each do |neighbour|
       - who = neighbour.user&.login || neighbour.secret_username || 'anon'
       %li
-        %a.strip__cell{ href: tag_path(neighbour), 'aria-current' => (neighbour == current ? 'page' : nil),
+        %a.strip__cell{ href: tag_path(neighbour), 'aria-current' => (neighbour == current ? 'page' : nil), 'aria-label' => "Tag ##{neighbour.id}",
                         title: "##{neighbour.id} · #{neighbour.sexy_app_name.presence || 'upload'} · #{who}" }
           %canvas{ data: { preview: tag_path(neighbour, format: :json, preview: 1) }, 'aria-label' => "Tag ##{neighbour.id}" }
   - if newer

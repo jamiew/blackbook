@@ -57,7 +57,6 @@ class User < ApplicationRecord
     update_column(:password_digest, ::BCrypt::Password.create(password))
   end
 
-  # FIXME: manually reimplmenting this for now...
   # should we just use friendly_id?
   # has_slug :login
 
@@ -73,7 +72,6 @@ class User < ApplicationRecord
   validates :iphone_uniquekey, uniqueness: { message: "has already been claimed by another user! If you believe this is an error email the admins => info@000000book.com" }, on: :save, unless: lambda {
     iphone_uniquekey.blank?
   }
-  # TODO: email regex validation
 
   has_one_attached :photo do |attachable|
     attachable.variant :medium, resize_to_limit: [300, 300]
@@ -123,7 +121,6 @@ class User < ApplicationRecord
     old_tags = Tag.claimed.where(gml_uniquekey: iphone_uniquekey_was)
     old_tags.update_all(user_id: nil)
 
-    logger.debug "User#activate_device_pairing: associated #{new_tags.length} new tags from #{iphone_uniquekey.inspect}; disassociated #{old_tags.length} old tags from previous key #{iphone_uniquekey_was.inspect}"
     true # ??
   end
 end

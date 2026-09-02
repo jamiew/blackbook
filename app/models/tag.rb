@@ -93,10 +93,6 @@ class Tag < ApplicationRecord
     valid_gml: 3001,
     rotated: 3000,
     bad_binary_data: 5198
-    # empty: TODO
-    # invalid_gml: TODO
-    # tempt1_eyesaver: TODO
-    # TODO one from each iPhone app
   }.freeze
 
   def gml_object
@@ -105,7 +101,6 @@ class Tag < ApplicationRecord
   end
 
   def gml_object=(obj)
-    # Rails.logger.debug "Tag #{id}: gml_object="
     self._gml_object = obj
   end
 
@@ -134,7 +129,6 @@ class Tag < ApplicationRecord
   def from_iphone?
     app_matcher = /(DustTag|Dust Tag|Fat Tag|Katsu)/
     (gml_application =~ app_matcher || application =~ app_matcher).present?
-    # puts "from_iphone?(#{self.gml_application} || #{self.application}) = #{test}"
   end
 
   # The device uniqueKey is a credential, not metadata: anyone holding one can
@@ -154,7 +148,6 @@ class Tag < ApplicationRecord
 
   # Smart wrapper for the GML data, actually stored in `GmlObject.data`
   def gml(opts = {})
-    # Rails.logger.debug "Tag #{id}: gml"
     return nil if gml_object.blank? || gml_object.data.blank?
     return rotated_gml if opts[:iphone_rotate].to_s == '1' # handoff for backwards compt; DEPRECATEME
 
@@ -163,13 +156,11 @@ class Tag < ApplicationRecord
   end
 
   def data
-    # Rails.logger.debug "Tag #{id.inspect}: data"
     # rotate_gml
     gml
   end
 
   def data=(arg)
-    # Rails.logger.debug "Tag #{id.inspect}: data="
     # raise "why are you doing tag.data="
     @gml_temp = arg
     gml_object.data = arg
@@ -177,25 +168,21 @@ class Tag < ApplicationRecord
 
   # HACK: around todd's player not rotating, swap x/y for 90 deg turn for iphone
   def rotated_gml
-    # Rails.logger.debug "Tag #{id}: rotated_gml (cached)"
     Rails.cache.fetch(rotated_gml_cache_key) { rotate_gml.to_s }
   end
 
   # Proxy; will be processed on save
   def gml=(fresh)
-    # FIXME: wtf is going on
     if fresh.is_a?(ActionDispatch::Http::UploadedFile)
       Rails.logger.warn "Warning, reading data from ActionDispatch::Http::UploadedFile"
       fresh = fresh.read
     end
 
-    # Rails.logger.debug "Tag #{id}: gml= (#{fresh[0..100]}"
     @gml_temp = fresh
   end
 
   # the GML data (String) as a Hash (w/ caching, conversion is an expensive operation)
   def gml_hash
-    # Rails.logger.debug "Tag #{id}: gml_hash"
     @gml_hash ||= Rails.cache.read(gml_hash_cache_key)
     if @gml_hash.blank?
       @gml_hash = convert_gml_to_hash
@@ -213,6 +200,10 @@ class Tag < ApplicationRecord
   # The player repairs it and reports what it had to do, so bad captures stay
   # visible instead of being silently smoothed over here.
   def player_data
+    @player_data ||= build_player_data
+  end
+
+  def build_player_data
     drawing = gml_hash.dig('gml', 'tag', 'drawing') || gml_hash.dig('GML', 'tag', 'drawing') || {}
     header  = gml_hash.dig('gml', 'tag', 'header') || gml_hash.dig('GML', 'tag', 'header') || {}
     env     = gml_hash.dig('gml', 'tag', 'environment') || gml_hash.dig('GML', 'tag', 'environment') || {}
@@ -246,6 +237,34 @@ class Tag < ApplicationRecord
       rotate: landscape_capture?(env),
       client: header.dig('client', 'name'),
       strokes: strokes }
+  end
+
+  # The stage's shape before the player mounts, so the page does not jump
+  # when it does. Mirrors present() in player.js: the drawing's bounds after
+  # rotation, clamped so a lone stroke cannot become a full screen of black.
+  def stage_ratio
+    points = player_data[:strokes].flat_map { |stroke| stroke[:points] }
+    return 1.333 if points.empty?
+
+    points = points.map { |x, y, _t| [y, 1 - x] } if landscape_capture?
+    xs = points.map(&:first)
+    ys = points.pluck(1)
+    width = xs.max - xs.min
+    height = ys.max - ys.min
+    width = 0.1 if width < 1e-4
+    height = 0.1 if height < 1e-4
+    (width / height).clamp(0.75, 2).round(3)
+  end
+
+  # What the player's head shows before JS has repaired the timeline: strokes,
+  # points, seconds, and whether the capture was sideways. player.js replaces
+  # it with the repaired numbers, in the same shape, so nothing moves.
+  def readout
+    strokes = player_data[:strokes]
+    points = strokes.sum { |stroke| stroke[:points].size }
+    seconds = strokes.flat_map { |stroke| stroke[:points] }.map(&:last).max || 0
+    ["#{strokes.size} #{strokes.size == 1 ? 'stroke' : 'strokes'}", "#{points} pts", format('%05.2fs', seconds),
+     (landscape_capture? ? 'rot 90°' : nil)].compact.join('  //  ')
   end
 
   # player_data cut down for a grid of thumbnails: every Nth point, three
@@ -292,7 +311,6 @@ class Tag < ApplicationRecord
   # `only:` is forced rather than left to the caller, so a controller cannot
   # forget it. In ActiveRecord `only` beats any `except` a caller passes.
   def as_json(opts = {})
-    # Rails.logger.debug "Tag #{id}: as_json"
     hash = super(opts.merge(only: PUBLIC_ATTRIBUTES))
     hash.reject! { |_k, v| v.blank? }
     hash[:gml] = gml_hash && gml_hash['gml']
@@ -306,13 +324,11 @@ class Tag < ApplicationRecord
   # Options still pass through to Hash#to_xml because Array#to_xml calls this
   # for each element with :builder, :root and :skip_instruct set.
   def to_xml(options = {})
-    # Rails.logger.debug "Tag #{id}: to_xml"
     attributes.slice(*PUBLIC_ATTRIBUTES).compact_blank.to_xml(options)
   end
 
   # GML as a Nokogiri object...
   def gml_document
-    # Rails.logger.debug "Tag #{id}: gml_document"
     return nil if gml.blank?
 
     @document ||= Nokogiri::XML(gml)
@@ -323,7 +339,6 @@ class Tag < ApplicationRecord
 
   # Read the important bits of the GML -- also called by the save_header :before_save hook
   def gml_header
-    # Rails.logger.debug "Tag #{id}: gml_header"
     # doc = self.class.read_gml_header(self.gml)
     doc = gml_document
 
@@ -374,7 +389,6 @@ class Tag < ApplicationRecord
     end
 
     # encode the uniquekey with SHA-1 immediately
-    # FIXME this slows this method down significantly -- denormalize whole hash to the model on save...?
     attrs[:gml_uniquekey_hash] = self.class.hash_uniquekey(attrs[:gml_uniquekey]) if attrs[:gml_uniquekey].present?
 
     attrs
@@ -383,9 +397,6 @@ class Tag < ApplicationRecord
   # def self.read_gml_header(gml)
   #   # DRY with Tag.new.gml_document
   #   doc = Nokogiri::XML(self.gml)
-  # end
-
-  # TODO: inject 000000book infos into this GML...
 
   # Dump some chars from the uniquekey as a Secret User Codename
   def secret_username
@@ -395,13 +406,11 @@ class Tag < ApplicationRecord
   end
 
   # Sexify the app name (this could be a helper)
-  # TODO: link
   def sexy_app_name
-    # puts "gml_application=#{gml_application.inspect} application=#{application.inspect}"
     (application.present? && application) || (gml_application.present? && gml_application) || ''
   end
 
-  # Favorites-related -- TODO this should be elsewhere/via named_scopes
+  # Favorites
   def favorited_by?(user)
     Favorite.where('object_id = ? AND object_type = ? AND user_id = ?', id, self.class.to_s, user.id).any?
   end
@@ -414,7 +423,6 @@ class Tag < ApplicationRecord
   end
 
   def convert_gml_to_hash
-    # Rails.logger.debug "Tag #{id}: convert_gml_to_hash"
     return {} if public_gml.blank?
 
     # Built from public_gml, not gml_document, so the nested `gml` in a .json
@@ -430,7 +438,6 @@ class Tag < ApplicationRecord
   end
 
   def rotate_gml
-    # Rails.logger.debug "Tag #{id}: rotate_gml"
     doc = gml_document
     strokes = (doc / 'drawing' / 'stroke')
     strokes.each do |stroke|
@@ -449,20 +456,15 @@ class Tag < ApplicationRecord
   # Parse and build errors & warnings
   # Not actually used as a validation, but
   def validate_gml
-    # Rails.logger.debug "Tag #{id}: validate_gml"
     doc = gml_document
     errors = []
     warnings = []
     recommendations = []
 
-    # TODO: use nested tags -- e.g. stroke/pt/t rather than just t
     errors << check_for_tag('stroke', "No <stroke> tags - at least 1 stroke required")
     errors << check_for_tag('pt', "No <pt> tags - GML requires at least 1 point. This isn't 'EmptyML'")
-    # TODO: iterate through each pt to ensure each has x/y's -- not just any x/y
     errors << check_for_tag('x', "Missing <x> tags inside your <pt>'s")
     errors << check_for_tag('y', "Missing <y> tags inside your <pt>'s")
-
-    # TODO: parse & verify all pt values are between 0 and 1.0
 
     warnings << check_for_tag('time',
                               "No <time> tags in your <pt> tags! Capturing time data makes things much more interesting.")
@@ -492,8 +494,6 @@ class Tag < ApplicationRecord
     validation_results[:warnings] = warnings.compact if warnings.present?
     validation_results[:recommendations] = recommendations.compact if recommendations.present?
 
-    Rails.logger.debug "GML Validation Results..."
-    Rails.logger.debug validation_results.inspect
     return validation_results
   end
 
@@ -505,13 +505,6 @@ class Tag < ApplicationRecord
 
   # before_create hook to copy over our temp data & then read our GML /
   def build_gml_object
-    Rails.logger.debug do
-      "Tag #{id}: build_gml_object ... current gml attribute is #{begin
-        attributes['gml'].length
-      rescue StandardError
-        nil
-      end} bytes"
-    end
     obj = GmlObject.new(tag_id: id) # tag_id nil if we're unsaved, but not if it's old or being fixed
     obj.data = @gml_temp || attributes['gml']
     self.gml_object = obj
@@ -522,13 +515,11 @@ class Tag < ApplicationRecord
 
   # after_create hook to finalize the GmlObject
   def save_gml_object
-    # Rails.logger.debug "Tag #{id}: save_gml_object..."
-    gml_object.tag_id ||= id # FIXME? fail-safe for if you build object pre-save, when tag has no id
+    gml_object.tag_id ||= id
     gml_object.save!
   end
 
   def copy_gml_temp_to_gml_object
-    # Rails.logger.debug "Tag #{id}: copy_gml_temp_to_gml_object..."
     return if gml_object.nil? || @gml_temp.blank?
 
     gml_object.data = @gml_temp
@@ -543,33 +534,27 @@ class Tag < ApplicationRecord
       send("#{k}=", v) if respond_to?(k) && v.present?
       [k, v]
     end.to_hash
-    # puts "Tag.save_header: #{attrs.inspect}"
   end
 
   # assign a user if there's a paired iPhone uniquekey
   def find_paired_user
-    Rails.logger.debug { "Tag.find_paired_user: self.gml_uniquekey=#{gml_uniquekey}" }
     return if gml_uniquekey.blank?
 
     user = User.find_by(iphone_uniquekey: gml_uniquekey)
     return if user.nil?
 
-    Rails.logger.debug { "Pairing with user=#{user.login.inspect}" }
     self.user = user
   end
 
   # extract some information from the GML
   # and insert our server signature
-  # FIXME duplicating some stuff from save_header
   def process_gml
-    Rails.logger.debug { "Tag #{id}: process_gml" }
     doc = gml_document
     return if doc.nil?
 
     header = (doc / 'header')
     if header.blank?
       Rails.logger.error "Tag.process_gml: no header found in GML"
-      # TODO: raise exception
       return nil
     end
 
@@ -613,10 +598,6 @@ class Tag < ApplicationRecord
   end
 
   def check_for_gml_object
-    if gml_object.nil?
-      Rails.logger.error "ERROR: Missing gml_object for Tag #{id}"
-    elsif !gml_object.valid?
-      # Rails.logger.warn "Warning: Invalid gml_object for Tag #{self.id}"
-    end
+    Rails.logger.error "ERROR: Missing gml_object for Tag #{id}" if gml_object.nil?
   end
 end

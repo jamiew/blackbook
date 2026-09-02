@@ -83,14 +83,21 @@ function currentLook(player) {
   };
 }
 
+const sameLook = (a, b) => a.mode === b.mode &&
+  [...a.effects].sort().join() === [...b.effects].sort().join() &&
+  [...a.layers].sort().join() === [...b.layers].sort().join();
+
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Fit the stage to the drawing and fill the head's readout. Called on mount
-// and again whenever the browse page swaps the tag.
-function present(root, stage, tag) {
-  // The stage takes the drawing's own proportions, within reason.
-  const { x0, x1, y0, y1 } = tag.bounds;
-  stage.style.aspectRatio = Math.min(Math.max((x1 - x0) / (y1 - y0), 0.75), 2);
+// Fit the stage to the drawing and fill the head's readout. Called on mount,
+// and again without reshaping whenever the browse page swaps the tag, so the
+// grid under it holds still.
+function present(root, stage, tag, reshape = true) {
+  if (reshape) {
+    // The stage takes the drawing's own proportions, within reason.
+    const { x0, x1, y0, y1 } = tag.bounds;
+    stage.style.aspectRatio = Math.min(Math.max((x1 - x0) / (y1 - y0), 0.75), 2);
+  }
 
   const meta = root.querySelector('[data-player-meta]');
   if (!meta) return;
@@ -165,6 +172,10 @@ function mount(root) {
   // gml-ui's switches read their state once, when built, so the pane is
   // rebuilt whenever something changes it from outside a switch.
   function build() {
+    const now = currentLook(player);
+    looks.querySelectorAll('button').forEach(chip => {
+      chip.setAttribute('aria-pressed', String(sameLook(LOOKS[chip.dataset.look], now)));
+    });
     pane.innerHTML = '';
     if (still) {
       const live = button('Live', () => showStill(false));
@@ -179,6 +190,18 @@ function mount(root) {
     }))));
     switches(player, pane);
   }
+
+  // The looks stay in the stage's corner, dim until the pointer is near; the
+  // pane behind Controls has the rest.
+  const looks = el('div', 'player__looks');
+  looks.setAttribute('role', 'group');
+  looks.setAttribute('aria-label', 'Look');
+  Object.keys(LOOKS).forEach(name => {
+    const chip = button(name, () => { apply(player, LOOKS[name]); build(); save(); });
+    chip.dataset.look = name;
+    looks.append(chip);
+  });
+  stage.append(looks);
 
   // Any button in the pane changes something worth remembering. The button's
   // own handler runs first, so this reads the state after the change.
@@ -232,7 +255,7 @@ if (browse && browseRoot?.player) {
       swapping = true;
       player.pause().load(data);
       swapping = false;
-      present(browseRoot, stage, player.tag);
+      present(browseRoot, stage, player.tag, false);
 
       browseRoot.querySelector('.player__id').textContent = `#${data.id}`;
       const app = card.querySelector('.tag-card__app')?.textContent.trim();

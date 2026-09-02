@@ -177,16 +177,13 @@ class TagsController < ApplicationController
     end
 
     if params[:check] == 'connected' # DustTag weirdness?
-      logger.debug "connected check"
       head :ok
       return
     end
 
     if params[:tag].present? # sent by the form
-      logger.debug "sent by the form"
       create_from_form
     elsif params[:gml].present? # sent from an app!
-      logger.debug "sent from an app"
       create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
@@ -212,7 +209,6 @@ class TagsController < ApplicationController
     else
       flash[:error] = "Could not destroy tag: #{@tag.errors.full_messages.to_sentence}"
     end
-    # redirect_to(tags_path)
     redirect_back_or_to(root_path)
   end
 
@@ -248,7 +244,6 @@ class TagsController < ApplicationController
 
     respond_to do |wants|
       wants.html { render 'validator' }
-      # FIXME: to_xml does the fuckin' <hash> thing :(
       joined_hash = @tag.validation_results.transform_values { |v| v.join(";\n") }
       wants.xml   { render xml: joined_hash.to_xml(dasherize: false, skip_types: true) }
       # callback: belongs on render, not on to_json, which ignores it. Passing it
@@ -265,26 +260,12 @@ class TagsController < ApplicationController
   end
 
   def require_owner
-    logger.debug "require_owner (tag.id=#{begin
-      @tag.id
-    rescue StandardError
-      nil
-    end}): current_user=#{begin
-      current_user.id
-    rescue StandardError
-      nil
-    end}; tag.user.id=#{begin
-      @tag.user.id
-    rescue StandardError
-      nil
-    end}"
     raise NoPermissionError unless current_user && @tag && (@tag.user == current_user || is_admin?)
   end
 
   # Create a tag uploaded w/o a user or authentication, via the ghetto-API
   # this is currently used for tempt from the Eyewriter, but will be expanded...
   def create_from_api
-    # TODO: add app uuid? or Hash app uuid?
     opts = {
       gml: params[:gml],
       ip: request.remote_ip,
@@ -319,10 +300,7 @@ class TagsController < ApplicationController
     # Read the GML uploaded gml file and dump it into the GML field
     # GML file overrides anything in the textarea -- that was probably accidental input
     file = params[:tag][:gml_file]
-    if file
-      logger.debug "Reading from GML file = #{file.inspect}"
-      params[:tag][:gml] = file.read
-    end
+    params[:tag][:gml] = file.read if file
 
     # Build object with permitted params. The owner is assigned off the session, never
     # mass-assigned: `permit` drops non-scalars, so a User in params silently vanished.
@@ -332,9 +310,7 @@ class TagsController < ApplicationController
     # GML data of some kind is required -- catching this ourselves due to GmlObject complexity...
     # Allowing screenshot-only's for now... delete later.
     # if params[:tag].blank? || params[:tag][:gml].blank?
-    #   @tag.errors.add("You must provide valid GML data to upload (no screenshots only, sorry)")
     #   raise "bad GML data"
-    # end
 
     @tag.save!
     flash[:notice] = "Tag created"
@@ -359,12 +335,9 @@ class TagsController < ApplicationController
   end
 
   def convert_app_id_to_app_name
-    Rails.logger.debug "#convert_app_id_to_app_name"
-
     # Sub in an existing application if specified...
     return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
 
-    # FIXME: use internal ids if available? string matching all the time is ghetto
     app = begin
       Visualization.find(params[:tag][:existing_application_id])
     rescue StandardError
@@ -373,7 +346,6 @@ class TagsController < ApplicationController
     params[:tag][:application] = app.name if app.present?
   end
 
-  # TODO: this should be a Sweeper...
   def expire_caches
     formats = [nil, 'json', 'gml', 'xml', 'rss', 'txt']
 

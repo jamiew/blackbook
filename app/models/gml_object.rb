@@ -2,7 +2,6 @@ class GmlObject
   attr_accessor :tag_id
 
   def initialize(**opts)
-    # Rails.logger.debug "GmlObject.new opts=#{opts.inspect}"
     self.tag_id = opts[:tag_id]
     self.tag_id ||= opts[:tag]&.try(:id)
 
@@ -30,12 +29,10 @@ class GmlObject
   end
 
   def data
-    # Rails.logger.debug "*** GmlObject #data..."
     @_data
   end
 
   def data=(args)
-    # Rails.logger.debug "*** GmlObject #data=, #{args.try(:length).inspect} bytes"
     @_data = args
   end
 
@@ -45,7 +42,6 @@ class GmlObject
   end
 
   def valid?
-    # Rails.logger.debug "GmlObject.valid? data?=#{data.present?} tag?=#{tag_id.present?}"
     data.present? && tag_id.present?
   end
 

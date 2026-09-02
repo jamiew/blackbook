@@ -63,7 +63,6 @@ class VisualizationsController < ApplicationController
     redirect_back_or_default(@visualization)
   end
 
-  # DRY?
   def unapprove
     update_approval_state(@visualization, false)
     flash[:notice] = "App was unapproved"
@@ -86,7 +85,6 @@ class VisualizationsController < ApplicationController
     if params[:user_id]
       @user = User.find_by_param(params[:user_id])
       which = which.where(user_id: @user.id)
-      # TODO: set page_title etc. Also handle all this logic less if/elsify
     end
     @visualizations ||= chipped(which).with_attached_image.includes(:user)
                                       .order(approved_at: :desc, name: :asc)
@@ -113,7 +111,6 @@ class VisualizationsController < ApplicationController
   end
 
   def update_approval_state(obj, enabled)
-    logger.debug "hi from update_approval_state obj=#{obj.inspect}"
     obj.approved_at = (enabled ? Time.zone.now : nil)
     obj.approved_by = (enabled ? current_user.id : nil)
     obj.save!

@@ -64,6 +64,7 @@ h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700; line-height: 1.04; letter-
   letter-spacing: -0.01em;
   line-height: 1.05;
   text-transform: none;
+  text-wrap: balance;
 }
 p { margin: 0 0 1em; }
 ul, ol, dl, dd { margin: 0; padding: 0; }
@@ -138,6 +139,7 @@ textarea:focus-visible,
 .masthead__nav { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 
 .masthead__nav a {
+  padding: 6px 0;
   font-family: var(--mono);
   font-size: var(--meta-size);
   letter-spacing: var(--meta-tracking);
@@ -150,6 +152,7 @@ textarea:focus-visible,
 .masthead__nav a[aria-current="page"]::before { content: "● "; color: var(--accent); }
 
 .masthead__account { display: flex; align-items: center; gap: 16px; }
+.masthead__account a { padding: 6px 0; }
 .masthead__account img { width: 22px; height: 22px; border-radius: 50%; }
 
 /* A row of label/value readings. The writer profile uses it for tags,
@@ -197,11 +200,11 @@ textarea:focus-visible,
 
 .page__title { font-size: clamp(1.5rem, 3vw, 2.25rem); }
 
-.page__lede { color: var(--dim); max-width: 46ch; margin: 0; }
+.page__lede { color: var(--dim); max-width: 46ch; margin: 0; text-wrap: pretty; }
 
 /* A way back, above the title. A link, not a label. */
 .crumb { font-family: var(--mono); font-size: var(--meta-size); color: var(--dim); margin: 0 0 8px; }
-.crumb a { border-bottom-color: var(--line); color: var(--dim); }
+.crumb a { border-bottom-color: var(--line); color: var(--dim); padding: 4px 0; }
 .crumb a:hover { color: var(--accent); }
 
 /* The front page: the tags and the player's readout, no labels around them. */
@@ -304,6 +307,7 @@ th {
   border-bottom: var(--rule);
 }
 td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: middle; }
+td a { padding: 4px 0; }
 
 /* --- pagination --------------------------------------------------------- */
 
@@ -372,7 +376,8 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 }
 /* The id is the label. Display face, not mono, and the one thing in the head
    set in mixed case. */
-.player__id { font-size: 1.35rem; color: var(--ink); margin: 0; }
+.player__id { font-size: 1.35rem; color: var(--ink); margin: 0; padding: 2px 0; }
+.player__context a { padding: 4px 0; }
 .player__context { color: var(--dim); }
 .player__context a { color: var(--ink); border-bottom-color: var(--line); }
 .player__context a:hover { color: var(--accent); }
@@ -413,7 +418,8 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   color: var(--warn);
 }
 
-.player__transport { padding: 10px 14px; border-top: 1px solid var(--line); }
+/* The height it will have once transport() fills it, so nothing below jumps. */
+.player__transport { min-height: 50px; padding: 10px 14px; border-top: 1px solid var(--line); }
 
 .gml-transport,
 .gml-switches {
@@ -658,7 +664,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   letter-spacing: 0.05em;
 }
 .specs__row--wide { grid-column: 1 / -1; }
-.specs__key { color: var(--dimmer); text-transform: uppercase; font-size: 10px; letter-spacing: 0.12em; }
+.specs__key { color: var(--dimmer); text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; }
 .specs__value { color: var(--ink); overflow-wrap: anywhere; }
 .specs__value a { border-bottom-color: var(--line); }
 .specs__value--null { color: var(--dimmer); }
@@ -776,9 +782,38 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   overflow-x: auto;
 }
 
+/* The looks in the stage's corner, dim until the pointer is near. */
+.player__looks {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  opacity: 0.55;
+  transition: opacity 120ms;
+}
+.player__stage:hover .player__looks,
+.player__looks:focus-within { opacity: 1; }
+.player__looks button {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: var(--meta-tracking);
+  text-transform: uppercase;
+  min-height: 24px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--dim);
+  border: 1px solid var(--line-bright);
+  cursor: pointer;
+}
+.player__looks button:hover { color: var(--ink); }
+.player__looks button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #000; }
+
 /* Previous and next on the browse player. */
 .player__step {
   width: 30px;
+  min-height: 28px !important;
   min-width: 0 !important;
   padding: 0 !important;
   font-size: 16px !important;
@@ -827,7 +862,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   background: var(--surface);
   padding: 24px;
 }
-.signup_or_login h2 {
+.signup_or_login h1 {
   font-size: 1.5rem;
   font-variation-settings: "wdth" 108;
   text-transform: uppercase;
@@ -849,7 +884,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 .signup_or_login .buttons { margin-top: 18px; }
 .signup_or_login .help { margin-top: 16px; padding-top: 14px; border-top: var(--rule); }
 .signup_or_login .help li { margin-bottom: 6px; }
-.signup_or_login .help a { font-family: var(--mono); font-size: var(--meta-size); color: var(--dim); }
+.signup_or_login .help a { font-family: var(--mono); font-size: var(--meta-size); color: var(--dim); padding: 4px 0; }
 
 /* --- about -------------------------------------------------------------- */
 
@@ -917,7 +952,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   color: var(--dimmer);
 }
 .footer nav { display: flex; flex-wrap: wrap; gap: 18px; }
-.footer a { border: 0; color: var(--dim); }
+.footer a { border: 0; color: var(--dim); padding: 6px 0; }
 .footer a:hover { color: var(--accent); }
 
 /* --- responsive --------------------------------------------------------- */
@@ -935,6 +970,15 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   .masthead__nav { gap: 16px; order: 3; width: 100%; }
   .player__stage { aspect-ratio: 1 / 1; }
   .strip__hint { display: none; }
+  .player__looks { opacity: 0.8; }
+  /* The transport wraps its timeline onto a second row here. */
+  .player__transport { min-height: 94px; }
+  /* Three rows, always: id, context, readout. A shorter context after a
+     swap would otherwise climb up beside the id and move everything below. */
+  .player__context, .player__meta { flex-basis: 100%; }
+  /* The buttons row sits on a wrap threshold at 390px; a little slack stops
+     it flickering a third row while fonts arrive. */
+  .gml-transport .rate, .player__debug { min-width: 0; }
   .about__hero figcaption { position: static; transform: none; max-width: none; padding: 12px; }
   .strip__cell { width: 84px; height: 56px; }
   .tag-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }

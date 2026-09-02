@@ -1,9 +1,9 @@
+- content_for :description, 'What has been uploaded, registered and favorited lately on 000000book.'
+.page__head
+  %div
+    %h1.page__title Activity
+  %p.page__lede.meta= "#{number_with_delimiter(@notifications.total_entries)} events"
 
-%h2 Recent Database Activity
-%p
-  &larr;
-  = link_to "back to home", root_path
-
-= pagination(@notifications)
-= render partial: 'notifications', object: @notifications #not :collection
-%p= pagination(@notifications)
+= render partial: 'notifications', object: @notifications
+%nav{ 'aria-label' => 'Pagination', style: 'margin-top: 28px' }
+  = pagination(@notifications)

@@ -105,7 +105,6 @@ class Visualization < ApplicationRecord
 
   def reject_if_any_html
     attributes.each do |key, value|
-      # Rails.logger.warn "Visualization field #{key} contains HTML: #{value} -- objects=#{self.inspect}"
       errors.add(key, "is invalid") if value.present? && value.instance_of?(String) && value.match(/href=/)
     end
   end

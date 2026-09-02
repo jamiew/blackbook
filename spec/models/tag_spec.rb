@@ -292,6 +292,37 @@ RSpec.describe Tag, type: :model do
     end
   end
 
+  describe '#readout' do
+    it 'counts strokes and points and formats the seconds like the player' do
+      tag = tag_with_gml(<<~GML)
+        <drawing><stroke>
+          <pt><x>0.25</x><y>0.5</y><time>0</time></pt>
+          <pt><x>0.75</x><y>0.5</y><time>0.4</time></pt>
+        </stroke></drawing>
+      GML
+      expect(tag.readout).to eq('1 stroke  //  2 pts  //  00.40s')
+      expect(tag_with_environment(up_x: 1, up_y: 0).readout).to end_with('rot 90°')
+    end
+  end
+
+  describe '#stage_ratio' do
+    it 'is the drawing\'s width over its height, clamped' do
+      wide = tag_with_gml(<<~GML)
+        <drawing><stroke>
+          <pt><x>0.1</x><y>0.4</y><time>0</time></pt>
+          <pt><x>0.9</x><y>0.5</y><time>1</time></pt>
+        </stroke></drawing>
+      GML
+      expect(wide.stage_ratio).to eq(2.0)
+      tall = tag_with_gml('<drawing><stroke><pt><x>0.5</x><y>0.1</y><time>0</time></pt><pt><x>0.5</x><y>0.9</y><time>1</time></pt></stroke></drawing>')
+      expect(tall.stage_ratio).to eq(0.75)
+    end
+
+    it 'turns with a landscape capture' do
+      expect(tag_with_environment(up_x: 1, up_y: 0).stage_ratio).to eq(1.0)
+    end
+  end
+
   describe '#preview_data' do
     it 'keeps about PREVIEW_POINTS points, always including the last' do
       pts = (0..999).map { |i| "<pt><x>#{i / 1000.0}</x><y>0.5</y><time>#{i / 100.0}</time></pt>" }.join
