@@ -27,6 +27,10 @@ gem 'authlogic', require: false
 
 # API/Controllers
 gem 'responders', '~> 3.0'
+# Cross-origin access to the read API, and the OPTIONS preflight that goes with
+# it. Middleware rather than per-action headers so it also covers .gml and .xml,
+# and so preflight is answered before routing and before the beta auth gate.
+gem 'rack-cors'
 
 # File uploads. Active Storage handles attachments; kt-paperclip is gone, and
 # with it the pin holding marcel at 1.x. The *_file_name columns stay until the

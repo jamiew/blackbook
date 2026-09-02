@@ -1,30 +1,48 @@
 # 000000book
 
-> An open archive of motion-captured graffiti, stored as GML (Graffiti Markup
-> Language) files. Running since 2009. Graffiti writers capture tags with tools
-> like Graffiti Analysis, DustTag and the EyeWriter; programmers build new
-> applications and visualizations on the resulting open data.
+> An open archive of Graffiti Markup Language (GML) files, running since 2009.
+> Tens of thousands of graffiti motion-capture tags. Everything is public and
+> anonymous: there is no API key, and none is needed.
 
-Every tag is downloadable as GML, JSON or XML. The API needs no key and no SDK:
-append a format to a tag URL to read one, POST to /data to add one.
+GML is an XML format that records a graffiti tag as timed stroke points, so the
+same gesture can be replayed by a laser projector, a browser canvas, or a robot
+arm. Every endpoint below allows cross-origin requests from any origin, and also
+accepts a `?callback=` parameter for JSONP.
 
-## Docs
+Reads are limited to 300 requests a minute per IP address, uploads to 30 an hour.
+Responses carry `ETag` and `Last-Modified`; send `If-None-Match` and you will get
+a `304` instead of a body. Please do that if you are polling.
+
+## Endpoints
+
+Base URL `<%= request.base_url %>`.
+
+- `GET /data.json` — list tags, newest first. Filter with `app`, `user`,
+  `location` or `keywords`. Page with `page` and `per_page` (default 15, max 100).
+  Also available as `.xml` and `.rss`.
+- `GET /data/{id}.json` — one tag, with its full GML parsed into nested JSON.
+- `GET /data/{id}.gml` — the raw GML file. This is the canonical format.
+- `GET /data/{id}.xml` — tag metadata only, without the GML.
+- `GET /latest.gml` — the most recently uploaded tag. Takes no filters.
+- `GET /random.gml` — a random tag. Takes no filters.
+- `POST /data` — upload a tag. Send `gml` and `application`. Returns the new
+  tag's id as plain text. No authentication.
+- `POST /validate.json` — check a GML document. Send `gml`. Returns errors,
+  warnings and recommendations.
+- `GET /apps.json` — applications that read or write GML.
+
+`.json` on a single tag includes the whole GML document as nested JSON, so you
+do not have to parse XML. `.xml` is metadata only.
+
+## Documentation
 <% @docs.select(&:reference?).each do |page| -%>
 - [<%= page.title %>](<%= request.base_url %><%= page.url_path %>)<%= ": #{page.summary}" if page.summary.present? %>
 <% end -%>
-
-## API
-
-- [One tag](<%= request.base_url %>/data/154.gml): also .json and .xml
-- [Newest tag](<%= request.base_url %>/latest.gml): site-wide, takes no filters
-- [Random tag](<%= request.base_url %>/random.gml): site-wide
-- [Filtered list](<%= request.base_url %>/data.json?app=eyewriter): also user_id, location, keywords
-- Upload: POST to <%= request.base_url %>/data with a `gml` parameter
+- [OpenAPI spec](<%= request.base_url %>/openapi.yaml): the same endpoints, machine-readable
 
 ## Optional
 <% @docs.reject(&:reference?).each do |page| -%>
 - [<%= page.title %>](<%= request.base_url %><%= page.url_path %>)<%= ": #{page.summary}" if page.summary.present? %>
 <% end -%>
-- [Source code](https://github.com/jamiew/blackbook): Rails, MIT licensed
+- [Source code](https://github.com/jamiew/blackbook): the Rails app serving this
 - [GML syntax validator](<%= request.base_url %>/validator)
-- [Applications using GML](<%= request.base_url %>/apps)

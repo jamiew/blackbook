@@ -84,6 +84,22 @@ SES SMTP credentials are **not** AWS access keys; generate a separate pair in th
 [sandboxed](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html)
 and can only send to verified addresses until you request production access.
 
+The sender comes from the `ses.from` credential, applied as
+`config.action_mailer.default_options`. Do not add a `default from:` to
+`ApplicationMailer`: a mailer-class default overrides that config, which is how
+mail spent years claiming to come from `000book.com`, a domain we no longer use.
+The fallback for development and test is in `config/application.rb`.
+
+To check a change before a bounce tells you about it:
+
+```bash
+./script/send-test-email.sh you@example.com
+```
+
+It sends one real message through the production settings while reading nothing
+from production. A rejection naming the *recipient* means the sender is fine and
+you are still in the SES sandbox.
+
 ## A new host
 
 `kamal setup` does everything above the operating system. Four things it does

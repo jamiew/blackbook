@@ -1,0 +1,332 @@
+# Hand-maintained. There are only a handful of endpoints, so a generator gem
+# would be more machinery than this is worth. If you change a route or a
+# response shape, change it here too.
+openapi: 3.1.0
+
+info:
+  title: 000000book
+  version: "1.0.0"
+  summary: An open archive of Graffiti Markup Language (GML) files.
+  description: |
+    GML records a graffiti tag as timed stroke points, so the same gesture can be
+    replayed by a laser projector, a browser canvas or a robot arm. This archive
+    has been running since 2009.
+
+    Everything here is public and anonymous. There is no API key and none is
+    needed. All endpoints allow cross-origin requests from any origin, and also
+    accept a `callback` query parameter for JSONP.
+
+    Reads are limited to 300 requests a minute per IP address, uploads to 30 an
+    hour. Over the limit you get a `429` with a `Retry-After` header. Responses
+    carry `ETag` and `Last-Modified`, so send `If-None-Match` when polling.
+  license:
+    name: See repository
+    url: https://github.com/jamiew/blackbook
+
+servers:
+  - url: https://000000book.com
+
+tags:
+  - name: tags
+    description: GML tags, the archive's primary resource
+  - name: apps
+    description: Applications that read or write GML
+
+paths:
+  /data.json:
+    get:
+      tags: [tags]
+      summary: List tags, newest first
+      operationId: listTags
+      parameters:
+        - { name: app, in: query, schema: { type: string }, description: Filter by application name }
+        - { name: user, in: query, schema: { type: string }, description: Filter by anonymous device codename, e.g. anon-1a2b3 }
+        - { name: location, in: query, schema: { type: string } }
+        - { name: keywords, in: query, schema: { type: string } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 15 } }
+        - $ref: '#/components/parameters/Callback'
+      responses:
+        '200':
+          description: A page of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tag' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /data/{id}.json:
+    get:
+      tags: [tags]
+      summary: One tag, with its GML parsed into nested JSON
+      description: Saves you parsing XML. The `gml` property holds the whole document.
+      operationId: getTag
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Callback'
+      responses:
+        '200':
+          description: The tag
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tag' }
+        '304': { description: Unchanged since the ETag you sent }
+        '404': { description: No such tag }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /data/{id}.gml:
+    get:
+      tags: [tags]
+      summary: The raw GML file
+      description: The canonical format. This is the actual document that was uploaded.
+      operationId: getTagGml
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - name: iphone_rotate
+          in: query
+          schema: { type: boolean }
+          description: Rotate the coordinates 90 degrees, for tags captured in portrait
+      responses:
+        '200':
+          description: A GML document
+          content:
+            application/xml:
+              schema: { type: string }
+        '304': { description: Unchanged since the ETag you sent }
+        '404': { description: No such tag }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /data/{id}.xml:
+    get:
+      tags: [tags]
+      summary: Tag metadata only, without the GML
+      operationId: getTagMetadata
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Tag metadata
+          content:
+            application/xml:
+              schema: { type: string }
+        '404': { description: No such tag }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /latest.gml:
+    get:
+      tags: [tags]
+      summary: The most recently uploaded tag
+      description: |
+        Made for installations that want the freshest GML. Also available as
+        `.json` and `.xml`. Poll it with `If-None-Match` and you will mostly get
+        `304`s.
+      operationId: getLatestTag
+      responses:
+        '200':
+          description: A GML document
+          content:
+            application/xml:
+              schema: { type: string }
+        '304': { description: Nothing new since the ETag you sent }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /random.gml:
+    get:
+      tags: [tags]
+      summary: A random tag
+      description: Also available as `.json` and `.xml`.
+      operationId: getRandomTag
+      responses:
+        '200':
+          description: A GML document
+          content:
+            application/xml:
+              schema: { type: string }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /data:
+    post:
+      tags: [tags]
+      summary: Upload a tag
+      description: |
+        No authentication. Include a `<uniqueKey>` in your GML and users can pair
+        their account with your app to claim their uploads.
+      operationId: createTag
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [gml, application]
+              properties:
+                gml:
+                  type: string
+                  description: The GML document. Around 1 MB is the practical limit.
+                application:
+                  type: string
+                  description: Your app's name, so uploads can be attributed to it
+                keywords: { type: string }
+                location: { type: string }
+                username: { type: string }
+                author: { type: string }
+      responses:
+        '200':
+          description: The new tag's id, as plain text
+          content:
+            text/plain:
+              schema: { type: string }
+        '422':
+          description: The GML was rejected. The body says why.
+          content:
+            text/plain:
+              schema: { type: string }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /validate.json:
+    post:
+      tags: [tags]
+      summary: Check a GML document without uploading it
+      operationId: validateGml
+      parameters:
+        - $ref: '#/components/parameters/Callback'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [gml]
+              properties:
+                gml: { type: string }
+      responses:
+        '200':
+          description: What is wrong with it, if anything
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors: { type: array, items: { type: string } }
+                  warnings: { type: array, items: { type: string } }
+                  recommendations: { type: array, items: { type: string } }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /apps.json:
+    get:
+      tags: [apps]
+      summary: List applications that read or write GML
+      operationId: listApps
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200':
+          description: A page of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/App' }
+
+  /apps/{id}.json:
+    get:
+      tags: [apps]
+      summary: One application
+      operationId: getApp
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: The application
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/App' }
+        '404': { description: No such application }
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+    Callback:
+      name: callback
+      in: query
+      schema: { type: string }
+      description: Wrap the response in this function call, for JSONP. Prefer CORS.
+
+  responses:
+    TooManyRequests:
+      description: Over the rate limit
+      headers:
+        Retry-After:
+          schema: { type: integer }
+          description: Seconds to wait before trying again
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: { type: string }
+
+  schemas:
+    Tag:
+      type: object
+      description: |
+        A GML tag. Blank fields are omitted rather than sent as null, so do not
+        assume every property is present.
+      properties:
+        id: { type: integer }
+        application: { type: string, description: The app that uploaded it }
+        author: { type: string }
+        comment_count: { type: integer }
+        created_at: { type: string, format: date-time }
+        description: { type: string }
+        gml_application: { type: string, description: The app named inside the GML itself }
+        gml_keywords: { type: string }
+        gml_username: { type: string }
+        gml_version: { type: string }
+        image_content_type: { type: string }
+        image_file_name: { type: string }
+        image_file_size: { type: integer }
+        image_updated_at: { type: string, format: date-time }
+        likes_count: { type: integer }
+        location: { type: string }
+        remote_image: { type: string }
+        slug: { type: string }
+        title: { type: string }
+        updated_at: { type: string, format: date-time }
+        uuid: { type: string }
+        gml:
+          type: object
+          description: The whole GML document, parsed. Present on single-tag responses.
+
+    App:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        authors: { type: string }
+        website: { type: string }
+        download: { type: string }
+        kind:
+          type: string
+          description: Language or platform
+          enum: ['', flash, javascript, cpp, openframeworks, processing, ruby, python, java, other]
+        version: { type: string }
+        approved_at: { type: string, format: date-time }
+        is_embeddable: { type: boolean }
+        embed_url: { type: string }
+        embed_code: { type: string }
+        embed_params: { type: string }
+        embed_callback: { type: string }
+        image_content_type: { type: string }
+        image_file_name: { type: string }
+        image_file_size: { type: integer }
+        slug: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }

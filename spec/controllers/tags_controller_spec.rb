@@ -158,12 +158,8 @@ describe TagsController do
         expect(response.body).to match("\"gml\":")
       end
 
-      it "has CORS header set permissively" do
-        get :show, params: { id: @tag.to_param, format: 'json' }
-        expect(response.headers['Access-Control-Allow-Origin']).to eq('*')
-        expect(response.headers['Access-Control-Allow-Methods']).to eq('GET, OPTIONS')
-        expect(response.headers['Access-Control-Max-Age']).to eq("1728000")
-      end
+      # CORS moved from this action to Rack::Cors middleware, which controller
+      # specs do not run. Covered by spec/integration/cors_spec.rb.
     end
 
     it ".gml should fail gracefully if GML data file is missing" do

@@ -6,7 +6,8 @@
     -#TODO: select the currently active link
     %li= link_to 'data', tags_path
     %li= link_to 'applications', visualizations_path
-    %li= link_to 'API/docs', "https://github.com/jamiew/blackbook/wiki/", target: '_blank'
+    -# The wiki this used to point at is archived; the docs live in the repo now
+    %li= link_to 'API/docs', "https://github.com/jamiew/blackbook/tree/main/docs", target: '_blank'
     %li= link_to 'about', "/about"
     - if false
       %li= link_to 'activity', activity_path
