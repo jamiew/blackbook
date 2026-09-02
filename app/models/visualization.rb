@@ -9,7 +9,7 @@ class Visualization < ApplicationRecord
     id approved_at authors created_at description download
     embed_callback embed_code embed_params embed_url
     image_content_type image_file_name image_file_size
-    is_embeddable kind name slug updated_at version website
+    is_embeddable kind name slug source_url updated_at version website
   ].freeze
 
   # Everything else, so that adding a column without deciding which list it
@@ -43,9 +43,12 @@ class Visualization < ApplicationRecord
   validates :authors, presence: { message: "can't be blank, put your username if nothing else" }, on: :create
   # validates :website, presence: { message: "can't be blank" }, on: :create
   validates :embed_url, presence: { message: "can't be blank" }, on: :create, if: :is_embeddable
+  validates :source_url, format: { with: %r{\Ahttps?://}, message: 'must start with http:// or https://' }, allow_blank: true
   validate :reject_if_any_html
 
   scope :approved, -> { where('approved_at < ?', Time.zone.now) }
+  # Open source means the code is somewhere you can read it.
+  scope :open_source, -> { where.not(source_url: [nil, '']) }
   scope :pending, -> { where('approved_at IS NULL OR approved_at > ?', Time.zone.now) }
 
   after_create :create_notification

@@ -34,7 +34,7 @@
   -# Propshaft doesn't read sprockets `//= require` directives, so each file is listed here.
   -# `rails-ujs` ships with actionview and drives data-method/data-confirm on links.
   = javascript_include_tag 'rails-ujs', 'application'
-  = javascript_include_tag 'player', 'gml_thumbnails', type: 'module'
+  = javascript_include_tag 'player', 'gml_thumbnails', 'recorder', type: 'module'
   = csrf_meta_tags
 
   = yield :head

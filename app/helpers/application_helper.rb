@@ -46,6 +46,20 @@ module ApplicationHelper
     ['/canvasplayer/6.0.0', file].compact.join('/')
   end
 
+  # A link that turns one filter on, or off when it already is, keeping the
+  # other filters and everything else in the query. `keys` are the page's
+  # filters; an empty `on` is the All chip, which clears them.
+  def filter_chip(label, on = {}, keys:)
+    on = on.stringify_keys
+    active = on.empty? ? keys.none? { |k| params[k].present? } : on.all? { |k, v| params[k].to_s == v.to_s }
+    query = request.query_parameters.except('page')
+    query = if on.empty? then query.except(*keys)
+            elsif active then query.except(*on.keys)
+            else query.merge(on)
+            end
+    link_to label, url_for(query.merge(only_path: true)), class: 'chip', 'aria-current' => (active ? 'true' : nil)
+  end
+
   def html_attrs(lang = 'en-US')
     { lang: lang }
   end
@@ -60,9 +74,11 @@ module ApplicationHelper
     @flash_messages ||= messages
   end
 
-  def nav_link(label, path, active: [])
-    current = active.include?(controller_name)
-    link_to label, path, 'aria-current' => (current ? 'page' : nil)
+  # `active` names the controllers a section covers; with none given the link
+  # is current only on its own page.
+  def nav_link(label, path, active: [], css: nil)
+    current = active.include?(controller_name) || (active.empty? && current_page?(path))
+    link_to label, path, class: css, 'aria-current' => (current ? 'page' : nil)
   end
 
   # Archive counts for the home page. Cached because Tag.count is a full scan

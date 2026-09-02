@@ -27,6 +27,25 @@ describe VisualizationsController do
       expect(response).to be_successful
       expect(response.body).to include(@visualization.name)
     end
+
+    it "narrows by language and by open source" do
+      @visualization.update!(approved_at: 1.hour.ago, kind: 'javascript')
+      closed = create(:visualization, approved_at: 1.hour.ago, kind: 'processing', source_url: nil)
+      @visualization.update!(source_url: 'https://github.com/example/app')
+      get :index, params: { kind: 'javascript' }
+      expect(assigns(:visualizations)).to contain_exactly(@visualization)
+      get :index, params: { source: 'open' }
+      expect(assigns(:visualizations)).to contain_exactly(@visualization)
+      expect(assigns(:visualizations)).not_to include(closed)
+      expect(response.body).to match(/<a[^>]*aria-current="true"[^>]*>Open source</)
+    end
+
+    it "plays a tag made with the app on its card" do
+      @visualization.update!(approved_at: 1.hour.ago)
+      tag = create(:tag, application: @visualization.name)
+      get :index
+      expect(response.body).to include(%(data-preview="/data/#{tag.id}.json?preview=1"))
+    end
   end
 
   describe "GET #show" do
@@ -45,6 +64,14 @@ describe VisualizationsController do
       @visualization.update!(website: nil)
       get :show, params: { id: @visualization.id }
       expect(response).to be_successful
+    end
+
+    it "plays the newest tag made with the app" do
+      create(:tag, gml_application: @visualization.name)
+      newest = create(:tag, application: @visualization.name)
+      get :show, params: { id: @visualization.id }
+      expect(assigns(:sample)).to eq(newest)
+      expect(response.body).to include('data-gml-player')
     end
 
     it "404s if that record does not exist" do
@@ -69,8 +96,10 @@ describe VisualizationsController do
       unique_name = "test_#{rand(100_000)}"
       expect do
         post :create,
-             params: { visualization: { name: unique_name, description: 'test', authors: 'test', embed_url: 'test' } }
+             params: { visualization: { name: unique_name, description: 'test', authors: 'test', embed_url: 'test',
+                                        source_url: 'https://github.com/example/app' } }
         expect(response).to be_redirect
+        expect(Visualization.find_by(name: unique_name).source_url).to eq('https://github.com/example/app')
         expect(flash[:notice]).not_to be_blank
         expect(flash[:error]).to be_blank
       end.to change(Visualization, :count).by(1)

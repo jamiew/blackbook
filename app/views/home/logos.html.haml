@@ -1,0 +1,25 @@
+- @noindex = true
+.page__head
+  %div
+    %span.eyebrow Design
+    %h1.page__title Logo variants
+    %p.page__lede
+      The wordmark without its tagline, with the badge kept, and four remixes from Glif. Pick one and the
+      masthead uses it in this browser until you reset.
+  %button.button.button--quiet{ type: 'button', data: { logo: '' } } Reset to the original
+
+- variants = [['original', '/images/000000book-logo-beta.png', 'As shipped, with the tagline.'],
+              ['clean', '/images/logo/clean.png', 'The same artwork with the tagline cut off.'],
+              ['fat-marker', '/images/logo/fat-marker.jpg', 'Glif remix: marker weight with drips. Reads correctly.'],
+              ['hairline', '/images/logo/hairline.jpg', 'Glif remix: one thin line. The model wrote "co1"; a redo would fix it.'],
+              ['chrome', '/images/logo/chrome.jpg', 'Glif remix: chrome piece letters. Same "co1" slip.'],
+              ['skeleton', '/images/logo/skeleton.jpg', 'Glif remix: plotter path with a yellow start. Same slip.']]
+.logos
+  - variants.each do |name, src, note|
+    .logos__variant{ data: { logo_variant: name } }
+      .logos__masthead
+        = image_tag src, alt: "#000000book.com wordmark, #{name} variant", class: 'logos__image'
+      .logos__meta
+        %span.meta= name
+        %span.logos__note= note
+        %button.button{ type: 'button', data: { logo: src } } Use in masthead

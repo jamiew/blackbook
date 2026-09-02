@@ -557,6 +557,23 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 .filters select { width: auto; min-width: 190px; max-width: 100%; }
 .filters__spacer { flex: 1 1 auto; }
 
+/* --- chips -------------------------------------------------------------- */
+/* Filters that combine. The active ones are lit. */
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: -8px 0 24px; }
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: var(--meta-tracking);
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  color: var(--dim);
+}
+.chip:hover { color: var(--ink); border-color: var(--line-bright); }
+.chip[aria-current] { color: #000; background: var(--accent); border-color: var(--accent); }
+.chips__gap { width: 10px; }
+
 /* --- home --------------------------------------------------------------- */
 
 /* One line on what this is. On the front page it sits above the browse
@@ -732,6 +749,67 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 .masthead__view button:hover { color: var(--ink); border-color: var(--line-bright); position: relative; z-index: 1; }
 .masthead__view button[aria-pressed="true"] { color: #000; background: var(--accent); border-color: var(--accent); }
 
+/* --- upload ------------------------------------------------------------- */
+
+/* The one loud item in the nav. */
+.masthead__nav a.masthead__upload { color: var(--accent); border: 1px solid var(--accent); padding: 4px 9px; }
+.masthead__nav a.masthead__upload:hover { background: var(--accent); color: #000; }
+.masthead__nav a.masthead__upload[aria-current="page"]::before { content: none; }
+
+.upload-apps { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 0; }
+.upload-apps .specs__value {
+  font-family: var(--display);
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 1.45;
+  color: var(--dim);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+.upload-apps strong { color: var(--ink); }
+
+.recorder { border: var(--rule); background: var(--surface); }
+/* max-height transfers through aspect-ratio into a max-width, so on a wide
+   screen the pad is narrower than its frame; it sits centred in it. */
+.recorder__stage {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  max-height: 60vh;
+  margin: 0 auto;
+  background: var(--ground);
+  touch-action: none;
+  cursor: crosshair;
+}
+.recorder__pad, .recorder__play { position: absolute; inset: 0; width: 100%; height: 100%; }
+.recorder__play[hidden] { display: none; }
+.recorder__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; border-top: var(--rule); }
+.recorder__bar form { display: contents; }
+.recorder[data-empty] [data-recorder-upload],
+.recorder[data-empty] [data-recorder-play],
+.recorder[data-empty] [data-recorder-download] { opacity: 0.4; pointer-events: none; }
+
+.upload-curl {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--surface);
+  border: var(--rule);
+  padding: 12px 14px;
+  margin: 0 0 12px;
+  overflow-x: auto;
+}
+
+/* --- logos (design tool) ----------------------------------------------- */
+
+.logos { display: grid; gap: 1px; background: var(--line); border: var(--rule); }
+.logos__variant { background: var(--ground); display: grid; grid-template-columns: minmax(0, 1fr) 300px; align-items: center; }
+.logos__masthead { padding: 20px var(--gutter); border-right: var(--rule); }
+.logos__image { height: 56px; width: auto; }
+.logos__meta { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.logos__note { color: var(--dim); font-size: 14px; }
+.logos__variant[data-chosen] { outline: 1px solid var(--accent); outline-offset: -1px; }
+
 /* --- profile & people --------------------------------------------------- */
 
 .profile {
@@ -892,6 +970,8 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   .player__stage { aspect-ratio: 1 / 1; }
   .strip__hint { display: none; }
   .masthead__view { display: none; }
+  .logos__variant { grid-template-columns: minmax(0, 1fr); }
+  .logos__masthead { border-right: 0; }
   .about__hero figcaption { position: static; transform: none; max-width: none; padding: 12px; }
   .strip__cell { width: 84px; height: 56px; }
   .tag-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }

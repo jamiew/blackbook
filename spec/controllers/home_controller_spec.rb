@@ -36,6 +36,13 @@ describe HomeController do
     end
   end
 
+  it "/upload explains how to make a tag and lets you draw one" do
+    get :upload
+    expect(response).to be_successful
+    expect(response.body).to include('Fat Tag')
+    expect(response.body).to include('data-gml-recorder')
+  end
+
   it "/about works" do
     get :about
     expect(response.body).to include('About')

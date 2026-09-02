@@ -13,6 +13,7 @@ class VisualizationsController < ApplicationController
 
   def show
     set_page_title @visualization.name
+    @sample = sample_tags([@visualization.name])[@visualization.name]
     respond_with @visualization do |format|
       format.html {}
       format.js
@@ -83,9 +84,34 @@ class VisualizationsController < ApplicationController
       which = which.where(user_id: @user.id)
       # TODO: set page_title etc. Also handle all this logic less if/elsify
     end
-    @visualizations ||= which.with_attached_image.includes(:user)
-                             .order(approved_at: :desc, name: :asc)
-                             .paginate(page: @page, per_page: @per_page)
+    @visualizations ||= chipped(which).with_attached_image.includes(:user)
+                                      .order(approved_at: :desc, name: :asc)
+                                      .paginate(page: @page, per_page: @per_page)
+    @kinds = Visualization::KINDS.select { |_, value| value.present? && kinds_present.include?(value) }
+    @samples = sample_tags(@visualizations.map(&:name))
+  end
+
+  # The chips. They combine: ?kind=javascript&source=open.
+  def chipped(scope)
+    scope = scope.where(kind: params[:kind]) if params[:kind].present?
+    scope = scope.open_source if params[:source] == 'open'
+    scope = scope.where(is_embeddable: true) if params[:embeddable].present?
+    scope
+  end
+
+  def kinds_present
+    (is_admin? ? Visualization : Visualization.approved).distinct.pluck(:kind)
+  end
+
+  # The newest tag made with each app, by name, so a card can play one. Tags
+  # name their app in either of two columns.
+  def sample_tags(names)
+    return {} if names.empty?
+
+    Tag.where(application: names).or(Tag.where(gml_application: names))
+       .order(created_at: :desc, id: :desc).to_a
+       .group_by { |tag| names.include?(tag.application) ? tag.application : tag.gml_application }
+       .transform_values(&:first)
   end
 
   def update_approval_state(obj, enabled)
@@ -102,7 +128,8 @@ class VisualizationsController < ApplicationController
   private
 
   def visualization_parameters
-    params.fetch(:visualization, {}).permit(:name, :version, :description, :authors, :website, :kind, :image,
-                                            :is_embeddable, :embed_url, :embed_callback, :embed_params, :embed_code)
+    params.fetch(:visualization, {}).permit(:name, :version, :description, :authors, :website, :source_url, :kind,
+                                            :image, :is_embeddable, :embed_url, :embed_callback, :embed_params,
+                                            :embed_code)
   end
 end

@@ -104,6 +104,28 @@ describe TagsController do
       # @should_mention_application.call(/user_test/)
     end
 
+    describe "chips" do
+      it "narrows to tags with a still" do
+        plain = FactoryBot.create(:tag)
+        pictured = FactoryBot.create(:tag)
+        pictured.image.attach(io: StringIO.new('x'), filename: 'still.png', content_type: 'image/png')
+        get :index, params: { has: 'still' }
+        expect(assigns(:tags)).to contain_exactly(pictured)
+        expect(response.body).to match(/<a[^>]*aria-current="true"[^>]*>With still</)
+        expect(assigns(:tags)).not_to include(plain)
+      end
+
+      it "combine, and a chip turns itself off" do
+        anon = FactoryBot.create(:tag, user: nil)
+        FactoryBot.create(:tag)
+        get :index, params: { who: 'anon', year: anon.created_at.year }
+        expect(assigns(:tags)).to contain_exactly(anon)
+        # The lit Anonymous chip links to the same query without itself.
+        without_itself = "/data?year=#{anon.created_at.year}"
+        expect(response.body).to match(/aria-current="true"[^>]*href="#{Regexp.escape(without_itself)}"/)
+      end
+    end
+
     it "plays the tag ?tag= asks for beside the grid" do
       FactoryBot.create(:tag)
       chosen = FactoryBot.create(:tag)

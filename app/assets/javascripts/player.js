@@ -276,6 +276,31 @@ if (browse && browseRoot?.player) {
   };
 }
 
+/* --- logo: a variant picked on /logos, for this browser ----------------- */
+
+const LOGO_KEY = 'blackbook.logo';
+const logo = document.querySelector('[data-logo-default]');
+
+if (logo) {
+  try {
+    const chosen = localStorage.getItem(LOGO_KEY);
+    if (chosen) logo.src = chosen;
+  } catch { /* private */ }
+  document.querySelectorAll('button[data-logo]').forEach(button => {
+    button.addEventListener('click', () => {
+      const src = button.dataset.logo;
+      logo.src = src || logo.dataset.original || logo.src;
+      try {
+        if (src) localStorage.setItem(LOGO_KEY, src);
+        else localStorage.removeItem(LOGO_KEY);
+      } catch { /* private */ }
+      document.querySelectorAll('[data-logo-variant]').forEach(v => {
+        v.toggleAttribute('data-chosen', v.querySelector('button[data-logo]').dataset.logo === src);
+      });
+    });
+  });
+}
+
 /* --- view switch: the browse page four ways ------------------------------ */
 
 const VIEW_KEY = 'blackbook.view';

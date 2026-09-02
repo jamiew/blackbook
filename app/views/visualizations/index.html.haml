@@ -9,6 +9,15 @@
   .filters__spacer
   = link_to '+ Register an application', new_visualization_path, class: 'button button--solid'
 
+- keys = %w[kind source embeddable]
+.chips{ role: 'group', 'aria-label' => 'Filter' }
+  = filter_chip 'All', keys: keys
+  - @kinds.each do |label, value|
+    = filter_chip label, { kind: value }, keys: keys
+  %span.chips__gap
+  = filter_chip 'Open source', { source: 'open' }, keys: keys
+  = filter_chip 'Embeddable', { embeddable: 1 }, keys: keys
+
 - if @visualizations.empty?
   %p.page__lede None yet.
 - else
@@ -19,10 +28,17 @@
           -# Only admins are served unapproved apps, so this is a moderation cue.
           - unless app.approved?
             %span.tag-card__id Pending
-          = image_tag attachment_url(app, :image, :medium), alt: app.name, loading: 'lazy'
+          -# The app's newest tag, alive, is its picture. The screenshot stands in
+          -# when nothing in the archive names the app.
+          - if (sample = @samples[app.name])
+            %canvas.tag-card__canvas{ data: { preview: tag_path(sample, format: :json, preview: 1), autoplay: true }, 'aria-label' => "A tag made with #{app.name}" }
+          - else
+            = image_tag attachment_url(app, :image, :medium), alt: app.name, loading: 'lazy'
         .tag-card__body
           %span.tag-card__title= app.name
           %span.tag-card__app= [app.kind_name.presence, app.authors.presence].compact.join(' · ')
+          - if app.source_url.present?
+            %span.tag-card__who Open source
 
   %nav{ 'aria-label' => 'Pagination', style: 'margin-top: 28px' }
     = pagination(@visualizations)

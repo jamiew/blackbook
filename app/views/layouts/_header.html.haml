@@ -1,13 +1,14 @@
 - alt = '#000000book: An open database for Graffiti Markup Language (GML) files'
 %header.masthead.shell
   %a.masthead__logo{ href: root_path, 'aria-label' => alt }
-    = image_tag('/images/000000book-logo-beta.png', alt: alt)
+    = image_tag('/images/000000book-logo-beta.png', alt: alt, data: { logo_default: true, original: '/images/000000book-logo-beta.png' })
 
   %nav.masthead__nav{ 'aria-label' => 'Primary' }
     = nav_link 'data', tags_path, active: %w[tags favorites]
     = nav_link 'applications', visualizations_path, active: %w[visualizations]
     = nav_link 'API/docs', docs_path, active: %w[docs]
-    = nav_link 'about', '/about', active: []
+    = nav_link 'about', about_path
+    = nav_link 'upload', upload_path, css: 'masthead__upload'
 
   .masthead__account.meta
     - if @browse

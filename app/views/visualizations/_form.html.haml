@@ -24,6 +24,9 @@
   %p
     %label{ for: 'visualization_website' } Website
     = f.text_field :website, placeholder: 'https://'
+  %p
+    %label{ for: 'visualization_source_url' } Source code, if it is open
+    = f.text_field :source_url, placeholder: 'https://github.com/'
 
 %fieldset
   %legend About

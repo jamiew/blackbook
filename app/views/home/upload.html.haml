@@ -1,0 +1,73 @@
+.page__head
+  %div
+    %span.eyebrow Make and upload
+    %h1.page__title Upload a tag
+    %p.page__lede
+      A tag is a GML file: strokes as coordinates and time. Anything that writes one can post it here,
+      and you can draw one right now.
+
+.section-head
+  %h2 Apps that capture GML
+  %span.meta= link_to 'Everything that reads or writes GML →', visualizations_path
+
+.specs.upload-apps
+  .specs__row
+    %span.specs__key iPhone
+    %span.specs__value
+      %strong Fat Tag Graffiti, Katsu Edition
+      By Theo Watson and F.A.T. Lab. Draw with a finger, drips from the accelerometer, and it uploads the GML
+      and a screenshot straight here. It has not been updated in years, so check it still installs.
+      = link_to 'App Store ↗', 'https://apps.apple.com/us/app/fat-tag-graffiti-katsu-edition/id349044241', class: 'button button--quiet', rel: 'noopener', target: '_blank'
+  .specs__row
+    %span.specs__key iPhone
+    %span.specs__value
+      %strong DustTag
+      Graffiti Analysis for the phone, by Evan Roth and Chris Sugrue. Long gone from the store; its tags
+      are a large part of this archive.
+      = link_to 'About DustTag ↗', 'http://graffitianalysis.com/iphone/', class: 'button button--quiet', rel: 'noopener', target: '_blank'
+  .specs__row
+    %span.specs__key Desktop
+    %span.specs__value
+      %strong Graffiti Analysis
+      A marker with a light in it, tracked by a webcam. The original, for Mac and Windows.
+      = link_to 'Downloads ↗', 'http://graffitianalysis.com/downloads/', class: 'button button--quiet', rel: 'noopener', target: '_blank'
+  .specs__row
+    %span.specs__key Build it
+    %span.specs__value
+      %strong EyeWriter
+      Open-source eye tracking that writes GML. Hardware plans and code on GitHub.
+      = link_to 'GitHub ↗', 'https://github.com/eyewriter/eyewriter', class: 'button button--quiet', rel: 'noopener', target: '_blank'
+  .specs__row
+    %span.specs__key Android
+    %span.specs__value
+      Nothing we know of. If you make one,
+      = link_to 'register it', new_visualization_path
+      and it will be listed here.
+
+.section-head
+  %h2 Or draw one here
+  %span.meta{ data: { recorder_readout: true } } Draw here
+
+.recorder{ data: { gml_recorder: true } }
+  .recorder__stage
+    %canvas.recorder__pad{ role: 'img', 'aria-label' => 'Drawing pad. Press and drag to draw a tag.' }
+    %canvas.recorder__play{ hidden: true, 'aria-hidden' => 'true' }
+  .recorder__bar
+    %button.button{ type: 'button', data: { recorder_play: true } } ▶ Play back
+    %button.button.button--quiet{ type: 'button', data: { recorder_download: true } } Download .gml
+    %button.button.button--quiet{ type: 'button', data: { recorder_clear: true } } Clear
+    .filters__spacer
+    - if current_user
+      = form_with url: tags_path, method: :post do |f|
+        = hidden_field_tag 'tag[gml]', '', data: { recorder_gml: true }
+        = f.submit 'Upload this tag', class: 'button button--solid', data: { recorder_upload: true }
+    - else
+      = link_to 'Log in to upload', login_path, class: 'button button--solid'
+      = link_to 'Sign up', signup_path, class: 'button button--quiet'
+
+.section-head
+  %h2 Upload a file
+%p.page__lede
+  Have a .gml already? #{link_to 'Upload it here', new_tag_path} with an account, or post it from anywhere:
+%pre.upload-curl curl -F gml=@tag.gml https://000000book.com/data
+%p.page__lede= link_to 'API docs for uploading →', '/docs/api/uploading-gml'

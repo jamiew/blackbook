@@ -24,6 +24,18 @@
   - if current_user
     = link_to '+ Upload GML', new_tag_path, class: 'button button--solid'
 
+- keys = %w[has from who year]
+.chips{ role: 'group', 'aria-label' => 'Filter' }
+  = filter_chip 'All', keys: keys
+  = filter_chip 'With still', { has: 'still' }, keys: keys
+  = filter_chip 'From a device', { from: 'device' }, keys: keys
+  = filter_chip 'Claimed', { who: 'claimed' }, keys: keys
+  = filter_chip 'Anonymous', { who: 'anon' }, keys: keys
+  - if @years.to_a.size > 1
+    %span.chips__gap
+    - @years.each do |year|
+      = filter_chip year.to_s, { year: year }, keys: keys
+
 - if @tags.empty?
   %p.page__lede No results.
 - else

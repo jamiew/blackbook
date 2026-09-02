@@ -59,7 +59,12 @@ class TagsController < ApplicationController
                  .with_attached_image
                  .includes(user: { photo_attachment: :blob })
                  .where(@search_context && @search_context[:conditions])
+                 .merge(filters)
                  .paginate(page: @page, per_page: @per_page)
+    # One query, cached: every year with an upload, for the chips.
+    @years = Rails.cache.fetch('tags/years', expires_in: 1.hour) do
+      Tag.distinct.pluck(Arel.sql('YEAR(created_at)')).compact.sort.reverse
+    end
     @applications ||= Tag.select("DISTINCT application AS name")
                          .where.not(application: [nil, ""])
                          .order(:name)
@@ -340,6 +345,19 @@ class TagsController < ApplicationController
   end
 
   # For converting from the pre-existing 'Application' params into a string in create/update
+  # The chips on /data. Unlike the search context they combine, and each is a
+  # fact about the row rather than a search: ?has=still&who=anon&year=2010.
+  def filters
+    scope = Tag.all
+    scope = scope.joins(:image_attachment) if params[:has] == 'still'
+    scope = scope.from_device if params[:from] == 'device'
+    scope = scope.where.not(user_id: nil) if params[:who] == 'claimed'
+    scope = scope.where(user_id: nil) if params[:who] == 'anon'
+    year = params[:year].to_i
+    scope = scope.where(created_at: Time.zone.local(year).all_year) if year > 2000
+    scope
+  end
+
   def convert_app_id_to_app_name
     Rails.logger.debug "#convert_app_id_to_app_name"
 

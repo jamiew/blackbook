@@ -18,6 +18,14 @@ class HomeController < ApplicationController
     set_page_title "Activity"
   end
 
+  def upload
+    set_page_title 'Make and upload a tag'
+  end
+
+  def logos
+    set_page_title 'Logo variants'
+  end
+
   def about
     # Six of the archive's own tags, alive, as the page's second graphic.
     @tags = Array.new(6) { Tag.random }.compact.uniq

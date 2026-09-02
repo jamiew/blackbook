@@ -17,6 +17,10 @@
       - else
         = link_to 'Approve', approve_visualization_path(@visualization), method: :put, class: 'button button--solid'
 
+- if @sample
+  -# The newest tag in the archive made with this app.
+  = render 'tags/player', tag: @sample, link: true
+
 - if @visualization.image.attached?
   %figure.figure
     = image_tag attachment_url(@visualization, :image, :large), alt: @visualization.name
@@ -30,6 +34,9 @@
   .specs__row
     %span.specs__key Website
     %span.specs__value= website_link(@visualization.website) || null
+  .specs__row
+    %span.specs__key Source code
+    %span.specs__value= website_link(@visualization.source_url) || content_tag(:span, 'closed', class: 'specs__value--null')
   - unless @visualization.kind_name.blank?
     .specs__row
       %span.specs__key Language
