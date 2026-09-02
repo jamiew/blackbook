@@ -29,6 +29,12 @@ module Blackbook4
     # setup both already have; vips would need installing separately.
     config.active_storage.variant_processor = :mini_magick
 
+    # Where GmlObject reads and writes the raw .gml files. A setting rather
+    # than a constant so the test environment can point somewhere disposable:
+    # the suite writes real files, and sharing this directory means every run
+    # overwrites tags with fixtures.
+    config.x.gml_data_dir = Rails.root.join("data")
+
     # 8.1 default is :raise. The GML upload API deliberately takes a caller-supplied
     # `?redirect_to=` with `allow_other_host: true`, so a scheme-less value like
     # "example.com" is an expected input, not an attack we can reject.
