@@ -10,7 +10,7 @@ fi
 # Rails 8 generates a `db:prepare` here on boot. Deliberately omitted.
 #
 # ./deploy has never run migrations, for a documented reason: the pending set
-# drops a 301,076-row table. Migrating as a side effect of a container starting
+# drops the comments table. Migrating as a side effect of a container starting
 # would make that irreversible change happen on a restart, a rollback, or a
 # scale-up, at a moment nobody chose. Run migrations on purpose:
 #

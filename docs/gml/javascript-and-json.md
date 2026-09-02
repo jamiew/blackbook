@@ -6,5 +6,3 @@ from 000000book using a JSON callback, sometimes called GSON.
 
 - Demo: <http://jamiedubs.com/canvasplayer>
 - Code: <http://github.com/jamiew/canvasplayer>
-
-![Canvasplayer screenshot](http://www.graffitimarkuplanguage.com/wp-content/uploads/2010/09/Screen-shot-2010-09-01-at-8.53.33-AM.png)

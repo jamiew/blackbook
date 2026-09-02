@@ -1,5 +1,8 @@
 # Downloading GML
 
+Every tag is public and needs no key. Append a format to a tag's URL to get
+it, or use one of the shortcuts below.
+
 - Every tag page has a "Download GML" button.
 - Or append `.gml` to any data page URL, e.g. `http://000000book.com/data/154.gml`
 - Other formats work too: `.json` includes the full GML as JSON, and `.xml` gives
@@ -20,14 +23,13 @@ A random tag:
 curl http://000000book.com/random.gml
 ```
 
-Latest tag by a specific user:
+To filter, use the index rather than `/latest`. `/data` accepts `user_id`,
+`app`, `location` and `keywords`:
 
 ```
-curl http://000000book.com/tempt1/latest.gml
+curl "http://000000book.com/data.json?app=eyewriter"
+curl "http://000000book.com/data.json?user_id=tempt1"
 ```
 
-Latest from a specific application:
-
-```
-curl http://000000book.com/latest.gml?application=eyewriter
-```
+`/latest` and `/random` take no filters: they always return the newest and a
+random tag site-wide.

@@ -3,7 +3,7 @@
 # Deploy 000000book.
 #
 # Deploys code and restarts. It does NOT run migrations. The pending set
-# includes drop_table on 301,076 comments, so migrating is a separate,
+# includes drop_table on the comments table, so migrating is a separate,
 # deliberate command rather than a side effect of shipping code.
 #
 # Usage:  ./deploy              # deploy origin/main
@@ -79,7 +79,7 @@ if [ "$PREV_SHA" = "$NEW_SHA" ]; then
 fi
 
 # 3. The GML corpus lives on a block volume behind a symlink. Verify it rather
-#    than recreating it: a wrong `ln -fs` target would hide 76,000 files.
+#    than recreating it: a wrong `ln -fs` target would hide the whole corpus.
 if [ ! -d data ]; then
   echo "FATAL: data/ is missing"; exit 1
 fi

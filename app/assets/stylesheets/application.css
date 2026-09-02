@@ -934,3 +934,92 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Docs (/docs) ------------------------------------------------------- */
+/* Rendered from the markdown in docs/. Prose is the one place the mono chrome
+   gives way to the display face: these are pages to read, not instrumentation. */
+
+.docs {
+  display: grid;
+  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  gap: var(--gutter);
+  align-items: start;
+}
+
+.docs__nav {
+  position: sticky;
+  top: var(--gutter);
+  font-family: var(--mono);
+  font-size: var(--meta-size);
+  letter-spacing: var(--meta-tracking);
+  text-transform: uppercase;
+  border-right: var(--rule);
+  padding-right: var(--gutter);
+}
+
+.docs__nav h3 { margin-bottom: 1.2em; color: var(--dim); }
+.docs__nav ul { list-style: none; margin: 0; padding: 0; }
+.docs__nav li { margin-bottom: 0.9em; line-height: 1.35; }
+.docs__nav a { color: var(--dim); text-decoration: none; }
+.docs__nav a:hover { color: var(--ink); }
+.docs__nav .is-current a { color: var(--accent); }
+
+.docs__body {
+  max-width: 68ch;
+  font-family: var(--display);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.docs__body h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; margin: 0 0 0.7em; }
+.docs__body h2 { font-size: 22px; margin: 2em 0 0.6em; padding-bottom: 0.3em; border-bottom: var(--rule); }
+.docs__body h3 { font-size: 17px; margin: 1.6em 0 0.4em; }
+.docs__body p { margin: 0 0 1.1em; }
+.docs__body ul, .docs__body ol { margin: 0 0 1.1em 1.4em; padding: 0; }
+.docs__body li { margin-bottom: 0.45em; }
+.docs__body a { color: var(--ink); text-underline-offset: 3px; }
+.docs__body a:hover { color: var(--accent); }
+
+.docs__body code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: var(--surface-raised);
+  padding: 1px 5px;
+}
+
+.docs__body pre {
+  font-family: var(--mono);
+  background: var(--surface);
+  border: var(--rule);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0 0 1.1em;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.docs__body pre code { background: none; padding: 0; font-size: inherit; }
+.docs__body table { width: 100%; border-collapse: collapse; margin: 0 0 1.1em; }
+.docs__body td, .docs__body th { padding: 8px 12px; border-bottom: var(--rule); text-align: left; vertical-align: top; }
+.docs__body blockquote { margin: 0 0 1.1em; padding-left: 16px; border-left: 2px solid var(--line-bright); color: var(--dim); }
+.docs__body hr { border: 0; border-top: var(--rule); margin: 2.5em 0; }
+.docs__body em { color: var(--dim); }
+
+.docs__source {
+  margin-top: 3.5em;
+  padding-top: 1.2em;
+  border-top: var(--rule);
+  font-family: var(--mono);
+  font-size: var(--meta-size);
+  letter-spacing: var(--meta-tracking);
+  text-transform: uppercase;
+}
+
+.docs__source a { color: var(--dim); text-decoration: none; }
+.docs__source a:hover { color: var(--accent); }
+
+@media (max-width: 720px) {
+  .docs { grid-template-columns: minmax(0, 1fr); }
+  .docs__nav { position: static; border-right: 0; border-bottom: var(--rule); padding: 0 0 var(--gutter); }
+  .docs__nav ul { display: flex; flex-wrap: wrap; gap: 0 1.2em; }
+}
