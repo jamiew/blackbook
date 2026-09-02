@@ -50,7 +50,7 @@
     .gml
       %span.download= link_to('download GML', tag_path(@tag, format: :gml), class: 'button smallbutton')
       %span.what-is-gml= link_to('?', 'http://fffff.at/gml-week-graffiti-markup-language/', target: '_blank')
-      %textarea.gml{cols: 24, rows: 12, onclick: 'this.select();'}= @tag.gml
+      %textarea.gml{cols: 24, rows: 12, onclick: 'this.select();'}= @tag.public_gml
 
   -# Tag modbox -- edit/delete/debugging etc.
   - if is_owner?(@tag) || is_admin?
