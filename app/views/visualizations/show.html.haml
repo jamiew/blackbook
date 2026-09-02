@@ -1,61 +1,68 @@
+- can_edit = is_owner?(@visualization) || is_admin?
+- null = content_tag(:span, 'null', class: 'specs__value--null')
 
-%p.back= link_to '&larr; back to applications'.html_safe, visualizations_path
-
-.left{style: 'margin-top: 40px;'}
-  = image_tag(attachment_url(@visualization, :image, :medium))
-  =# image_tag(@visualization.image(:large), width: 300)
-
-.centered{style: 'width: 400px; margin: 20px 0 0 330px;'}
-  %h1
-    =h @visualization.name
-    %span.version=h @visualization.version
-  %div[@visualization]
-    %p.authors
-      %strong Author(s):
-      =h @visualization.authors
-    %p.website
-      %strong Website:
-      = link_to @visualization.website, "http://#{@visualization.website.gsub("http://",'')}"
-
-    %hr
-    - unless @visualization.kind.blank?
-      %p
-        %strong Language:
-        =h Visualization::KINDS.select { |k,v| v == @visualization.kind }[0][0] rescue @visualization.kind
-    - unless @visualization.download.blank?
-      %p
-        %strong Download:
-        = link_to(@visualization.download, @visualization.download)
-
-    .description
-      %strong Description:
-      = h @visualization.description || '(none)'
-
-    - unless @visualization.user.nil?
-      %hr
-      %p
-        %strong Submitted by:
-        %span.user
-          = link_to @visualization.user.login, user_path(@visualization.user)
-        %span.submitted_at= @visualization.created_at.strftime('%D')
-
-
-  - if logged_in? && (@visualization.respond_to?(:user) && @visualization.user == current_user) || is_admin?
-    %hr
-    %p.controls
-      = link_to 'Edit', edit_visualization_path
-      |
-      = link_to 'Delete', visualization_path, method: :delete, data: { confirm: 'Are you sure?' }
+.page__head
+  %div
+    %span.eyebrow= link_to '← All applications', visualizations_path
+    %h1.page__title
+      = @visualization.name
+      - unless @visualization.version.blank?
+        %span.meta= @visualization.version
+    %p.page__lede.meta= [@visualization.kind_name.presence, @visualization.authors.presence].compact.join(' · ')
 
   - if is_admin?
-    %p
+    .stepper
       - if @visualization.approved?
-        Approved by
-        = link_to @visualization.approver.login, user_path(@visualization.approver)
-        @
-        = @visualization.approved_at
-        = link_to 'Unapprove', unapprove_visualization_path, method: :put, data: { confirm: 'Are you sure?' }
+        = link_to 'Unapprove', unapprove_visualization_path(@visualization), method: :put, class: 'button button--quiet', data: { confirm: 'Unapprove this app?' }
       - else
-        Unapproved.
-        = link_to 'Approve', approve_visualization_path, method: :put
+        = link_to 'Approve', approve_visualization_path(@visualization), method: :put, class: 'button button--solid'
 
+.tag-detail
+  %div
+    - if @visualization.image.attached?
+      %figure.figure
+        = image_tag attachment_url(@visualization, :image, :large), alt: @visualization.name
+    - unless @visualization.description.blank?
+      %p{ style: 'margin-top: 20px; max-width: 68ch; color: var(--dim)' }= @visualization.description
+
+  %aside
+    .specs
+      .specs__row
+        %span.specs__key Authors
+        %span.specs__value= @visualization.authors.presence || null
+      .specs__row
+        %span.specs__key Website
+        %span.specs__value= website_link(@visualization.website) || null
+      - unless @visualization.kind_name.blank?
+        .specs__row
+          %span.specs__key Language
+          %span.specs__value= @visualization.kind_name
+      - unless @visualization.download.blank?
+        .specs__row
+          %span.specs__key Download
+          %span.specs__value= website_link(@visualization.download)
+      - if @visualization.user
+        .specs__row
+          %span.specs__key Submitter
+          %span.specs__value= link_to @visualization.user.login, user_path(@visualization.user)
+      .specs__row
+        %span.specs__key Submitted
+        %span.specs__value= @visualization.created_at.strftime('%Y-%m-%d')
+      - if @visualization.approved?
+        .specs__row
+          %span.specs__key Approved
+          %span.specs__value
+            = @visualization.approved_at.strftime('%Y-%m-%d')
+            - if is_admin? && @visualization.approver
+              == by #{link_to @visualization.approver.login, user_path(@visualization.approver)}
+      - elsif is_admin?
+        .specs__row
+          %span.specs__key Approved
+          %span.specs__value.specs__value--null pending
+
+    - if can_edit
+      .modbox
+        %h2 Modbox
+        .modbox__body
+          = link_to 'Edit', edit_visualization_path(@visualization), class: 'button button--quiet'
+          = link_to 'Delete', visualization_path(@visualization), method: :delete, class: 'button button--danger', data: { confirm: 'Delete this application?' }

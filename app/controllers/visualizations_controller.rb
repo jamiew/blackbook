@@ -102,7 +102,7 @@ class VisualizationsController < ApplicationController
   private
 
   def visualization_parameters
-    params.fetch(:visualization, {}).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable,
-                                            :image)
+    params.fetch(:visualization, {}).permit(:name, :version, :description, :authors, :website, :kind, :image,
+                                            :is_embeddable, :embed_url, :embed_callback, :embed_params, :embed_code)
   end
 end

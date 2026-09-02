@@ -29,6 +29,16 @@ module ApplicationHelper
     tag.remote_thumbnail_url || attachment_url(tag, :image, style)
   end
 
+  # Writers and apps store a website as typed, so it may lack a scheme or be
+  # blank. Nil when blank, so a view can `= website_link(x)` and print nothing.
+  def website_link(url)
+    return if url.blank?
+
+    scheme = %r{\Ahttps?://}i
+    href = url.match?(scheme) ? url : "http://#{url}"
+    link_to url.sub(scheme, '').chomp('/'), href, rel: 'nofollow noopener', target: '_blank'
+  end
+
   def html_attrs(lang = 'en-US')
     { lang: lang }
   end
@@ -48,8 +58,8 @@ module ApplicationHelper
     link_to label, path, 'aria-current' => (current ? 'page' : nil)
   end
 
-  # Counts for the instrument bar under the masthead. Cached because it runs on
-  # every page and Tag.count is a full scan of ~77k rows.
+  # Archive counts for the home page. Cached because Tag.count is a full scan
+  # of ~77k rows.
   def archive_stats
     @archive_stats ||= Rails.cache.fetch('archive_stats', expires_in: 5.minutes) do
       today = Time.current.in_time_zone('Pacific Time (US & Canada)').to_date

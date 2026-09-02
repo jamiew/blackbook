@@ -1,57 +1,59 @@
-- required = '<span style="color: #d33">*</span>'
-- visualization = @visualization || form
-
-.right_column
+-# Shared by new and edit. `f` is the form builder for @visualization.
+%fieldset
+  %legend Application
   %p
-    %label Submitter:
-    %strong{style: 'margin-left: 3px;'}= link_to current_user.login
-  %p
-    %label{for: "visualization_authors"}== #{required.html_safe}Authors:
-    = f.text_area :authors, rows: 2
-  %p
-    %label{for: "visualization_website"} Website:
-    = f.text_field :website
-  %p
-    %label{for: "visualization_description"}== #{required.html_safe}Description:
-    = f.text_area :description, rows: 6
-
-  %p
-    %label{for: 'visualization_image'}== Image/screenshot (JPG/PNG/GIF)
-    = f.file_field :image, size: 10
-  %p
-    = image_tag(attachment_url(@visualization, :image, :small))
-
-.left_column
-  %p
-    %label{for: "visualization_name"}== #{required.html_safe}Name:
+    %label{ for: 'visualization_name' }== Name #{redstar}
     = f.text_field :name
-    %label{for: "visualization_version"} Version:
-    = f.text_field :version, size: 5
   %p
-    %label{for: "visualization_kind"}== #{required.html_safe}Kind:
+    %label{ for: 'visualization_version' } Version
+    = f.text_field :version
+  %p
+    %label{ for: 'visualization_kind' } Language
     = f.select :kind, Visualization::KINDS
 
-  %p.embed_toggle
-    .left= f.check_box :is_embeddable, id: 'embeddable_toggle'
-    %label{for: 'embeddable_toggle', style: 'margin-left: 1em'}== Embeddable?
-  .embed_details{class: @visualization.is_embeddable ? '' : 'disabled'}
-    %label{for: "visualization_embed_url"}== #{required.html_safe} URL to .swf, .js, etc
-    = f.text_field :embed_url
+%fieldset
+  %legend People
+  -# new and create sit behind require_user, so current_user is always there.
+  - if @visualization.new_record?
+    %p.meta== Submitting as #{current_user.login}
+  - elsif @visualization.user
+    %p.meta== Submitted by #{@visualization.user.login}
+  %p
+    %label{ for: 'visualization_authors' }== Authors #{redstar}
+    = f.text_area :authors, rows: 2
+  %p
+    %label{ for: 'visualization_website' } Website
+    = f.text_field :website, placeholder: 'https://'
 
-    %label{for: "visualization_embed_callback"}== The name of a callback function, e.g. 'drawGML'
-    = f.text_field :embed_callback
+%fieldset
+  %legend About
+  %p
+    %label{ for: 'visualization_description' }== What it does #{redstar}
+    = f.text_area :description, rows: 6
+  %p
+    %label{ for: 'visualization_image' } Screenshot (JPG, PNG or GIF under 1 MB)
+    = f.file_field :image, accept: 'image/jpeg,image/png,image/gif'
+    - if @visualization.image.attached?
+      = image_tag attachment_url(@visualization, :image, :small), alt: '', style: 'margin-top: 8px'
 
-    %label{for: "visualization_embed_params"}==  Bonus parameters: foo=bar&bob=joe&...
-    = f.text_field :embed_params
-
-    %label{for: "visualization_embed_params"}==  Embed code (check the API docs)
-    = f.text_area :embed_code, rows: 3
-
-    %small
-      %a{id: 'preview_embed', class: 'preview', onclick: "alert('TODO!');"} Preview
-
-
-
+%fieldset
+  %legend Embedding
+  %p.check
+    = f.check_box :is_embeddable, id: 'embeddable_toggle'
+    %label{ for: 'embeddable_toggle' } This app can be embedded on a tag page
+  .embed_details{ class: @visualization.is_embeddable ? '' : 'disabled' }
+    %p
+      %label{ for: 'visualization_embed_url' }== URL to the .swf, .js or page #{redstar}
+      = f.text_field :embed_url
+    %p
+      %label{ for: 'visualization_embed_callback' } Callback function, for example drawGML
+      = f.text_field :embed_callback
+    %p
+      %label{ for: 'visualization_embed_params' } Extra parameters, foo=bar&bob=joe
+      = f.text_field :embed_params
+    %p
+      %label{ for: 'visualization_embed_code' } Embed code (see the API docs)
+      = f.text_area :embed_code, rows: 3
 
 :javascript
   document.addEventListener('DOMContentLoaded', function () {

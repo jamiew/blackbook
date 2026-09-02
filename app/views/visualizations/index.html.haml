@@ -1,54 +1,28 @@
+.page__head
+  %div
+    %span.eyebrow The archive
+    %h1.page__title Applications
+    %p.page__lede Capture apps, players and toys that write or read GML. Register yours and it appears here once approved.
+  %p.page__lede.meta= pluralize(number_with_delimiter(@visualizations.total_entries), 'app')
 
-%p.create_new
-  = link_to '+ Register New Application', new_visualization_path, class: 'button add facebox'
+.filters
+  .filters__spacer
+  = link_to '+ Register an application', new_visualization_path, class: 'button button--solid'
 
-= pagination(@visualizations)
+- if @visualizations.empty?
+  %p.page__lede None yet.
+- else
+  .tag-grid
+    - @visualizations.each do |app|
+      %a.tag-card{ href: visualization_path(app) }
+        .tag-card__frame
+          -# Only admins are served unapproved apps, so this is a moderation cue.
+          - unless app.approved?
+            %span.tag-card__id Pending
+          = image_tag attachment_url(app, :image, :medium), alt: app.name, loading: 'lazy'
+        .tag-card__body
+          %span.tag-card__title= app.name
+          %span.tag-card__app= [app.kind_name.presence, app.authors.presence].compact.join(' · ')
 
-%table{style: 'width: 100%'}
-  %tr
-    / %th{style: 'width: 110px;'}
-    %th{style: 'width: 100px;'} application
-    %th{style: 'width: 200px;'}
-    %th{style: 'width: 220px; padding: 0px 0px 0 25px;'} authors
-    %th
-    %th
-    - if false
-      %th{style: 'width: 40px;'} embeddable
-      %th{style: 'width: 150px;'} submitted
-    %th.controls
-    - if is_admin? || is_owner?
-      %th.admin{style: 'width: 40px;'}
-      %th.admin{style: 'width: 80px;'}
-
-  - @visualizations.each do |app|
-    %tr.fat
-      %td= link_to(image_tag(attachment_url(app, :image, :small), width: 100), visualization_path(app))
-      %td.name
-        %strong= link_to app.name, visualization_path(app)
-      %td.authors{style: 'line-height: 1.3em; padding: 0px 10px 0 15px;'}= app.authors[0..100] || '&mdash;'
-      %td.language= app.kind.blank? ? '&mdash;' : app.kind
-      %td.website{style: 'padding: 0px 5px 0 15px;'}= link_to (app.website&.gsub('http://','') || '&mdash;'), app.website
-      - if false
-        %td= app.is_embeddable? ? 'y' : 'n'
-        %td{style: 'width: 20px; text-align: center; background-color: #f00;'}= link_to app.user.login, user_path(app.user) rescue "&mdash;"
-        %td{style: 'width: 150px;'}= app.created_at.strftime('%D')
-      %td.controls= link_to "more&nbsp;&raquo;".html_safe, visualization_path(app), class: 'ghost button'
-
-      -#Admin debuggery & controls
-      - if is_admin?
-        %td.admin= app.approved? ? 'Approved' : 'Pending'
-        %td.admin.controls
-          - if app.approved?
-            = link_to 'unapprove', unapprove_visualization_path(app), method: :put, data: { confirm: 'Are you sure?' }
-          - else
-            = link_to 'approve', approve_visualization_path(app), method: :put, data: { confirm: 'Are you sure?' }
-          %br
-          = link_to 'edit', edit_visualization_path(app)
-          = link_to 'delete', visualization_path(app), method: :delete, class: 'delete', data: { confirm: "Are you sure?" }
-
-%p= pagination(@visualizations)
-
-=# render partial: 'visualization', collection: @visualizations
-
-- if @visualizations.blank?
-  %em None yet!
+  %nav{ 'aria-label' => 'Pagination', style: 'margin-top: 28px' }
+    = pagination(@visualizations)

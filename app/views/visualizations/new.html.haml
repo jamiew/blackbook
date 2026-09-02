@@ -1,10 +1,11 @@
-%h1 Register New Application
+.page__head
+  %div
+    %span.eyebrow= link_to '← All applications', visualizations_path
+    %h1.page__title Register an application
+    %p.page__lede Something that writes or reads GML. It goes live once an admin approves it.
 
-= render "layouts/error_messages", target: @visualization
-
-= form_for(:visualization, url: visualizations_url, html: { multipart: true }) do |f|
-  = render partial: "form", object: @visualization, locals: {f: f}
-  %br
-  %p= submit_tag "Create"
-
-= link_to 'Back', visualizations_path
+.form-page
+  = render 'layouts/error_messages', target: @visualization
+  = form_for @visualization, html: { multipart: true } do |f|
+    = render 'form', f: f
+    %p.actions= f.submit 'Register'

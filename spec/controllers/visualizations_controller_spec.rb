@@ -20,6 +20,13 @@ describe VisualizationsController do
       expect(assigns(:page)).to eq(1)
       expect(assigns(:per_page)).to eq(20)
     end
+
+    it "renders an app that has no website" do
+      @visualization.update!(approved_at: 1.hour.ago, website: nil)
+      get :index
+      expect(response).to be_successful
+      expect(response.body).to include(@visualization.name)
+    end
   end
 
   describe "GET #show" do
@@ -31,6 +38,13 @@ describe VisualizationsController do
       get :show, params: { id: @visualization.id }
       expect(response).to be_successful
       expect(response.body).to match(@visualization.name)
+    end
+
+    # /apps/1 in production has no website, and the view called gsub on it.
+    it "renders an app that has no website" do
+      @visualization.update!(website: nil)
+      get :show, params: { id: @visualization.id }
+      expect(response).to be_successful
     end
 
     it "404s if that record does not exist" do

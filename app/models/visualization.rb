@@ -80,6 +80,11 @@ class Visualization < ApplicationRecord
     approved_at && approved_at < Time.zone.now
   end
 
+  # The label for `kind` from KINDS, or the raw value for anything not listed.
+  def kind_name
+    KINDS.rassoc(kind)&.first || kind
+  end
+
   # Forced rather than left to the caller, so the responders fallback in
   # VisualizationsController cannot publish a column nobody meant to publish.
   def as_json(opts = {}) = super(opts.merge(only: PUBLIC_ATTRIBUTES))

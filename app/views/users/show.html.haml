@@ -39,7 +39,7 @@
       %h2 Profile
       %p.profile__photo= link_to image_tag(attachment_url(@user, :photo, :small), alt: @user.login), attachment_url(@user, :photo, :medium)
       - unless @user.website.blank?
-        %p= link_to @user.website.gsub(%r{^https?://}, ''), (@user.website =~ /^http/ ? @user.website : "http://#{@user.website}"), rel: 'nofollow'
+        %p= website_link(@user.website)
       - unless @user.about.blank?
         %p{ style: 'color: var(--dim); font-size: 14px' }= @user.about
       - unless @user.iphone_uniquekey.blank?

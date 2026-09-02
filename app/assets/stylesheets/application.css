@@ -93,13 +93,15 @@ textarea:focus-visible,
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding-block: 18px 16px;
+  padding-block: 20px 18px;
   border-bottom: var(--rule);
 }
 
 .masthead__logo { border: 0; flex: 0 0 auto; }
 .masthead__logo:hover { background: none; }
-.masthead__logo img { height: 34px; width: auto; }
+/* The wordmark is script with a tagline under it. Below about 50px the
+   tagline turns to mush, and the logo is the one soft thing on the page. */
+.masthead__logo img { height: 56px; width: auto; }
 
 .masthead__nav { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
 
@@ -118,7 +120,8 @@ textarea:focus-visible,
 .masthead__account { display: flex; align-items: center; gap: 16px; }
 .masthead__account img { width: 22px; height: 22px; border-radius: 50%; }
 
-/* Counts off the archive, sitting under the masthead. */
+/* A row of label/value readings. The writer profile uses it for tags,
+   favorites and joined. */
 .instruments {
   display: flex;
   align-items: center;
@@ -237,6 +240,25 @@ input[type="submit"], button[type="submit"] {
   cursor: pointer;
 }
 input[type="submit"]:hover, button[type="submit"]:hover { background: var(--accent); border-color: var(--accent); }
+
+/* Standalone form pages, such as registering an app. */
+.form-page { max-width: 680px; }
+.form-page fieldset p { margin: 0 0 14px; }
+.form-page fieldset p:last-child { margin-bottom: 0; }
+.form-page .actions { display: flex; align-items: center; gap: 8px; }
+.form-page .check { display: flex; align-items: center; gap: 8px; }
+.form-page .check label { margin: 0; }
+.embed_details.disabled { opacity: 0.45; }
+
+.error_explanation {
+  border: 1px solid var(--warn);
+  color: var(--warn);
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.error_explanation h2 { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
 
 /* --- tables (secondary pages) ------------------------------------------- */
 
@@ -632,6 +654,7 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   text-transform: uppercase;
   color: var(--dimmer);
 }
+.tag-card__title { color: var(--ink); font-weight: 600; letter-spacing: 0.06em; }
 .tag-card__app { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tag-card__who { color: var(--dimmer); }
 
@@ -796,6 +819,10 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 /* Previous / next between tags. */
 .stepper { display: flex; align-items: center; gap: 8px; }
 
+/* An app's screenshot on its detail page. */
+.figure { border: var(--rule); background: var(--surface); margin: 0; padding: 12px; }
+.figure img { margin: 0 auto; }
+
 /* --- profile & people --------------------------------------------------- */
 
 .profile {
@@ -906,7 +933,7 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 @media (max-width: 720px) {
   body { font-size: 14px; }
   .masthead { flex-wrap: wrap; gap: 12px; padding-block: 14px 12px; }
-  .masthead__logo img { height: 24px; }
+  .masthead__logo img { height: 40px; }
   .masthead__nav { gap: 16px; order: 3; width: 100%; }
   .player__stage { aspect-ratio: 1 / 1; }
   .player__transport { flex-wrap: wrap; gap: 8px 10px; }

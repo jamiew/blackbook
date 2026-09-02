@@ -17,23 +17,3 @@
     - else
       = link_to 'login', login_path
       = link_to 'signup', signup_path
-
--# Live readings off the archive. This is a database that is still being
--# written to by phones in the street, so the chrome says so.
-.instruments.shell
-  .instrument
-    %span.instrument__label Archive
-    %span.instrument__value= number_with_delimiter(archive_stats[:total])
-    %span.instrument__label tags
-  .instrument
-    %span.instrument__label Today
-    %span.instrument__value= archive_stats[:today]
-    %span.instrument__label from
-    %span.instrument__value= archive_stats[:writers]
-    %span.instrument__label writers
-  .instrument
-    %span.instrument__label Spec
-    %span.instrument__value GML 0.1b
-  .instrument
-    %span.instrument__label Feed
-    %span.instrument__value= link_to 'RSS', tags_path(format: :rss)
