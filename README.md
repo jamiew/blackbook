@@ -1,4 +1,4 @@
-![000000book-handshake](public/images/000000book-handshake.jpg)
+![Tag 10043 from the archive, drawn at marker weight with its skeleton, speed vectors and readouts over it](public/images/about-hero.jpg)
 
 # About
 
@@ -18,6 +18,13 @@ Full documentation is in [docs/](docs/README.md), imported from the GitHub wiki
 and served on the site at [/docs](https://000000book.com/docs). `/api` redirects
 to the API section, and [/llms.txt](https://000000book.com/llms.txt) indexes it
 all for crawlers.
+
+## Playback
+
+Every tag on the site is drawn by [canvasplayer](https://github.com/jamiew/canvasplayer),
+vendored byte for byte under `public/canvasplayer/<version>/`. `SOURCE` in that
+directory records the commit and how to update. `app/assets/javascripts/player.js`
+and `gml_thumbnails.js` are the only player code that belongs to this app.
 
 ## Team
 

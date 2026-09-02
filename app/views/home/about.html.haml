@@ -1,0 +1,72 @@
+.about
+  %figure.about__hero
+    = image_tag '/images/about-hero.jpg', alt: 'Tag 10043 from the archive, drawn at marker weight with its skeleton, speed vectors and readouts over it'
+    %figcaption
+      = image_tag '/images/000000book-logo-beta.png', alt: '#000000book', class: 'about__wordmark'
+      %span.meta The Library of Babel for graffiti blackbooks
+
+  .about__body
+    %dl.about__defs
+      %div
+        %dt #000000
+        %dd
+          %em -adjective.
+          The hexadecimal representation of black, commonly used in mathematics and computer science.
+      %div
+        %dt black book
+        %dd
+          %em -noun.
+          A graffiti artist's sketchbook. Often used to sketch out and plan potential graffiti, and to collect tags from other writers.
+          = link_to '(Wikipedia)', 'http://en.wikipedia.org/wiki/Graffiti_terminology', rel: 'noopener', target: '_blank'
+
+    %p
+      \#000000book is an open repository for sharing and archiving motion captured graffiti tags.
+      Tags are saved as digital text files known as GML (Graffiti Markup Language), which can be
+      captured through freely available software such as
+      #{link_to 'Graffiti Analysis', 'http://graffitianalysis.com'} (marker),
+      #{link_to 'DustTag', 'http://graffitianalysis.com/iphone'} (iPhone),
+      #{link_to 'EyeWriter', 'http://eyewriter.org'} (eye movement) and
+      #{link_to 'Laser Tag', 'http://graffitiresearchlab.com/?page_id=76'} (laser).
+      Graffiti writers are invited to capture and share their own tags, and programmers are invited
+      to build new applications and visualizations of the data. The project brings together two
+      communities that share an interest in hacking systems, whether found in code or in the city.
+
+    - if @tags.present?
+      .section-head
+        %h2 From the archive
+        %span.meta= link_to 'View all data →', tags_path
+      .tag-grid
+        = render partial: 'tags/tag', collection: @tags, as: :tag
+
+    .about__row
+      = image_tag '/images/000000book-handshake.jpg', alt: 'Two hands shaking, one holding a marker and one a keyboard'
+      = image_tag '/images/gml-file.png', alt: 'A GML file'
+
+    .section-head
+      %h2 Team
+    %p
+      The GML and #000000book development team is
+      #{link_to 'Jamie Wilkinson', 'http://jamiedubs.com/'},
+      #{link_to 'Evan Roth', 'http://evan-roth.com'},
+      #{link_to 'Theodore Watson', 'http://www.theowatson.com/'},
+      #{link_to 'Chris Sugrue', 'http://csugrue.com/'} and
+      #{link_to 'Todd Vanderlin', 'http://toddvanderlin.com/'}, all members of the copyleft
+      #{link_to 'F.A.T. Lab', 'http://fffff.at'}. Additional Flash development by
+      #{link_to 'Manolis Perrakis', 'http://art.manorius.com/'}.
+
+    .specs
+      .specs__row
+        %span.specs__key Contact
+        %span.specs__value info[at]000000book.com
+      .specs__row
+        %span.specs__key Docs
+        %span.specs__value= link_to 'API and GML documentation', docs_path
+      .specs__row
+        %span.specs__key Machines
+        %span.specs__value
+          = link_to 'OpenAPI', '/openapi.yaml'
+          = '·'
+          = link_to 'llms.txt', '/llms.txt'
+      .specs__row
+        %span.specs__key Source
+        %span.specs__value= link_to 'github.com/jamiew/blackbook', 'https://github.com/jamiew/blackbook', rel: 'noopener', target: '_blank'

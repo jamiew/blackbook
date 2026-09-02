@@ -1,17 +1,28 @@
 -# The tag, played back from its own timestamps. Transport and pane are built
--# by player.js so the markup stays inert without JS.
+-# by player.js so the markup stays inert without JS. `heading` is :h1 on the
+-# tag's own page and a span anywhere else; `strip` adds the filmstrip.
+- heading = local_assigns.fetch(:heading, :span)
+- strip = local_assigns[:strip]
 .player{ data: { gml_player: true } }
   .player__head
-    %span.player__label Canvas player
+    = content_tag heading, tag_title(tag), class: 'player__id'
+    %span.player__context
+      = application_link(tag.sexy_app_name)
+      = '·'
+      = tag_user_link(tag)
+      = '·'
+      %abbr{ title: tag.created_at.strftime('%D %T') }== #{timeago(tag.created_at)} ago
     %span.player__meta{ data: { player_meta: true } }
   .player__stage
-    %canvas.player__canvas{ role: 'img', 'aria-label' => "Playback of tag ##{player.id}" }
-    - if player.image.attached? || player.remote_thumbnail_url.present?
-      - still = tag_thumbnail_url(player, :large)
+    %canvas.player__canvas{ role: 'img', 'aria-label' => "Playback of tag ##{tag.id}" }
+    - if tag.image.attached? || tag.remote_thumbnail_url.present?
+      - still = tag_thumbnail_url(tag, :large)
       -# The still the capture app uploaded, for the pane's live/still switch.
-      = image_tag still, alt: "Still of tag ##{player.id}", class: 'player__still', hidden: true, loading: 'lazy'
+      = image_tag still, alt: "Still of tag ##{tag.id}", class: 'player__still', hidden: true, loading: 'lazy'
       %noscript
-        = image_tag still, alt: "Tag ##{player.id}"
+        = image_tag still, alt: "Tag ##{tag.id}"
     -# Escaped by ActiveSupport's JSON encoder, so `</script>` cannot break out.
-    %script{ type: 'application/json' }!= player.player_data.to_json
+    %script{ type: 'application/json' }!= tag.player_data.to_json
   .player__transport{ data: { player_controls: true } }
+  - if strip.present?
+    = render 'tags/filmstrip', tags: strip, current: tag, older: local_assigns[:prev], newer: local_assigns[:next]

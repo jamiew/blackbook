@@ -134,6 +134,23 @@ describe TagsController do
       expect(response.body).to match(/Tag ##{@tag.id}/)
     end
 
+    it "lines the neighbours up oldest to newest around the tag" do
+      older = @tag
+      middle = FactoryBot.create(:tag)
+      newer = FactoryBot.create(:tag)
+      get :show, params: { id: middle.id }
+      expect(assigns(:strip)).to eq([older, middle, newer])
+      expect(assigns(:prev)).to eq(older)
+      expect(assigns(:next)).to eq(newer)
+      expect(response.body).to match(%r{data-key="ArrowLeft"[^>]*href="/data/#{older.id}"})
+      expect(response.body.scan(/<a[^>]*aria-current="page"[^>]*class="strip__cell"/).size).to eq(1)
+    end
+
+    it "gives every cell its preview payload" do
+      get :show, params: { id: @tag.to_param }
+      expect(response.body).to include(%(data-preview="/data/#{@tag.id}.json?preview=1"))
+    end
+
     it ".gml" do
       get :show, params: { id: @tag.to_param, format: 'gml' }
       expect(response).to be_successful

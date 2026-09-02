@@ -35,6 +35,10 @@ drops the `comments` table. Run `rake data:validate` first.
 
 ## Things that look wrong but are not
 
+- **`public/canvasplayer/` is vendored JavaScript outside the asset pipeline.**
+  Propshaft fingerprints filenames, which breaks the modules' relative
+  imports. `SOURCE` in that directory records the commit and how to update.
+  Never edit those files here; changes go upstream first.
 - **`crypted_password` and `password_salt` are still on `users`.** Accounts
   predating the Authlogic removal have only an scrypt hash, verified against the
   old scheme and rehashed to bcrypt on next login. Dropping these columns logs

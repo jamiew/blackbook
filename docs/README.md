@@ -14,6 +14,7 @@ the website and anyone (or anything) working on the repo.
 ## Rendering GML
 
 - [Sample playback code](gml/playback-implementations.md), across C++, Processing, Javascript, Flash, PHP and Python
+- [canvasplayer](https://github.com/jamiew/canvasplayer), the site's own player, vendored under `public/canvasplayer/`
 - [Drawing GML with Javascript and JSON](gml/javascript-and-json.md)
 - [PHP API scraping example](examples/php-scraper.md)
 

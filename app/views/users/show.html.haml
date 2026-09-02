@@ -35,7 +35,7 @@
         = pagination(@tags)
 
   %aside.profile__aside
-    .hero__panel
+    .panel
       %h2 Profile
       %p.profile__photo= link_to image_tag(attachment_url(@user, :photo, :small), alt: @user.login), attachment_url(@user, :photo, :medium)
       - unless @user.website.blank?
@@ -48,6 +48,6 @@
         %p= link_to 'Edit settings', settings_path, class: 'button'
 
     - unless @notifications.blank?
-      .hero__panel
+      .panel
         %h2 Activity
         = render partial: 'home/notifications', object: @notifications

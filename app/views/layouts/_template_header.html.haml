@@ -1,9 +1,20 @@
+- description = "An open archive of motion-captured graffiti. Every tag is a GML file: the writer's hand as coordinates and timestamps, replayable by anyone."
 %head
   %meta{ charset: 'utf-8' }
   -# Without this the layout renders at desktop width on phones, zoomed out.
   %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1' }
   %meta{ name: 'robots', content: @noindex ? 'noindex,follow' : 'all' }
   %meta{ name: 'theme-color', content: '#000000' }
+  %meta{ name: 'description', content: description }
+
+  -# One card for the whole site until tags get their own (see PLAN.md).
+  %meta{ property: 'og:type', content: 'website' }
+  %meta{ property: 'og:title', content: page_title }
+  %meta{ property: 'og:description', content: description }
+  %meta{ property: 'og:image', content: image_url('/images/social-card.jpg') }
+  %meta{ name: 'twitter:card', content: 'summary_large_image' }
+  %link{ rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }
+  %link{ rel: 'icon', type: 'image/png', sizes: '512x512', href: '/images/icon-512.png' }
 
   %link{ rel: 'preconnect', href: 'https://fonts.googleapis.com' }
   %link{ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' }
@@ -14,8 +25,8 @@
   %link{ rel: 'service-desc', type: 'application/yaml', href: '/openapi.yaml', title: 'OpenAPI' }
   %link{ rel: 'describedby', type: 'text/plain', href: '/llms.txt', title: 'llms.txt' }
 
-  -# The vendored player. player.js reads the directory from this meta, and the
-  -# controls' stylesheet goes before ours so ours wins ties.
+  -# The vendored player. player.js and gml_thumbnails.js read the directory
+  -# from this meta, and the controls' stylesheet goes before ours so ours wins ties.
   %meta{ name: 'canvasplayer', content: canvasplayer_path }
   %link{ rel: 'stylesheet', href: canvasplayer_path('gml-ui.css') }
 
@@ -23,7 +34,7 @@
   -# Propshaft doesn't read sprockets `//= require` directives, so each file is listed here.
   -# `rails-ujs` ships with actionview and drives data-method/data-confirm on links.
   = javascript_include_tag 'rails-ujs', 'application'
-  = javascript_include_tag 'player', type: 'module'
+  = javascript_include_tag 'player', 'gml_thumbnails', type: 'module'
   = csrf_meta_tags
 
   = yield :head

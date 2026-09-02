@@ -97,11 +97,13 @@ class TagsController < ApplicationController
 
     # We only need these instance variables when rendering HTML (aka ghetto interlok)
     if ['html', nil].include?(params[:format])
-      @prev = Tag.where(id: ...@tag.id).last
-      @next = Tag.find_by("id > ?", @tag.id)
-
-      @user = User.find_by_param(params[:user_id]) if params[:user_id]
-      @user ||= @tag.user
+      # The filmstrip: eight either side by id, oldest to newest, so ‹ › and
+      # the arrow keys read as a timeline.
+      before = Tag.where(id: ...@tag.id).order(id: :desc).limit(8).includes(:user).to_a
+      after  = Tag.where('id > ?', @tag.id).order(id: :asc).limit(8).includes(:user).to_a
+      @prev  = before.first
+      @next  = after.first
+      @strip = before.reverse + [@tag] + after
     end
 
     # Freak out if GML data is missing; this really isn't ever supposed to happen

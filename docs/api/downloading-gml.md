@@ -40,6 +40,25 @@ actually changes:
 curl -H 'If-None-Match: "abc123"' http://000000book.com/latest.gml
 ```
 
+## Preview payload for thumbnails
+
+`/data/:id.json?preview=1` returns the tag cut down for drawing small: about
+300 points, three decimal places, no per-stroke styling. The site's own grid
+and filmstrip draw from it.
+
+```
+curl 'http://000000book.com/data/147.json?preview=1'
+```
+
+```json
+{ "id": 147, "app": "DustTag", "up": { "x": 1.0, "y": 0.0 }, "rotate": true,
+  "strokes": [ { "points": [[0.427, 0.113, 0.0], [0.431, 0.118, 0.03]] } ] }
+```
+
+`up` is the capture's up vector, so a client can decide rotation the way the
+reference player does; `rotate` is the server's answer for older clients. It
+carries the same ETag and caching rules as the full `.json`.
+
 ## Other handy API access points
 
 Latest tag uploaded site-wide:

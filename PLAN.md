@@ -20,14 +20,20 @@ tag: the detail page, the grid, the filmstrip, and later the social card.
       pauses; `←`/`→` follow next and previous on a tag page.
 - [x] `Tag#preview_data`, served from `tags#show` as `.json?preview=1`.
 
+- [x] **The viewer.** The id and context live in the player head; the
+      filmstrip of live neighbours sits inside the frame; metadata is a strip
+      of tiles below. `/` is the same viewer on the latest tag. Every grid
+      cell on the site draws its own tag (`gml_thumbnails.js`).
+- [x] **About page and graphics.** Rebuilt with a hero composed from tag
+      10043's real strokes (Glif), six random live cells, and local images.
+      The same render is the README header and the default OpenGraph card.
+
 ## Next
 
-- [ ] **Grid.** Cells become canvases mounted on scroll from `?preview=1`,
-      `hairline` mode, looped on hover. `prefers-reduced-motion` draws the
-      finished tag once. `NO STILL` stays as the pre-JS state.
-- [ ] **Filmstrip.** `tags/_filmstrip` under the player on `/` and
-      `/data/:id`: the neighbouring tags as the same live cells, each a link,
-      with a `← → browse · space play` hint. No pushState.
+- [ ] Per-tag OpenGraph cards, and stills for tags with no attachment. The
+      cheapest renderer is `gml2img.py` in the tempt1-archive worktree, which
+      already ports the marker model to SVG (PNG via `rsvg-convert`).
+      Backfilling production needs its own approval.
 
 ## Backlog
 

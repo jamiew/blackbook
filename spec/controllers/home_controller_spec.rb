@@ -13,6 +13,13 @@ describe HomeController do
     expect(response).to be_successful
   end
 
+  it "plays the latest tag with a filmstrip and live cells" do
+    FactoryBot.create(:tag)
+    get :index
+    expect(response.body).to include('class="strip"')
+    expect(response.body).to include('data-preview="/data/')
+  end
+
   it "/about works" do
     get :about
     expect(response.body).to include('About')

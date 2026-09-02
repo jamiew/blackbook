@@ -1,0 +1,44 @@
+-# The tag's metadata as a strip of tiles, and what you can do with it.
+- null = content_tag(:span, 'null', class: 'specs__value--null')
+.specs
+  .specs__row
+    %span.specs__key Application
+    %span.specs__value
+      - app = tag.gml_application.presence || tag.application
+      = app.blank? ? null : application_link(tag.sexy_app_name)
+  .specs__row
+    %span.specs__key Uploader
+    %span.specs__value= tag_user_link(tag)
+  - unless tag.author.blank?
+    .specs__row
+      %span.specs__key Author
+      %span.specs__value= tag.author
+  .specs__row
+    %span.specs__key Location
+    %span.specs__value= tag.location.blank? ? null : location_link(tag.location)
+  .specs__row
+    %span.specs__key Keywords
+    %span.specs__value
+      - if tag.gml_keywords.blank?
+        = null
+      - else
+        = tag.gml_keywords.split(',').map { |w| link_to w.strip, tags_path(keywords: w.strip) }.join(', ').html_safe
+  .specs__row
+    %span.specs__key Uploaded
+    %span.specs__value= tag.created_at.strftime('%Y-%m-%d %H:%M:%S')
+  -# There is no :original variant, so this links the stored blob itself.
+  - url = tag.image.attached? ? url_for(tag.image) : tag.remote_image
+  - if url
+    .specs__row
+      %span.specs__key Still
+      %span.specs__value= link_to File.basename(url.gsub(/\?.*/, '')), url, target: '_blank', rel: 'noopener'
+  - unless tag.description.blank?
+    .specs__row.specs__row--wide
+      %span.specs__key Description
+      %span.specs__value= tag.description
+
+.actions
+  = link_to 'Download GML', tag_path(tag, format: :gml), class: 'button button--solid'
+  - on = current_user && tag.favorited_by?(current_user)
+  = link_to (on ? '★ Favorited' : '☆ Favorite'), tag_favorites_path(tag), method: :post, class: "button #{'button--solid' if on}"
+  = link_to 'What is GML?', 'http://fffff.at/gml-week-graffiti-markup-language/', class: 'button button--quiet', target: '_blank', rel: 'noopener'

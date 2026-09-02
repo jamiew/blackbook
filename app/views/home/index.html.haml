@@ -1,48 +1,25 @@
 = auto_discovery_link_tag(:rss, { format: :rss, controller: 'tags', action: 'index' }, title: '#000000book: Latest Tags')
 
 - if @tag.blank?
-  %h1.page__title No tag data
+  %p.page__lede No tag data.
 - else
-  .hero
-    .hero__main
-      %span.eyebrow Most recent capture
-      %h1.hero__title
-        %a{ href: tag_path(@tag) }= tag_title(@tag)
-      .hero__meta.meta
-        %span= application_link(@tag.sexy_app_name)
-        %span= tag_user_link(@tag)
-        - unless @tag.location.blank?
-          %span= location_link(@tag.location)
-        %span== #{timeago(@tag.created_at)} ago
-      = render partial: 'tags/player', object: @tag, as: :player
+  = render 'tags/player', tag: @tag, strip: @strip, prev: @prev
 
-    .hero__aside
-      .hero__panel
-        %h2 Latest uploads
-        %ul.feed
-          - @tags.first(14).each do |tag|
-            %li
-              %a{ href: tag_path(tag) }
-                %span.feed__id= "##{tag.id}"
-                %span.feed__app= tag.sexy_app_name.presence || 'upload'
-        %p{ style: 'margin: 14px 0 0' }
-          = link_to 'View all data →', tags_path, class: 'button'
+  .lede
+    %h1.lede__title An open archive of motion-captured graffiti
+    %p.page__lede
+      Every tag is a #{link_to 'GML', 'http://fffff.at/gml-week-graffiti-markup-language/'} file:
+      the writer's hand as coordinates and timestamps, replayable by anyone.
+    - if current_user
+      = link_to '+ Upload GML', new_tag_path, class: 'button button--solid'
+    - else
+      = link_to 'Create an account', signup_path, class: 'button button--solid'
 
-      .hero__panel
-        %h2 What this is
-        %p{ style: 'margin-bottom: 12px; color: var(--dim); font-size: 14px' }
-          An open archive of motion-captured graffiti. Every tag here is a
-          #{link_to 'GML', 'http://fffff.at/gml-week-graffiti-markup-language/'} file:
-          the writer's hand, sampled as coordinates and timestamps, replayable by anyone.
-        %p{ style: 'margin: 0' }
-          - if current_user
-            = link_to '+ Upload GML', new_tag_path, class: 'button button--solid'
-          - else
-            = link_to 'Create an account', signup_path, class: 'button button--solid'
+  .section-head
+    %h2 Recent tags
+    %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_stats[:total])} archived
 
-.section-head
-  %h2 Recent tags
-  %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_stats[:total])} archived
+  .tag-grid
+    = render partial: 'tags/tag', collection: @tags, as: :tag
 
-.tag-grid
-  = render partial: 'tags/tag', collection: @tags, as: :tag
+  %p{ style: 'margin-top: 20px' }= link_to 'View all data →', tags_path, class: 'button'

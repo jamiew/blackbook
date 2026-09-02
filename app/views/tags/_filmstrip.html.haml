@@ -1,0 +1,20 @@
+-# The tag's neighbours as live thumbnails, oldest on the left. ‹ and › are
+-# the older and newer links; the arrow keys follow them through data-key
+-# (see player.js).
+%nav.strip{ 'aria-label' => 'Nearby tags' }
+  - if older
+    = link_to '‹', tag_path(older), class: 'strip__step', data: { key: 'ArrowLeft' }, 'aria-label' => "Previous, tag ##{older.id}"
+  - else
+    %span.strip__step.strip__step--off{ 'aria-hidden' => true } ‹
+  %ol.strip__rail
+    - tags.each do |neighbour|
+      - who = neighbour.user&.login || neighbour.secret_username || 'anon'
+      %li
+        %a.strip__cell{ href: tag_path(neighbour), 'aria-current' => (neighbour == current ? 'page' : nil),
+                        title: "##{neighbour.id} · #{neighbour.sexy_app_name.presence || 'upload'} · #{who}" }
+          %canvas{ data: { preview: tag_path(neighbour, format: :json, preview: 1) }, 'aria-label' => "Tag ##{neighbour.id}" }
+  - if newer
+    = link_to '›', tag_path(newer), class: 'strip__step', data: { key: 'ArrowRight' }, 'aria-label' => "Next, tag ##{newer.id}"
+  - else
+    %span.strip__step.strip__step--off{ 'aria-hidden' => true } ›
+  %span.strip__hint.meta ← → browse · space play

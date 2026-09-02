@@ -1,13 +1,11 @@
--# One cell in the tag grid. The image is the content, so it gets the space.
+-# One cell in the tag grid. The canvas draws the tag itself once it scrolls
+-# into view (gml_thumbnails.js); the still is only for browsers without JS.
 %a.tag-card{ href: tag_path(tag) }
   .tag-card__frame
     %span.tag-card__id= "##{tag.id}"
+    %canvas.tag-card__canvas{ data: { preview: tag_path(tag, format: :json, preview: 1), autoplay: true }, 'aria-label' => "Tag ##{tag.id}" }
     - if tag.image.attached? || tag.remote_thumbnail_url.present?
-      = image_tag tag_thumbnail_url(tag), alt: "Tag ##{tag.id}", loading: 'lazy'
-    - else
-      -# Older uploads never had a still generated. Say so rather than falling
-      -# back to a stock photo that reads as the tag itself.
-      %span.tag-card__empty No still
+      %noscript= image_tag tag_thumbnail_url(tag), alt: "Tag ##{tag.id}", loading: 'lazy'
   .tag-card__body
     %span.tag-card__app= tag.sexy_app_name.presence || 'Upload'
     %span.tag-card__who

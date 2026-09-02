@@ -164,7 +164,7 @@ textarea:focus-visible,
 }
 
 .page__title {
-  font-size: clamp(2rem, 5.5vw, 4.25rem);
+  font-size: clamp(1.75rem, 4vw, 3rem);
   font-variation-settings: "wdth" 112;
   text-transform: uppercase;
 }
@@ -317,10 +317,10 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 #flash-notice { border-color: var(--accent); color: var(--accent); }
 
 /* --- canvas player ------------------------------------------------------ */
-/* The transport and the switches come from canvasplayer's gml-ui.css, themed
-   through the four custom properties it reads. Its --rule is a colour and ours
-   is a border shorthand, and gml-ui.js adds its class to our own element, so
-   anything under those two hosts spells its border out in full. */
+/* One instrument: head, stage, transport, filmstrip. The transport and the
+   switches come from canvasplayer's gml-ui.css, themed through the four custom
+   properties it reads. Its --rule is a colour and ours is a border shorthand,
+   so it is only overridden on its own two hosts. */
 
 .player {
   border: var(--rule);
@@ -332,19 +332,32 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 
 .player__head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 14px;
   padding: 10px 14px;
   border-bottom: var(--rule);
   font-size: var(--meta-size);
   letter-spacing: var(--meta-tracking);
   text-transform: uppercase;
-  flex-wrap: wrap;
 }
-.player__label { color: var(--dimmer); }
-.player__label::before { content: "◧ "; color: var(--accent); }
-.player__meta { color: var(--dim); }
+/* The id is the label. Display face, not mono, and the one thing in the head
+   set in mixed case. */
+.player__id {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variation-settings: "wdth" 112;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-transform: none;
+  color: var(--ink);
+  margin: 0;
+}
+.player__context { color: var(--dim); }
+.player__context a { color: var(--ink); border-bottom-color: var(--line); }
+.player__context a:hover { color: var(--accent); }
+.player__meta { margin-left: auto; color: var(--dimmer); white-space: nowrap; }
 
 .player__stage {
   position: relative;
@@ -417,6 +430,57 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
    hidden attribute. */
 .player__pane[hidden] { display: none; }
 
+/* --- filmstrip ---------------------------------------------------------- */
+/* The tag's neighbours, oldest to newest, inside the player frame. Each cell
+   is a live canvas (gml_thumbnails.js); the current one is lit. */
+
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+}
+.strip__rail {
+  display: flex;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.strip__rail::-webkit-scrollbar { display: none; }
+.strip__cell {
+  display: block;
+  position: relative;
+  flex: 0 0 auto;
+  width: 104px;
+  height: 68px;
+  background: var(--ground);
+  border: 1px solid transparent;
+  scroll-snap-align: center;
+  transition: border-color 120ms;
+}
+.strip__cell:hover { border-color: var(--line-bright); }
+.strip__cell[aria-current] { border-color: var(--accent); }
+.strip__cell canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.strip__step {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--dim);
+  border: 1px solid var(--line-bright);
+}
+a.strip__step:hover { background: var(--accent); border-color: var(--accent); color: #000; }
+.strip__step--off { opacity: 0.3; }
+.strip__hint { flex: 0 0 auto; white-space: nowrap; padding-left: 6px; }
+
 /* --- tag grid ----------------------------------------------------------- */
 
 .tag-grid {
@@ -445,28 +509,12 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   overflow: hidden;
   background: var(--surface);
 }
-.tag-card__frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transition: transform 260ms cubic-bezier(0.2, 0, 0, 1);
-}
-.tag-card:hover .tag-card__frame img { transform: scale(1.035); }
-
-.tag-card__empty {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--dimmer);
-}
+.tag-card__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tag-card__frame noscript img { width: 100%; height: 100%; object-fit: contain; }
 
 .tag-card__id {
   position: absolute;
+  z-index: 1;
   top: 8px;
   left: 8px;
   font-family: var(--mono);
@@ -511,30 +559,19 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 
 /* --- home --------------------------------------------------------------- */
 
-.hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: var(--gutter);
-  align-items: start;
-  margin-bottom: 56px;
-}
-
-.hero__title {
-  font-size: clamp(1.5rem, 3vw, 2.4rem);
+/* One line on what this is, under the player. */
+.lede { padding: 28px 0 8px; max-width: 60ch; }
+.lede__title {
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
   font-variation-settings: "wdth" 108;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
-.hero__title a { border: 0; }
-.hero__title a:hover { color: var(--accent); }
+.lede .page__lede { margin-bottom: 14px; }
 
-.hero__meta { margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
-.hero__meta a { border-bottom-color: var(--line); }
-
-.hero__aside { display: flex; flex-direction: column; gap: 14px; }
-
-.hero__panel { border: var(--rule); background: var(--surface); padding: 14px; }
-.hero__panel h2 {
+/* A bordered box with a small mono heading, used by the writer profile. */
+.panel { border: var(--rule); background: var(--surface); padding: 14px; }
+.panel h2 {
   font-family: var(--mono);
   font-size: var(--meta-size);
   letter-spacing: var(--meta-tracking);
@@ -543,26 +580,6 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   font-weight: 500;
   margin-bottom: 10px;
 }
-
-.feed { display: flex; flex-direction: column; }
-.feed li { border-top: var(--rule); }
-.feed li:first-child { border-top: 0; }
-.feed a {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 7px 0;
-  border: 0;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
-.feed a:hover { color: var(--accent); }
-.feed__id { color: var(--ink); flex: 0 0 auto; }
-.feed a:hover .feed__id { color: var(--accent); }
-.feed__app { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .section-head {
   display: flex;
@@ -582,36 +599,32 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 
 /* --- tag detail --------------------------------------------------------- */
 
-.tag-detail {
+/* The tag's metadata as tiles, full width under the player. */
+.specs {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: var(--gutter);
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: var(--rule);
+  margin-top: 20px;
 }
-
-.tag-detail__id {
-  font-size: clamp(2.25rem, 6vw, 4.5rem);
-  font-variation-settings: "wdth" 118;
-  line-height: 0.9;
-  margin-bottom: 4px;
-}
-
-.specs { border: var(--rule); }
 .specs__row {
-  display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  gap: 12px;
-  padding: 9px 12px;
-  border-bottom: var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--ground);
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.05em;
 }
-.specs__row:last-child { border-bottom: 0; }
-.specs__key { color: var(--dimmer); text-transform: uppercase; }
+.specs__row--wide { grid-column: 1 / -1; }
+.specs__key { color: var(--dimmer); text-transform: uppercase; font-size: 10px; letter-spacing: 0.12em; }
 .specs__value { color: var(--ink); overflow-wrap: anywhere; }
 .specs__value a { border-bottom-color: var(--line); }
 .specs__value--null { color: var(--dimmer); }
+
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
 .source { margin-top: 14px; border: var(--rule); }
 .source summary {
@@ -650,9 +663,6 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   font-weight: 500;
 }
 .modbox__body { padding: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
-
-/* Previous / next between tags. */
-.stepper { display: flex; align-items: center; gap: 8px; }
 
 /* An app's screenshot on its detail page. */
 .figure { border: var(--rule); background: var(--surface); margin: 0; padding: 12px; }
@@ -729,8 +739,53 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 
 /* --- about -------------------------------------------------------------- */
 
-.column_left { max-width: 680px; }
-.column_left img { margin-bottom: 10px; }
+.about__hero { position: relative; margin: 0 0 32px; border: var(--rule); background: var(--surface); }
+.about__hero img { width: 100%; }
+/* The wordmark sits on the render's calm left third rather than being baked in. */
+.about__hero figcaption {
+  position: absolute;
+  left: 4%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 30%;
+}
+.about__wordmark { width: 100%; max-width: 360px; height: auto; filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.9)); }
+
+.about__body > p { max-width: 72ch; }
+.about__body .section-head { margin-top: 32px; }
+
+.about__defs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: var(--rule);
+  margin-bottom: 24px;
+}
+.about__defs > div { background: var(--ground); padding: 14px 16px; }
+.about__defs dt {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-variation-settings: "wdth" 112;
+  margin-bottom: 4px;
+}
+.about__defs dd { color: var(--dim); }
+.about__defs em {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: var(--meta-size);
+  letter-spacing: var(--meta-tracking);
+  text-transform: uppercase;
+  color: var(--dimmer);
+  margin-right: 6px;
+}
+
+.about__row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 24px 0; }
+.about__row img { max-height: 160px; width: auto; }
 
 /* Float helpers a few remaining views still hang on to. */
 .clear { clear: both; }
@@ -760,8 +815,6 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
 /* --- responsive --------------------------------------------------------- */
 
 @media (max-width: 1080px) {
-  .hero { grid-template-columns: minmax(0, 1fr); }
-  .tag-detail { grid-template-columns: minmax(0, 1fr); }
   .profile { grid-template-columns: minmax(0, 1fr); }
 }
 
@@ -771,10 +824,11 @@ td { padding: 12px 12px 12px 0; border-bottom: var(--rule); vertical-align: midd
   .masthead__logo img { height: 40px; }
   .masthead__nav { gap: 16px; order: 3; width: 100%; }
   .player__stage { aspect-ratio: 1 / 1; }
+  .strip__hint { display: none; }
+  .about__hero figcaption { position: static; transform: none; max-width: none; padding: 12px; }
+  .strip__cell { width: 84px; height: 56px; }
   .tag-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-  /* 'APPLICATION' does not fit a narrow key column, so stack instead of
-     letting it run into its own value. */
-  .specs__row { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+  .specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .page { padding-block: 24px 64px; }
 }
 
