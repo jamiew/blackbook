@@ -126,11 +126,15 @@ describe TagsController do
       end
     end
 
-    it "is the grid alone, every cell a link to its tag" do
+    it "is the grid alone, every cell a link to its tag, with a display dropdown" do
       tag = FactoryBot.create(:tag)
+      pictured = FactoryBot.create(:tag)
+      pictured.image.attach(io: StringIO.new('x'), filename: 'still.png', content_type: 'image/png')
       get :index
       expect(response.body).not_to include('class="browse"')
       expect(response.body).to include(%(href="/data/#{tag.id}"))
+      expect(response.body).to include('data-display-switch')
+      expect(response.body.scan('tag-card__still').size).to eq(1)
     end
 
     it "works for a valid user" do

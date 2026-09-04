@@ -51,8 +51,9 @@ Migrations never run automatically on deploy. The pending set drops the
   `/openapi.yaml` describe the API. `spec/requests/seo_spec.rb` checks all of it.
 - Test UI changes with `agent-browser` at 1440 and 390 wide. Thumbnails only
   draw once their cells scroll into view.
-- The player's pane remembers its look per browser in `localStorage`
-  (`blackbook.player.v2`). The logo is `public/images/logo/clean.png`.
+- Per-browser choices live in `localStorage`: the player's look
+  (`blackbook.player.v2`) and the grid's display mode (`blackbook.display`,
+  set from the dropdown on `/data`). The logo is `public/images/logo/clean.png`.
 
 ## Design
 

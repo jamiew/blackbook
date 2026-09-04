@@ -69,7 +69,7 @@ class Tag < ApplicationRecord
       where("application LIKE '%eyewriter%' OR gml_application LIKE '%eyewriter%' " \
             "OR gml_keywords LIKE '%tempt%' OR author LIKE '%tempt%'").order(created_at: :desc, id: :desc)
     when 'nyc'
-      places = %w[new\ york nyc brooklyn queens bronx manhattan harlem staten\ island]
+      places = ['new york', 'nyc', 'brooklyn', 'queens', 'bronx', 'manhattan', 'harlem', 'staten island']
       where((places.map { |place| "location LIKE '%#{place}%'" } + ["gml_keywords LIKE '%nyc%'"]).join(' OR '))
         .order(created_at: :desc, id: :desc)
     when 'popular'

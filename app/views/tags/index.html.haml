@@ -21,6 +21,15 @@
       = select_tag :app, "<option value=''>All applications</option>".html_safe + options_from_collection_for_select(@applications, 'name', 'name', (CGI.unescape(params[:app].to_s) rescue '')), id: 'app'
       = submit_tag 'Apply', name: nil
   .filters__spacer
+  -# How a cell shows a tag that has an uploaded still. Remembered per browser.
+  %label.display{ for: 'display' }
+    %span.meta Show
+    %select#display{ data: { display_switch: true } }
+      %option{ value: 'drawing' } ◫ Drawing
+      %option{ value: 'still' } ▣ Still, or drawing
+      %option{ value: 'over' } ◧ Still with drawing over
+      %option{ value: 'pip' } ⧉ Picture in picture
+      %option{ value: 'hover' } ⇄ Drawing, still on hover
   - if current_user
     = link_to '+ Upload GML', new_tag_path, class: 'button button--solid'
 

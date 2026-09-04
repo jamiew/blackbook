@@ -136,20 +136,21 @@ textarea:focus-visible,
    tagline turns to mush, and the logo is the one soft thing on the page. */
 .masthead__logo img { height: 56px; width: auto; }
 
-.masthead__nav { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.masthead__nav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
+/* Every state has the same padding and a border, so nothing moves when the
+   current one lights up. */
 .masthead__nav a {
-  padding: 6px 0;
+  padding: 5px 9px;
+  border: 1px solid transparent;
   font-family: var(--mono);
   font-size: var(--meta-size);
   letter-spacing: var(--meta-tracking);
   text-transform: uppercase;
-  border: 0;
   color: var(--dim);
 }
-.masthead__nav a:hover { color: var(--ink); }
-.masthead__nav a[aria-current="page"] { color: var(--ink); }
-.masthead__nav a[aria-current="page"]::before { content: "● "; color: var(--accent); }
+.masthead__nav a:hover { color: var(--ink); border-color: var(--line); }
+.masthead__nav a[aria-current="page"] { color: var(--ink); border-color: var(--line-bright); }
 
 .masthead__account { display: flex; align-items: center; gap: 16px; }
 .masthead__account a { padding: 6px 0; }
@@ -534,12 +535,33 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
   overflow: hidden;
   background: var(--surface);
 }
+/* The drawing's box, which the engine sizes its canvas to; picture in picture
+   shrinks the box, not the canvas. */
+.tag-card__drawing { position: absolute; inset: 0; }
 .tag-card__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tag-card__still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--ground); }
+
+/* Display modes, set on <html> by the dropdown on /data. No attribute is the
+   no-JS state: the still, when there is one. */
+[data-display="drawing"] .tag-card__still { display: none; }
+[data-display="still"] .tag-card__frame:has(.tag-card__still) .tag-card__drawing { display: none; }
+[data-display="over"] .tag-card__frame:has(.tag-card__still) .tag-card__drawing { z-index: 1; mix-blend-mode: screen; }
+[data-display="pip"] .tag-card__frame:has(.tag-card__still) .tag-card__drawing {
+  inset: auto 6px 6px auto;
+  width: 44%;
+  height: 44%;
+  z-index: 1;
+  border: 1px solid var(--line-bright);
+  background: var(--ground);
+}
+[data-display="hover"] .tag-card__still { opacity: 0; transition: opacity 120ms; }
+[data-display="hover"] .tag-card:hover .tag-card__still,
+[data-display="hover"] .tag-card:focus .tag-card__still { opacity: 1; }
 .tag-card__frame noscript img { width: 100%; height: 100%; object-fit: contain; }
 
 .tag-card__id {
   position: absolute;
-  z-index: 1;
+  z-index: 2; /* above the drawing when a mode lifts it over the still */
   top: 8px;
   left: 8px;
   font-family: var(--mono);
@@ -580,6 +602,8 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 }
 .filters form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .filters select { width: auto; min-width: 190px; max-width: 100%; }
+.display { display: flex; align-items: center; gap: 8px; margin: 0; }
+.display select { min-width: 0; padding: 7px 9px; font-size: 12px; }
 .filters__spacer { flex: 1 1 auto; }
 
 /* --- tabs --------------------------------------------------------------- */
@@ -752,7 +776,7 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 /* --- upload ------------------------------------------------------------- */
 
 /* The one loud item in the nav. */
-.masthead__nav a.masthead__upload { color: var(--accent); border: 1px solid var(--accent); padding: 4px 9px; }
+.masthead__nav a.masthead__upload { color: var(--accent); border-color: var(--accent); }
 .masthead__nav a.masthead__upload:hover { background: var(--accent); color: #000; }
 .masthead__nav a.masthead__upload[aria-current="page"]::before { content: none; }
 

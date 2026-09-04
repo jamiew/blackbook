@@ -26,7 +26,9 @@ app cards, in the recorder.
 
 - Curation: the front page has sets as tabs (Featured, Tempt1, NYC, Latest,
   Popular); `views_count` on tags, counted when the page, file or player
-  payload loads; `/data` is the grid alone.
+  payload loads; `/data` is the grid alone, with a display dropdown for tags
+  that have a still: drawing, still, still with drawing over, picture in
+  picture, still on hover. Seeds attach no stills; generate a few by hand.
 
 ## Next
 

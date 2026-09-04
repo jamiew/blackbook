@@ -79,5 +79,27 @@ const seen = new IntersectionObserver(entries => {
 
 document.querySelectorAll('canvas[data-preview]').forEach(canvas => seen.observe(canvas));
 
+/* --- display mode: what a cell shows when the tag has a still ---------- */
+
+// Applied on every page from what the browser remembers; the dropdown only
+// exists on /data. Without JS the still shows, so the default here is set
+// on purpose to the drawing.
+const DISPLAY_KEY = 'blackbook.display';
+const DISPLAYS = ['drawing', 'still', 'over', 'pip', 'hover'];
+const display = document.querySelector('[data-display-switch]');
+
+function setDisplay(name) {
+  document.documentElement.dataset.display = name;
+  if (display) display.value = name;
+}
+
+let remembered = null;
+try { remembered = localStorage.getItem(DISPLAY_KEY); } catch { /* private */ }
+setDisplay(DISPLAYS.includes(remembered) ? remembered : 'drawing');
+display?.addEventListener('change', () => {
+  setDisplay(display.value);
+  try { localStorage.setItem(DISPLAY_KEY, display.value); } catch { /* private */ }
+});
+
 // The filmstrip opens with the current tag in view.
 document.querySelector('.strip [aria-current]')?.scrollIntoView({ inline: 'center', block: 'nearest' });
