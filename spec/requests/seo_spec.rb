@@ -54,7 +54,7 @@ RSpec.describe 'search, social and agents' do
   end
 
   it 'has a web manifest, and an llms.txt that points at the markdown' do
-    get '/manifest.webmanifest'
+    get '/manifest.json'
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body['icons']).to be_present
 
