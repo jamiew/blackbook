@@ -1,6 +1,9 @@
 - can_edit = is_owner?(@visualization) || is_admin?
 - content_for :description, "#{@visualization.name}: #{@visualization.description.to_s.truncate(150)}"
-- content_for :og_image, attachment_url(@visualization, :image, :large) if @visualization.image.attached?
+- if @visualization.image.attached?
+  - content_for :og_image, attachment_url(@visualization, :image, :large)
+  - content_for :og_image_alt, "#{@visualization.name}, screenshot"
+- content_for :structured_data, json_ld(app_structured_data(@visualization))
 - null = content_tag(:span, 'null', class: 'specs__value--null')
 
 .page__head

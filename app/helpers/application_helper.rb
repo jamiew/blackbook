@@ -63,6 +63,18 @@ module ApplicationHelper
     link_to label, url_for(query.merge(only_path: true)), class: 'chip', 'aria-current' => (active ? 'true' : nil)
   end
 
+  # A JSON-LD block for the head. Rails' encoder escapes < and >, so a
+  # `</script>` inside a description cannot break out of the tag.
+  def json_ld(data)
+    content_tag(:script, data.to_json.html_safe, type: 'application/ld+json')
+  end
+
+  # Who a tag is by, for titles and descriptions: the account, the device's
+  # codename, or nobody.
+  def tag_author(tag)
+    tag.user&.login || tag.secret_username || 'an anonymous writer'
+  end
+
   def html_attrs(lang = 'en-US')
     { lang: lang }
   end

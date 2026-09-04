@@ -19,6 +19,7 @@ XML by appending an extension to its URL.
 | Filtered list | `/data.json?app=eyewriter`, also `user`, `location`, `keywords`, `has=still`, `who=anon`, `year=2010` |
 | For drawing | `/data/154.json?preview=1` (about 300 points) or `?player=1` (everything) |
 | Upload | `POST /data` with a `gml` parameter |
+| These docs as markdown | append `.md` to any `/docs` URL |
 
 Rendering what you download is covered in
 [sample playback code](../gml/playback-implementations.md), which collects

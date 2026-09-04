@@ -46,6 +46,9 @@ Migrations never run automatically on deploy. The pending set drops the
   `Tag#preview_data` for thumbnails; `.json?player=1` is `player_data` for the
   browse page's swaps. Rotation is decided on the client with upstream
   `isLandscape` from the `up` vector each payload carries.
+- Every page carries a description, canonical, OpenGraph card and JSON-LD
+  (`SeoHelper`); `/docs/*.md` serves raw markdown; `/llms.txt` and
+  `/openapi.yaml` describe the API. `spec/requests/seo_spec.rb` checks all of it.
 - Test UI changes with `agent-browser` at 1440 and 390 wide. Thumbnails only
   draw once their cells scroll into view.
 - The player's pane remembers its look per browser in `localStorage`

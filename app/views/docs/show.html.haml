@@ -1,4 +1,6 @@
 - content_for :description, "#{@doc.title}. Documentation for the 000000book API and the Graffiti Markup Language."
+- content_for :head, tag.link(rel: 'alternate', type: 'text/markdown', href: "#{request.base_url}#{@doc.url_path}.md")
+- content_for :structured_data, json_ld(doc_structured_data(@doc))
 - sections = { 'api' => 'API', 'gml' => 'GML', 'examples' => 'Examples', nil => 'Running it' }
 - pages = DocsPage.all.reject { |p| p.slug == 'README' }.group_by { |p| p.slug.include?('/') ? p.slug.split('/').first : nil }
 

@@ -14,7 +14,9 @@ app cards, in the recorder.
   it in place; four layouts from the masthead switch; combinable chips.
 - Apps: `source_url`, chips, every card and page playing the app's newest tag.
 - Upload: capture apps, a GML recorder, form and API.
-- Search and social: descriptions, canonical, cards, `sitemap.xml`, skip link.
+- Search and social: descriptions, canonical, cards, `sitemap.xml`, skip link,
+  JSON-LD for the site, archive, tags, apps and docs, docs as markdown, a web
+  manifest, and a request spec over all of it.
 - Cleanup: dead icons, placeholders, the ga.js partial, an unused view and a
   stale spec gone; docs rewritten short.
 - The logo without its tagline (Glif variations were tried and dropped);

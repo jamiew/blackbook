@@ -21,6 +21,8 @@ Base URL `<%= request.base_url %>`.
   `location` or `keywords`. Page with `page` and `per_page` (default 15, max 100).
   Also available as `.xml` and `.rss`.
 - `GET /data/{id}.json` — one tag, with its full GML parsed into nested JSON.
+  `?preview=1` cuts it to about 300 points for drawing small; `?player=1` is
+  the full-fidelity payload the site's own player uses.
 - `GET /data/{id}.gml` — the raw GML file. This is the canonical format.
 - `GET /data/{id}.xml` — tag metadata only, without the GML.
 - `GET /latest.gml` — the most recently uploaded tag. Takes no filters.
@@ -35,6 +37,10 @@ Base URL `<%= request.base_url %>`.
 do not have to parse XML. `.xml` is metadata only.
 
 ## Documentation
+
+Append `.md` to any page under `/docs` for the markdown itself, for example
+`<%= request.base_url %>/docs/api/downloading-gml.md`.
+
 <% @docs.select(&:reference?).each do |page| -%>
 - [<%= page.title %>](<%= request.base_url %><%= page.url_path %>)<%= ": #{page.summary}" if page.summary.present? %>
 <% end -%>

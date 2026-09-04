@@ -1,4 +1,5 @@
 = auto_discovery_link_tag(:rss, params.merge({ format: :rss }), title: page_title)
+- content_for :structured_data, json_ld(dataset_structured_data(archive_total))
 
 .page__head
   %div

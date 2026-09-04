@@ -3,11 +3,12 @@
 - description = content_for(:description).presence || "An open archive of motion-captured graffiti. Every tag is a GML file: the writer's hand as coordinates and timestamps, replayable by anyone."
 - canonical = request.base_url + request.path
 - card = URI.join(request.base_url, content_for(:og_image).presence || '/images/social-card.jpg').to_s
+- card_alt = content_for(:og_image_alt).presence || 'A graffiti tag from the archive, drawn at marker weight with its skeleton and readouts over it'
 %head
   %meta{ charset: 'utf-8' }
   -# Without this the layout renders at desktop width on phones, zoomed out.
   %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1' }
-  %meta{ name: 'robots', content: @noindex ? 'noindex,follow' : 'all' }
+  %meta{ name: 'robots', content: @noindex ? 'noindex,follow' : 'index,follow,max-image-preview:large' }
   %meta{ name: 'theme-color', content: '#000000' }
   %meta{ name: 'description', content: description }
   %link{ rel: 'canonical', href: canonical }
@@ -18,12 +19,18 @@
   %meta{ property: 'og:title', content: page_title }
   %meta{ property: 'og:description', content: description }
   %meta{ property: 'og:image', content: card }
+  %meta{ property: 'og:image:alt', content: card_alt }
+  - if content_for(:og_image).blank?
+    %meta{ property: 'og:image:width', content: '1200' }
+    %meta{ property: 'og:image:height', content: '630' }
+  %meta{ property: 'og:locale', content: 'en_US' }
   %meta{ name: 'twitter:card', content: 'summary_large_image' }
   %meta{ name: 'twitter:title', content: page_title }
   %meta{ name: 'twitter:description', content: description }
   %meta{ name: 'twitter:image', content: card }
   %link{ rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }
   %link{ rel: 'icon', type: 'image/png', sizes: '512x512', href: '/images/icon-512.png' }
+  %link{ rel: 'manifest', href: '/manifest.webmanifest' }
 
   %link{ rel: 'preconnect', href: 'https://fonts.googleapis.com' }
   %link{ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' }
@@ -47,6 +54,10 @@
   = javascript_include_tag 'player', 'gml_thumbnails', 'recorder', type: 'module'
   = csrf_meta_tags
 
+  -# Who and what this site is, for search engines and agents. Pages add
+  -# their own block with content_for(:structured_data).
+  = json_ld('@context' => 'https://schema.org', '@graph' => [{ '@type' => 'WebSite', '@id' => "#{request.base_url}/#website", 'name' => '000000book', 'url' => request.base_url, 'description' => description, 'inLanguage' => 'en', 'publisher' => SeoHelper::PUBLISHER }, { '@type' => 'Organization', '@id' => 'https://fffff.at/#org', 'name' => 'Free Art and Technology Lab', 'alternateName' => 'F.A.T. Lab', 'url' => 'https://fffff.at' }])
+  = content_for(:structured_data)
   = yield :head
 
   %title= page_title

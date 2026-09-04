@@ -91,7 +91,7 @@ class TagsController < ApplicationController
   end
 
   def show
-    set_page_title "Tag ##{@tag.id}"
+    set_page_title "Tag ##{@tag.id}: #{@tag.sexy_app_name.presence || 'upload'} by #{helpers.tag_author(@tag)}"
 
     # Checked before the GML is touched, so a 304 costs no disk read.
     # iphone_rotate is in the etag because it changes the .gml body, and so are

@@ -12,7 +12,7 @@ class VisualizationsController < ApplicationController
   end
 
   def show
-    set_page_title @visualization.name
+    set_page_title "#{@visualization.name}, a GML application"
     @sample = sample_tags([@visualization.name])[@visualization.name]
     respond_with @visualization do |format|
       format.html {}
