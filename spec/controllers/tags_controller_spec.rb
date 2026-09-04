@@ -126,13 +126,11 @@ describe TagsController do
       end
     end
 
-    it "plays the tag ?tag= asks for beside the grid" do
-      FactoryBot.create(:tag)
-      chosen = FactoryBot.create(:tag)
-      get :index, params: { tag: chosen.id }
-      expect(assigns(:tag)).to eq(chosen)
-      expect(response.body).to include('class="browse"')
-      expect(response.body).to match(%r{<a[^>]*aria-current="true"[^>]*href="/data/#{chosen.id}"})
+    it "is the grid alone, every cell a link to its tag" do
+      tag = FactoryBot.create(:tag)
+      get :index
+      expect(response.body).not_to include('class="browse"')
+      expect(response.body).to include(%(href="/data/#{tag.id}"))
     end
 
     it "works for a valid user" do
@@ -163,6 +161,20 @@ describe TagsController do
       get :show, params: { id: @tag.to_param }
       expect(response).to be_successful
       expect(response.body).to match(/Tag ##{@tag.id}/)
+    end
+
+    it "counts a page view, a download and a play, but not a thumbnail or a cache hit" do
+      get :show, params: { id: @tag.to_param }
+      get :show, params: { id: @tag.to_param, format: 'gml' }
+      get :show, params: { id: @tag.to_param, format: 'json', player: '1' }
+      get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
+      expect(@tag.reload.views_count).to eq(3)
+
+      get :show, params: { id: @tag.to_param, format: 'gml' }
+      request.headers['If-None-Match'] = response.headers['ETag']
+      get :show, params: { id: @tag.to_param, format: 'gml' }
+      expect(response).to have_http_status(:not_modified)
+      expect(@tag.reload.views_count).to eq(4)
     end
 
     it "describes itself for search and social, with its still as the card" do

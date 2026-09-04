@@ -24,6 +24,9 @@
       - else
         = tag.gml_keywords.split(',').map { |w| link_to w.strip, tags_path(keywords: w.strip) }.join(', ').html_safe
   .specs__row
+    %span.specs__key Views
+    %span.specs__value= number_with_delimiter(tag.views_count)
+  .specs__row
     %span.specs__key Uploaded
     %span.specs__value= tag.created_at.strftime('%Y-%m-%d %H:%M:%S')
   -# There is no :original variant, so this links the stored blob itself.

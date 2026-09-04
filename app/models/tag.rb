@@ -19,6 +19,7 @@ class Tag < ApplicationRecord
     gml_application gml_keywords gml_username gml_version
     image_content_type image_file_name image_file_size image_updated_at
     likes_count location remote_image slug title updated_at uuid
+    views_count
   ].freeze
 
   # Everything else. Only here so that adding a column without deciding which
@@ -56,6 +57,35 @@ class Tag < ApplicationRecord
   # The front page leads with these, in this order: canvasplayer's picks.
   # Katsu, Jesus Saves, Seen, Hell, hello world, 404. Stale by design.
   FEATURED = [161, 158, 1399, 818, 147, 842].freeze
+
+  # The front page's sets, in tab order. Featured is ordered by hand in
+  # HomeController; the rest are relations.
+  SETS = { 'featured' => 'Featured', 'tempt1' => 'Tempt1', 'nyc' => 'NYC', 'latest' => 'Latest',
+           'popular' => 'Popular' }.freeze
+
+  def self.curated(name)
+    case name
+    when 'tempt1'
+      where("application LIKE '%eyewriter%' OR gml_application LIKE '%eyewriter%' " \
+            "OR gml_keywords LIKE '%tempt%' OR author LIKE '%tempt%'").order(created_at: :desc, id: :desc)
+    when 'nyc'
+      places = %w[new\ york nyc brooklyn queens bronx manhattan harlem staten\ island]
+      where((places.map { |place| "location LIKE '%#{place}%'" } + ["gml_keywords LIKE '%nyc%'"]).join(' OR '))
+        .order(created_at: :desc, id: :desc)
+    when 'popular'
+      where('views_count > 0').order(views_count: :desc, created_at: :desc)
+    else
+      order(created_at: :desc, id: :desc)
+    end
+  end
+
+  # Counted when the page, the file or the player payload is loaded, never per
+  # loop or per thumbnail. One UPDATE, no callbacks, and updated_at stays put
+  # so the ETag does not change.
+  def count_view!
+    self.class.increment_counter(:views_count, id, touch: false) # rubocop:disable Rails/SkipsModelValidations
+  end
+
   # Seek to a random primary key rather than ORDER BY RAND(), which sorted all
   # 76,000 rows on every hit and made the cheapest-looking public endpoint the
   # most expensive one we serve. This is two index lookups and a PK seek.

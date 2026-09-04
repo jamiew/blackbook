@@ -13,8 +13,12 @@
     - else
       = link_to 'Create an account', signup_path, class: 'button button--solid'
 
+%nav.tabs{ 'aria-label' => 'Sets' }
+  - Tag::SETS.each do |key, label|
+    = link_to label, root_path(set: (key unless key == 'featured')), 'aria-current' => (key == @set ? 'page' : nil)
+
 - if @tag.blank?
-  %p.page__lede No tag data.
+  %p.page__lede Nothing here yet.
 - else
   = render layout: 'tags/browse', locals: { tag: @tag } do
     .section-head

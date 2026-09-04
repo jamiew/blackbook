@@ -1,11 +1,7 @@
 class HomeController < ApplicationController
   def index
-    newest = Tag.order(created_at: :desc).limit(30).with_attached_image.includes(:user).to_a
-    featured = Tag.where(id: Tag::FEATURED).with_attached_image.includes(:user)
-                  .index_by(&:id).values_at(*Tag::FEATURED).compact
-    # canvasplayer's picks lead, then the newest. Stale by design: a front page
-    # that previews well beats one that changes every hour.
-    @tags = (featured + newest).uniq.first(30)
+    @set = params[:set].presence_in(Tag::SETS.keys) || 'featured'
+    @tags = curated_tags(@set)
     # The browse layout plays one tag beside the grid: ?tag=id, or the first.
     @tag = (params[:tag].present? && Tag.find_by(id: params[:tag])) || @tags.first
     @browse = true
@@ -17,6 +13,17 @@ class HomeController < ApplicationController
     @page, @per_page = pagination_params
     @notifications = Notification.paginate(page: @page, per_page: @per_page).order(id: :desc).includes(:subject)
     set_page_title "Activity"
+  end
+
+  # Thirty from the set. Featured is canvasplayer's picks in their own order,
+  # then the newest to fill the grid: stale by design, a front page that
+  # previews well beats one that changes every hour.
+  def curated_tags(set)
+    scope = Tag.with_attached_image.includes(:user)
+    return Tag.curated(set).merge(scope).limit(30).to_a unless set == 'featured'
+
+    featured = scope.where(id: Tag::FEATURED).index_by(&:id).values_at(*Tag::FEATURED).compact
+    (featured + scope.order(created_at: :desc).limit(30).to_a).uniq.first(30)
   end
 
   def upload

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_02_031259) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_04_161106) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -97,11 +97,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_031259) do
     t.datetime "updated_at", precision: nil
     t.integer "user_id"
     t.string "uuid"
+    t.integer "views_count", default: 0, null: false
     t.index ["application"], name: "index_tags_on_application"
     t.index ["created_at"], name: "index_tags_on_created_at"
     t.index ["gml_application"], name: "index_tags_on_gml_application"
     t.index ["gml_uniquekey"], name: "index_tags_on_gml_uniquekey"
     t.index ["user_id", "created_at"], name: "index_tags_on_user_id_and_created_at"
+    t.index ["views_count"], name: "index_tags_on_views_count"
   end
 
   create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|

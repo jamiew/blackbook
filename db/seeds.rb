@@ -47,5 +47,10 @@ if Rails.env.development?
     Tag.where(application: test_names).order(:id).each_with_index do |tag, i|
       tag.update_columns(application: records[i % records.size].name) # rubocop:disable Rails/SkipsModelValidations
     end
+    # A few in New York and a few with views, so every front-page set shows.
+    Tag.order(:id).limit(24).each_with_index do |tag, i|
+      tag.update_columns(location: (i % 4).zero? ? 'New York, NY' : tag.location, # rubocop:disable Rails/SkipsModelValidations
+                         views_count: [0, 3, 12, 40][i % 4])
+    end
   end
 end

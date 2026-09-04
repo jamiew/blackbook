@@ -292,6 +292,30 @@ RSpec.describe Tag, type: :model do
     end
   end
 
+  describe '.curated' do
+    it 'finds New York by location or keyword, and orders popular by views' do
+      brooklyn = FactoryBot.create(:tag, location: 'Brooklyn, NY')
+      tagged = FactoryBot.create(:tag, gml_keywords: 'nyc,handstyle')
+      elsewhere = FactoryBot.create(:tag, location: 'Berlin')
+      expect(described_class.curated('nyc')).to contain_exactly(brooklyn, tagged)
+
+      elsewhere.count_view!
+      elsewhere.count_view!
+      brooklyn.count_view!
+      expect(described_class.curated('popular').to_a).to eq([elsewhere, brooklyn])
+    end
+  end
+
+  describe '#count_view!' do
+    it 'adds one without touching updated_at' do
+      tag = FactoryBot.create(:tag)
+      stamp = tag.updated_at
+      tag.count_view!
+      expect(tag.reload.views_count).to eq(1)
+      expect(tag.updated_at).to eq(stamp)
+    end
+  end
+
   describe '#readout' do
     it 'counts strokes and points and formats the seconds like the player' do
       tag = tag_with_gml(<<~GML)

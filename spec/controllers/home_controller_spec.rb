@@ -26,6 +26,22 @@ describe HomeController do
       expect(response.body).to include('page--quiet')
     end
 
+    it "serves the set the tab asks for, and falls back to featured" do # rubocop:disable RSpec/MultipleExpectations
+      stub_const('Tag::FEATURED', [])
+      old = FactoryBot.create(:tag, location: 'Queens, NY')
+      new = FactoryBot.create(:tag, application: 'EyeWriter')
+      get :index, params: { set: 'latest' }
+      expect(assigns(:tags).first(2)).to eq([new, old])
+      get :index, params: { set: 'nyc' }
+      expect(assigns(:tags)).to eq([old])
+      get :index, params: { set: 'tempt1' }
+      expect(assigns(:tags)).to eq([new])
+      get :index, params: { set: 'bogus' }
+      expect(assigns(:set)).to eq('featured')
+      expect(response.body).to include('<a aria-current="page" href="/">Featured</a>')
+      expect(response.body).to include('href="/?set=popular"')
+    end
+
     it "plays the tag ?tag= asks for" do
       FactoryBot.create(:tag)
       chosen = FactoryBot.create(:tag)

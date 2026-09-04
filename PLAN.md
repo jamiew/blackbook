@@ -24,7 +24,13 @@ app cards, in the recorder.
   on the browse player, which plays on to the next tag like a slideshow.
   Themes and chrome switches were tried and dropped.
 
+- Curation: the front page has sets as tabs (Featured, Tempt1, NYC, Latest,
+  Popular); `views_count` on tags, counted when the page, file or player
+  payload loads; `/data` is the grid alone.
+
 ## Next
+
+- [ ] `./script/rehearse-migrations.sh` for `add_views_count_to_tags` too.
 
 - [ ] `./script/rehearse-migrations.sh` for `add_source_url_to_visualizations`
       before it ships. Needs SSH to production.

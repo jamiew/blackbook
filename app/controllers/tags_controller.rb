@@ -72,12 +72,6 @@ class TagsController < ApplicationController
 
     set_page_title "GML Tags#{": #{@search_context[:key]}=#{@search_context[:value].inspect} " if @search_context}"
 
-    if request.format.html?
-      # The browse layout plays one tag beside the grid: ?tag=id, or the first.
-      @tag = (params[:tag].present? && Tag.find_by(id: params[:tag])) || @tags.first
-      @browse = true
-    end
-
     # The callback is in the etag because JSONP changes the body.
     return if cached_for_api?(etag: [@tags.map { |t| [t.id, t.updated_at] }, jsonp_callback],
                               last_modified: @tags.filter_map(&:updated_at).max)
@@ -119,6 +113,8 @@ class TagsController < ApplicationController
 
     # Freak out if GML data is missing; this really isn't ever supposed to happen
     raise MissingDataError if @tag.gml.blank?
+
+    @tag.count_view! if loading_the_tag?
 
     respond_to do |wants|
       wants.html  { render }
@@ -332,6 +328,12 @@ class TagsController < ApplicationController
     year = params[:year].to_i
     scope = scope.where(created_at: Time.zone.local(year).all_year) if year > 2000
     scope
+  end
+
+  # A page view, a file download or a play in the browse grid counts once.
+  # Thumbnails (?preview=1) and cache hits (the 304 in show) do not.
+  def loading_the_tag?
+    params[:format].blank? || params[:format] == 'gml' || (params[:format] == 'json' && params[:player].present?)
   end
 
   def convert_app_id_to_app_name

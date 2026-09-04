@@ -582,6 +582,24 @@ a.strip__step:hover { background: var(--accent); border-color: var(--accent); co
 .filters select { width: auto; min-width: 190px; max-width: 100%; }
 .filters__spacer { flex: 1 1 auto; }
 
+/* --- tabs --------------------------------------------------------------- */
+/* The front page's sets. The current one is underlined in the accent. */
+
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 20px; border-bottom: var(--rule); }
+.tabs a {
+  font-family: var(--mono);
+  font-size: var(--meta-size);
+  letter-spacing: var(--meta-tracking);
+  text-transform: uppercase;
+  padding: 10px 14px;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--dim);
+}
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current] { color: var(--ink); border-bottom-color: var(--accent); }
+
 /* --- chips -------------------------------------------------------------- */
 /* Filters that combine. The active ones are lit. */
 

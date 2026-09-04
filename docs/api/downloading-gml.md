@@ -62,6 +62,9 @@ carries the same ETag and caching rules as the full `.json`.
 `?player=1` is the same shape at full fidelity, every point with its
 per-stroke colour and brush: what the site inlines for its own player.
 
+Every tag carries `views_count`: how many times its page, its `.gml` or its
+player payload has been loaded. Thumbnails and cache hits do not count.
+
 ## Other handy API access points
 
 Latest tag uploaded site-wide:
