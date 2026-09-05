@@ -43,7 +43,7 @@ module ApplicationHelper
   # fingerprint the files and break the modules' relative imports. See SOURCE in
   # that directory for the commit and how to update; bump the version here.
   def canvasplayer_path(file = nil)
-    ['/canvasplayer/6.0.0', file].compact.join('/')
+    ['/canvasplayer/6.0.1', file].compact.join('/')
   end
 
   # A link that turns one filter on, or off when it already is, keeping the

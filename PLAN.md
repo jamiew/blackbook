@@ -7,7 +7,7 @@ app cards, in the recorder.
 ## Done
 
 - Chrome: instruments row gone, logo given height, `/apps` rebuilt and fixed.
-- Engine: canvasplayer 6.0.0 vendored with `SOURCE`; `player.js` is the glue.
+- Engine: canvasplayer 6.0.1 vendored with `SOURCE`; `player.js` is the glue.
 - Viewer: id in the head, filmstrip of neighbours, metadata tiles, About rebuilt
   around a hero composed from tag 10043.
 - Browse: `/` and `/data` play one tag beside the grid; click or `←`/`→` loads

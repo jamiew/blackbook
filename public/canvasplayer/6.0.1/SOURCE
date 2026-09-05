@@ -1,8 +1,8 @@
-canvasplayer 6.0.0, vendored verbatim.
+canvasplayer 6.0.1, vendored verbatim.
 
 Source:  https://github.com/jamiew/canvasplayer
-Commit:  a1f00ea306c2c868f43ccd46918b2151e6fdc922 (2026-09-01)
-         "Split into ES modules and set up for npm"
+Commit:  ee5f9ea00c94cddbe1df5e530051991e3e46a409 (2026-09-04)
+         "Lay the ghost down once"
 Files:   gml.js gml-player.js gml-ui.js gml-ui.css, byte for byte from
          that commit. Public domain, no rights reserved.
 
