@@ -43,4 +43,9 @@ Rails.application.configure do
 
   # Propshaft doesn't need precompiled asset checking
 
+  # Tailscale MagicDNS names, so a real phone on the tailnet can load this
+  # machine: `tailscale serve --bg 3000`, then https://<machine>.<tailnet>.ts.net.
+  # Rails' own ".ts.net" shorthand allows one label; these names have two. It is
+  # wrapped in \A..\z with an optional port, so nothing else may end in ts.net.
+  config.hosts << /[a-z0-9-]+\.[a-z0-9-]+\.ts\.net/i
 end

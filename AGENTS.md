@@ -22,6 +22,11 @@ Development, test and CI all use that MySQL. A version gap against production
 once hid the utf8mb3 and MyISAM problems for years; keep them aligned.
 `MYSQL_PORT` overrides the port. Pages 500 while MySQL is down.
 
+To test on a real phone, `tailscale serve --bg 3000` and open
+`https://<machine>.<tailnet>.ts.net`. Any `*.ts.net` name is an allowed host in
+development. For any other name, `RAILS_DEVELOPMENT_HOSTS` in the gitignored
+`.env` takes a comma-separated list.
+
 ## Before changing a migration
 
 Run `./script/rehearse-migrations.sh`; it needs SSH to production. The test
