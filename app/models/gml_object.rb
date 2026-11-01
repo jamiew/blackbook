@@ -19,7 +19,7 @@ class GmlObject
   end
 
   def self.file_dir
-    Rails.root.join("data").to_s
+    Rails.configuration.x.gml_data_dir.to_s
   end
 
   def filename

@@ -19,7 +19,7 @@
     %span.player__meta{ data: { player_meta: true } }= tag.readout
   .player__stage{ style: "aspect-ratio: #{tag.stage_ratio}" }
     %canvas.player__canvas{ role: 'img', 'aria-label' => "Playback of tag ##{tag.id}" }
-    - if tag.image.attached? || tag.remote_thumbnail_url.present?
+    - if tag.image.attached?
       - still = tag_thumbnail_url(tag, :large)
       -# The still the capture app uploaded, for the pane's live/still switch.
       = image_tag still, alt: "Still of tag ##{tag.id}", class: 'player__still', hidden: true, loading: 'lazy'

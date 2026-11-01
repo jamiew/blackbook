@@ -73,6 +73,26 @@ Generating only one layout silently misses a third of the images.
 Do this after growing the volume. Copying every image needs headroom the 50 GiB
 volume does not have at roughly 35 GB used.
 
+## Importing the TEMPT1 archive
+
+```bash
+bin/kamal tempt1-verify    # report only, writes nothing
+bin/kamal tempt1-import
+```
+
+Or run the "Import TEMPT1 archive" workflow from the Actions tab, which does the
+dry run first and only writes when you type IMPORT.
+
+It attaches the eyetag images, repairs the two GML files MySQL truncated at
+65535 bytes in 2009, and creates the tags that were never uploaded here. The 159
+source files are not in this repo; they come from a pinned release tarball,
+checked against a SHA256, and then each file is checked again against
+`db/tempt1/manifest.tsv` as it is used.
+
+Deliberately a rake task rather than a migration. It reaches the network, writes
+Active Storage blobs, and is built to be re-run after a partial failure, which a
+recorded migration version would take away.
+
 ## Passwords after the Authlogic removal
 
 Accounts created before the move have only an scrypt hash in `crypted_password`.
