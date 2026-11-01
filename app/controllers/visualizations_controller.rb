@@ -12,7 +12,8 @@ class VisualizationsController < ApplicationController
   end
 
   def show
-    set_page_title @visualization.name
+    set_page_title "#{@visualization.name}, a GML application"
+    @sample = sample_tags([@visualization.name])[@visualization.name]
     respond_with @visualization do |format|
       format.html {}
       format.js
@@ -62,7 +63,6 @@ class VisualizationsController < ApplicationController
     redirect_back_or_default(@visualization)
   end
 
-  # DRY?
   def unapprove
     update_approval_state(@visualization, false)
     flash[:notice] = "App was unapproved"
@@ -78,18 +78,39 @@ class VisualizationsController < ApplicationController
   def current_objects
     @page, @per_page = pagination_params
     which = is_admin? ? Visualization : Visualization.approved
+    # A kind gets a chip only if something listed is written in it. Read before
+    # the filters below, so a chip never disappears because you are standing on it.
+    kinds = which.distinct.pluck(:kind)
+    @kinds = Visualization::KINDS.select { |_, value| value.present? && kinds.include?(value) }
     if params[:user_id]
       @user = User.find_by_param(params[:user_id])
       which = which.where(user_id: @user.id)
-      # TODO: set page_title etc. Also handle all this logic less if/elsify
     end
-    @visualizations ||= which.with_attached_image.includes(:user)
-                             .order(approved_at: :desc, name: :asc)
-                             .paginate(page: @page, per_page: @per_page)
+    @visualizations ||= chipped(which).with_attached_image.includes(:user)
+                                      .order(approved_at: :desc, name: :asc)
+                                      .paginate(page: @page, per_page: @per_page)
+    @samples = sample_tags(@visualizations.map(&:name))
+  end
+
+  # The chips. They combine: ?kind=javascript&source=open.
+  def chipped(scope)
+    scope = scope.where(kind: params[:kind]) if params[:kind].present?
+    scope = scope.open_source if params[:source] == 'open'
+    scope = scope.where(is_embeddable: true) if params[:embeddable].present?
+    scope
+  end
+
+  # The newest tag made with each app, by name, so a card can play one. Tags
+  # name their app in either of two columns. One LIMIT 1 per app: an app like
+  # DustTag has tens of thousands of tags, and loading them to pick one is not
+  # an option.
+  def sample_tags(names)
+    names.index_with do |name|
+      Tag.where(application: name).or(Tag.where(gml_application: name)).order(created_at: :desc, id: :desc).first
+    end.compact
   end
 
   def update_approval_state(obj, enabled)
-    logger.debug "hi from update_approval_state obj=#{obj.inspect}"
     obj.approved_at = (enabled ? Time.zone.now : nil)
     obj.approved_by = (enabled ? current_user.id : nil)
     obj.save!
@@ -102,7 +123,8 @@ class VisualizationsController < ApplicationController
   private
 
   def visualization_parameters
-    params.fetch(:visualization, {}).permit(:name, :description, :authors, :website, :embed_url, :kind, :is_embeddable,
-                                            :image)
+    params.fetch(:visualization, {}).permit(:name, :version, :description, :authors, :website, :source_url, :kind,
+                                            :image, :is_embeddable, :embed_url, :embed_callback, :embed_params,
+                                            :embed_code)
   end
 end

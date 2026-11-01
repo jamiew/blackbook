@@ -62,6 +62,7 @@ Rails.application.routes.draw do
   get '/activity' => 'home#activity', as: 'activity'
 
   get '/about' => 'home#about', as: 'about'
+  get '/upload' => 'home#upload', as: 'upload'
 
   # The repo's docs/ served as pages. `format: false` so a slug ending in
   # something like .md is passed through rather than parsed as a format.
@@ -69,6 +70,7 @@ Rails.application.routes.draw do
   get '/docs/*path' => 'docs#show', as: 'doc', format: false
   get '/api' => redirect('/docs/api'), as: 'api'
   get '/llms.txt' => 'docs#llms', as: 'llms'
+  get '/sitemap.xml' => 'home#sitemap', as: 'sitemap', defaults: { format: 'xml' }
 
   root controller: 'home', action: 'index'
 end

@@ -7,13 +7,14 @@ the website and anyone (or anything) working on the repo.
 ## Using the API
 
 - [Downloading GML](api/downloading-gml.md), including CORS, rate limits and caching
-- [Uploading GML](api/uploading-gml.md)
+- [Uploading GML](api/uploading-gml.md), or draw one at [/upload](http://000000book.com/upload)
 - [OpenAPI spec](http://000000book.com/openapi.yaml), the same thing machine-readable
 - [llms.txt](http://000000book.com/llms.txt), a summary for language models
 
 ## Rendering GML
 
 - [Sample playback code](gml/playback-implementations.md), across C++, Processing, Javascript, Flash, PHP and Python
+- [canvasplayer](https://github.com/jamiew/canvasplayer), the site's own player, vendored under `public/canvasplayer/`
 - [Drawing GML with Javascript and JSON](gml/javascript-and-json.md)
 - [PHP API scraping example](examples/php-scraper.md)
 

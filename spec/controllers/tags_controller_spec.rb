@@ -104,6 +104,39 @@ describe TagsController do
       # @should_mention_application.call(/user_test/)
     end
 
+    describe "chips" do
+      it "narrows to tags with a still" do
+        plain = FactoryBot.create(:tag)
+        pictured = FactoryBot.create(:tag)
+        pictured.image.attach(io: StringIO.new('x'), filename: 'still.png', content_type: 'image/png')
+        get :index, params: { has: 'still' }
+        expect(assigns(:tags)).to contain_exactly(pictured)
+        expect(response.body).to match(/<a[^>]*aria-current="true"[^>]*>With still</)
+        expect(assigns(:tags)).not_to include(plain)
+      end
+
+      it "combine, and a chip turns itself off" do
+        anon = FactoryBot.create(:tag, user: nil)
+        FactoryBot.create(:tag)
+        get :index, params: { who: 'anon', year: anon.created_at.year }
+        expect(assigns(:tags)).to contain_exactly(anon)
+        # The lit Anonymous chip links to the same query without itself.
+        without_itself = "/data?year=#{anon.created_at.year}"
+        expect(response.body).to match(/aria-current="true"[^>]*href="#{Regexp.escape(without_itself)}"/)
+      end
+    end
+
+    it "is the grid alone, every cell a link to its tag, with a display dropdown" do
+      tag = FactoryBot.create(:tag)
+      pictured = FactoryBot.create(:tag)
+      pictured.image.attach(io: StringIO.new('x'), filename: 'still.png', content_type: 'image/png')
+      get :index
+      expect(response.body).not_to include('class="browse"')
+      expect(response.body).to include(%(href="/data/#{tag.id}"))
+      expect(response.body).to include('data-display-switch')
+      expect(response.body.scan('tag-card__still').size).to eq(1)
+    end
+
     it "works for a valid user" do
       user = FactoryBot.create(:user)
       get :index, params: { user_id: user.login }
@@ -134,6 +167,48 @@ describe TagsController do
       expect(response.body).to match(/Tag ##{@tag.id}/)
     end
 
+    it "counts a page view, a download and a play, but not a thumbnail or a cache hit" do
+      get :show, params: { id: @tag.to_param }
+      get :show, params: { id: @tag.to_param, format: 'gml' }
+      get :show, params: { id: @tag.to_param, format: 'json', player: '1' }
+      get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
+      expect(@tag.reload.views_count).to eq(3)
+
+      get :show, params: { id: @tag.to_param, format: 'gml' }
+      request.headers['If-None-Match'] = response.headers['ETag']
+      get :show, params: { id: @tag.to_param, format: 'gml' }
+      expect(response).to have_http_status(:not_modified)
+      expect(@tag.reload.views_count).to eq(4)
+    end
+
+    it "describes itself for search and social, with its still as the card" do
+      get :show, params: { id: @tag.to_param }
+      expect(response.body).to match(%r{<link href="http://test.host/data/#{@tag.id}" rel="canonical">})
+      expect(response.body).to include('/images/social-card.jpg" property="og:image"')
+      expect(response.body).to match(/content="Tag ##{@tag.id}, motion-captured graffiti[^"]*" name="description"/)
+
+      @tag.image.attach(io: StringIO.new('x'), filename: 'still.png', content_type: 'image/png')
+      get :show, params: { id: @tag.to_param }
+      expect(response.body).to match(%r{content="http://test.host/rails/active_storage/[^"]+" property="og:image"})
+    end
+
+    it "lines the neighbours up oldest to newest around the tag" do
+      older = @tag
+      middle = FactoryBot.create(:tag)
+      newer = FactoryBot.create(:tag)
+      get :show, params: { id: middle.id }
+      expect(assigns(:strip)).to eq([older, middle, newer])
+      expect(assigns(:prev)).to eq(older)
+      expect(assigns(:next)).to eq(newer)
+      expect(response.body).to match(%r{data-key="ArrowLeft"[^>]*href="/data/#{older.id}"})
+      expect(response.body.scan(/<a[^>]*aria-current="page"[^>]*class="strip__cell"/).size).to eq(1)
+    end
+
+    it "gives every cell its preview payload" do
+      get :show, params: { id: @tag.to_param }
+      expect(response.body).to include(%(data-preview="/data/#{@tag.id}.json?preview=1"))
+    end
+
     it ".gml" do
       get :show, params: { id: @tag.to_param, format: 'gml' }
       expect(response).to be_successful
@@ -156,6 +231,25 @@ describe TagsController do
       it "includes GML data (GSON)" do
         get :show, params: { id: @tag.to_param, format: 'json' }
         expect(response.body).to match("\"gml\":")
+      end
+
+      it "renders the cut-down preview with ?preview=1" do
+        get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
+        expect(response).to be_successful
+        expect(response.parsed_body.keys).to contain_exactly('id', 'app', 'up', 'rotate', 'strokes')
+      end
+
+      it "renders the player payload with ?player=1" do
+        get :show, params: { id: @tag.to_param, format: 'json', player: '1' }
+        expect(response.parsed_body.keys).to include('strokes', 'up', 'client')
+        expect(response.parsed_body).not_to have_key('gml')
+      end
+
+      it "gives the preview its own ETag" do
+        get :show, params: { id: @tag.to_param, format: 'json' }
+        full = response.headers['ETag']
+        get :show, params: { id: @tag.to_param, format: 'json', preview: '1' }
+        expect(response.headers['ETag']).not_to eq(full)
       end
 
       # CORS moved from this action to Rack::Cors middleware, which controller

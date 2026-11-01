@@ -8,6 +8,8 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://000000book.com/sitemap.xml
+
 # /random picks a different tag every time, so crawling it is infinite work for
 # a page nobody can link to.
 Disallow: /random

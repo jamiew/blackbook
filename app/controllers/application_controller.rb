@@ -34,12 +34,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from NoPermissionError, with: :permission_denied
 
-  # Oink object debugging in dev
-  # if Rails.env == 'development'
-  #   include Oink::MemoryUsageLogger
-  #   include Oink::InstanceTypeCounter
-  # end
-
   protected
 
   def jsonp_callback
@@ -98,7 +92,6 @@ class ApplicationController < ActionController::Base
   end
 
   # Modify the global page title -- could also use @page_title
-  # TODO change to page_title= (or just use @page_title/@title directly)
   def set_page_title(title, suffix = true)
     title += (suffix ? " - 000000book" : '')
     title += " (page #{@page})" if @page.to_i > 1
@@ -150,7 +143,6 @@ class ApplicationController < ActionController::Base
   alias admin? is_admin?
   helper_method :is_admin?, :admin?
 
-  # TODO: need smarter evaluation of object and "owner"
   # e.g. use more than just .user -- current_object is also unreliable
   def is_owner?(object = nil)
     object = @current_object if object.nil? && !@current_object.nil? # Hijack into
@@ -162,7 +154,6 @@ class ApplicationController < ActionController::Base
   def require_user
     return if current_user
 
-    logger.debug "require_user failed"
     store_location
     flash[:error] = "You must be logged in to do that"
     redirect_to(login_path)
@@ -172,10 +163,8 @@ class ApplicationController < ActionController::Base
   def require_no_user
     return unless current_user
 
-    logger.debug "require_no_user failed"
     store_location
     flash[:error] = "You must *not* be logged-in to access that."
-    # redirect_back_or_default(user_path(current_user))
     redirect_to(user_path(current_user))
   end
 
@@ -186,7 +175,6 @@ class ApplicationController < ActionController::Base
     store_location
     flash[:error] =
       "You don't have permission to access this page. Your IP #{request.remote_addr} has been logged & reported."
-    # redirect_back_or_default(logged_in? ? root_path : login_path)
     redirect_to(logged_in? ? root_path : login_path)
   end
 
@@ -201,11 +189,8 @@ class ApplicationController < ActionController::Base
   #  use :store_location explicitly on the callin page
   def redirect_back_or_default(default, opts = {})
     if session[:return_to].blank?
-      # puts "Redirecting to :back ..."
-      # redirect_to(:back)
       redirect_to(default, opts)
     else
-      Rails.logger.debug { "Redirecting to #{session[:return_to]}" }
       redirect_to(session[:return_to], opts)
       session[:return_to] = nil
     end

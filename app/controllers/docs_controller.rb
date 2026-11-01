@@ -5,6 +5,12 @@ class DocsController < ApplicationController
     @doc = DocsPage.find(params[:path])
     return render(template: "docs/missing", status: :not_found) if @doc.nil?
 
+    # Agents and editors want the markdown itself: append .md to any docs URL.
+    if request.path.end_with?(".md") || params[:format] == "md"
+      return render(plain: @doc.markdown, content_type: "text/markdown")
+    end
+
+    response.headers["Link"] = %(<#{request.base_url}#{@doc.url_path}.md>; rel="alternate"; type="text/markdown")
     set_page_title @doc.title
   end
 

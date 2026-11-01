@@ -1,0 +1,12 @@
+-# The browse layout: one tag playing beside the grid, or above it, or not at
+-# all, as the masthead's view switch says. player.js swaps the tag in place
+-# when a cell is clicked. The block is the grid.
+.browse{ data: { browse: true } }
+  - if tag
+    .browse__player
+      = render 'tags/player', tag: tag, link: true
+      .browse__actions
+        = link_to 'Open tag →', tag_path(tag), class: 'button button--quiet', data: { browse_open: true }
+        = link_to 'Download GML', tag_path(tag, format: :gml), class: 'button button--quiet', data: { browse_download: true }
+  .browse__grid
+    = yield

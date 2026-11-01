@@ -4,37 +4,37 @@
 * (cc) Free Art & Technology Lab
 */
 
-function selectTab(link) {
-  document.querySelectorAll('div.tabs ul.tab_navigation a.selected').forEach(function (selected) {
-    selected.classList.remove('selected');
-  });
-  link.classList.add('selected');
+// Pull a tag's GML in the first time its Source panel is opened. Inlining it
+// made the markup several hundred kilobytes for something most visitors leave
+// folded away.
+function loadSource(details) {
+  var field = details.querySelector('textarea');
+  if (!details.open || details.dataset.loaded || !field) return;
+  details.dataset.loaded = 'true';
 
-  var target = document.querySelector(link.getAttribute('href'));
-  if (!target) return;
-  window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' });
+  fetch(details.dataset.sourceUrl)
+    .then(function (response) {
+      if (!response.ok) throw new Error(response.status);
+      return response.text();
+    })
+    .then(function (body) { field.value = body; })
+    .catch(function () {
+      delete details.dataset.loaded; // let opening it again retry
+      field.placeholder = 'Could not load the GML. Use Download GML instead.';
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('details.source[data-source-url]').forEach(function (details) {
+    details.addEventListener('toggle', function () { loadSource(details); });
+  });
+
   // Flashes are display:none in CSS -- show them, then take them away again
   var flashes = document.querySelectorAll('#flash-error, #flash-notice, #flash-warning');
   flashes.forEach(function (flash) { flash.style.display = 'block'; });
-  setTimeout(function () {
-    flashes.forEach(function (flash) { flash.style.display = 'none'; });
-  }, 2500);
-
-  // Formerly tabs - now a slider control
-  var tabLinks = document.querySelectorAll('div.tabs ul.tab_navigation a');
-  tabLinks.forEach(function (link) {
-    link.addEventListener('click', function (event) {
-      event.preventDefault();
-      selectTab(link);
-    });
-  });
-
-  // Select ghettotab based on URL anchor; e.g. #vanderplayer
-  var fromAnchor = Array.from(tabLinks).find(function (link) {
-    return window.location.href.includes(link.getAttribute('href'));
-  });
-  if (fromAnchor) selectTab(fromAnchor);
+  if (flashes.length) {
+    setTimeout(function () {
+      flashes.forEach(function (flash) { flash.style.display = 'none'; });
+    }, 4000);
+  }
 });
