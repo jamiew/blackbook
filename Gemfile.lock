@@ -389,6 +389,7 @@ DEPENDENCIES
   haml
   image_processing (~> 2.1)
   invisible_captcha
+  json (< 3)
   kamal
   lograge
   mini_magick
