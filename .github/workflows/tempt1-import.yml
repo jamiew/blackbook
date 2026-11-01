@@ -22,7 +22,8 @@ on:
 jobs:
   import:
     name: Import TEMPT1 archive
-    runs-on: ubuntu-latest
+    # ubuntu-latest is 26.04, which has no prebuilt Ruby 3.4.5 for setup-ruby.
+    runs-on: ubuntu-24.04
     # Shares the lock with deploys and migrations: kamal takes a host lock, and
     # this should not race a container rollover mid-import.
     concurrency:

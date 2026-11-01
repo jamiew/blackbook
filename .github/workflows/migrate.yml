@@ -17,7 +17,8 @@ on:
 jobs:
   migrate:
     name: Migrate beta
-    runs-on: ubuntu-latest
+    # ubuntu-latest is 26.04, which has no prebuilt Ruby 3.4.5 for setup-ruby.
+    runs-on: ubuntu-24.04
     concurrency:
       group: deploy-beta
       cancel-in-progress: false
