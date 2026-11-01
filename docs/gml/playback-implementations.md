@@ -12,7 +12,7 @@ project's early years and are kept as the historical record. Links checked on
 
 ## Javascript
 
-- [Canvasplayer](http://jamiedubs.com/canvasplayer) with Processing.js, by Jamie Wilkinson
+- [Canvasplayer](https://github.com/jamiew/canvasplayer) by Jamie Wilkinson: HTML canvas, no dependencies, and what 000000book itself plays with
 - [SVG-WOW Graffitis](http://svg-wow.org/graffitis/graffitis.xhtml) by Vincent Hardy
 - [GML Canvas Recorder](http://codingwithattitude.net/gml/gml-drawer.html) *(offline)* (capture) by Laurent Van Basseliere
 - [Webmarker](http://webmarker.me), a Firefox addon by Tobias Leingruber, Jamie Wilkinson and Greg Leuch (capture and playback)

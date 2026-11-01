@@ -13,6 +13,52 @@ describe HomeController do
     expect(response).to be_successful
   end
 
+  describe "the front page" do
+    it "leads with the featured tags, then the newest, and plays the first" do
+      older = FactoryBot.create(:tag)
+      newest = FactoryBot.create(:tag)
+      stub_const('Tag::FEATURED', [older.id])
+      get :index
+      expect(assigns(:tags).first(2)).to eq([older, newest])
+      expect(assigns(:tag)).to eq(older)
+      expect(response.body).to include('class="browse"')
+      expect(response.body).to include('data-preview="/data/')
+      expect(response.body).to include('page--quiet')
+    end
+
+    it "serves the set the tab asks for, and falls back to featured" do # rubocop:disable RSpec/MultipleExpectations
+      stub_const('Tag::FEATURED', [])
+      old = FactoryBot.create(:tag, location: 'Queens, NY')
+      new = FactoryBot.create(:tag, application: 'EyeWriter')
+      get :index, params: { set: 'latest' }
+      expect(assigns(:tags).first(2)).to eq([new, old])
+      get :index, params: { set: 'nyc' }
+      expect(assigns(:tags)).to eq([old])
+      get :index, params: { set: 'tempt1' }
+      expect(assigns(:tags)).to eq([new])
+      get :index, params: { set: 'bogus' }
+      expect(assigns(:set)).to eq('featured')
+      expect(response.body).to include('<a aria-current="page" href="/">Featured</a>')
+      expect(response.body).to include('href="/?set=popular"')
+    end
+
+    it "plays the tag ?tag= asks for" do
+      FactoryBot.create(:tag)
+      chosen = FactoryBot.create(:tag)
+      stub_const('Tag::FEATURED', [])
+      get :index, params: { tag: chosen.id }
+      expect(assigns(:tag)).to eq(chosen)
+      expect(response.body).to match(%r{<a[^>]*aria-current="true"[^>]*href="/data/#{chosen.id}"})
+    end
+  end
+
+  it "/upload explains how to make a tag and lets you draw one" do
+    get :upload
+    expect(response).to be_successful
+    expect(response.body).to include('Fat Tag')
+    expect(response.body).to include('data-gml-recorder')
+  end
+
   it "/about works" do
     get :about
     expect(response.body).to include('About')

@@ -2,7 +2,7 @@
 
   = form_with url: user_session_path, method: :post do |f|
 
-    %h2 Login
+    %h1 Login
     = f.label :login, 'Username'
     = f.text_field :login, value: params[:login]
 

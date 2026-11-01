@@ -3,7 +3,6 @@ class UsersController < ApplicationController
   before_action :require_user, only: %i[edit change_password update]
   before_action :set_user_from_current_user, only: %i[edit change_password update]
 
-  # FIXME: would love a smarter way to avoid test failures using this
   invisible_captcha only: [:create]
 
   # Show all users

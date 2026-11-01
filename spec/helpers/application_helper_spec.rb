@@ -17,4 +17,21 @@ describe ApplicationHelper do
       expect(helper.attachment_url(user, :photo, :tiny)).to eq('/images/defaults/photo_tiny.jpg')
     end
   end
+
+  describe '#website_link' do
+    it 'is nil for a blank website' do
+      expect(helper.website_link(nil)).to be_nil
+      expect(helper.website_link('')).to be_nil
+    end
+
+    it 'adds a scheme when none was typed and strips it from the label' do
+      html = helper.website_link('example.com/')
+      expect(html).to include('href="http://example.com/"')
+      expect(html).to include('>example.com<')
+    end
+
+    it 'keeps https' do
+      expect(helper.website_link('https://example.org')).to include('href="https://example.org"')
+    end
+  end
 end

@@ -59,7 +59,12 @@ class TagsController < ApplicationController
                  .with_attached_image
                  .includes(user: { photo_attachment: :blob })
                  .where(@search_context && @search_context[:conditions])
+                 .merge(filters)
                  .paginate(page: @page, per_page: @per_page)
+    # One query, cached: every year with an upload, for the chips.
+    @years = Rails.cache.fetch('tags/years', expires_in: 1.hour) do
+      Tag.distinct.pluck(Arel.sql('YEAR(created_at)')).compact.sort.reverse
+    end
     @applications ||= Tag.select("DISTINCT application AS name")
                          .where.not(application: [nil, ""])
                          .order(:name)
@@ -80,32 +85,36 @@ class TagsController < ApplicationController
   end
 
   def show
-    set_page_title "Tag ##{@tag.id}"
+    set_page_title "Tag ##{@tag.id}: #{@tag.sexy_app_name.presence || 'upload'} by #{helpers.tag_author(@tag)}"
 
     # Checked before the GML is touched, so a 304 costs no disk read.
-    # iphone_rotate is in the etag because it changes the .gml body, and so is
-    # the JSONP callback.
+    # iphone_rotate is in the etag because it changes the .gml body, and so are
+    # the JSONP callback, preview and player, which swap the .json body.
     #
     # #random routes through here and must never validate: a 304 would defeat
     # the point, and a shared cache would pin one "random" tag for everybody.
     if action_name == 'random'
       response.headers['Cache-Control'] = 'no-store'
-    elsif cached_for_api?(etag: [@tag, jsonp_callback, params[:iphone_rotate]],
+    elsif cached_for_api?(etag: [@tag, jsonp_callback, params[:iphone_rotate], params[:preview], params[:player]],
                           last_modified: @tag.updated_at)
       return
     end
 
     # We only need these instance variables when rendering HTML (aka ghetto interlok)
     if ['html', nil].include?(params[:format])
-      @prev = Tag.where(id: ...@tag.id).last
-      @next = Tag.find_by("id > ?", @tag.id)
-
-      @user = User.find_by_param(params[:user_id]) if params[:user_id]
-      @user ||= @tag.user
+      # The filmstrip: eight either side by id, oldest to newest, so ‹ › and
+      # the arrow keys read as a timeline.
+      before = Tag.where(id: ...@tag.id).order(id: :desc).limit(8).includes(:user).to_a
+      after  = Tag.where('id > ?', @tag.id).order(id: :asc).limit(8).includes(:user).to_a
+      @prev  = before.first
+      @next  = after.first
+      @strip = before.reverse + [@tag] + after
     end
 
     # Freak out if GML data is missing; this really isn't ever supposed to happen
     raise MissingDataError if @tag.gml.blank?
+
+    @tag.count_view! if loading_the_tag?
 
     respond_to do |wants|
       wants.html  { render }
@@ -113,7 +122,18 @@ class TagsController < ApplicationController
       wants.xml   { render xml: @tag.to_xml(dasherize: false, skip_types: true) }
       # CORS headers used to be set by hand here, and only here. Rack::Cors now
       # covers every API format and answers the preflight. See config/initializers/cors.rb.
-      wants.json  { render json: @tag.to_json, callback: jsonp_callback }
+      # ?preview=1 is the grid's cut-down payload and ?player=1 is what the
+      # page inlines for its own player. See Tag#preview_data and #player_data.
+      wants.json do
+        body = if params[:preview]
+                 @tag.preview_data
+               elsif params[:player]
+                 @tag.player_data
+               else
+                 @tag.to_json
+               end
+        render json: body, callback: jsonp_callback
+      end
     end
   end
 
@@ -153,16 +173,13 @@ class TagsController < ApplicationController
     end
 
     if params[:check] == 'connected' # DustTag weirdness?
-      logger.debug "connected check"
       head :ok
       return
     end
 
     if params[:tag].present? # sent by the form
-      logger.debug "sent by the form"
       create_from_form
     elsif params[:gml].present? # sent from an app!
-      logger.debug "sent from an app"
       create_from_api
     else
       # Otherwise error out, without displaying any sensitive or internal params
@@ -188,7 +205,6 @@ class TagsController < ApplicationController
     else
       flash[:error] = "Could not destroy tag: #{@tag.errors.full_messages.to_sentence}"
     end
-    # redirect_to(tags_path)
     redirect_back_or_to(root_path)
   end
 
@@ -228,7 +244,6 @@ class TagsController < ApplicationController
 
     respond_to do |wants|
       wants.html { render 'validator' }
-      # FIXME: to_xml does the fuckin' <hash> thing :(
       joined_hash = @tag.validation_results.transform_values { |v| v.join(";\n") }
       wants.xml   { render xml: joined_hash.to_xml(dasherize: false, skip_types: true) }
       # callback: belongs on render, not on to_json, which ignores it. Passing it
@@ -245,26 +260,12 @@ class TagsController < ApplicationController
   end
 
   def require_owner
-    logger.debug "require_owner (tag.id=#{begin
-      @tag.id
-    rescue StandardError
-      nil
-    end}): current_user=#{begin
-      current_user.id
-    rescue StandardError
-      nil
-    end}; tag.user.id=#{begin
-      @tag.user.id
-    rescue StandardError
-      nil
-    end}"
     raise NoPermissionError unless current_user && @tag && (@tag.user == current_user || is_admin?)
   end
 
   # Create a tag uploaded w/o a user or authentication, via the ghetto-API
   # this is currently used for tempt from the Eyewriter, but will be expanded...
   def create_from_api
-    # TODO: add app uuid? or Hash app uuid?
     opts = {
       gml: params[:gml],
       ip: request.remote_ip,
@@ -299,10 +300,7 @@ class TagsController < ApplicationController
     # Read the GML uploaded gml file and dump it into the GML field
     # GML file overrides anything in the textarea -- that was probably accidental input
     file = params[:tag][:gml_file]
-    if file
-      logger.debug "Reading from GML file = #{file.inspect}"
-      params[:tag][:gml] = file.read
-    end
+    params[:tag][:gml] = file.read if file
 
     # Build object with permitted params. The owner is assigned off the session, never
     # mass-assigned: `permit` drops non-scalars, so a User in params silently vanished.
@@ -312,9 +310,7 @@ class TagsController < ApplicationController
     # GML data of some kind is required -- catching this ourselves due to GmlObject complexity...
     # Allowing screenshot-only's for now... delete later.
     # if params[:tag].blank? || params[:tag][:gml].blank?
-    #   @tag.errors.add("You must provide valid GML data to upload (no screenshots only, sorry)")
     #   raise "bad GML data"
-    # end
 
     @tag.save!
     flash[:notice] = "Tag created"
@@ -325,13 +321,29 @@ class TagsController < ApplicationController
   end
 
   # For converting from the pre-existing 'Application' params into a string in create/update
-  def convert_app_id_to_app_name
-    Rails.logger.debug "#convert_app_id_to_app_name"
+  # The chips on /data. Unlike the search context they combine, and each is a
+  # fact about the row rather than a search: ?has=still&who=anon&year=2010.
+  def filters
+    scope = Tag.all
+    scope = scope.joins(:image_attachment) if params[:has] == 'still'
+    scope = scope.from_device if params[:from] == 'device'
+    scope = scope.where.not(user_id: nil) if params[:who] == 'claimed'
+    scope = scope.where(user_id: nil) if params[:who] == 'anon'
+    year = params[:year].to_i
+    scope = scope.where(created_at: Time.zone.local(year).all_year) if year > 2000
+    scope
+  end
 
+  # A page view, a file download or a play in the browse grid counts once.
+  # Thumbnails (?preview=1) and cache hits (the 304 in show) do not.
+  def loading_the_tag?
+    params[:format].blank? || params[:format] == 'gml' || (params[:format] == 'json' && params[:player].present?)
+  end
+
+  def convert_app_id_to_app_name
     # Sub in an existing application if specified...
     return unless params[:tag] && params[:tag][:existing_application_id] && params[:tag][:application].blank?
 
-    # FIXME: use internal ids if available? string matching all the time is ghetto
     app = begin
       Visualization.find(params[:tag][:existing_application_id])
     rescue StandardError
@@ -340,7 +352,6 @@ class TagsController < ApplicationController
     params[:tag][:application] = app.name if app.present?
   end
 
-  # TODO: this should be a Sweeper...
   def expire_caches
     formats = [nil, 'json', 'gml', 'xml', 'rss', 'txt']
 

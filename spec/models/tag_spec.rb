@@ -255,7 +255,162 @@ RSpec.describe Tag, type: :model do
     end
   end
 
+  describe '#player_data' do
+    it 'flattens strokes into [x, y, time] triples' do
+      tag = tag_with_gml(<<~GML)
+        <drawing><stroke>
+          <pt><x>0.25</x><y>0.5</y><time>0</time></pt>
+          <pt><x>0.75</x><y>0.5</y><time>0.4</time></pt>
+        </stroke></drawing>
+      GML
+
+      expect(tag.player_data[:strokes].first[:points]).to eq([[0.25, 0.5, 0.0], [0.75, 0.5, 0.4]])
+    end
+
+    it 'keeps a single stroke and a list of strokes in the same shape' do
+      one = tag_with_gml('<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>')
+      two = tag_with_gml(<<~GML)
+        <drawing>
+          <stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke>
+          <stroke><pt><x>1</x><y>1</y><time>1</time></pt></stroke>
+        </drawing>
+      GML
+
+      expect(one.player_data[:strokes].size).to eq(1)
+      expect(two.player_data[:strokes].size).to eq(2)
+    end
+
+    it 'drops points with unreadable coordinates' do
+      tag = tag_with_gml(<<~GML)
+        <drawing><stroke>
+          <pt><x>0.1</x><y>0.1</y><time>0</time></pt>
+          <pt><x>banana</x><y>0.2</y><time>0.1</time></pt>
+        </stroke></drawing>
+      GML
+
+      expect(tag.player_data[:strokes].first[:points].size).to eq(1)
+    end
+  end
+
+  describe '.curated' do
+    it 'finds New York by location or keyword, and orders popular by views' do
+      brooklyn = FactoryBot.create(:tag, location: 'Brooklyn, NY')
+      tagged = FactoryBot.create(:tag, gml_keywords: 'nyc,handstyle')
+      elsewhere = FactoryBot.create(:tag, location: 'Berlin')
+      expect(described_class.curated('nyc')).to contain_exactly(brooklyn, tagged)
+
+      elsewhere.count_view!
+      elsewhere.count_view!
+      brooklyn.count_view!
+      expect(described_class.curated('popular').to_a).to eq([elsewhere, brooklyn])
+    end
+  end
+
+  describe '#count_view!' do
+    it 'adds one without touching updated_at' do
+      tag = FactoryBot.create(:tag)
+      stamp = tag.updated_at
+      tag.count_view!
+      expect(tag.reload.views_count).to eq(1)
+      expect(tag.updated_at).to eq(stamp)
+    end
+  end
+
+  describe '#readout' do
+    it 'counts strokes and points and formats the seconds like the player' do
+      tag = tag_with_gml(<<~GML)
+        <drawing><stroke>
+          <pt><x>0.25</x><y>0.5</y><time>0</time></pt>
+          <pt><x>0.75</x><y>0.5</y><time>0.4</time></pt>
+        </stroke></drawing>
+      GML
+      expect(tag.readout).to eq('1 stroke  //  2 pts  //  00.40s')
+      expect(tag_with_environment(up_x: 1, up_y: 0).readout).to end_with('rot 90°')
+    end
+  end
+
+  describe '#stage_ratio' do
+    it 'is the drawing\'s width over its height, clamped' do
+      wide = tag_with_gml(<<~GML)
+        <drawing><stroke>
+          <pt><x>0.1</x><y>0.4</y><time>0</time></pt>
+          <pt><x>0.9</x><y>0.5</y><time>1</time></pt>
+        </stroke></drawing>
+      GML
+      expect(wide.stage_ratio).to eq(2.0)
+      tall = tag_with_gml('<drawing><stroke><pt><x>0.5</x><y>0.1</y><time>0</time></pt><pt><x>0.5</x><y>0.9</y><time>1</time></pt></stroke></drawing>')
+      expect(tall.stage_ratio).to eq(0.75)
+    end
+
+    it 'turns with a landscape capture' do
+      expect(tag_with_environment(up_x: 1, up_y: 0).stage_ratio).to eq(1.0)
+    end
+  end
+
+  describe '#preview_data' do
+    it 'keeps about PREVIEW_POINTS points, always including the last' do
+      pts = (0..999).map { |i| "<pt><x>#{i / 1000.0}</x><y>0.5</y><time>#{i / 100.0}</time></pt>" }.join
+      tag = tag_with_gml("<drawing><stroke>#{pts}</stroke></drawing>")
+
+      points = tag.preview_data[:strokes].first[:points]
+      expect(points.size).to be_between(Tag::PREVIEW_POINTS / 2, Tag::PREVIEW_POINTS + 1)
+      expect(points.first).to eq([0.0, 0.5, 0.0])
+      expect(points.last).to eq([0.999, 0.5, 9.99])
+    end
+
+    it 'leaves a short tag alone apart from rounding' do
+      tag = tag_with_gml('<drawing><stroke><pt><x>0.12345</x><y>0.5</y><time>0.123</time></pt></stroke></drawing>')
+      expect(tag.preview_data[:strokes].first[:points]).to eq([[0.123, 0.5, 0.12]])
+    end
+
+    it 'drops the per-stroke styling and screen size' do
+      tag = tag_with_gml('<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>')
+      expect(tag.preview_data.keys).to contain_exactly(:id, :app, :up, :rotate, :strokes)
+      expect(tag.preview_data[:strokes].first.keys).to eq([:points])
+    end
+  end
+
+  describe '#player_data up vector' do
+    it 'passes it through for the client to read' do
+      expect(tag_with_environment(up_x: 1, up_y: 0).player_data[:up]).to eq(x: 1.0, y: 0.0)
+    end
+
+    it 'is nil when none was recorded' do
+      tag = tag_with_gml('<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>')
+      expect(tag.player_data[:up]).to be_nil
+    end
+  end
+
+  # The old player decided this from the client's name, which is wrong in both
+  # directions: the same app wrote landscape captures on early phones and
+  # upright ones later. GML records the orientation, so read it.
+  describe '#landscape_capture?' do
+    it 'is true when the up vector points along x' do
+      expect(tag_with_environment(up_x: 1, up_y: 0).player_data[:rotate]).to be true
+    end
+
+    it 'is false when the up vector points along y' do
+      expect(tag_with_environment(up_x: 0, up_y: 1).player_data[:rotate]).to be false
+    end
+
+    it 'is false when no up vector was recorded' do
+      expect(tag_with_gml('<drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>')
+               .player_data[:rotate]).to be false
+    end
+  end
+
   protected
+
+  def tag_with_gml(body)
+    FactoryBot.create(:tag, gml: "<gml><tag><header><client><name>test</name></client></header>#{body}</tag></gml>")
+  end
+
+  def tag_with_environment(up_x:, up_y:)
+    tag_with_gml(<<~GML)
+      <environment><up><x>#{up_x}</x><y>#{up_y}</y><z>0</z></up></environment>
+      <drawing><stroke><pt><x>0</x><y>0</y><time>0</time></pt></stroke></drawing>
+    GML
+  end
 
   def base_gml
     {

@@ -40,6 +40,31 @@ actually changes:
 curl -H 'If-None-Match: "abc123"' http://000000book.com/latest.gml
 ```
 
+## Preview payload for thumbnails
+
+`/data/:id.json?preview=1` returns the tag cut down for drawing small: about
+300 points, three decimal places, no per-stroke styling. The site's own grid
+and filmstrip draw from it.
+
+```
+curl 'http://000000book.com/data/147.json?preview=1'
+```
+
+```json
+{ "id": 147, "app": "DustTag", "up": { "x": 1.0, "y": 0.0 }, "rotate": true,
+  "strokes": [ { "points": [[0.427, 0.113, 0.0], [0.431, 0.118, 0.03]] } ] }
+```
+
+`up` is the capture's up vector, so a client can decide rotation the way the
+reference player does; `rotate` is the server's answer for older clients. It
+carries the same ETag and caching rules as the full `.json`.
+
+`?player=1` is the same shape at full fidelity, every point with its
+per-stroke colour and brush: what the site inlines for its own player.
+
+Every tag carries `views_count`: how many times its page, its `.gml` or its
+player payload has been loaded. Thumbnails and cache hits do not count.
+
 ## Other handy API access points
 
 Latest tag uploaded site-wide:
@@ -67,7 +92,9 @@ curl 'http://000000book.com/data.json?user=anon-1a2b3'
 ```
 
 Filtering also works on `location` and `keywords`, and pages with `page` and
-`per_page` (default 15, maximum 100).
+`per_page` (default 15, maximum 100). The chips on `/data` are plain
+parameters too and combine: `has=still`, `from=device`, `who=claimed` or
+`who=anon`, and `year=2010`.
 
 Note that `/latest` and `/random` take no filters: they are the newest and a
 random tag across the whole archive. Earlier versions of this page documented

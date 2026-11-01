@@ -1,66 +1,29 @@
+= auto_discovery_link_tag(:rss, { format: :rss, controller: 'tags', action: 'index' }, title: '#000000book: Latest Tags')
 
--# RSS
-= auto_discovery_link_tag(:rss, {format: :rss, controller: 'tags', action: 'index'}, title: '#0000book: Latest Tags')
-
--# Be a little more specific about what 'today' is.
-- timezone = ActiveSupport::TimeZone["Pacific Time (US & Canada)"]
-- today = DateTime.now.in_time_zone(timezone).to_date
-
-#home
-
-  #intro
-    .right{style: 'font-weight: normal; margin-left: 20px; margin-top: 0px; color: #777;'}
-      == #{pluralize Tag.where("created_at >= ?", today).count, 'tag'} uploaded
-      == by #{pluralize Tag.where("created_at >= ?", today).select('DISTINCT gml_uniquekey').count, 'person'} today (last #{time_ago_in_words(today).gsub('about ','')})
-      %br
-      == &rarr; #{link_to 'view all activity', activity_path, style: 'text-decoration: underline;'}
-
-    .welcome{style: 'width: 600px;'}
-      %strong Welcome to #000000book
-      == &ndash; read an #{link_to 'intro to GML', 'http://fffff.at/gml-week-graffiti-markup-language/'}
-      == &ndash; uploading tags? #{link_to 'Register an account', signup_path}
-      == <br/> Signup and #{link_to 'link your iPhone', settings_path} to claim your uploads
-
-  #vanderplayer
-
-    .prevnext
-      - next_text = '&larr; next'.html_safe
-      - prev_text = 'previous &rarr;'.html_safe
-      %li= @next.nil? ? next_text : link_to(next_text, tag_path(@next), class: 'button')
-      %li &nbsp;::&nbsp;
-      %li= @prev.nil? ? prev_text : link_to(prev_text, tag_path(@prev), class: 'button')
-    - if @tag.blank?
-      %h2.warning Warning: no tag data
+.lede.lede--home
+  %div
+    %h1.lede__title An open database for Graffiti Markup Language (.gml) files
+    %p.page__lede
+      Every tag is a #{link_to 'GML', 'http://fffff.at/gml-week-graffiti-markup-language/'} file:
+      the writer's hand as coordinates and timestamps, replayable by anyone.
+  .actions
+    = link_to 'View all data →', tags_path, class: 'button'
+    - if current_user
+      = link_to '+ Upload GML', new_tag_path, class: 'button button--solid'
     - else
-      %h2
-        %a{href: tag_path(@tag)}= tag_title(@tag)
-        %small
-          - if true
-            %span.application== &ndash; #{application_link(@tag.sexy_app_name)}
-          - unless @tag.location.blank?
-            %span.location== &ndash; #{@tag.location}
-          - if !@tag.user.nil?
-            %span.username== &ndash; #{link_to @tag.user.login, user_path(@tag.user)}
-          - elsif @tag.secret_username.blank?
-            %span.uniquekey== <em>&ndash;</em> #{secret_username_link(@tag.secret_username)}
-          == &ndash; uploaded #{time_ago_in_words(@tag.created_at)} ago
-      = render partial: 'tags/tag_playback', object: @tag
+      = link_to 'Create an account', signup_path, class: 'button button--solid'
 
-  - # List of tags
-  #tag-list
-    %ul#frontpage_tags
-      - @tags.each do |tag|
-        %li
-          %span
-            %a{href: tag_path(tag)}= tag_title(tag)
-          %small
-            -# unless tag.application.blank? && tag.gml_application.blank?
-            - if true
-              %span.application== <em>|</em> #{application_link(tag.sexy_app_name, short: true)}
-            - if !tag.user.nil?
-              %span.username== <em>|</em> #{link_to tag.user.login, user_path(tag.user)}
-            - elsif !tag.secret_username.blank?
-              %span.uniquekey== <em>|</em> #{secret_username_link(tag.secret_username)}
-    %br
-    %p.right
-      %strong= link_to '<span>View all data &raquo;</span>'.html_safe, tags_path, class: 'button ghost small'
+%nav.tabs{ 'aria-label' => 'Sets' }
+  - Tag::SETS.each do |key, label|
+    = link_to label, root_path(set: (key unless key == 'featured')), 'aria-current' => (key == @set ? 'page' : nil)
+
+- if @tag.blank?
+  %p.page__lede Nothing here yet.
+- else
+  = render layout: 'tags/browse', locals: { tag: @tag } do
+    .section-head
+      %h2 Featured and recent
+      %span.meta== #{@tags.size} shown / #{number_with_delimiter(archive_total)} archived
+    .tag-grid
+      = render partial: 'tags/tag', collection: @tags, as: :tag, locals: { current: @tag }
+    %p{ style: 'margin-top: 20px' }= link_to 'View all data →', tags_path, class: 'button'
