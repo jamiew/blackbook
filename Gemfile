@@ -35,7 +35,7 @@ gem 'rack-cors'
 # File uploads. Active Storage handles attachments; kt-paperclip is gone, and
 # with it the pin holding marcel at 1.x. The *_file_name columns stay until the
 # backfill has run everywhere. See lib/active_storage_backfill.rb.
-gem 'image_processing', '~> 2.0'
+gem 'image_processing', '~> 2.1'
 # image_processing 2.x stopped depending on mini_magick, so declaring it here is
 # what keeps config.active_storage.variant_processor = :mini_magick working on a
 # clean bundle install. Without it variants fail in the container but not on a
