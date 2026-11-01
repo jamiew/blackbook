@@ -14,7 +14,8 @@ concurrency:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    # ubuntu-latest is 26.04, which has no prebuilt Ruby 3.4.5 for setup-ruby.
+    runs-on: ubuntu-24.04
     services:
       mysql:
         # Match the server. Keep this, compose.yaml and the server in step:
@@ -54,7 +55,7 @@ jobs:
 
   rubocop:
     name: RuboCop
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -66,7 +67,7 @@ jobs:
     name: Deploy beta
     needs: [test, rubocop]
     if: github.ref == 'refs/heads/upgrade-migrations'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # kamal takes a lock on the host and does not release it when a runner is
     # cancelled, so two overlapping deploys leave a stale lock that blocks every
     # later one. The workflow-level cancel above is disabled for this branch for
