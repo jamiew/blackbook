@@ -6,7 +6,7 @@ gem 'mysql2'
 gem 'puma', '~> 8.0'
 
 # ActiveSupport 8.1 breaks on json 3, so hold it on 2.x.
-gem 'json', '< 3'
+gem 'json', '< 4'
 
 # Serves assets and handles compression and caching in front of Puma, inside
 # the container. It is what removes the need for nginx to serve static files.
