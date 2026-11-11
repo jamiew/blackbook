@@ -50,7 +50,7 @@ gem 'mini_magick'
 gem 'redcarpet'
 
 # Utilities
-gem 'nokogiri', '~> 1.15'
+gem 'nokogiri', '~> 1.19'
 gem 'will_paginate'
 
 # Operations
