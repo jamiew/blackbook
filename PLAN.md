@@ -11,6 +11,8 @@ app cards, in the recorder.
 - Activity and profiles skip notifications for removed models without deleting
   archived rows. Backup, resync and rehearsal scripts fail closed on unsafe
   inputs and failed checks; production execution still needs a separate review.
+  Isolated resync specs cover failed marker, SSH and SQL checks without
+  connecting to a server.
 - Dependencies: Ruby 3.4.12, compatible gem updates and current CI actions.
   Authlogic is test-only. Keep JSON 2 and dependency-constrained major versions;
   retain canvasplayer 6.0.1 because upstream removes existing rendering modes.
