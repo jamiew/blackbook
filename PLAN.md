@@ -8,6 +8,9 @@ app cards, in the recorder.
 
 - Security: Rails 8.1.4.1, Rack 3.2.8, Nokogiri 1.19.7 and net-ssh
   7.3.10 replace vulnerable releases.
+- Activity and profiles skip notifications for removed models without deleting
+  archived rows. Backup, resync and rehearsal scripts fail closed on unsafe
+  inputs and failed checks; production execution still needs a separate review.
 
 - Chrome: instruments row gone, logo given height, `/apps` rebuilt and fixed.
 - Engine: canvasplayer 6.0.1 vendored with `SOURCE`; `player.js` is the glue.

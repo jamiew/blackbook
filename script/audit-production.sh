@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Read-only production audit. Makes no writes: no migrations, no restarts,
-# no git operations, no file changes. Safe to run any time.
+# Production audit: no application-data writes, migrations or restarts.
+# It creates a temporary credentials file and performs potentially costly reads.
 #
 # Answers three questions before we touch the deploy:
 #   1. What code is actually running on the VPS?
@@ -33,10 +33,17 @@ if [ -z "$PROD_HOST" ] || [ -z "$PROD_USER" ] || [ -z "$PROD_APP_PATH" ]; then
   echo "so PROD_APP_PATH is probably /home/rails/blackbook (confirm before running)." >&2
   exit 1
 fi
+[[ "$PROD_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ &&
+   "$PROD_USER" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_-]*$ &&
+   "$PROD_DB" =~ ^[a-zA-Z0-9_]+$ &&
+   "$PROD_APP_PATH" =~ ^/[a-zA-Z0-9_./-]+$ ]] || {
+  echo "Invalid production host, user, database or absolute app path." >&2
+  exit 1
+}
 
 echo "Auditing $PROD_USER@$PROD_HOST:$PROD_APP_PATH (read-only)"
 
-ssh "$PROD_USER@$PROD_HOST" "APP_PATH='$PROD_APP_PATH' DB_NAME='$PROD_DB' bash -s" <<'REMOTE'
+ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$PROD_USER@$PROD_HOST" "APP_PATH='$PROD_APP_PATH' DB_NAME='$PROD_DB' bash -s" <<'REMOTE'
 # Deliberately NOT set -e: every section must run even if an earlier one fails.
 # (This is the exact bug in ./deploy, where a failed reset still reports success.)
 set -uo pipefail
@@ -115,10 +122,9 @@ echo "zero-byte:   $(find data/ -maxdepth 1 -name '*.gml' -size 0 2>/dev/null | 
 echo "total size:  $(du -shL data/ 2>/dev/null | cut -f1)"
 echo
 echo "-- paperclip images --"
-# -L follows the symlink: public/system is usually a link to the block volume,
-# and plain `find` counts 0 files there while `du -L` reports the real size.
-echo "public/system files: $(find -L public/system -type f 2>/dev/null | wc -l)"
-echo "public/system size:  $(du -shL public/system 2>/dev/null | cut -f1)"
+# Avoid walking every image on network block storage. df below reports
+# filesystem usage and free inodes, not the size or count of this directory.
+echo "public/system -> $(readlink -f public/system 2>/dev/null || echo 'N/A')"
 
 section "DISK (InnoDB conversion needs ~2x the largest table free)"
 echo "-- app root and MySQL datadir --"
@@ -132,12 +138,17 @@ done
 echo
 echo "-- inodes (76k+ small GML files make these matter) --"
 df -ih .
+for p in data public/system; do
+  real=$(readlink -f "$p" 2>/dev/null) && [ -n "$real" ] && df -ih "$real" | tail -1
+done
 
 section "MYSQL"
 # Pull credentials out of the production block of database.yml into a 0600 temp
 # file. Same approach as script/sync-production.sh: never puts a password on a
 # command line or in the output.
-MYCNF=$(mktemp); chmod 600 "$MYCNF"
+umask 077
+MYCNF=$(mktemp) || exit 1
+chmod 600 "$MYCNF" || exit 1
 trap 'rm -f "$MYCNF"' EXIT
 
 # Look in the production: block first, then anywhere (values often live in &default)
@@ -218,5 +229,5 @@ echo "-- listening sockets --"
 ss -lntp 2>/dev/null | head -20 || netstat -lntp 2>/dev/null | head -20
 
 section "DONE"
-echo "Nothing was modified. Review MIGRATION BLOCKERS above before any deploy."
+echo "No application data was modified. Review errors and MIGRATION BLOCKERS above."
 REMOTE

@@ -22,8 +22,8 @@ class UsersController < ApplicationController
 
     @tags = @user.tags.order(created_at: :desc).with_attached_image.includes(:user)
                  .paginate(page: @page, per_page: @per_page)
-    @notifications = @user.notifications.includes(:subject, :user).order(created_at: :desc).paginate(page: 1,
-                                                                                                     per_page: 15)
+    @notifications = @user.notifications.displayable.includes(:subject, :user).order(created_at: :desc)
+                          .paginate(page: 1, per_page: 15)
 
     set_page_title @user.name || @user.login
 
