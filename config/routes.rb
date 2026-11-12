@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   get '/data/temp.png', controller: 'home', action: 'discard', as: 'discard_data_temp_png'
   get '/tags/temp.png', controller: 'home', action: 'discard', as: 'discard_tags_temp_png'
 
-  # Users/authentication via authlogic
+  # Existing accounts can log in; account creation remains disabled.
   resources :users, only: [:index, :show] do
     resources :tags
   end

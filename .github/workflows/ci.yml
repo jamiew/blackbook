@@ -14,7 +14,7 @@ concurrency:
 jobs:
   test:
     name: Test
-    # ubuntu-latest is 26.04, which has no prebuilt Ruby 3.4.5 for setup-ruby.
+    # Keep CI on the supported Ubuntu runner used by the deployment jobs.
     runs-on: ubuntu-24.04
     services:
       mysql:
@@ -35,7 +35,7 @@ jobs:
         # rather than inheriting the server default.
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -47,7 +47,7 @@ jobs:
           MYSQL_PASSWORD: ""
           # Same knob developers use locally, rather than a second way of
           # spelling the connection that can drift from database.yml.
-          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+          MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}
         run: |
           bundle exec rake db:create
           bundle exec rake db:schema:load --trace
@@ -57,7 +57,7 @@ jobs:
     name: RuboCop
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -84,7 +84,7 @@ jobs:
       BETA_HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -92,10 +92,10 @@ jobs:
 
       # An amd64 runner builds natively. A laptop on arm64 has to cross-compile
       # under QEMU, which turned a short build into roughly nine minutes.
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Add the deploy key
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.BETA_SSH_PRIVATE_KEY }}
 

@@ -158,7 +158,7 @@ email is required.
 `crypted_password` and `password_salt` must stay until nothing depends on them.
 Dropping them early logs those accounts out permanently.
 
-Two traps, both pinned by `spec/models/user_authenticate_legacy_scrypt_spec.rb`:
+The legacy login specs cover two traps:
 
 - The hashed string is the password **then** the salt. Authlogic's
   `encrypt_arguments` returns `[raw_password, salt]`. Reversed, every legacy

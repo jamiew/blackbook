@@ -1,50 +1,54 @@
 # Uploading GML to 000000book.com
 
-Sending your application's GML data to blackbook is simple. Authenticating or
-registering your app is optional.
-
-Send an HTTP POST to `http://000000book.com/data` with a payload containing:
-
-- **gml** (text, required) — the complete GML data. Validated for required GML
-  fields, e.g. at least one x/y point.
-- **application** (string) — the name of your application. Not enforced, but
-  send it: it is how uploads are attributed and how `/data?app=` filters.
+Send an HTTPS POST to `https://000000book.com/data` with a `gml` parameter
+containing the complete XML. No account or API key is required. Uploads are
+limited to 30 per hour per IP; a `429` response includes `Retry-After`.
 
 ## Sample
 
-On macOS or Linux you can test uploading with `curl`:
+This command creates a public tag. Use a local server instead when testing.
+`--data-urlencode` preserves XML containing characters such as `&` or `+`.
 
+```bash
+curl --data-urlencode 'application=curlwriter' \
+  --data-urlencode 'gml=<gml spec="1.0"><tag><header><client><name>curlwriter</name></client></header><drawing><stroke><pt><x>0.1</x><y>0.1</y><time>0</time></pt><pt><x>0.8</x><y>0.8</y><time>1</time></pt></stroke></drawing></tag></gml>' \
+  https://000000book.com/data
 ```
-curl -A curlwriter \
-  -d 'application=curlwriter&gml=<gml><stroke><pt><x>1</x><y>1</y><t>1</t></pt></stroke></gml>' \
-  http://000000book.com/data
-```
 
-- `-A` sets a user-agent
-- `-d` is the POST data, which needs only `application` and `gml`
+To upload a file, replace the inline XML argument with
+`--data-urlencode 'gml@drawing.gml'`. Success returns `200` with the new tag ID
+as plain text. Use `/data/<id>` to view it. Requests with no GML or a failed
+model validation return `422`; a successful upload is not proof of valid GML.
 
-The recorder at [/upload](http://000000book.com/upload) writes a valid file in
-the browser if you want one to test with.
+The recorder at [/upload](https://000000book.com/upload) produces the expected
+file structure. Drawing data belongs under `<gml><tag><drawing>`, with `<stroke>`
+elements containing `<pt>` elements. Points use `<x>`, `<y>` and `<time>` (not
+`<t>`). The [validator](https://000000book.com/validator) checks for strokes,
+points and coordinates and reports missing capture metadata. These diagnostic
+checks do **not** run as upload validations.
 
-## Optional fields
+## Metadata
 
-These can be specified either in the GML itself **or** via HTTP POST, in which
-case 000000book writes them into the GML for you.
+The API accepts these additional POST fields:
 
-- **keywords** (string) — comma-separated list of keywords. These are tags in
-  the metadata sense, not graffiti tags.
-- **location** (string) — a name like "NYC", lat/long coordinates, or a URL.
-- **uniqueKey** (string) — a unique device id for device pairing, e.g. an iPhone
-  UUID or a computer's MAC address. Note: this field must currently be in the
-  GML; it is not accepted via POST.
-- **username** (string) — a 000000book user's login.
-- **author** (string) — the person who was actually writing.
+- **application**: application name, used for attribution and `?app=` filtering.
+- **location**: free-text location.
+- **uniquekey**: optional device-pairing credential; lowercase in POST.
+- **image**: an uploaded image file, sent as multipart form data.
 
-The `uniqueKey` payload uniquely identifies the uploading device. Users can
-later pair their 000000book account with a given uniqueKey.
+These fields are stored with the tag; they are not inserted into its GML.
+The server also reads `<name>`, `<username>`, `<keywords>`, `<location>` and
+`<uniqueKey>` from `<gml><tag><header><client>`. Nonempty header values populate
+the corresponding metadata; header location and uniqueKey override POST values.
+`keywords`, `username` and `author` are not accepted as separate POST fields.
+A GML username is descriptive metadata, not account authentication.
 
-Treat it as a credential, not metadata: anyone who has it can have their own
-uploads attributed to that device's owner. We never give it back out. It is
-stripped from every GML we serve and never appears in `.json` or `.xml`, so a
-tag you download will not contain the `<uniqueKey>` you uploaded. Send a value
-that is hard to guess, and do not reuse one across users.
+## Device pairing
+
+A user can set the matching device key in their account settings. Uploads with
+that key are assigned to the paired account.
+
+Treat the key as a credential: anyone who has it can attribute uploads to the
+paired account. Generate a hard-to-guess value rather than a MAC address or other
+public identifier, and do not share it across users. Public GML, JSON and XML
+responses omit the key; downloaded GML therefore differs from the uploaded file.

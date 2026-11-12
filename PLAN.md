@@ -11,6 +11,12 @@ app cards, in the recorder.
 - Activity and profiles skip notifications for removed models without deleting
   archived rows. Backup, resync and rehearsal scripts fail closed on unsafe
   inputs and failed checks; production execution still needs a separate review.
+- Dependencies: Ruby 3.4.12, compatible gem updates and current CI actions.
+  Authlogic is test-only. Keep JSON 2 and dependency-constrained major versions;
+  retain canvasplayer 6.0.1 because upstream removes existing rendering modes.
+- Cleanup: checks no longer edit files, formatting uses safe corrections, and
+  setup no longer runs migrations or clears logs. Empty initializer templates
+  are gone; API and deployment docs describe current behavior.
 
 - Chrome: instruments row gone, logo given height, `/apps` rebuilt and fixed.
 - Engine: canvasplayer 6.0.1 vendored with `SOURCE`; `player.js` is the glue.

@@ -9,7 +9,7 @@
 # The Ruby version is pinned to the same string as .ruby-version. There is no
 # rbenv and nothing compiles Ruby from source, which is what made provisioning
 # on a new Ubuntu release fragile.
-ARG RUBY_VERSION=3.4.5
+ARG RUBY_VERSION=3.4.12
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Links the package to the repo on ghcr.io, which is what lets a workflow's

@@ -8,6 +8,7 @@ app card on 000000book is drawn by it. The same files are vendored under
 - Demo: <https://jamiew.github.io/canvasplayer>
 - Code: <https://github.com/jamiew/canvasplayer>
 
-Any tag is available as JSON at `/data/:id.json`. `?preview=1` cuts it to
-about 300 points for thumbnails and `?player=1` returns the full-fidelity
-payload the site plays; see [Downloading GML](../api/downloading-gml.md).
+Any tag is available as JSON at `/data/:id.json`. `?preview=1` samples points
+for thumbnails; `?player=1` returns the site's normalized playback data.
+Use `.gml` or unqualified `.json` when you need the original drawing fields.
+See [Downloading GML](../api/downloading-gml.md).
