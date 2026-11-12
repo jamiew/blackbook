@@ -1,8 +1,8 @@
 # Deployment
 
-The app is deployed as a Docker container by [Kamal](https://kamal-deploy.org).
-MySQL is deliberately **not** containerized: it stays a host package so the block
-volume, backups and unattended-upgrades keep working as they already do.
+`config/deploy.yml` targets **beta**, using a Docker container managed by
+[Kamal](https://kamal-deploy.org). Production still uses the legacy `./deploy`
+script. MySQL runs on the host; GML and images live on a persistent block volume.
 
 ## Layout
 
@@ -13,36 +13,34 @@ volume, backups and unattended-upgrades keep working as they already do.
 | Database | MySQL 8.4 on the host, reached over its Unix socket |
 | Registry | `ghcr.io/jamiew/blackbook` |
 
-## Commands
+## Beta commands
 
 ```bash
 kamal setup            # first time on a new server
 kamal deploy           # build, push, roll over with no downtime
-kamal rollback         # back to the previous image
+kamal rollback <version> # roll back to a retained image version
 kamal logs             # follow
 kamal console          # rails console
 kamal migrate          # run migrations, deliberately a separate step
 ```
 
-Migrations never run automatically. `bin/docker-entrypoint` omits the `db:prepare`
-that Rails generates, because the pending set drops the `comments` table and that
-must not happen because a container restarted or a deploy rolled back.
+Migrations never run automatically: `bin/docker-entrypoint` does not run
+`db:prepare`. Before `kamal migrate`, check migration status, take a backup and
+follow the [migration rehearsal procedure](operations.md). The repository
+includes a migration that drops `comments`; do not assume it is pending on every
+target.
 
 ## Secrets
 
-Kamal reads `.kamal/secrets-common` first, then `.kamal/secrets`, and **later
-values win**. A key present in both takes the value from `.kamal/secrets`, even
-if that resolves to an empty string because the shell variable it references is
-unset. That failure is silent.
+Kamal loads `.kamal/secrets-common` before `.kamal/secrets`; later values win.
+Keep literal credentials in the gitignored file or the calling environment.
+The committed file must contain references only. Avoid duplicate definitions:
+an unset environment reference can overwrite a value from the common file.
 
-- `.kamal/secrets` is committed and contains only references, never values.
-- `.kamal/secrets-common` is gitignored and holds `KAMAL_REGISTRY_PASSWORD` (a
-  GitHub token with the `write:packages` scope) and `DATABASE_URL`. Neither may
-  be named in `.kamal/secrets`, or the empty shell value would win.
-
-Application secrets go in Rails encrypted credentials rather than the
-environment. The encrypted file is safe to commit in a public repo, and
-`RAILS_MASTER_KEY` already reaches the container.
+Deployment needs `KAMAL_REGISTRY_PASSWORD`, `DATABASE_URL` and `RAILS_MASTER_KEY`.
+For local registry pushes, use a GitHub token with `write:packages`.
+Application mail settings live in Rails encrypted credentials. Never commit
+the master key or unencrypted credentials.
 
 ```bash
 bin/rails credentials:edit
@@ -50,12 +48,12 @@ bin/rails credentials:edit
 
 ## Host MySQL
 
-The container reaches the database over MySQL's Unix socket, bind-mounted
-read-only by `config/deploy.yml`. Nothing listens on a port, so there is no
-bind address, firewall rule or certificate to keep working. TCP was tried
-first and every route timed out at connect.
+The container uses `/var/run/mysqld/mysqld.sock`, with the host socket directory
+mounted read-only by `config/deploy.yml`. This does not disable MySQL TCP on the
+host: configure its listener and firewall separately, and do not expose 3306
+publicly.
 
-Two one-time things on the server:
+Configure the database account and connection:
 
 1. A grant for the socket, which MySQL sees as localhost:
 
@@ -70,60 +68,52 @@ Two one-time things on the server:
    mysql2://blackbook:<password>@localhost/blackbook_prod
    ```
 
-[DigitalOcean Managed MySQL](https://www.digitalocean.com/products/managed-databases-mysql)
-removes this section, and the patching with it.
 
 ## Email
 
-Production sends through Amazon SES over SMTP, configured from encrypted
-credentials under the `ses` key. It falls back to `:sendmail` when those are
-absent, which is what the old server used.
+Production-mode Rails sends through Amazon SES when the encrypted `ses`
+credentials are present. Otherwise it falls back to `:sendmail`; the container
+does not install a sendmail service, so configure SES before relying on mail.
 
 SES SMTP credentials are **not** AWS access keys; generate a separate pair in the
 [SES console](https://console.aws.amazon.com/ses/home#/smtp). New accounts are
 [sandboxed](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html)
 and can only send to verified addresses until you request production access.
 
-The sender comes from the `ses.from` credential, applied as
-`config.action_mailer.default_options`. Do not add a `default from:` to
-`ApplicationMailer`: a mailer-class default overrides that config, which is how
-mail spent years claiming to come from `000book.com`, a domain we no longer use.
-The fallback for development and test is in `config/application.rb`.
+Set `ses.smtp_address`, `ses.smtp_username`, `ses.smtp_password` and `ses.from`;
+`ses.port` defaults to 587. The verified sender is applied through
+`config.action_mailer.default_options`. A mailer-level `default from:` would
+override it. Development and test use the fallback in `config/application.rb`.
 
-To check a change before a bounce tells you about it:
+To send a real test message:
 
 ```bash
 ./script/send-test-email.sh you@example.com
 ```
 
-It sends one real message through the production settings while reading nothing
-from production. A rejection naming the *recipient* means the sender is fine and
-you are still in the SES sandbox.
+This uses production mail settings and requires the credentials key. The script
+defaults to local MySQL, but honors an existing `DATABASE_URL`; check your
+environment before running it. SES accepting the message does not guarantee
+inbox delivery.
 
 ## A new host
 
-`kamal setup` does everything above the operating system. Four things it does
-not do, so a fresh droplet needs them first:
+Provision the host before `kamal setup`:
 
-```bash
-# 1. Attach the block volume and mount it at /mnt/blackbook_volume, then
-#    create the three directories config/deploy.yml bind-mounts:
-mkdir -p /mnt/blackbook_volume/{blackbook-data,active-storage}
-mkdir -p /mnt/blackbook_volume/blackbook-backup/public/system
+1. Attach the intended block volume at `/mnt/blackbook_volume`. Create
+   `blackbook-data`, `active-storage` and `blackbook-backup/public/system` within
+   it. These bind mounts must be writable by container UID/GID `1000:1000`;
+   ownership set in the image does not change a mounted host directory.
+2. Install MySQL **8.4** from an appropriate package source. The distribution's
+   default `mysql-server` package may be a different version. Create
+   `blackbook_prod` with `utf8mb4` and `utf8mb4_unicode_ci`, then configure the
+   account and `DATABASE_URL` above.
+3. Configure SSH access and allow HTTP/HTTPS traffic on ports 80 and 443.
+   Keep the database private. `kamal-proxy` needs those web ports; do not install
+   a competing web server.
+4. Set the target host, proxy hostname and secrets before deploying. The checked-in
+   config targets beta; changing `BETA_HOST` alone does not change its hostname.
 
-# 2. MySQL, matching the version in compose.yaml
-apt-get install -y mysql-server
-mysql -e "CREATE DATABASE blackbook_prod
-          CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# 3. The grant and DATABASE_URL from "Host MySQL" above.
-
-# 4. Only 80 and 443 need to be open; nothing listens on 3306.
-ufw allow 80,443/tcp
-```
-
-Nothing may hold port 80 when `kamal setup` runs: kamal-proxy binds it, and a
-partly-created proxy container is hard to recover from. In particular, do not
-install nginx.
-
-`./deploy` still ships the old production server, and retires with it.
+These are provisioning instructions, not permission to modify the live production
+volume. See [operations](operations.md) for the separate beta and production
+storage and backup procedures.

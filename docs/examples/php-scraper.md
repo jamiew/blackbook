@@ -3,9 +3,11 @@
 A 000000book crawler and basic GML parser by Filipe Cruz ("ps / TPOLM",
 <http://tpolm.org/~ps/>).
 
-Kept verbatim as contributed. It targets a long-obsolete PHP and uses the
-removed `mysql_*` functions, so treat it as a worked example of walking the
-`/data/{id}.gml` endpoint rather than as code to run.
+Historical source, not runnable guidance. It requires files not included here,
+uses removed `mysql_*` functions, and inserts downloaded text into SQL and HTML
+without escaping. Do not deploy it. For a new client, use the HTTPS endpoints,
+pagination and rate limits in [Downloading GML](../api/downloading-gml.md),
+parameterized SQL and escaped HTML output. The contribution below is unchanged.
 
 ```php
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">

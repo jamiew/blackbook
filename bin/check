@@ -1,16 +1,6 @@
 #!/usr/bin/env bash
-# Combined formatting, linting and testing script
-set -e
+# Check without rewriting files.
+set -euo pipefail
 
-echo "🚀 Running full code quality checks..."
-
-echo "🎨 Step 1: Auto-formatting..."
-./bin/format
-
-echo "📝 Step 2: Linting..."
 ./bin/lint
-
-echo "🧪 Step 3: Testing..."  
-./bin/test
-
-echo "✅ All checks passed!"
+./bin/test "$@"

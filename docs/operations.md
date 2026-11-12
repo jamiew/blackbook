@@ -2,53 +2,108 @@
 
 ## Testing migrations before they touch a server
 
-The test database is built from `schema.rb`, so it has never looked like
-production, which is still MyISAM and utf8mb3. Migrations that pass the suite can
-still fail or corrupt data there.
+The test database is built from `schema.rb`, not the legacy MyISAM/utf8mb3
+schema. Passing the suite does not establish that production migrations are safe.
 
 ```bash
 ./script/rehearse-migrations.sh
 ```
 
-Pulls production's table definitions (schema only, never any rows), loads them
-into a throwaway MySQL 8.4, seeds the duplicate users that decide which branch
-`AddMissingUniqueIndexes` takes, and runs every pending migration.
+This command contacts production. It copies table definitions and
+`schema_migrations` versions, but no user records, into a uniquely named database
+on the local Compose MySQL. It seeds duplicate users and runs pending migrations.
+Coordinate the schema read with deployments and use a local Docker context.
+The scratch database remains for inspection; the script prints its name and
+a command to drop only that database. Never use `docker compose down -v` to
+clean up a rehearsal on a volume shared with development or test databases.
 
-This is what caught two things reasoning alone did not:
+A schema rehearsal is not a full-data restore or a completed cutover rehearsal.
+The migration risks include:
 
 - MyISAM's 1000-byte index limit rejects a utf8mb4 `varchar(255)` unique key,
   where [InnoDB allows 3072](https://dev.mysql.com/doc/refman/8.4/en/innodb-limits.html).
   So the charset conversion has to run *after* the InnoDB conversion.
-- Converting utf8mb4 back to utf8mb3 does not fail on 4-byte data, it silently
-  mangles it. A stored 🎨 (`F0 9F 8E A8`) returns as `C3 B0 C5 B8 C5 BD C2 A8`
-  with no error. `ConvertToUtf8mb4` is therefore irreversible on purpose.
+- Converting utf8mb4 back to utf8mb3 risks corrupting 4-byte characters.
+  `ConvertToUtf8mb4` is irreversible on purpose.
 
 ## Reloading beta from production
 
 ```bash
-./script/resync-beta.sh
+BETA_HOST=NEW_DROPLET_IP ./script/resync-beta.sh
 ```
 
-Streams a fresh dump and rsyncs the volume from production to beta directly, so
-roughly 35 GB never travels through a laptop. Production is only ever read.
+Streams a database dump through the laptop and copies volume files directly
+from production to beta. **It drops and recreates beta's database and deletes
+beta-only volume files. Stop every beta writer first and keep a recoverable beta
+backup if its contents matter.** Recreating the database prevents beta-only
+tables, such as `active_storage_*`, surviving a reset of `schema_migrations`.
 
-Two guards, both tested: it refuses when source and target are the same host, and
-when beta's volume is not mounted, which would otherwise fill the root disk.
+The script requires an explicit beta host, verified SSH host keys on the laptop
+and beta, different machine IDs, mounted source and target volumes, and a
+working agent-forwarded connection from beta to the same production machine.
+Verify host-key fingerprints through a trusted channel before adding them to
+`known_hosts`; do not disable strict checking. Forward your agent only to a
+trusted beta host. Host and database names are restricted to safe characters;
+volume paths must be direct mount points under `/mnt`.
 
-The dump uses `--skip-lock-tables` so it never blocks the live site. Production is
-still MyISAM, so that trades a consistent snapshot for zero impact, which is the
-right way round while testing. **For the final cutover, stop the app on production
-first.**
+`/etc/blackbook-live` blocks a resync. A failed marker check also blocks it.
+**Create that marker on the new host before directing production traffic or
+writers to it**, and never run a resync concurrently with cutover.
+
+Dump, decompression and count-query failures stop the script. Any table row-count
+mismatch is fatal, including while production is active; stop writers and repeat.
+Matching counts do not verify row contents or snapshot consistency. A failure
+after the drop can leave beta incomplete: keep it offline until a successful
+reload and restore validation.
+
+`--skip-lock-tables` avoids explicit table locks, not all blocking or server load.
+MyISAM dumps can be inconsistent while writes continue. **For final cutover,
+stop every production writer for the entire database and file copy.** A systemd
+service's status alone does not establish that workers, cron jobs or other
+clients have stopped. Migrations remain a separate, deliberate step.
 
 ## Backups and audit
 
 ```bash
-script/audit-production.sh    # read-only: what is deployed, what migrations will hit
-script/backup-production.sh   # verified dump, GML corpus, images, gitignored config
+script/audit-production.sh    # data reads; review reported errors
+script/backup-production.sh   # database dump and private config copy
 ```
 
-`backup-production.sh` deliberately does not copy anything off the server. It
-prints the `scp` command so the transfer stays a human decision.
+Both scripts contact production and require verified SSH host keys. The audit
+does not modify application data, but reads can add load and it uses a temporary
+credentials file. It avoids recursively walking the image tree; filesystem
+usage is not an exact image-directory count or size.
+
+The backup uses a private, unique destination and checks free space, retaining
+an extra GiB above the estimated dump allowance. A file-size limit bounds the
+dump; other processes can still consume disk concurrently. Invalid size results
+stop the backup. The MyISAM dump locks tables and can block writes for its full
+duration.
+
+The script checks gzip integrity, a dump trailer and checksums, **not
+restorability**. It does not copy the backup off the server or snapshot the
+volume; it prints commands for those separate steps. Protect the local copy:
+the database and config snapshot contain private data and secrets.
+
+GML files and images are not archived to the root disk because this could
+exhaust MySQL's free space. Take a separate attached-volume snapshot; a droplet
+snapshot does not include attached volumes. Stop all writers and flush buffers,
+keeping writes stopped across the database backup and volume snapshot for a
+consistent recovery point. Restore into isolated local storage and validate
+the database and files before trusting the backup.
+
+### Local syntax checks only
+
+These commands parse the scripts without executing them or contacting a server:
+
+```bash
+for script in audit-production backup-production rehearse-migrations resync-beta; do
+  bash -n "script/$script.sh" || exit
+done
+```
+
+Syntax checks do not establish operational safety or a successful production
+rehearsal. Do not run the operational scripts themselves as a local smoke test.
 
 ## Moving images into Active Storage
 
@@ -103,7 +158,7 @@ email is required.
 `crypted_password` and `password_salt` must stay until nothing depends on them.
 Dropping them early logs those accounts out permanently.
 
-Two traps, both pinned by `spec/models/user_authenticate_legacy_scrypt_spec.rb`:
+The legacy login specs cover two traps:
 
 - The hashed string is the password **then** the salt. Authlogic's
   `encrypt_arguments` returns `[raw_password, salt]`. Reversed, every legacy
@@ -118,6 +173,9 @@ Two traps, both pinned by `spec/models/user_authenticate_legacy_scrypt_spec.rb`:
   counts them first and skips those two indexes rather than failing, so the
   migration is safe to run before they are cleaned up.
   `script/rehearse-migrations.sh` prints the current counts.
+- Notifications can refer to comments removed by `drop_comments_table`.
+  `Notification.displayable` excludes these from `/activity` and user pages
+  without deleting the notification rows.
 
 ## Rate limits
 
