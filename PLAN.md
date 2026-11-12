@@ -6,6 +6,9 @@ app cards, in the recorder.
 
 ## Done
 
+- Security: Rails 8.1.4.1, Rack 3.2.8, Nokogiri 1.19.7 and net-ssh
+  7.3.10 replace vulnerable releases.
+
 - Chrome: instruments row gone, logo given height, `/apps` rebuilt and fixed.
 - Engine: canvasplayer 6.0.1 vendored with `SOURCE`; `player.js` is the glue.
 - Viewer: id in the head, filmstrip of neighbours, metadata tiles, About rebuilt
