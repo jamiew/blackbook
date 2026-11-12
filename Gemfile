@@ -8,8 +8,7 @@ gem 'puma', '~> 8.0'
 # ActiveSupport 8.1 breaks on json 3, so hold it on 2.x.
 gem 'json', '< 3'
 
-# Serves assets and handles compression and caching in front of Puma, inside
-# the container. It is what removes the need for nginx to serve static files.
+# Serves assets, compression and caching in front of Puma.
 gem 'thruster', require: false
 
 # Assets
@@ -25,28 +24,18 @@ gem 'haml'
 # Authlogic wrote, which cannot be converted. See User#authenticate_legacy_scrypt.
 gem 'bcrypt', '~> 3.1'
 gem 'scrypt', '~> 3.0'
-# Still here only so the specs can build a real Authlogic hash to test against.
-gem 'authlogic', require: false
 
 # API/Controllers
 gem 'responders', '~> 3.0'
-# Cross-origin access to the read API, and the OPTIONS preflight that goes with
-# it. Middleware rather than per-action headers so it also covers .gml and .xml,
-# and so preflight is answered before routing and before the beta auth gate.
+# Covers read API responses and OPTIONS before routing and beta authentication.
 gem 'rack-cors'
 
-# File uploads. Active Storage handles attachments; kt-paperclip is gone, and
-# with it the pin holding marcel at 1.x. The *_file_name columns stay until the
-# backfill has run everywhere. See lib/active_storage_backfill.rb.
+# Legacy *_file_name columns stay until the Active Storage backfill finishes.
 gem 'image_processing', '~> 2.1'
-# image_processing 2.x stopped depending on mini_magick, so declaring it here is
-# what keeps config.active_storage.variant_processor = :mini_magick working on a
-# clean bundle install. Without it variants fail in the container but not on a
-# laptop that still has the gem lying around from 1.x.
+# image_processing 2.x does not include the configured MiniMagick backend.
 gem 'mini_magick'
 
-# Renders docs/*.md at /docs. GFM out of the box, so the tables and fenced code
-# already in those files come through without a second parser gem.
+# Renders docs/*.md with tables and fenced code.
 gem 'redcarpet'
 
 # Utilities
@@ -70,6 +59,11 @@ group :development, :test do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
+end
+
+group :test do
+  # Builds legacy scrypt hashes for authentication compatibility specs.
+  gem 'authlogic', require: false
 end
 
 group :development do

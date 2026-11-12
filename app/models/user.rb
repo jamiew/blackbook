@@ -57,9 +57,6 @@ class User < ApplicationRecord
     update_column(:password_digest, ::BCrypt::Password.create(password))
   end
 
-  # should we just use friendly_id?
-  # has_slug :login
-
   has_many :favorites
   has_many :tags
   has_many :visualizations

@@ -66,6 +66,14 @@ describe HomeController do
     expect(response).to be_successful
   end
 
+  it "/activity skips notifications whose subject model is gone" do
+    tag = FactoryBot.create(:tag)
+    Notification.insert!({ subject_type: 'Comment', subject_id: '1', verb: 'created' }) # rubocop:disable Rails/SkipsModelValidations
+    get :activity
+    expect(response).to be_successful
+    expect(assigns(:notifications).map(&:subject)).to contain_exactly(tag.user, tag)
+  end
+
   describe "pagination parameter validation" do
     # Test the controller logic without hitting the views
     controller described_class do

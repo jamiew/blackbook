@@ -17,7 +17,7 @@ on:
 jobs:
   migrate:
     name: Migrate beta
-    # ubuntu-latest is 26.04, which has no prebuilt Ruby 3.4.5 for setup-ruby.
+    # Match the CI and deployment runner.
     runs-on: ubuntu-24.04
     concurrency:
       group: deploy-beta
@@ -29,14 +29,14 @@ jobs:
       BETA_HOST: ${{ vars.BETA_HOST || '159.203.72.141' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
 
       - name: Add the deploy key
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.BETA_SSH_PRIVATE_KEY }}
 

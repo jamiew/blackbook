@@ -5,52 +5,61 @@
 # tests this, and it is where the expensive surprises live: production is still
 # MyISAM and utf8mb3, which the test database has never been.
 #
-# It found two things worth the effort:
-#   MyISAM's 1000-byte index limit rejects a utf8mb4 varchar(255) unique key,
-#   so table engine order matters
-#   rolling utf8mb4 back to utf8mb3 corrupts 4-byte characters silently
+# Checks migration ordering for MyISAM's 1000-byte index limit and stores a
+# 4-byte character after the utf8mb4 conversion.
 #
 #   ./script/rehearse-migrations.sh
 #
-# Schema only. No production rows are ever copied to this machine.
+# Copies table definitions and schema_migrations versions, not user records.
 #
 set -euo pipefail
 
 PROD_HOST="${PROD_HOST:-138.197.101.244}"
 DB_NAME="${DB_NAME:-blackbook_prod}"
-PORT="${PORT:-13306}"
-WORK_DB=blackbook_rehearsal
 
-SSH_OPTS=(-o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10)
+SSH_OPTS=(-o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10)
 MYSQL=(docker compose exec -T mysql mysql)
 
 step() { printf '\n\033[1m==> %s\033[0m\n' "$1"; }
 die()  { echo "ERROR: $1" >&2; exit 1; }
+[[ "$PROD_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]] || die "invalid PROD_HOST"
+[[ "$DB_NAME" =~ ^[a-zA-Z0-9_]+$ ]] || die "invalid DB_NAME"
+umask 077
+WORK_DIR=$(mktemp -d "${TMPDIR:-/tmp}/blackbook-rehearsal.XXXXXXXX")
+WORK_DB="blackbook_rehearsal_${WORK_DIR##*.}"
+trap 'rm -rf "$WORK_DIR"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 cd "$(dirname "$0")/.."
 
 step "MySQL 8.4"
 docker compose up -d mysql
+# Use this service's actual published port, not a separate override which
+# could send Rails migrations to a different MySQL instance.
+PORT=$(docker compose port mysql 3306 | awk -F: 'NR==1 {print $NF}')
+[[ "$PORT" =~ ^[0-9]+$ ]] || die "cannot determine compose MySQL's port"
 until docker compose exec -T mysql mysqladmin ping -h127.0.0.1 --silent >/dev/null 2>&1; do
   sleep 2
 done
 "${MYSQL[@]}" -N -e "SELECT CONCAT('running MySQL ', VERSION())"
 
 step "Production schema"
-# --no-data is what keeps this safe to run whenever you like. Table
-# definitions carry the MyISAM engine and utf8mb3 charset the migrations have
-# to cope with; the rows are irrelevant to that.
+# Definitions preserve the source engines and charsets. --skip-lock-tables
+# avoids explicit table locks; coordinate this read with any schema changes.
 ssh "${SSH_OPTS[@]}" "root@$PROD_HOST" \
-  "mysqldump --no-data --skip-comments '$DB_NAME'" > /tmp/rehearsal-schema.sql \
+  "mysqldump --no-data --skip-lock-tables --skip-comments '$DB_NAME'" > "$WORK_DIR/schema.sql" \
   || die "could not read schema from production"
 
 ssh "${SSH_OPTS[@]}" "root@$PROD_HOST" \
-  "mysqldump --no-create-info --skip-comments '$DB_NAME' schema_migrations" > /tmp/rehearsal-versions.sql \
+  "mysqldump --no-create-info --skip-lock-tables --skip-comments '$DB_NAME' schema_migrations" > "$WORK_DIR/versions.sql" \
   || die "could not read schema_migrations from production"
 
-"${MYSQL[@]}" -e "DROP DATABASE IF EXISTS $WORK_DB; CREATE DATABASE $WORK_DB"
-"${MYSQL[@]}" "$WORK_DB" < /tmp/rehearsal-schema.sql
-"${MYSQL[@]}" "$WORK_DB" < /tmp/rehearsal-versions.sql
+# CREATE fails on collision; never drop an existing database to make room.
+"${MYSQL[@]}" -e "CREATE DATABASE \`$WORK_DB\`"
+echo "Scratch database: $WORK_DB (retained for inspection, including on failure)"
+"${MYSQL[@]}" "$WORK_DB" < "$WORK_DIR/schema.sql"
+"${MYSQL[@]}" "$WORK_DB" < "$WORK_DIR/versions.sql"
 
 echo "loaded production's schema as it stands today:"
 "${MYSQL[@]}" -N "$WORK_DB" -e "
@@ -97,4 +106,7 @@ read -r bytes chars <<<"$("${MYSQL[@]}" -N "$WORK_DB" -e \
 echo "  4-byte characters store correctly ($bytes bytes, $chars characters)"
 
 echo
-echo "Rehearsal passed. Drop the database with: docker compose down -v"
+# Not `docker compose down -v`: that also deletes the development and test
+# databases living in the same volume.
+echo "Schema rehearsal passed, not a full-data restore or cutover rehearsal."
+echo "Drop only its database: docker compose exec -T mysql mysql -e 'DROP DATABASE \`$WORK_DB\`'"

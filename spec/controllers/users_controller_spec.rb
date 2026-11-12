@@ -121,6 +121,15 @@ describe UsersController do
       expect(response).to be_successful
     end
 
+    it 'skips notifications whose subject model is gone' do
+      tag = FactoryBot.create(:tag, user: default_user)
+      Notification.insert!({ subject_type: 'Comment', subject_id: '1', verb: 'created', # rubocop:disable Rails/SkipsModelValidations
+                             user_id: default_user.id })
+      get :show, params: { id: default_user.login }
+      expect(response).to be_successful
+      expect(assigns(:notifications).map(&:subject)).to contain_exactly(default_user, tag)
+    end
+
     it 'returns 404 if user does not exist' do
       expect(User.find_by(id: 666)).to be_nil
       expect do

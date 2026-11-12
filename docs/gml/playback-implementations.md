@@ -35,10 +35,6 @@ project's early years and are kept as the historical record. Links checked on
 - [DustTag](http://graffitianalysis.com/iphone/)
 - [FatTag Deluxe](http://fffff.at/fattag-deluxe-katsu-edition/)
 
-## iPhone (Objective-C)
-
-None at this time.
-
 ## Python
 
 - [GMLImageRenderer](http://github.com/myildirim/GMLImageRenderer)
