@@ -33,7 +33,7 @@ jobs:
       contents: read
       packages: write
     env:
-      BETA_HOST: ${{ vars.BETA_HOST || 'BETA_HOST_IP' }}
+      BETA_HOST: ${{ vars.BETA_HOST }}
 
     steps:
       - uses: actions/checkout@v7

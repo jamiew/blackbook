@@ -11,7 +11,7 @@ deploy_timeout: 120
 servers:
   web:
     hosts:
-      - <%= ENV.fetch("BETA_HOST", "BETA_HOST_IP") %>
+      - <%= ENV.fetch("BETA_HOST") %>
 
 ssh:
   user: root

@@ -81,7 +81,7 @@ jobs:
       packages: write
     env:
       # One place for the address, read by every step below and by deploy.yml.
-      BETA_HOST: ${{ vars.BETA_HOST || 'BETA_HOST_IP' }}
+      BETA_HOST: ${{ vars.BETA_HOST }}
 
     steps:
       - uses: actions/checkout@v7

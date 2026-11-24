@@ -14,7 +14,7 @@
 #
 set -euo pipefail
 
-PROD_HOST="${PROD_HOST:-PROD_HOST_IP}"
+PROD_HOST="${PROD_HOST:?set PROD_HOST (see .env.example)}"
 DB_NAME="${DB_NAME:-blackbook_prod}"
 
 SSH_OPTS=(-o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10)

@@ -17,7 +17,7 @@
 #
 set -euo pipefail
 
-PROD_HOST="${PROD_HOST:-PROD_HOST_IP}"
+PROD_HOST="${PROD_HOST:?set PROD_HOST (see .env.example)}"
 # No default. DigitalOcean recycles addresses, and this script drops a database
 # as root on whatever host it is pointed at.
 BETA_HOST="${BETA_HOST:-}"

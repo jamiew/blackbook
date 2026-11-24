@@ -129,11 +129,13 @@ else is the chrome around them, and it stays quiet.
 
 - Don't run migrations as a side effect of anything.
 - Don't `git add -A`; other agents may be working in the same tree.
-- Don't touch `PROD_VOLUME` or droplet `PROD_DROPLET`. That is live
-  production. Beta is `blackbook-beta` and `blackbook-beta-volume`, entirely
-  separate compute and storage.
+- Don't touch the production droplet or its block volume. Beta runs on its own
+  droplet and volume (the `blackbook-beta*` ones), entirely separate compute
+  and storage.
 - Don't commit secrets. `.kamal/secrets` holds references only; real values live
   in the gitignored `.kamal/secrets-common` or in Rails encrypted credentials.
+- Don't commit server IPs, production resource names or personal details. This
+  repo is public; hosts come from `.env` locally and repository variables in CI.
 
 ## More
 

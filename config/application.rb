@@ -43,7 +43,7 @@ module Blackbook4
     # Where operational alerts go: rate limit trips and exception notifications.
     # One place so the two cannot drift apart. Set ALERT_EMAIL to change it
     # without a code change; config/deploy.yml can supply it.
-    config.x.alert_recipients = ENV.fetch('ALERT_EMAIL', 'jamie@jamiedubs.com').split(',')
+    config.x.alert_recipients = ENV.fetch('ALERT_EMAIL', 'info@000000book.com').split(',')
 
     # The fallback sender. Production replaces it with the address SES has
     # actually verified, from encrypted credentials. It lives here rather than

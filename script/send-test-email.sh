@@ -3,7 +3,6 @@
 # Send one real email through the production mail settings, so you find out
 # whether SES accepts our sender here rather than from a silent bounce.
 #
-#   ./script/send-test-email.sh                   # to jamie@jamiedubs.com
 #   ./script/send-test-email.sh you@example.com
 #
 # Runs with RAILS_ENV=production because that is the only environment wired to
@@ -20,7 +19,7 @@
 
 set -euo pipefail
 
-TO="${1:-jamie@jamiedubs.com}"
+TO="${1:?Usage: ./script/send-test-email.sh recipient@example.com}"
 cd "$(dirname "$0")/.."
 
 if [ ! -f config/master.key ] && [ -z "${RAILS_MASTER_KEY:-}" ]; then

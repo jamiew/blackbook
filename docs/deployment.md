@@ -24,6 +24,9 @@ kamal console          # rails console
 kamal migrate          # run migrations, deliberately a separate step
 ```
 
+Kamal reads the beta address from `BETA_HOST`. CI uses the repository variable of
+the same name; export it locally (e.g. in `.env`) before running `kamal`.
+
 Migrations never run automatically: `bin/docker-entrypoint` does not run
 `db:prepare`. Before `kamal migrate`, check migration status, take a backup and
 follow the [migration rehearsal procedure](operations.md). The repository
